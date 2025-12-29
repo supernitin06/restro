@@ -4,6 +4,7 @@ import Dashboard from "../pages/Dashboard";
 import Layout from "../pages/Layout";
 import RestaurantManagement from "../pages/RestaurantManagement";
 import UserManagement from "../pages/Usermanagement";
+import AuthContainer from '../components/Auth/AuthContainer';
 
 const router = createBrowserRouter([
     {
@@ -13,6 +14,10 @@ const router = createBrowserRouter([
             {
                 index: true,
                 element: <Dashboard />,
+            },
+            {
+                path: "auth",
+                element: <AuthContainer />,
             },
             {
                 path: "users",
