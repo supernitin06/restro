@@ -1,0 +1,500 @@
+{
+    "restaurantManagement": {
+        "restaurantList": [{
+                "restaurantId": "RES001",
+                "status": "Pending",
+                "restaurantDetail": {
+                    "name": "Spice Garden",
+                    "rating": 4.3,
+                    "tables": 25,
+                    "gst": { "gstNumber": "27GST0001", "gstVerified": false },
+                    "basicInfo": {
+                        "ownerName": "Rahul Sharma",
+                        "contactNumber": "9876543210",
+                        "email": "spicegarden@gmail.com"
+                    },
+                    "bankDetails": {
+                        "accountHolderName": "Spice Garden",
+                        "accountNumber": "1111111111",
+                        "ifscCode": "SBIN000111",
+                        "bankName": "SBI"
+                    },
+                    "address": { "fullAddress": "MG Road, Mumbai" },
+                    "commissionPercentage": 12
+                },
+                "actions": { "canApprove": true, "canSuspend": true }
+            },
+            {
+                "restaurantId": "RES002",
+                "status": "Approved",
+                "restaurantDetail": {
+                    "name": "Food Villa",
+                    "rating": 4.6,
+                    "tables": 40,
+                    "gst": { "gstNumber": "29GST0002", "gstVerified": true },
+                    "basicInfo": {
+                        "ownerName": "Amit Verma",
+                        "contactNumber": "9123456789",
+                        "email": "foodvilla@gmail.com"
+                    },
+                    "bankDetails": {
+                        "accountHolderName": "Food Villa",
+                        "accountNumber": "2222222222",
+                        "ifscCode": "HDFC000222",
+                        "bankName": "HDFC"
+                    },
+                    "address": { "fullAddress": "Vijay Nagar, Indore" },
+                    "commissionPercentage": 15
+                },
+                "actions": { "canApprove": false, "canSuspend": true }
+            },
+            {
+                "restaurantId": "RES003",
+                "status": "Suspended",
+                "restaurantDetail": {
+                    "name": "Urban Tadka",
+                    "rating": 3.9,
+                    "tables": 30,
+                    "gst": { "gstNumber": "07GST0003", "gstVerified": true },
+                    "basicInfo": {
+                        "ownerName": "Neha Gupta",
+                        "contactNumber": "9012345678",
+                        "email": "urbantadka@gmail.com"
+                    },
+                    "bankDetails": {
+                        "accountHolderName": "Urban Tadka",
+                        "accountNumber": "3333333333",
+                        "ifscCode": "ICIC000333",
+                        "bankName": "ICICI"
+                    },
+                    "address": { "fullAddress": "Karol Bagh, Delhi" },
+                    "commissionPercentage": 10
+                },
+                "actions": { "canApprove": true, "canSuspend": false }
+            },
+            {
+                "restaurantId": "RES004",
+                "status": "Approved",
+                "restaurantDetail": {
+                    "name": "Royal Biryani",
+                    "rating": 4.8,
+                    "tables": 50,
+                    "gst": { "gstNumber": "36GST0004", "gstVerified": true },
+                    "basicInfo": {
+                        "ownerName": "Imran Khan",
+                        "contactNumber": "9988776655",
+                        "email": "royalbiryani@gmail.com"
+                    },
+                    "bankDetails": {
+                        "accountHolderName": "Royal Biryani",
+                        "accountNumber": "4444444444",
+                        "ifscCode": "AXIS000444",
+                        "bankName": "Axis"
+                    },
+                    "address": { "fullAddress": "Banjara Hills, Hyderabad" },
+                    "commissionPercentage": 18
+                },
+                "actions": { "canApprove": false, "canSuspend": true }
+            },
+            {
+                "restaurantId": "RES005",
+                "status": "Pending",
+                "restaurantDetail": {
+                    "name": "Cafe Delight",
+                    "rating": 4.1,
+                    "tables": 18,
+                    "gst": { "gstNumber": "19GST0005", "gstVerified": false },
+                    "basicInfo": {
+                        "ownerName": "Pooja Mehta",
+                        "contactNumber": "9090909090",
+                        "email": "cafedelight@gmail.com"
+                    },
+                    "bankDetails": {
+                        "accountHolderName": "Cafe Delight",
+                        "accountNumber": "5555555555",
+                        "ifscCode": "KOTAK000555",
+                        "bankName": "Kotak"
+                    },
+                    "address": { "fullAddress": "Salt Lake, Kolkata" },
+                    "commissionPercentage": 14
+                },
+                "actions": { "canApprove": true, "canSuspend": true }
+            },
+
+            {
+                "restaurantId": "RES006",
+                "status": "Approved",
+                "restaurantDetail": {
+                    "name": "Punjabi Dhaba",
+                    "rating": 4.5,
+                    "tables": 35,
+                    "gst": { "gstNumber": "03GST0006", "gstVerified": true },
+                    "basicInfo": {
+                        "ownerName": "Gurpreet Singh",
+                        "contactNumber": "8888777766",
+                        "email": "punjabidhaba@gmail.com"
+                    },
+                    "bankDetails": {
+                        "accountHolderName": "Punjabi Dhaba",
+                        "accountNumber": "6666666666",
+                        "ifscCode": "PNB000666",
+                        "bankName": "PNB"
+                    },
+                    "address": { "fullAddress": "Sector 17, Chandigarh" },
+                    "commissionPercentage": 16
+                },
+                "actions": { "canApprove": false, "canSuspend": true }
+            },
+
+            {
+                "restaurantId": "RES007",
+                "status": "Pending",
+                "restaurantDetail": {
+                    "name": "South Spice",
+                    "rating": 4.2,
+                    "tables": 28,
+                    "gst": { "gstNumber": "33GST0007", "gstVerified": false },
+                    "basicInfo": {
+                        "ownerName": "Ramesh Iyer",
+                        "contactNumber": "8899001122",
+                        "email": "southspice@gmail.com"
+                    },
+                    "bankDetails": {
+                        "accountHolderName": "South Spice",
+                        "accountNumber": "7777777777",
+                        "ifscCode": "IDBI000777",
+                        "bankName": "IDBI"
+                    },
+                    "address": { "fullAddress": "T Nagar, Chennai" },
+                    "commissionPercentage": 13
+                },
+                "actions": { "canApprove": true, "canSuspend": true }
+            },
+
+            {
+                "restaurantId": "RES008",
+                "status": "Approved",
+                "restaurantDetail": {
+                    "name": "The Hungry Hub",
+                    "rating": 4.4,
+                    "tables": 32,
+                    "gst": { "gstNumber": "09GST0008", "gstVerified": true },
+                    "basicInfo": {
+                        "ownerName": "Ankit Jain",
+                        "contactNumber": "9870011223",
+                        "email": "hungryhub@gmail.com"
+                    },
+                    "bankDetails": {
+                        "accountHolderName": "Hungry Hub",
+                        "accountNumber": "8888888888",
+                        "ifscCode": "YESB000888",
+                        "bankName": "YES Bank"
+                    },
+                    "address": { "fullAddress": "Alambagh, Lucknow" },
+                    "commissionPercentage": 15
+                },
+                "actions": { "canApprove": false, "canSuspend": true }
+            },
+
+            {
+                "restaurantId": "RES009",
+                "status": "Suspended",
+                "restaurantDetail": {
+                    "name": "Street Bites",
+                    "rating": 3.6,
+                    "tables": 15,
+                    "gst": { "gstNumber": "24GST0009", "gstVerified": true },
+                    "basicInfo": {
+                        "ownerName": "Kunal Patel",
+                        "contactNumber": "9988112233",
+                        "email": "streetbites@gmail.com"
+                    },
+                    "bankDetails": {
+                        "accountHolderName": "Street Bites",
+                        "accountNumber": "9999999999",
+                        "ifscCode": "BOB000999",
+                        "bankName": "Bank of Baroda"
+                    },
+                    "address": { "fullAddress": "CG Road, Ahmedabad" },
+                    "commissionPercentage": 9
+                },
+                "actions": { "canApprove": true, "canSuspend": false }
+            },
+
+            {
+                "restaurantId": "RES010",
+                "status": "Approved",
+                "restaurantDetail": {
+                    "name": "Ocean View",
+                    "rating": 4.7,
+                    "tables": 45,
+                    "gst": { "gstNumber": "32GST0010", "gstVerified": true },
+                    "basicInfo": {
+                        "ownerName": "Joseph Thomas",
+                        "contactNumber": "8899776655",
+                        "email": "oceanview@gmail.com"
+                    },
+                    "bankDetails": {
+                        "accountHolderName": "Ocean View",
+                        "accountNumber": "1010101010",
+                        "ifscCode": "FED000101",
+                        "bankName": "Federal Bank"
+                    },
+                    "address": { "fullAddress": "Marine Drive, Kochi" },
+                    "commissionPercentage": 17
+                },
+                "actions": { "canApprove": false, "canSuspend": true }
+            },
+
+            {
+                "restaurantId": "RES011",
+                "status": "Pending",
+                "restaurantDetail": {
+                    "name": "Taste Factory",
+                    "rating": 4.0,
+                    "tables": 22,
+                    "gst": { "gstNumber": "08GST0011", "gstVerified": false },
+                    "basicInfo": {
+                        "ownerName": "Manish Joshi",
+                        "contactNumber": "9911223344",
+                        "email": "tastefactory@gmail.com"
+                    },
+                    "bankDetails": {
+                        "accountHolderName": "Taste Factory",
+                        "accountNumber": "1111222233",
+                        "ifscCode": "SBI000111",
+                        "bankName": "SBI"
+                    },
+                    "address": { "fullAddress": "Vaishali Nagar, Jaipur" },
+                    "commissionPercentage": 14
+                },
+                "actions": { "canApprove": true, "canSuspend": true }
+            },
+
+            {
+                "restaurantId": "RES012",
+                "status": "Approved",
+                "restaurantDetail": {
+                    "name": "Grill House",
+                    "rating": 4.5,
+                    "tables": 38,
+                    "gst": { "gstNumber": "06GST0012", "gstVerified": true },
+                    "basicInfo": {
+                        "ownerName": "Arjun Malik",
+                        "contactNumber": "9898989898",
+                        "email": "grillhouse@gmail.com"
+                    },
+                    "bankDetails": {
+                        "accountHolderName": "Grill House",
+                        "accountNumber": "1212121212",
+                        "ifscCode": "ICIC000121",
+                        "bankName": "ICICI"
+                    },
+                    "address": { "fullAddress": "Sector 29, Gurgaon" },
+                    "commissionPercentage": 16
+                },
+                "actions": { "canApprove": false, "canSuspend": true }
+            },
+
+            {
+                "restaurantId": "RES013",
+                "status": "Pending",
+                "restaurantDetail": {
+                    "name": "Veggie Love",
+                    "rating": 4.2,
+                    "tables": 20,
+                    "gst": { "gstNumber": "23GST0013", "gstVerified": false },
+                    "basicInfo": {
+                        "ownerName": "Sunita Jain",
+                        "contactNumber": "9000011111",
+                        "email": "veggielove@gmail.com"
+                    },
+                    "bankDetails": {
+                        "accountHolderName": "Veggie Love",
+                        "accountNumber": "1313131313",
+                        "ifscCode": "BOI000131",
+                        "bankName": "BOI"
+                    },
+                    "address": { "fullAddress": "MP Nagar, Bhopal" },
+                    "commissionPercentage": 11
+                },
+                "actions": { "canApprove": true, "canSuspend": true }
+            },
+
+            {
+                "restaurantId": "RES014",
+                "status": "Approved",
+                "restaurantDetail": {
+                    "name": "Chai Adda",
+                    "rating": 4.1,
+                    "tables": 12,
+                    "gst": { "gstNumber": "10GST0014", "gstVerified": true },
+                    "basicInfo": {
+                        "ownerName": "Rohit Kumar",
+                        "contactNumber": "9333344444",
+                        "email": "chaiadda@gmail.com"
+                    },
+                    "bankDetails": {
+                        "accountHolderName": "Chai Adda",
+                        "accountNumber": "1414141414",
+                        "ifscCode": "PNB000141",
+                        "bankName": "PNB"
+                    },
+                    "address": { "fullAddress": "Fraser Road, Patna" },
+                    "commissionPercentage": 10
+                },
+                "actions": { "canApprove": false, "canSuspend": true }
+            },
+
+            {
+                "restaurantId": "RES015",
+                "status": "Suspended",
+                "restaurantDetail": {
+                    "name": "BBQ Nation Local",
+                    "rating": 3.8,
+                    "tables": 48,
+                    "gst": { "gstNumber": "27GST0015", "gstVerified": true },
+                    "basicInfo": {
+                        "ownerName": "Vikas Mehra",
+                        "contactNumber": "9555566666",
+                        "email": "bbqlocal@gmail.com"
+                    },
+                    "bankDetails": {
+                        "accountHolderName": "BBQ Nation Local",
+                        "accountNumber": "1515151515",
+                        "ifscCode": "AXIS000151",
+                        "bankName": "Axis"
+                    },
+                    "address": { "fullAddress": "Powai, Mumbai" },
+                    "commissionPercentage": 20
+                },
+                "actions": { "canApprove": true, "canSuspend": false }
+            },
+
+            {
+                "restaurantId": "RES016",
+                "status": "Approved",
+                "restaurantDetail": {
+                    "name": "Food Street",
+                    "rating": 4.4,
+                    "tables": 34,
+                    "gst": { "gstNumber": "18GST0016", "gstVerified": true },
+                    "basicInfo": {
+                        "ownerName": "Anil Das",
+                        "contactNumber": "9777788888",
+                        "email": "foodstreet@gmail.com"
+                    },
+                    "bankDetails": {
+                        "accountHolderName": "Food Street",
+                        "accountNumber": "1616161616",
+                        "ifscCode": "UCO000161",
+                        "bankName": "UCO Bank"
+                    },
+                    "address": { "fullAddress": "GS Road, Guwahati" },
+                    "commissionPercentage": 14
+                },
+                "actions": { "canApprove": false, "canSuspend": true }
+            },
+
+            {
+                "restaurantId": "RES017",
+                "status": "Pending",
+                "restaurantDetail": {
+                    "name": "Flavours",
+                    "rating": 4.0,
+                    "tables": 26,
+                    "gst": { "gstNumber": "21GST0017", "gstVerified": false },
+                    "basicInfo": {
+                        "ownerName": "Debashish Rout",
+                        "contactNumber": "9666677777",
+                        "email": "flavours@gmail.com"
+                    },
+                    "bankDetails": {
+                        "accountHolderName": "Flavours",
+                        "accountNumber": "1717171717",
+                        "ifscCode": "CAN000171",
+                        "bankName": "Canara"
+                    },
+                    "address": { "fullAddress": "Jaydev Vihar, Bhubaneswar" },
+                    "commissionPercentage": 12
+                },
+                "actions": { "canApprove": true, "canSuspend": true }
+            },
+
+            {
+                "restaurantId": "RES018",
+                "status": "Approved",
+                "restaurantDetail": {
+                    "name": "Zayka Junction",
+                    "rating": 4.6,
+                    "tables": 36,
+                    "gst": { "gstNumber": "20GST0018", "gstVerified": true },
+                    "basicInfo": {
+                        "ownerName": "Sanjay Singh",
+                        "contactNumber": "9444455555",
+                        "email": "zayka@gmail.com"
+                    },
+                    "bankDetails": {
+                        "accountHolderName": "Zayka Junction",
+                        "accountNumber": "1818181818",
+                        "ifscCode": "BOB000181",
+                        "bankName": "BOB"
+                    },
+                    "address": { "fullAddress": "Ranchi Main Road, Ranchi" },
+                    "commissionPercentage": 15
+                },
+                "actions": { "canApprove": false, "canSuspend": true }
+            },
+
+            {
+                "restaurantId": "RES019",
+                "status": "Pending",
+                "restaurantDetail": {
+                    "name": "Daily Dine",
+                    "rating": 3.9,
+                    "tables": 19,
+                    "gst": { "gstNumber": "22GST0019", "gstVerified": false },
+                    "basicInfo": {
+                        "ownerName": "Ravi Kumar",
+                        "contactNumber": "9888899999",
+                        "email": "dailydine@gmail.com"
+                    },
+                    "bankDetails": {
+                        "accountHolderName": "Daily Dine",
+                        "accountNumber": "1919191919",
+                        "ifscCode": "SBI000191",
+                        "bankName": "SBI"
+                    },
+                    "address": { "fullAddress": "Raipur City Center, Raipur" },
+                    "commissionPercentage": 11
+                },
+                "actions": { "canApprove": true, "canSuspend": true }
+            },
+
+            {
+                "restaurantId": "RES020",
+                "status": "Approved",
+                "restaurantDetail": {
+                    "name": "Midnight Meals",
+                    "rating": 4.5,
+                    "tables": 27,
+                    "gst": { "gstNumber": "27GST0020", "gstVerified": true },
+                    "basicInfo": {
+                        "ownerName": "Nikhil Patil",
+                        "contactNumber": "9000090000",
+                        "email": "midnightmeals@gmail.com"
+                    },
+                    "bankDetails": {
+                        "accountHolderName": "Midnight Meals",
+                        "accountNumber": "2020202020",
+                        "ifscCode": "IDFC000202",
+                        "bankName": "IDFC"
+                    },
+                    "address": { "fullAddress": "Wakad, Pune" },
+                    "commissionPercentage": 16
+                },
+                "actions": { "canApprove": false, "canSuspend": true }
+            }
+        ]
+    }
+}
