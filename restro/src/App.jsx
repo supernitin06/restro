@@ -1,9 +1,13 @@
+// src/App.js
 import React from 'react';
+import AuthContainer from './components/auth/AuthContainer';
 
 function App() {
   return (
-    <div className='bg-red-500 p-10'>Hello</div>
-  )
+    <div className="App">
+      <AuthContainer />
+    </div>
+  );
 }
 
 export default App;
