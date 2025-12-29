@@ -5,10 +5,10 @@ import "./App.css"
 function App() {
   return (
     <div>
-    <AppRouter />
-   <div className=''>
-    hello
-   </div>
+      <AppRouter />
+      <div className='text-black text-3xl'>
+        hello
+      </div>
     </div>
   )
 }

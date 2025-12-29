@@ -2,7 +2,7 @@ import React from 'react'
 
 const Usermanagement = () => {
   return (
-    <div>Usermanagement</div>
+    <div className="bg-black">UserManagement</div>
   )
 }
 
