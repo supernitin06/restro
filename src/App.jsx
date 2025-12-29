@@ -4,11 +4,8 @@ import "./App.css"
 
 function App() {
   return (
-    <div>
+    <div className=''>
       <AppRouter />
-      <div className='text-black text-3xl'>
-        hello
-      </div>
     </div>
   )
 
