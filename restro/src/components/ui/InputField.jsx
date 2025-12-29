@@ -26,7 +26,7 @@ const InputField = ({
         value={value}
         onChange={onChange}
         className={`
-          w-full px-4 py-3 border ${error ? 'border-red-500' : 'border-gray-300'} 
+           input w-full px-4 py-3 border ${error ? 'border-red-500' : 'border-gray-300'} 
           rounded-lg focus:outline-none focus:ring-2 
           ${error ? 'focus:ring-red-500' : 'focus:ring-purple-500'} 
           focus:border-transparent transition duration-300
