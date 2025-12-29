@@ -43,6 +43,9 @@
   border-radius: 0.5rem;
   padding: 1rem;
 }
+.color-primary {
+  background-color: #eb2528; /* blue-600 */
+}
 
 /* Inputs */
 .input {

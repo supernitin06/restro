@@ -6,9 +6,9 @@ function App() {
   return (
     <div>
       <AppRouter />
-      <div className='text-black text-3xl'>
+      {/* <div className='text-black text-3xl'>
         hello
-      </div>
+      </div> */}
     </div>
   )
 }

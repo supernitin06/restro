@@ -1,46 +1,57 @@
 [
   {
     "name": "Dashboard",
-    "path": "/dashboard"
+    "path": "/dashboard",
+    "icon": "🔄"
   },
   {
     "name": "Users",
-    "path": "/users"
+    "path": "/users",
+    "icon": "👥"
   },
   {
     "name": "Restaurants",
-    "path": "/restaurants"
+    "path": "/restaurants",
+    "icon": "🍽️"
   },
   {
     "name": "Delivery Partners",
-    "path": "/delivery-partners"
+    "path": "/delivery-partners",
+    "icon": "🛵"
   },
   {
     "name": "Orders",
-    "path": "/orders"
+    "path": "/orders",
+    "icon": "📋"
   },
   {
     "name": "Payments",
-    "path": "/payments"
+    "path": "/payments",
+    "icon": "💳"
   },
   {
     "name": "Coupons",
-    "path": "/coupons"
+    "path": "/coupons",
+    "icon": "🎟️"
   },
   {
     "name": "Reports",
-    "path": "/reports"
+    "path": "/reports",
+    "icon": "📊"
   },
   {
     "name": "Support",
-    "path": "/support"
+    "path": "/support",
+    "icon": "🎧"
   },
   {
     "name": "Sub-Admins",
-    "path": "/sub-admins"
+    "path": "/sub-admins",
+    "icon": "👤"
   },
   {
     "name": "Settings",
-    "path": "/settings"
+    "path": "/settings",
+    "icon": "⚙️"
   }
 ]
