@@ -6,14 +6,16 @@ import {
   UtensilsCrossed, 
   BarChart3, 
   ChevronDown,
-  Menu,
-  ChevronRight
+  ChevronLeft,
+  ChevronRight,
+  Circle
 } from 'lucide-react';
 
 const Sidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isOrdersOpen, setIsOrdersOpen] = useState(false);
   const [activeMenu, setActiveMenu] = useState('dashboard');
+  const [hoveredMenu, setHoveredMenu] = useState(null);
 
   const menuItems = [
     {
@@ -65,106 +67,141 @@ const Sidebar = () => {
   };
 
   return (
-    <div className={`bg-[#2563eb] min-h-screen text-[#2563eb] transition-all duration-300 ease-in-out ${isCollapsed ? 'w-29' : 'w-65'} relative`}>
+    <div className={`bg-gradient-to-b from-[#2563eb] to-[#1e40af] min-h-screen text-white transition-all duration-300 ease-in-out ${isCollapsed ? 'w-20' : 'w-64'} relative shadow-2xl`}>
       {/* Header with Logo */}
-      <div className="relative border-b border-white/20 py-4 px-4">
+      <div className="relative border-b border-white/10 py-5 px-4">
         <div className="flex items-center justify-between">
           {!isCollapsed && (
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-lg">
+              <div className="w-11 h-11 bg-gradient-to-br from-white to-gray-100 rounded-xl flex items-center justify-center shadow-lg transform transition-transform hover:scale-105">
                 <UtensilsCrossed className="w-6 h-6 text-[#2563eb]" />
               </div>
               <span className="text-2xl font-bold tracking-wide text-white">Restro</span>
             </div>
           )}
           {isCollapsed && (
-            <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center mx-auto shadow-lg">
+            <div className="w-11 h-11 bg-gradient-to-br from-white to-gray-100 rounded-xl flex items-center justify-center mx-auto shadow-lg transform transition-transform hover:scale-105">
               <UtensilsCrossed className="w-6 h-6 text-[#2563eb]" />
             </div>
           )}
-          <button 
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className="text-white text-2xl p-1 hover:bg-white hover:bg-opacity-20 rounded transition-colors"
-          >
-            <Menu className="w-6 h-6" />
-          </button>
         </div>
+        
+        {/* Toggle Button - Positioned absolutely */}
+        <button 
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-white text-[#2563eb] rounded-full shadow-lg flex items-center justify-center hover:shadow-xl hover:scale-110 transition-all duration-200 z-20"
+          title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        >
+          {isCollapsed ? (
+            <ChevronRight className="w-4 h-4" />
+          ) : (
+            <ChevronLeft className="w-4 h-4" />
+          )}
+        </button>
       </div>
 
       {/* Menu Items */}
-      <nav className="py-6 relative">
-        {/* White curved background for Dashboard */}
-        {activeMenu === 'dashboard' && !isCollapsed && (
-          <div className="absolute top-6 left-0 right-0 bg-white rounded-r-[60px] h-14 z-0"></div>
-        )}
-        
-        {menuItems.map((item) => {
+      <nav className="py-6 px-3">
+        {menuItems.map((item, index) => {
           const IconComponent = item.icon;
+          const isActive = activeMenu === item.id;
+          const isHovered = hoveredMenu === item.id;
+          
           return (
-            <div key={item.id}>
+            <div key={item.id} className="mb-1">
               {/* Main Menu Item */}
               <div
                 onClick={() => handleMenuClick(item.id)}
+                onMouseEnter={() => setHoveredMenu(item.id)}
+                onMouseLeave={() => setHoveredMenu(null)}
                 className={`
-                  flex items-center justify-between px-5 py-3.5 mx-4 cursor-pointer transition-all duration-300 relative z-10
-                  ${item.id === 'dashboard' && activeMenu === 'dashboard' 
-                    ? 'text-[#ec4899] font-semibold' 
-                    : activeMenu === item.id
-                    ? 'bg-white text-[#2563eb] font-semibold shadow-lg rounded-lg' 
-                    : 'text-white hover:bg-[#1d4ed8] hover:bg-opacity-10 rounded-lg'
+                  flex items-center justify-between px-4 py-3.5 cursor-pointer transition-all duration-300 relative group
+                  ${isActive
+                    ? 'bg-white text-[#2563eb] shadow-lg rounded-xl scale-[1.02] font-semibold' 
+                    : 'text-white rounded-xl hover:bg-white/10'
                   }
-                  ${item.id !== 'dashboard' ? 'my-1' : ''}
+                  ${isCollapsed ? 'justify-center' : ''}
                 `}
                 title={isCollapsed ? item.label : ''}
               >
-                <div className="flex items-center gap-3">
-                  <IconComponent className="w-5 h-5" />
-                  {!isCollapsed && <span className="text-sm">{item.label}</span>}
+                {/* Active Indicator */}
+                {isActive && (
+                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-[#ec4899] rounded-r-full"></div>
+                )}
+                
+                <div className="flex items-center gap-3 flex-1">
+                  <div className={`
+                    relative transition-all duration-300
+                    ${isActive ? 'scale-110' : ''}
+                    ${isHovered && !isActive ? 'scale-105' : ''}
+                  `}>
+                    <IconComponent className="w-5 h-5" />
+                    {item.badge && isCollapsed && (
+                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-[#ec4899] rounded-full border-2 border-[#2563eb]"></div>
+                    )}
+                  </div>
+                  {!isCollapsed && (
+                    <span className={`text-sm transition-all duration-300 ${isActive ? 'font-semibold' : 'font-medium'}`}>
+                      {item.label}
+                    </span>
+                  )}
                 </div>
 
                 {!isCollapsed && (
                   <div className="flex items-center gap-2">
                     {item.badge && (
                       <span className={`
-                        px-2 py-0.5 rounded-xl text-xs font-semibold
-                        ${activeMenu === item.id 
-                          ? 'bg-pink-600 text-white' 
-                          : 'bg-white bg-opacity-20 text-white'
+                        px-2.5 py-0.5 rounded-full text-xs font-bold transition-all duration-300
+                        ${isActive
+                          ? 'bg-gradient-to-r from-[#ec4899] to-[#db2777] text-white shadow-md' 
+                          : 'bg-white/20 text-white'
                         }
+                        ${isHovered && !isActive ? 'bg-white/30' : ''}
                       `}>
                         {item.badge}
                       </span>
                     )}
                     {item.hasArrow && (
-                      <ChevronRight className="w-4 h-4" />
+                      <ChevronRight className={`
+                        w-4 h-4 transition-all duration-300
+                        ${isHovered ? 'translate-x-1' : ''}
+                      `} />
                     )}
                     {item.hasDropdown && (
                       <ChevronDown 
                         className={`
-                          w-4 h-4 transition-transform duration-300
+                          w-4 h-4 transition-all duration-300
                           ${isOrdersOpen ? 'rotate-180' : 'rotate-0'}
                         `}
                       />
                     )}
                   </div>
                 )}
+                
+                {/* Hover Effect Border */}
+                {!isActive && isHovered && (
+                  <div className="absolute inset-0 rounded-xl border-2 border-white/20 pointer-events-none"></div>
+                )}
               </div>
 
               {/* Dropdown Submenu for Orders */}
               {item.hasDropdown && !isCollapsed && (
                 <div className={`
-                  overflow-hidden transition-all duration-400 ease-in-out pl-12
-                  ${isOrdersOpen ? 'max-h-48 mt-1' : 'max-h-0'}
+                  overflow-hidden transition-all duration-300 ease-in-out
+                  ${isOrdersOpen ? 'max-h-48 mt-2 opacity-100' : 'max-h-0 opacity-0'}
                 `}>
-                  {item.subItems.map((subItem) => (
+                  {item.subItems.map((subItem, subIndex) => (
                     <div
                       key={subItem.id}
-                      className="px-4 py-2.5 text-white text-opacity-90 cursor-pointer text-sm 
-                               transition-all duration-200 rounded-md my-0.5 mx-4
-                               hover:bg-[#1d4ed8] hover:bg-opacity-10 hover:pl-5 flex items-center gap-2"
+                      className="pl-12 pr-4 py-2.5 text-white/90 cursor-pointer text-sm 
+                               transition-all duration-200 rounded-lg mx-1 my-0.5
+                               hover:bg-white/10 hover:pl-14 hover:text-white flex items-center gap-2.5 group"
+                      style={{
+                        transitionDelay: isOrdersOpen ? `${subIndex * 50}ms` : '0ms'
+                      }}
                     >
-                      <div className="w-1.5 h-1.5 rounded-full bg-white bg-opacity-60"></div>
-                      {subItem.label}
+                      <Circle className="w-1.5 h-1.5 fill-current transition-all duration-200 group-hover:scale-150" />
+                      <span className="font-medium">{subItem.label}</span>
                     </div>
                   ))}
                 </div>
@@ -173,6 +210,17 @@ const Sidebar = () => {
           );
         })}
       </nav>
+
+      {/* Collapsed State Tooltip */}
+      {isCollapsed && hoveredMenu && (
+        <div className="fixed left-20 bg-gray-900 text-white px-3 py-2 rounded-lg shadow-xl text-sm font-medium pointer-events-none z-50"
+             style={{
+               top: `${document.querySelector(`[title="${menuItems.find(m => m.id === hoveredMenu)?.label}"]`)?.getBoundingClientRect().top}px`
+             }}>
+          {menuItems.find(m => m.id === hoveredMenu)?.label}
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 w-2 h-2 bg-gray-900 rotate-45"></div>
+        </div>
+      )}
     </div>
   );
 };
