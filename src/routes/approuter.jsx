@@ -1,5 +1,5 @@
 import React from "react";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter } from "react-router-dom";
 
 import Dashboard from "../pages/Dashboard";
 import Layout from "../pages/Layout";
@@ -8,7 +8,7 @@ import UserManagement from "../pages/Usermanagement";
 import DeliverySettings from "../pages/DeliverySettings";
 import AuthContainer from "../components/Auth/AuthContainer";
 
-const router = createBrowserRouter(
+const AppRouter = createBrowserRouter(
   [
     // 🔐 Auth Routes
     {
@@ -47,9 +47,5 @@ const router = createBrowserRouter(
     },
   }
 );
-
-const AppRouter = () => {
-  return <RouterProvider router={router} />;
-};
 
 export default AppRouter;
