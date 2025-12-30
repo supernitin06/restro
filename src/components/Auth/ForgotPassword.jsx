@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FaArrowLeft } from 'react-icons/fa';
+import { FaArrowLeft, FaEnvelope } from 'react-icons/fa';
 import AuthLayout from '../auth/AuthLayout';
 import InputField from '../ui/InputField';
 import Button from '../ui/Button';
@@ -12,7 +12,7 @@ const ForgotPasswordPage = ({ onBackToLogin }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     setLoading(true);
-    
+
     setTimeout(() => {
       if (email) {
         setMessage(`✅ Password reset link sent to ${email}. Check your email.`);
@@ -53,6 +53,7 @@ const ForgotPasswordPage = ({ onBackToLogin }) => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
+          startIcon={<FaEnvelope />}
         />
 
         <Button

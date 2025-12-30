@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { FaStore, FaSearch, FaGlobe, FaCog } from 'react-icons/fa';
+import InputField from '../ui/InputField';
 
 const RestaurantOverride = () => {
     // Mock Data
@@ -23,39 +24,38 @@ const RestaurantOverride = () => {
     );
 
     return (
-        <div className="bg-white h-[300px] max-h-[450px] rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col h-full">
-            <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gradient-to-r from-orange-50 to-white">
-                <div className="flex items-center gap-3">
-                    <div className="p-2 bg-orange-100 rounded-lg text-orange-600">
-                        <FaStore />
+        <div className="bg-white dark:bg-gray-800 h-[400px] rounded-3xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden flex flex-col group hover:scale-[1.01] transition-transform duration-300">
+            <div className="px-8 py-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gradient-to-r from-orange-50 to-white dark:from-gray-800 dark:to-gray-800">
+                <div className="flex items-center gap-4">
+                    <div className="p-3 bg-orange-100 dark:bg-orange-900/30 rounded-2xl text-orange-600 dark:text-orange-400 shadow-inner">
+                        <FaStore className="text-xl" />
                     </div>
                     <div>
-                        <h3 className="font-bold text-gray-800">Restaurant Overrides</h3>
-                        <p className="text-xs text-gray-500">Set specific rules per outlet</p>
+                        <h3 className="font-bold text-lg text-gray-900 dark:text-white">Restaurant Overrides</h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Set specific rules per outlet</p>
                     </div>
                 </div>
             </div>
 
-            <div className="p-6 flex-1 flex flex-col gap-4">
+            <div className="p-8 flex-1 flex flex-col gap-6">
                 {/* Search */}
-                <div className="relative">
-                    <FaSearch className="absolute left-3 top-3 text-gray-400" />
-                    <input
+                <div>
+                    <InputField
                         type="text"
-                        placeholder="Search Restaurants..."
+                        placeholder="Search for a restaurant..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none text-sm bg-gray-50"
+                        startIcon={<FaSearch />}
                     />
                 </div>
 
                 {/* List */}
-                <div className="overflow-y-auto max-h-[300px] border border-gray-100 rounded-lg divide-y divide-gray-100">
+                <div className="overflow-y-auto pr-2 border border-gray-100 dark:border-gray-700 rounded-2xl divide-y divide-gray-100 dark:divide-gray-700 custom-scrollbar bg-gray-50 dark:bg-gray-900/20">
                     {filteredRestaurants.map((restaurant) => (
-                        <div key={restaurant.id} className="p-3 flex justify-between items-center hover:bg-gray-50 transition-colors">
-                            <div className="flex flex-col">
-                                <span className="font-semibold text-gray-700">{restaurant.name}</span>
-                                <span className="text-xs text-gray-400 flex items-center gap-1">
+                        <div key={restaurant.id} className="p-4 flex justify-between items-center hover:bg-white dark:hover:bg-gray-700/50 transition-colors">
+                            <div className="flex flex-col gap-1">
+                                <span className="font-bold text-gray-700 dark:text-gray-200">{restaurant.name}</span>
+                                <span className={`text-xs flex items-center gap-1.5 font-medium ${restaurant.mode === 'global' ? 'text-gray-400 dark:text-gray-500' : 'text-orange-500 dark:text-orange-400'}`}>
                                     {restaurant.mode === 'global' ? (
                                         <><FaGlobe size={10} /> Using Global Rules</>
                                     ) : (
@@ -67,17 +67,17 @@ const RestaurantOverride = () => {
                             {/* Toggle */}
                             <button
                                 onClick={() => toggleMode(restaurant.id)}
-                                className={`px-3 py-1 rounded-full text-xs font-semibold border transition-all ${restaurant.mode === 'global'
-                                        ? 'bg-gray-100 text-gray-500 border-gray-200 hover:bg-gray-200'
-                                        : 'bg-orange-50 text-orange-600 border-orange-200 hover:bg-orange-100'
+                                className={`px-4 py-2 rounded-lg text-xs font-bold border transition-all shadow-sm ${restaurant.mode === 'global'
+                                    ? 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+                                    : 'bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 border-orange-200 dark:border-orange-800 hover:bg-orange-100 dark:hover:bg-orange-900/30'
                                     }`}
                             >
-                                {restaurant.mode === 'global' ? 'Switch to Custom' : 'Manage Custom Rules'}
+                                {restaurant.mode === 'global' ? 'Customize' : 'Manage Rules'}
                             </button>
                         </div>
                     ))}
                     {filteredRestaurants.length === 0 && (
-                        <div className="p-4 text-center text-gray-400 text-sm">No restaurants found.</div>
+                        <div className="p-8 text-center text-gray-400 dark:text-gray-500 text-sm font-medium">No restaurants found.</div>
                     )}
                 </div>
             </div>
