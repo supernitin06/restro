@@ -1,6 +1,18 @@
 import React, { useState } from 'react';
 import { Outlet, NavLink } from 'react-router-dom';
-import { FaHome, FaUsers, FaStore, FaTruck, FaBars, FaTimes } from 'react-icons/fa';
+import { 
+    FaHome, 
+    FaUsers, 
+    FaStore, 
+    FaTruck, 
+    FaBars, 
+    FaCreditCard, 
+    FaExchangeAlt, 
+    FaReceipt, 
+    FaFileInvoiceDollar, 
+    FaChartBar,
+    FaFileAlt 
+} from 'react-icons/fa';
 
 const Layout = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -10,6 +22,13 @@ const Layout = () => {
         { path: '/users', label: 'Users', icon: <FaUsers /> },
         { path: '/restaurants', label: 'Restaurants', icon: <FaStore /> },
         { path: '/delivery-settings', label: 'Delivery Charge', icon: <FaTruck /> },
+        // Payment Module Navigation Items
+        { path: '/payment/dashboard', label: 'Payment Dashboard', icon: <FaChartBar /> },
+        { path: '/payment/transactions', label: 'Transactions', icon: <FaExchangeAlt /> },
+        { path: '/payment/refunds', label: 'Refunds', icon: <FaReceipt /> },
+        { path: '/payment/invoices', label: 'Invoices', icon: <FaFileInvoiceDollar /> },
+        { path: '/payment/tax-reports', label: 'Tax Reports', icon: <FaFileAlt /> },
+        { path: '/payment/settlements', label: 'Settlements', icon: <FaCreditCard /> },
     ];
 
     return (
@@ -31,41 +50,80 @@ const Layout = () => {
                     </div>
 
                     <nav className="flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar">
-                        {navItems.map((item) => (
-                            <NavLink
-                                key={item.path}
-                                to={item.path}
-                                className={({ isActive }) =>
-                                    `flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 group relative ${isActive
-                                        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200 dark:shadow-none'
-                                        : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-indigo-600 dark:hover:text-indigo-400'
-                                    }`
-                                }
-                                title={!isSidebarOpen ? item.label : ''}
-                            >
-                                <span className={`text-xl ${!isSidebarOpen && 'mx-auto'}`}>
-                                    {item.icon}
-                                </span>
-                                <span className={`font-medium whitespace-nowrap transition-all duration-200 ${isSidebarOpen ? 'opacity-100 w-auto' : 'opacity-0 w-0 overflow-hidden'}`}>
-                                    {item.label}
-                                </span>
-
-                                {/* Hover Tooltip for collapsed state */}
-                                {!isSidebarOpen && (
-                                    <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-50">
+                        {/* Main Navigation */}
+                        <div className="mb-4">
+                            <h3 className={`text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 ${!isSidebarOpen && 'text-center'}`}>
+                                {isSidebarOpen ? 'Main' : '•'}
+                            </h3>
+                            {navItems.slice(0, 4).map((item) => (
+                                <NavLink
+                                    key={item.path}
+                                    to={item.path}
+                                    className={({ isActive }) =>
+                                        `flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 group relative ${isActive
+                                            ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200 dark:shadow-none'
+                                            : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-indigo-600 dark:hover:text-indigo-400'
+                                        }`
+                                    }
+                                    title={!isSidebarOpen ? item.label : ''}
+                                >
+                                    <span className={`text-xl ${!isSidebarOpen && 'mx-auto'}`}>
+                                        {item.icon}
+                                    </span>
+                                    <span className={`font-medium whitespace-nowrap transition-all duration-200 ${isSidebarOpen ? 'opacity-100 w-auto' : 'opacity-0 w-0 overflow-hidden'}`}>
                                         {item.label}
-                                    </div>
-                                )}
-                            </NavLink>
-                        ))}
+                                    </span>
+
+                                    {!isSidebarOpen && (
+                                        <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-50">
+                                            {item.label}
+                                        </div>
+                                    )}
+                                </NavLink>
+                            ))}
+                        </div>
+
+                        {/* Payment Module Navigation */}
+                        <div className="mt-6">
+                            <h3 className={`text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 ${!isSidebarOpen && 'text-center'}`}>
+                                {isSidebarOpen ? 'Payments' : '💰'}
+                            </h3>
+                            {navItems.slice(4).map((item) => (
+                                <NavLink
+                                    key={item.path}
+                                    to={item.path}
+                                    className={({ isActive }) =>
+                                        `flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 group relative ${isActive
+                                            ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-200 dark:shadow-none'
+                                            : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-emerald-600 dark:hover:text-emerald-400'
+                                        }`
+                                    }
+                                    title={!isSidebarOpen ? item.label : ''}
+                                >
+                                    <span className={`text-xl ${!isSidebarOpen && 'mx-auto'}`}>
+                                        {item.icon}
+                                    </span>
+                                    <span className={`font-medium whitespace-nowrap transition-all duration-200 ${isSidebarOpen ? 'opacity-100 w-auto' : 'opacity-0 w-0 overflow-hidden'}`}>
+                                        {item.label}
+                                    </span>
+
+                                    {!isSidebarOpen && (
+                                        <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-50">
+                                            {item.label}
+                                        </div>
+                                    )}
+                                </NavLink>
+                            ))}
+                        </div>
                     </nav>
 
                     <div className="p-4 border-t border-gray-200 dark:border-gray-700">
                         <button
                             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                             className="w-full flex items-center justify-center p-2 rounded-lg text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                            title={isSidebarOpen ? "Collapse Sidebar" : "Expand Sidebar"}
                         >
-                            {isSidebarOpen ? <FaBars /> : <FaBars />}
+                            <FaBars className="transform transition-transform duration-300" />
                         </button>
                     </div>
                 </div>
@@ -76,7 +134,10 @@ const Layout = () => {
                 {/* Mobile Header */}
                 <header className="md:hidden bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 flex items-center justify-between">
                     <span className="font-bold text-gray-800 dark:text-white">Admin</span>
-                    <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="text-gray-600 dark:text-gray-300">
+                    <button 
+                        onClick={() => setIsSidebarOpen(!isSidebarOpen)} 
+                        className="text-gray-600 dark:text-gray-300 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
                         <FaBars />
                     </button>
                 </header>
