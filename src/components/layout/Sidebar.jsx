@@ -1,19 +1,12 @@
-import React from 'react'
-
-const Sidebar = () => {
-  return (
-    <div>Sidebar</div>
-  )
-}
-
-export default Sidebar
 import React, { useState } from 'react';
-import { 
-  LayoutDashboard, 
-  ShoppingBag, 
-  Users, 
-  UtensilsCrossed, 
-  BarChart3, 
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
+import {
+  LayoutDashboard,
+  Users,
+  UtensilsCrossed,
+  Truck,
+  Settings,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
@@ -21,6 +14,8 @@ import {
 } from 'lucide-react';
 
 const Sidebar = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isOrdersOpen, setIsOrdersOpen] = useState(false);
   const [activeMenu, setActiveMenu] = useState('dashboard');
@@ -31,8 +26,27 @@ const Sidebar = () => {
       id: 'dashboard',
       label: 'Dashboard',
       icon: LayoutDashboard,
-      path: '/dashboard'
+      path: '/'
     },
+    {
+      id: 'users',
+      label: 'Users',
+      icon: Users,
+      path: '/users'
+    },
+    {
+      id: 'restaurants',
+      label: 'Restaurants',
+      icon: UtensilsCrossed,
+      path: '/restaurants'
+    },
+    {
+      id: 'delivery-settings',
+      label: 'Delivery Settings',
+      icon: Truck,
+      path: '/delivery-settings'
+    },
+    /*
     {
       id: 'orders',
       label: 'Orders',
@@ -45,33 +59,28 @@ const Sidebar = () => {
         { id: 'cancelled', label: 'Cancelled Orders', path: '/orders/cancelled' }
       ]
     },
-    {
-      id: 'menus',
-      label: 'Menus',
-      icon: UtensilsCrossed,
-      hasArrow: true,
-      path: '/menus'
-    },
-    {
-      id: 'customers',
-      label: 'Customers',
-      icon: Users,
-      hasArrow: true,
-      path: '/customers'
-    },
-    {
-      id: 'analytics',
-      label: 'Analytics',
-      icon: BarChart3,
-      hasArrow: true,
-      path: '/analytics'
-    }
+    */
   ];
+
+  useEffect(() => {
+    const currentPath = location.pathname;
+    const activeItem = menuItems.find(item => item.path === currentPath);
+    if (activeItem) {
+      setActiveMenu(activeItem.id);
+    } else if (currentPath === '/') {
+      setActiveMenu('dashboard');
+    }
+  }, [location.pathname]);
 
   const handleMenuClick = (menuId) => {
     setActiveMenu(menuId);
-    if (menuId === 'orders') {
-      setIsOrdersOpen(!isOrdersOpen);
+    const item = menuItems.find(i => i.id === menuId);
+    if (item?.hasDropdown) {
+      if (menuId === 'orders') {
+        setIsOrdersOpen(!isOrdersOpen);
+      }
+    } else if (item?.path) {
+      navigate(item.path);
     }
   };
 
@@ -94,9 +103,9 @@ const Sidebar = () => {
             </div>
           )}
         </div>
-        
+
         {/* Toggle Button - Positioned absolutely */}
-        <button 
+        <button
           onClick={() => setIsCollapsed(!isCollapsed)}
           className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-white dark:bg-gray-800 text-[#2563eb] dark:text-white rounded-full shadow-lg flex items-center justify-center hover:shadow-xl hover:scale-110 transition-all duration-200 z-20"
           title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
@@ -115,7 +124,7 @@ const Sidebar = () => {
           const IconComponent = item.icon;
           const isActive = activeMenu === item.id;
           const isHovered = hoveredMenu === item.id;
-          
+
           return (
             <div key={item.id} className="mb-1">
               {/* Main Menu Item */}
@@ -126,7 +135,7 @@ const Sidebar = () => {
                 className={`
                   flex items-center justify-between px-4 py-3.5 cursor-pointer transition-all duration-300 relative group
                   ${isActive
-                    ? 'bg-white dark:bg-gray-800 text-[#2563eb] dark:text-white shadow-lg rounded-xl scale-[1.02] font-semibold' 
+                    ? 'bg-white dark:bg-gray-800 text-[#2563eb] dark:text-white shadow-lg rounded-xl scale-[1.02] font-semibold'
                     : 'text-white rounded-xl hover:bg-white/10'
                   }
                   ${isCollapsed ? 'justify-center' : ''}
@@ -137,7 +146,7 @@ const Sidebar = () => {
                 {isActive && (
                   <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-[#ec4899] rounded-r-full"></div>
                 )}
-                
+
                 <div className="flex items-center gap-3 flex-1">
                   <div className={`
                     relative transition-all duration-300
@@ -162,7 +171,7 @@ const Sidebar = () => {
                       <span className={`
                         px-2.5 py-0.5 rounded-full text-xs font-bold transition-all duration-300
                         ${isActive
-                          ? 'bg-gradient-to-r from-[#ec4899] to-[#db2777] text-white shadow-md' 
+                          ? 'bg-gradient-to-r from-[#ec4899] to-[#db2777] text-white shadow-md'
                           : 'bg-white/20 text-white'
                         }
                         ${isHovered && !isActive ? 'bg-white/30' : ''}
@@ -177,7 +186,7 @@ const Sidebar = () => {
                       `} />
                     )}
                     {item.hasDropdown && (
-                      <ChevronDown 
+                      <ChevronDown
                         className={`
                           w-4 h-4 transition-all duration-300
                           ${isOrdersOpen ? 'rotate-180' : 'rotate-0'}
@@ -186,7 +195,7 @@ const Sidebar = () => {
                     )}
                   </div>
                 )}
-                
+
                 {/* Hover Effect Border */}
                 {!isActive && isHovered && (
                   <div className="absolute inset-0 rounded-xl border-2 border-white/20 pointer-events-none"></div>
@@ -223,9 +232,9 @@ const Sidebar = () => {
       {/* Collapsed State Tooltip */}
       {isCollapsed && hoveredMenu && (
         <div className="fixed left-20 bg-gray-900 text-white px-3 py-2 rounded-lg shadow-xl text-sm font-medium pointer-events-none z-50"
-             style={{
-               top: `${document.querySelector(`[title="${menuItems.find(m => m.id === hoveredMenu)?.label}"]`)?.getBoundingClientRect().top}px`
-             }}>
+          style={{
+            top: `${document.querySelector(`[title="${menuItems.find(m => m.id === hoveredMenu)?.label}"]`)?.getBoundingClientRect().top}px`
+          }}>
           {menuItems.find(m => m.id === hoveredMenu)?.label}
           <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 w-2 h-2 bg-gray-900 rotate-45"></div>
         </div>
