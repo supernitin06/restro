@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { FaPlus, FaTrash, FaMoneyBillWave } from 'react-icons/fa';
+import InputField from '../ui/InputField';
 
 const OrderValueRules = () => {
     const [isEnabled, setIsEnabled] = useState(true);
@@ -25,76 +26,82 @@ const OrderValueRules = () => {
 
     return (
         <div className={`transition-all duration-300 ${!isEnabled ? 'opacity-60 grayscale' : ''}`}>
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden relative">
-                <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gradient-to-r from-blue-50 to-white">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 bg-blue-100 rounded-lg text-blue-600">
-                            <FaMoneyBillWave />
+            <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden transform hover:scale-[1.01] transition-transform duration-300">
+                <div className="px-8 py-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gradient-to-r from-blue-50 to-white dark:from-gray-800 dark:to-gray-800">
+                    <div className="flex items-center gap-4">
+                        <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-2xl text-blue-600 dark:text-blue-400 shadow-inner">
+                            <FaMoneyBillWave className="text-xl" />
                         </div>
                         <div>
-                            <h3 className="font-bold text-gray-800">Order Value Rules</h3>
-                            <p className="text-xs text-gray-500">Charge based on total cart amount</p>
+                            <h3 className="font-bold text-lg text-gray-900 dark:text-white">Order Value Rules</h3>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">Charge based on total cart amount</p>
                         </div>
                     </div>
                     <div className="form-control">
-                        <label className="label cursor-pointer flex items-center gap-2">
-                            <span className="label-text text-xs font-medium uppercase tracking-wider text-gray-500">{isEnabled ? 'Active' : 'Inactive'}</span>
+                        <label className="label cursor-pointer flex items-center gap-3">
+                            <span className="label-text text-sm font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">{isEnabled ? 'Active' : 'Inactive'}</span>
                             <input type="checkbox" className="toggle toggle-primary toggle-sm" checked={isEnabled} onChange={(e) => setIsEnabled(e.target.checked)} />
                         </label>
                     </div>
                 </div>
 
                 {isEnabled && (
-                    <div className="p-6">
+                    <div className="p-8">
                         <div className="overflow-x-auto">
-                            <table className="w-full text-sm text-left">
-                                <thead className="bg-gray-50 text-gray-600 uppercase text-xs">
+                            <table className="w-full text-sm text-left border-separate border-spacing-y-3">
+                                <thead className="text-gray-500 dark:text-gray-400 uppercase text-xs font-bold tracking-wider">
                                     <tr>
-                                        <th className="px-4 py-3 rounded-l-lg">Cart Value Range (₹)</th>
-                                        <th className="px-4 py-3">Delivery Fee (₹)</th>
-                                        <th className="px-4 py-3 rounded-r-lg w-10"></th>
+                                        <th className="px-2 pb-2">Cart Value Range (₹)</th>
+                                        <th className="px-2 pb-2">Delivery Fee (₹)</th>
+                                        <th className="px-2 pb-2 w-10"></th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-gray-100">
-                                    {slabs.map((slab, index) => (
-                                        <tr key={slab.id} className="hover:bg-gray-50 transition-colors">
-                                            <td className="px-4 py-3">
-                                                <div className="flex items-center gap-2">
-                                                    <input
-                                                        type="number"
-                                                        value={slab.min}
-                                                        onChange={(e) => updateSlab(slab.id, 'min', parseInt(e.target.value))}
-                                                        className="w-20 p-2 border border-gray-200 rounded-md focus:ring-2 focus:ring-blue-500 outline-none text-center"
-                                                    />
+                                <tbody>
+                                    {slabs.map((slab) => (
+                                        <tr key={slab.id} className="group">
+                                            <td className="px-2">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-24">
+                                                        <InputField
+                                                            type="number"
+                                                            value={slab.min}
+                                                            onChange={(e) => updateSlab(slab.id, 'min', parseInt(e.target.value))}
+                                                            placeholder="0"
+                                                            className="text-center"
+                                                        />
+                                                    </div>
                                                     <span className="text-gray-400 font-medium">to</span>
                                                     {slab.max === Infinity ? (
-                                                        <span className="w-20 text-center font-medium text-gray-600">Above</span>
+                                                        <span className="flex-1 w-24 text-center font-bold text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700/50 py-3 rounded-xl border border-dashed border-gray-300 dark:border-gray-600 block">Above</span>
                                                     ) : (
-                                                        <input
-                                                            type="number"
-                                                            value={slab.max}
-                                                            onChange={(e) => updateSlab(slab.id, 'max', parseInt(e.target.value))}
-                                                            className="w-20 p-2 border border-gray-200 rounded-md focus:ring-2 focus:ring-blue-500 outline-none text-center"
-                                                        />
+                                                        <div className="w-24">
+                                                            <InputField
+                                                                type="number"
+                                                                value={slab.max}
+                                                                onChange={(e) => updateSlab(slab.id, 'max', parseInt(e.target.value))}
+                                                                placeholder="Max"
+                                                                className="text-center"
+                                                            />
+                                                        </div>
                                                     )}
                                                 </div>
                                             </td>
-                                            <td className="px-4 py-3">
-                                                <div className="relative">
-                                                    <span className="absolute left-3 top-2 text-gray-400">₹</span>
-                                                    <input
+                                            <td className="px-2">
+                                                <div className="w-32 relative">
+                                                    <InputField
                                                         type="number"
                                                         value={slab.fee}
                                                         onChange={(e) => updateSlab(slab.id, 'fee', parseInt(e.target.value))}
-                                                        className={`w-24 pl-6 p-2 border rounded-md focus:ring-2 outline-none text-right font-semibold ${slab.fee === 0 ? 'text-green-600 border-green-200 bg-green-50' : 'text-gray-700 border-gray-200'}`}
+                                                        startIcon={<span className="text-xs">₹</span>}
+                                                        className={`text-right ${slab.fee === 0 ? 'text-emerald-600' : ''}`}
                                                     />
-                                                    {slab.fee === 0 && <span className="ml-2 text-xs font-bold text-green-600 uppercase">Free</span>}
+                                                    {slab.fee === 0 && <span className="absolute -right-12 top-1/2 -translate-y-1/2 text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">Free</span>}
                                                 </div>
                                             </td>
-                                            <td className="px-4 py-3 text-right">
+                                            <td className="px-2 text-right align-middle">
                                                 <button
                                                     onClick={() => removeSlab(slab.id)}
-                                                    className="text-gray-400 hover:text-red-500 transition-colors p-2 hover:bg-red-50 rounded-full"
+                                                    className="opacity-0 group-hover:opacity-100 text-gray-300 hover:text-red-500 dark:hover:text-red-400 transition-all p-3 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl"
                                                     title="Remove Slab"
                                                 >
                                                     <FaTrash size={14} />
@@ -108,9 +115,9 @@ const OrderValueRules = () => {
 
                         <button
                             onClick={addSlab}
-                            className="mt-4 flex items-center justify-center w-full py-2 border-2 border-dashed border-gray-200 rounded-lg text-gray-500 hover:border-blue-500 hover:text-blue-500 transition-all font-medium text-sm gap-2"
+                            className="mt-6 flex items-center justify-center w-full py-4 border-2 border-dashed border-gray-200 dark:border-gray-600 rounded-2xl text-gray-500 dark:text-gray-400 hover:border-blue-500 hover:text-blue-500 dark:hover:border-blue-400 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all font-bold text-sm gap-2"
                         >
-                            <FaPlus size={12} /> Add New Pricing Slab
+                            <FaPlus size={14} /> Add New Pricing Slab
                         </button>
                     </div>
                 )}

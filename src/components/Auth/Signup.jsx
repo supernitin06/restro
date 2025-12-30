@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { FaUser, FaEnvelope, FaPhone, FaLock } from 'react-icons/fa';
 import InputField from '../ui/InputField';
 import Button from '../ui/Button';
 
@@ -21,7 +22,7 @@ const SignupForm = ({ onSwitchToLogin }) => {
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
-    
+
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
@@ -29,56 +30,56 @@ const SignupForm = ({ onSwitchToLogin }) => {
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!formData.fullName.trim()) {
       newErrors.fullName = 'Full name is required';
     } else if (formData.fullName.trim().length < 3) {
       newErrors.fullName = 'Name must be at least 3 characters';
     }
-    
+
     if (!formData.email.trim()) {
       newErrors.email = 'Email is required';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = 'Please enter a valid email';
     }
-    
+
     if (!formData.phone.trim()) {
       newErrors.phone = 'Phone number is required';
     } else if (!/^[0-9]{10}$/.test(formData.phone)) {
       newErrors.phone = 'Enter a valid 10-digit phone number';
     }
-    
+
     if (!formData.password) {
       newErrors.password = 'Password is required';
     } else if (formData.password.length < 8) {
       newErrors.password = 'Password must be at least 8 characters';
     }
-    
+
     if (!formData.confirmPassword) {
       newErrors.confirmPassword = 'Please confirm password';
     } else if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = 'Passwords do not match';
     }
-    
+
     if (!formData.agreeToTerms) {
       newErrors.agreeToTerms = 'You must agree to the terms';
     }
-    
+
     return newErrors;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     const formErrors = validateForm();
     if (Object.keys(formErrors).length > 0) {
       setErrors(formErrors);
       return;
     }
-    
+
     setLoading(true);
     setMessage('');
-    
+
     setTimeout(() => {
       const newUser = {
         id: Date.now(),
@@ -87,15 +88,15 @@ const SignupForm = ({ onSwitchToLogin }) => {
         phone: formData.phone,
         joined: new Date().toLocaleDateString()
       };
-      
+
       setMessage('🎉 Account created successfully!');
-      
+
       // Store demo data
       localStorage.setItem('demo_users', JSON.stringify([
         ...JSON.parse(localStorage.getItem('demo_users') || '[]'),
         newUser
       ]));
-      
+
       // Reset form
       setFormData({
         fullName: '',
@@ -105,12 +106,12 @@ const SignupForm = ({ onSwitchToLogin }) => {
         confirmPassword: '',
         agreeToTerms: false
       });
-      
+
       setTimeout(() => {
         alert(`Welcome ${newUser.name}! Your account has been created.`);
         onSwitchToLogin();
       }, 1500);
-      
+
       setLoading(false);
     }, 1500);
   };
@@ -139,6 +140,7 @@ const SignupForm = ({ onSwitchToLogin }) => {
           value={formData.fullName}
           onChange={handleChange}
           error={errors.fullName}
+          startIcon={<FaUser />}
           required
         />
 
@@ -151,9 +153,10 @@ const SignupForm = ({ onSwitchToLogin }) => {
             value={formData.email}
             onChange={handleChange}
             error={errors.email}
+            startIcon={<FaEnvelope />}
             required
           />
-          
+
           <InputField
             label="Phone Number"
             name="phone"
@@ -162,6 +165,7 @@ const SignupForm = ({ onSwitchToLogin }) => {
             value={formData.phone}
             onChange={handleChange}
             error={errors.phone}
+            startIcon={<FaPhone />}
             required
           />
         </div>
@@ -175,9 +179,10 @@ const SignupForm = ({ onSwitchToLogin }) => {
             value={formData.password}
             onChange={handleChange}
             error={errors.password}
+            startIcon={<FaLock />}
             required
           />
-          
+
           <InputField
             label="Confirm Password"
             name="confirmPassword"
@@ -186,6 +191,7 @@ const SignupForm = ({ onSwitchToLogin }) => {
             value={formData.confirmPassword}
             onChange={handleChange}
             error={errors.confirmPassword}
+            startIcon={<FaLock />}
             required
           />
         </div>

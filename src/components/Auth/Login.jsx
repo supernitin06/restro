@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { FaEnvelope, FaLock } from 'react-icons/fa';
 
 import InputField from '../ui/InputField';
 import Button from '../ui/Button';
@@ -19,7 +20,7 @@ const LoginForm = ({ onSwitchToSignup, onSwitchToForgotPassword }) => {
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
-    
+
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
@@ -27,62 +28,62 @@ const LoginForm = ({ onSwitchToSignup, onSwitchToForgotPassword }) => {
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!formData.email.trim()) {
       newErrors.email = 'Email is required';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = 'Please enter a valid email';
     }
-    
+
     if (!formData.password) {
       newErrors.password = 'Password is required';
     } else if (formData.password.length < 6) {
       newErrors.password = 'Password must be at least 6 characters';
     }
-    
+
     return newErrors;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     const formErrors = validateForm();
     if (Object.keys(formErrors).length > 0) {
       setErrors(formErrors);
       return;
     }
-    
+
     setLoading(true);
     setMessage('');
-    
+
     // Demo login logic
     setTimeout(() => {
       const demoUsers = [
         { email: 'user@example.com', password: 'password123' },
         { email: 'demo@demo.com', password: 'demo123' }
       ];
-      
+
       const isValid = demoUsers.some(
         user => user.email === formData.email && user.password === formData.password
       );
-      
+
       if (isValid) {
         setMessage('✅ Login successful! Welcome back.');
-        
+
         // Store demo data
         localStorage.setItem('auth_user', JSON.stringify({
           email: formData.email,
           name: 'Demo User',
           timestamp: new Date().toISOString()
         }));
-        
+
         setTimeout(() => {
           alert('Redirecting to dashboard...');
         }, 1500);
       } else {
         setMessage('❌ Invalid credentials. Try: demo@demo.com / demo123');
       }
-      
+
       setLoading(false);
     }, 1500);
   };
@@ -117,6 +118,7 @@ const LoginForm = ({ onSwitchToSignup, onSwitchToForgotPassword }) => {
           value={formData.email}
           onChange={handleChange}
           error={errors.email}
+          startIcon={<FaEnvelope />}
           required
         />
 
@@ -128,6 +130,7 @@ const LoginForm = ({ onSwitchToSignup, onSwitchToForgotPassword }) => {
           value={formData.password}
           onChange={handleChange}
           error={errors.password}
+          startIcon={<FaLock />}
           required
         />
 
