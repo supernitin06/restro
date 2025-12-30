@@ -5,7 +5,7 @@ import Sidebar from "../components/layout/Sidebar";
 
 const Layout = () => {
   return (
-    <div className="flex h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
+    <div className="app flex h-screen">
       {/* LEFT SIDEBAR */}
       <Sidebar />
 

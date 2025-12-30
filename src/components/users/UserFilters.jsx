@@ -2,7 +2,7 @@ import React from 'react';
 import { Filter } from 'lucide-react';
 import GlassCard from '../ui/GlassCard';
 import GradientButton from '../ui/GradientButton';
-import InputField from '../ui/InputField'; // InputField component import करें
+import InputField from '../ui/InputField';
 
 const UserFilters = ({ 
   searchTerm, 
@@ -12,8 +12,14 @@ const UserFilters = ({
   onClearFilters 
 }) => {
   return (
-    <GlassCard className="p-6 mb-6">
+    <GlassCard className="
+      p-6 mb-6
+      bg-white dark:bg-white/10
+      border border-gray-200 dark:border-white/20
+    ">
       <div className="flex flex-col lg:flex-row gap-4">
+        
+        {/* Search */}
         <div className="flex-1">
           <InputField
             name="search"
@@ -21,15 +27,13 @@ const UserFilters = ({
             placeholder="Search users by name, email, or phone..."
             value={searchTerm}
             onChange={(e) => onSearch(e.target.value)}
-            className="mb-0" // Margin bottom को 0 कर दें
+            className="mb-0"
             inputClassName="
-              w-full px-4 py-3
-              bg-white/10
-              backdrop-blur-sm
-              border border-white/20
-              rounded-xl
-              text-white
-              placeholder-gray-400
+              w-full px-4 py-3 rounded-xl
+              bg-gray-100 dark:bg-white/10
+              border border-gray-300 dark:border-white/20
+              text-gray-800 dark:text-white
+              placeholder-gray-500 dark:placeholder-gray-400
               focus:outline-none
               focus:ring-2
               focus:ring-cyan-500/50
@@ -38,27 +42,45 @@ const UserFilters = ({
             "
           />
         </div>
-        
+
+        {/* Filters */}
         <div className="flex flex-wrap gap-3">
-          <div className="flex items-center gap-2 px-4 py-2 bg-white/10 rounded-xl border border-white/20">
-            <Filter className="w-4 h-4 text-gray-300" />
+          
+          {/* Status */}
+          <div className="
+            flex items-center gap-2 px-4 py-2 rounded-xl
+            bg-gray-100 dark:bg-white/10
+            border border-gray-300 dark:border-white/20
+          ">
+            <Filter className="w-4 h-4 text-gray-600 dark:text-gray-300" />
             <select
               value={filters.status}
               onChange={(e) => onFilterChange('status', e.target.value)}
-              className="bg-transparent text-white outline-none"
+              className="
+                bg-transparent outline-none
+                text-gray-800 dark:text-white
+              "
             >
               <option value="all">All Status</option>
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
             </select>
           </div>
-          
-          <div className="flex items-center gap-2 px-4 py-2 bg-white/10 rounded-xl border border-white/20">
-            <Filter className="w-4 h-4 text-gray-300" />
+
+          {/* Membership */}
+          <div className="
+            flex items-center gap-2 px-4 py-2 rounded-xl
+            bg-gray-100 dark:bg-white/10
+            border border-gray-300 dark:border-white/20
+          ">
+            <Filter className="w-4 h-4 text-gray-600 dark:text-gray-300" />
             <select
               value={filters.membership}
               onChange={(e) => onFilterChange('membership', e.target.value)}
-              className="bg-transparent text-white outline-none"
+              className="
+                bg-transparent outline-none
+                text-gray-800 dark:text-white
+              "
             >
               <option value="all">All Memberships</option>
               <option value="gold">Gold</option>
@@ -66,7 +88,8 @@ const UserFilters = ({
               <option value="bronze">Bronze</option>
             </select>
           </div>
-          
+
+          {/* Clear */}
           <GradientButton 
             onClick={onClearFilters}
             variant="ghost"

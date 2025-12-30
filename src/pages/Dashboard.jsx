@@ -14,12 +14,14 @@ import Footer from '../components/PageDashboard/Footer';
 
 const Dashboard = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-orange-50 dark:bg-gray-900 transition-colors duration-300">
+    <div className="page">
       <div className="max-w-[1600px] mx-auto p-8">
         {/* Header */}
+
+
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 dark:text-white mb-2">Dashboard</h1>
-          <p className="text-gray-600 dark:text-gray-300">Welcome back! Here's what's happening today.</p>
+          <h1 className="text-4xl font-bold mb-2">Dashboard</h1>
+          <p className="text-muted">Welcome back! Here's what's happening today.</p>
         </div>
 
         {/* Stats Grid */}

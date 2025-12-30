@@ -1,7 +1,9 @@
 import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
+import { useTheme } from '../../context/ThemeContext';
 
 const TopCategories = () => {
+  const { theme } = useTheme();
   const data = [
     { name: 'Seafood', value: 33, color: '#2563eb' },
     { name: 'Beverages', value: 25, color: '#eb2528' },
@@ -26,7 +28,7 @@ const TopCategories = () => {
       <div className="grid grid-cols-2 gap-3 mt-4">
         {payload.map((entry, index) => (
           <div key={index} className="flex items-center gap-2 group cursor-pointer">
-            <div 
+            <div
               className="w-3 h-3 rounded-full transition-transform group-hover:scale-125"
               style={{ backgroundColor: entry.color }}
             ></div>
@@ -40,14 +42,14 @@ const TopCategories = () => {
   };
 
   return (
-    <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20 hover:shadow-xl transition-all duration-300">
+    <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20 dark:border-gray-700 hover:shadow-xl transition-all duration-300">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-xl font-bold text-gray-800">Top Categories</h3>
+        <h3 className="text-xl font-bold text-gray-800 dark:text-white">Top Categories</h3>
         <button className="text-sm font-medium text-[#2563eb] hover:text-[#1d4ed8] transition-colors">
           This Month ▼
         </button>
       </div>
-      
+
       <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
@@ -59,10 +61,11 @@ const TopCategories = () => {
               outerRadius={90}
               paddingAngle={5}
               dataKey="value"
+              stroke={theme === 'dark' ? '#1f2937' : '#fff'}
             >
               {data.map((entry, index) => (
-                <Cell 
-                  key={`cell-${index}`} 
+                <Cell
+                  key={`cell-${index}`}
                   fill={entry.color}
                   className="hover:opacity-80 transition-opacity cursor-pointer"
                 />

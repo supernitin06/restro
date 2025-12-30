@@ -1,4 +1,5 @@
 import React from "react";
+import Button from "../ui/Button";
 
 const ViewDetailsModal = ({ restaurant, onClose, onApprove, onSuspend }) => {
   if (!restaurant) return null;
@@ -32,8 +33,8 @@ const ViewDetailsModal = ({ restaurant, onClose, onApprove, onSuspend }) => {
     status === "Suspended"
       ? "bg-red-300 opacity-50 cursor-not-allowed"
       : status === "Approved"
-      ? "bg-red-600 hover:bg-red-700"
-      : "bg-red-500 hover:bg-red-600";
+        ? "bg-red-600 hover:bg-red-700"
+        : "bg-red-500 hover:bg-red-600";
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 z-50">
@@ -107,30 +108,33 @@ const ViewDetailsModal = ({ restaurant, onClose, onApprove, onSuspend }) => {
         {/* Action Buttons */}
         <div className="flex justify-end gap-3 p-6">
           {/* Approve Button */}
-          <button
-            className={`py-2 px-4 rounded-lg font-medium text-white text-sm transition ${approveStyle}`}
+          <Button
+            variant="success"
+            className={`py-2 px-4 text-sm ${status === "Approved" ? "opacity-50 cursor-not-allowed" : ""}`}
             onClick={handleApprove}
             disabled={status === "Approved"}
           >
             Approve
-          </button>
+          </Button>
 
           {/* Suspend Button */}
-          <button
-            className={`py-2 px-4 rounded-lg font-medium text-white text-sm transition ${suspendStyle}`}
+          <Button
+            variant="danger"
+            className={`py-2 px-4 text-sm ${status === "Suspended" || status === "Approved" ? "opacity-50 cursor-not-allowed" : ""}`}
             onClick={handleSuspend}
             disabled={status === "Suspended" || status === "Approved"}
           >
             Suspend
-          </button>
+          </Button>
 
           {/* Close Button */}
-          <button
-            className="py-2 px-4 border border-gray-400 text-gray-700 rounded-lg font-medium text-sm hover:bg-gray-50 transition"
+          <Button
+            variant="outline"
+            className="py-2 px-4 text-sm border-gray-400 text-gray-700 hover:bg-gray-50"
             onClick={onClose}
           >
             Close
-          </button>
+          </Button>
         </div>
       </div>
     </div>

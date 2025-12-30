@@ -54,7 +54,7 @@ const AuthLayout = ({ children, activeTab = 'login', onTabChange }) => {
                     <div className="flex items-center px-4">
                       <FaMapMarkerAlt className="text-gray-300" />
                     </div>
-                    <input 
+                    <InputField
                       type="text" 
                       placeholder="Enter your location..." 
                       className="flex-1 bg-transparent px-4 py-4 text-white placeholder-purple-200 outline-none"

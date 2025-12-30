@@ -39,10 +39,10 @@ const RecentActivity = () => {
   ];
 
   return (
-    <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20 hover:shadow-xl transition-all duration-300">
+    <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20 dark:border-gray-700 hover:shadow-xl transition-all duration-300">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xl font-bold text-gray-800">Recent Activity</h3>
-        <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+        <h3 className="text-xl font-bold text-gray-800 dark:text-white">Recent Activity</h3>
+        <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
           <MoreHorizontal className="w-5 h-5 text-gray-400" />
         </button>
       </div>
@@ -53,39 +53,39 @@ const RecentActivity = () => {
           return (
             <div key={activity.id} className="group">
               <div className="flex items-start gap-4">
-                <div className={`${activity.iconBg} p-3 rounded-xl shadow-sm group-hover:scale-110 transition-transform duration-300`}>
-                  <IconComponent className={`w-5 h-5 ${activity.iconColor}`} />
+                <div className={`${activity.iconBg} dark:bg-opacity-20 p-3 rounded-xl shadow-sm group-hover:scale-110 transition-transform duration-300`}>
+                  <IconComponent className={`w-5 h-5 ${activity.iconColor} dark:text-opacity-90`} />
                 </div>
-                
+
                 <div className="flex-1">
                   <div className="flex items-start justify-between mb-1">
                     <div>
-                      <h4 className="font-bold text-gray-800 text-sm">
+                      <h4 className="font-bold text-gray-800 dark:text-gray-200 text-sm">
                         {activity.user}
-                        <span className="ml-2 text-xs font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
+                        <span className="ml-2 text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded-full">
                           {activity.role}
                         </span>
                       </h4>
                     </div>
                     <span className="text-xs text-gray-400">{activity.time}</span>
                   </div>
-                  
-                  <p className="text-sm text-gray-600">
+
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
                     {activity.action}{' '}
-                    <span className="font-semibold text-gray-800">{activity.item}</span>
+                    <span className="font-semibold text-gray-800 dark:text-gray-200">{activity.item}</span>
                   </p>
                 </div>
               </div>
-              
+
               {index < activities.length - 1 && (
-                <div className="ml-10 mt-4 mb-4 border-l-2 border-dashed border-gray-200 h-4"></div>
+                <div className="ml-10 mt-4 mb-4 border-l-2 border-dashed border-gray-200 dark:border-gray-700 h-4"></div>
               )}
             </div>
           );
         })}
       </div>
 
-      <button className="w-full mt-6 py-2.5 rounded-xl border-2 border-dashed border-gray-300 text-sm font-semibold text-gray-600 hover:border-[#2563eb] hover:text-[#2563eb] hover:bg-blue-50/50 transition-all duration-300">
+      <button className="w-full mt-6 py-2.5 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-700 text-sm font-semibold text-gray-600 dark:text-gray-300 hover:border-[#2563eb] hover:text-[#2563eb] hover:bg-blue-50/50 dark:hover:bg-blue-900/20 transition-all duration-300">
         View All Activities
       </button>
     </div>

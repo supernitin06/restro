@@ -1,24 +1,21 @@
 import React from "react";
+import InputField from "../ui/InputField";
+import Button from "../ui/Button";
 
 const SearchFilterBar = ({ searchTerm, setSearchTerm, statusFilter, setStatusFilter, onAddNew }) => {
   return (
     <div className="mb-8 bg-white p-4 rounded-xl shadow-sm border border-gray-200">
       <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-        
+
         {/* Search Input */}
         <div className="relative w-full md:w-2/3">
-          <input
-            type="text"
+          <InputField
             placeholder="Search restaurants..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="
-              w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg
-              focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent
-              transition duration-300 placeholder-gray-400
-            "
+            startIcon={<span>🔍</span>}
+            className="w-full"
           />
-          <span className="absolute left-3 top-3.5 text-gray-400">🔍</span>
         </div>
 
         {/* Status Filter & Add Button */}
@@ -38,15 +35,12 @@ const SearchFilterBar = ({ searchTerm, setSearchTerm, statusFilter, setStatusFil
             <option value="Suspended">Suspended</option>
           </select>
 
-          <button
+          <Button
             onClick={onAddNew}
-            className="
-              px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700
-              transition duration-300 font-semibold
-            "
+            className="px-6"
           >
             + Add New
-          </button>
+          </Button>
         </div>
       </div>
     </div>

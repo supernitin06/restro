@@ -1,5 +1,8 @@
 import React from "react";
 
+import InputField from '../ui/InputField';
+import Button from '../ui/Button';
+
 const EditRestaurantModal = ({
   editRestaurant,
   setEditRestaurant,
@@ -29,12 +32,9 @@ const EditRestaurantModal = ({
           <div className="space-y-4">
             {/* Restaurant Name */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Restaurant Name
-              </label>
-              <input
+              <InputField
+                label="Restaurant Name"
                 type="text"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
                 value={editRestaurant.name}
                 onChange={(e) =>
                   setEditRestaurant({ ...editRestaurant, name: e.target.value })
@@ -44,34 +44,43 @@ const EditRestaurantModal = ({
 
             {/* Rating */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Rating
-              </label>
-              <input
+              <InputField
+                label="Rating"
                 type="number"
                 step="0.1"
                 min="0"
                 max="5"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
                 value={editRestaurant.rating}
                 onChange={(e) =>
                   setEditRestaurant({
                     ...editRestaurant,
                     rating: parseFloat(e.target.value) || 0,
                   })
+                } />
+            </div>
+
+            {/* Number of Tables */}
+            <div className="flex items-center">
+              <InputField
+                label="Number of Tables"
+                type="number"
+                min="0"
+                value={editRestaurant.table}
+                onChange={(e) =>
+                  setEditRestaurant({
+                    ...editRestaurant,
+                    table: parseInt(e.target.value) || 0,
+                  })
                 }
               />
             </div>
 
-            {/* Number of Tables */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Number of Tables
-              </label>
-              <input
+            {/* Number of Tables (Duplicate?) */}
+            <div className="flex items-center"  >
+              <InputField
+                label="Number of Tables"
                 type="number"
                 min="0"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
                 value={editRestaurant.table}
                 onChange={(e) =>
                   setEditRestaurant({
@@ -84,12 +93,9 @@ const EditRestaurantModal = ({
 
             {/* Address */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Address
-              </label>
-              <input
+              <InputField
+                label="Address"
                 type="text"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
                 value={editRestaurant.basicInfo.address}
                 onChange={(e) =>
                   setEditRestaurant({
@@ -105,12 +111,9 @@ const EditRestaurantModal = ({
 
             {/* Phone Number */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Phone Number
-              </label>
-              <input
+              <InputField
+                label="Phone Number"
                 type="text"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
                 value={editRestaurant.basicInfo.phone}
                 onChange={(e) =>
                   setEditRestaurant({
@@ -144,14 +147,11 @@ const EditRestaurantModal = ({
 
             {/* Commission Percentage */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Commission Percentage
-              </label>
-              <input
+              <InputField
+                label="Commission Percentage"
                 type="number"
                 min="0"
                 max="100"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
                 value={editRestaurant.commissionPercentage}
                 onChange={(e) =>
                   setEditRestaurant({
@@ -164,18 +164,19 @@ const EditRestaurantModal = ({
 
             {/* Form Actions */}
             <div className="flex gap-3 pt-6 border-t border-gray-200">
-              <button
-                className="flex-1 py-3 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition"
+              <Button
+                className="flex-1"
                 onClick={onSave}
               >
                 Save Changes
-              </button>
-              <button
-                className="flex-1 py-3 border border-red-600 text-red-600 rounded-lg font-semibold hover:bg-red-50 transition"
+              </Button>
+              <Button
+                variant="outline"
+                className="flex-1"
                 onClick={onCancel}
               >
                 Cancel
-              </button>
+              </Button>
             </div>
           </div>
         </div>

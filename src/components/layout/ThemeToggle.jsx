@@ -9,7 +9,7 @@ const ThemeToggle = () => {
     <button
       type="button"
       onClick={toggleTheme}
-      className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-300"
+      className="p-2 rounded-full hover:bg-gray-200 dark:hoverbg-gray-700 transition-colors duration-300"
     >
       {theme === 'light' ? (
         <Moon className="w-6 h-6 text-gray-600 transition-transform duration-300 ease-in-out hover:scale-110" />

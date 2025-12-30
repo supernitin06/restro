@@ -111,7 +111,7 @@ const UserManagement = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white p-4 md:p-6 lg:p-8">
+    <div className="page">
       {/* Background effects */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 left-1/4 w-72 h-72 bg-cyan-500/10 rounded-full blur-3xl" />
@@ -139,7 +139,7 @@ const UserManagement = () => {
 
         {/* View Toggle */}
         <div className="flex items-center justify-between mb-6">
-          <div className="text-gray-300">
+          <div className="text-muted">
             Showing {filteredUsers.length} customers
           </div>
           <div className="flex gap-2">
@@ -204,8 +204,8 @@ const UserManagement = () => {
         {filteredUsers.length === 0 && (
           <div className="text-center py-16">
             <div className="text-4xl mb-4">👤</div>
-            <h3 className="text-xl font-semibold text-white mb-2">No customers found</h3>
-            <p className="text-gray-400 mb-6">Try adjusting your search or filters</p>
+            <h3 className="text-xl font-semibold mb-2">No customers found</h3>
+            <p className="text-muted mb-6">Try adjusting your search or filters</p>
             <GradientButton
               onClick={handleClearFilters}
               variant="primary"
