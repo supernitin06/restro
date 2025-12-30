@@ -67,21 +67,21 @@ const Sidebar = () => {
   };
 
   return (
-    <div className={`bg-gradient-to-b from-[#2563eb] to-[#1e40af] min-h-screen text-white transition-all duration-300 ease-in-out ${isCollapsed ? 'w-20' : 'w-64'} relative shadow-2xl`}>
+    <div className={`bg-gradient-to-b from-[#2563eb] to-[#1e40af] dark:from-gray-900 dark:to-gray-950 min-h-screen text-white transition-all duration-300 ease-in-out ${isCollapsed ? 'w-20' : 'w-64'} relative shadow-2xl`}>
       {/* Header with Logo */}
-      <div className="relative border-b border-white/10 py-5 px-4">
+      <div className="relative border-b border-white/10 dark:border-gray-800 py-5 px-4">
         <div className="flex items-center justify-between">
           {!isCollapsed && (
             <div className="flex items-center gap-3">
-              <div className="w-11 h-11 bg-gradient-to-br from-white to-gray-100 rounded-xl flex items-center justify-center shadow-lg transform transition-transform hover:scale-105">
-                <UtensilsCrossed className="w-6 h-6 text-[#2563eb]" />
+              <div className="w-11 h-11 bg-gradient-to-br from-white to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-xl flex items-center justify-center shadow-lg transform transition-transform hover:scale-105">
+                <UtensilsCrossed className="w-6 h-6 text-[#2563eb] dark:text-white" />
               </div>
               <span className="text-2xl font-bold tracking-wide text-white">Restro</span>
             </div>
           )}
           {isCollapsed && (
-            <div className="w-11 h-11 bg-gradient-to-br from-white to-gray-100 rounded-xl flex items-center justify-center mx-auto shadow-lg transform transition-transform hover:scale-105">
-              <UtensilsCrossed className="w-6 h-6 text-[#2563eb]" />
+            <div className="w-11 h-11 bg-gradient-to-br from-white to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-xl flex items-center justify-center mx-auto shadow-lg transform transition-transform hover:scale-105">
+              <UtensilsCrossed className="w-6 h-6 text-[#2563eb] dark:text-white" />
             </div>
           )}
         </div>
@@ -89,7 +89,7 @@ const Sidebar = () => {
         {/* Toggle Button - Positioned absolutely */}
         <button 
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-white text-[#2563eb] rounded-full shadow-lg flex items-center justify-center hover:shadow-xl hover:scale-110 transition-all duration-200 z-20"
+          className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-white dark:bg-gray-800 text-[#2563eb] dark:text-white rounded-full shadow-lg flex items-center justify-center hover:shadow-xl hover:scale-110 transition-all duration-200 z-20"
           title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
           {isCollapsed ? (
@@ -117,7 +117,7 @@ const Sidebar = () => {
                 className={`
                   flex items-center justify-between px-4 py-3.5 cursor-pointer transition-all duration-300 relative group
                   ${isActive
-                    ? 'bg-white text-[#2563eb] shadow-lg rounded-xl scale-[1.02] font-semibold' 
+                    ? 'bg-white dark:bg-gray-800 text-[#2563eb] dark:text-white shadow-lg rounded-xl scale-[1.02] font-semibold' 
                     : 'text-white rounded-xl hover:bg-white/10'
                   }
                   ${isCollapsed ? 'justify-center' : ''}

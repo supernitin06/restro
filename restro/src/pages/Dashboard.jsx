@@ -1,24 +1,24 @@
 import React from 'react';
 import { ShoppingBag, Users, Star, DollarSign } from 'lucide-react';
-import StatCard from './PageDashboard/StatCard';
-import RevenueChart from './PageDashboard/RevenueChart';
-import TopCategories from './PageDashboard/TopCategories';
-import OrdersOverview from './PageDashboard/OrdersOverview';
-import OrderTypes from './PageDashboard/OrderTypes';
-import RecentOrders from './PageDashboard/RecentOrders';
-import TrendingMenu from './PageDashboard/TrendingMenu';
-import CustomerReviews from './PageDashboard/CustomerReviews';
-import RecentActivity from './PageDashboard/RecentActivity';
-import Footer from './PageDashboard/Footer';
+import StatCard from '../components/PageDashboard/StatCard';
+import RevenueChart from '../components/PageDashboard/RevenueChart';
+import TopCategories from '../components/PageDashboard/TopCategories';
+import OrdersOverview from '../components/PageDashboard/OrdersOverview';
+import OrderTypes from '../components/PageDashboard/OrderTypes';
+import RecentOrders from '../components/PageDashboard/RecentOrders';
+import TrendingMenu from '../components/PageDashboard/TrendingMenu';
+import CustomerReviews from '../components/PageDashboard/CustomerReviews';
+import RecentActivity from '../components/PageDashboard/RecentActivity';
+import Footer from '../components/PageDashboard/Footer';
 
 const Dashboard = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-orange-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-orange-50 dark:bg-gray-900 transition-colors duration-300">
       <div className="max-w-[1600px] mx-auto p-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">Dashboard</h1>
-          <p className="text-gray-600">Welcome back! Here's what's happening today.</p>
+          <h1 className="text-4xl font-bold text-gray-800 dark:text-white mb-2">Dashboard</h1>
+          <p className="text-gray-600 dark:text-gray-300">Welcome back! Here's what's happening today.</p>
         </div>
 
         {/* Stats Grid */}
