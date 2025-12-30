@@ -5,6 +5,7 @@
                 "status": "Pending",
                 "restaurantDetail": {
                     "name": "Spice Garden",
+                    "imageUrl": "https://images.unsplash.com/photo-1600891964599-f61ba0e24092",
                     "rating": 4.3,
                     "tables": 25,
                     "gst": { "gstNumber": "27GST0001", "gstVerified": false },
@@ -29,6 +30,7 @@
                 "status": "Approved",
                 "restaurantDetail": {
                     "name": "Food Villa",
+                    "imageUrl": "https://images.unsplash.com/photo-1552566626-52f8b828add9",
                     "rating": 4.6,
                     "tables": 40,
                     "gst": { "gstNumber": "29GST0002", "gstVerified": true },
@@ -53,6 +55,7 @@
                 "status": "Suspended",
                 "restaurantDetail": {
                     "name": "Urban Tadka",
+                    "imageUrl": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5",
                     "rating": 3.9,
                     "tables": 30,
                     "gst": { "gstNumber": "07GST0003", "gstVerified": true },
@@ -77,6 +80,7 @@
                 "status": "Approved",
                 "restaurantDetail": {
                     "name": "Royal Biryani",
+                    "imageUrl": "https://images.unsplash.com/photo-1631515243349-e0cb75fb8d3a",
                     "rating": 4.8,
                     "tables": 50,
                     "gst": { "gstNumber": "36GST0004", "gstVerified": true },
@@ -101,6 +105,7 @@
                 "status": "Pending",
                 "restaurantDetail": {
                     "name": "Cafe Delight",
+                    "imageUrl": "https://images.unsplash.com/photo-1521017432531-fbd92d768814",
                     "rating": 4.1,
                     "tables": 18,
                     "gst": { "gstNumber": "19GST0005", "gstVerified": false },
@@ -120,12 +125,12 @@
                 },
                 "actions": { "canApprove": true, "canSuspend": true }
             },
-
             {
                 "restaurantId": "RES006",
                 "status": "Approved",
                 "restaurantDetail": {
                     "name": "Punjabi Dhaba",
+                    "imageUrl": "https://images.unsplash.com/photo-1626776876729-bab43633f85c",
                     "rating": 4.5,
                     "tables": 35,
                     "gst": { "gstNumber": "03GST0006", "gstVerified": true },
@@ -145,12 +150,12 @@
                 },
                 "actions": { "canApprove": false, "canSuspend": true }
             },
-
             {
                 "restaurantId": "RES007",
                 "status": "Pending",
                 "restaurantDetail": {
                     "name": "South Spice",
+                    "imageUrl": "https://images.unsplash.com/photo-1604908177522-040cfe0a7b61",
                     "rating": 4.2,
                     "tables": 28,
                     "gst": { "gstNumber": "33GST0007", "gstVerified": false },
@@ -170,12 +175,12 @@
                 },
                 "actions": { "canApprove": true, "canSuspend": true }
             },
-
             {
                 "restaurantId": "RES008",
                 "status": "Approved",
                 "restaurantDetail": {
                     "name": "The Hungry Hub",
+                    "imageUrl": "https://images.unsplash.com/photo-1559339352-11d035aa65de",
                     "rating": 4.4,
                     "tables": 32,
                     "gst": { "gstNumber": "09GST0008", "gstVerified": true },
@@ -195,12 +200,12 @@
                 },
                 "actions": { "canApprove": false, "canSuspend": true }
             },
-
             {
                 "restaurantId": "RES009",
                 "status": "Suspended",
                 "restaurantDetail": {
                     "name": "Street Bites",
+                    "imageUrl": "https://images.unsplash.com/photo-1504674900247-0877df9cc836",
                     "rating": 3.6,
                     "tables": 15,
                     "gst": { "gstNumber": "24GST0009", "gstVerified": true },
@@ -220,12 +225,12 @@
                 },
                 "actions": { "canApprove": true, "canSuspend": false }
             },
-
             {
                 "restaurantId": "RES010",
                 "status": "Approved",
                 "restaurantDetail": {
                     "name": "Ocean View",
+                    "imageUrl": "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0",
                     "rating": 4.7,
                     "tables": 45,
                     "gst": { "gstNumber": "32GST0010", "gstVerified": true },
@@ -245,12 +250,12 @@
                 },
                 "actions": { "canApprove": false, "canSuspend": true }
             },
-
             {
                 "restaurantId": "RES011",
                 "status": "Pending",
                 "restaurantDetail": {
                     "name": "Taste Factory",
+                    "imageUrl": "https://images.unsplash.com/photo-1551218808-94e220e084d2",
                     "rating": 4.0,
                     "tables": 22,
                     "gst": { "gstNumber": "08GST0011", "gstVerified": false },
@@ -270,12 +275,12 @@
                 },
                 "actions": { "canApprove": true, "canSuspend": true }
             },
-
             {
                 "restaurantId": "RES012",
                 "status": "Approved",
                 "restaurantDetail": {
                     "name": "Grill House",
+                    "imageUrl": "https://images.unsplash.com/photo-1544025162-d76694265947",
                     "rating": 4.5,
                     "tables": 38,
                     "gst": { "gstNumber": "06GST0012", "gstVerified": true },
@@ -295,12 +300,12 @@
                 },
                 "actions": { "canApprove": false, "canSuspend": true }
             },
-
             {
                 "restaurantId": "RES013",
                 "status": "Pending",
                 "restaurantDetail": {
                     "name": "Veggie Love",
+                    "imageUrl": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd",
                     "rating": 4.2,
                     "tables": 20,
                     "gst": { "gstNumber": "23GST0013", "gstVerified": false },
@@ -320,12 +325,12 @@
                 },
                 "actions": { "canApprove": true, "canSuspend": true }
             },
-
             {
                 "restaurantId": "RES014",
                 "status": "Approved",
                 "restaurantDetail": {
                     "name": "Chai Adda",
+                    "imageUrl": "https://images.unsplash.com/photo-1517705008128-361805f42e86",
                     "rating": 4.1,
                     "tables": 12,
                     "gst": { "gstNumber": "10GST0014", "gstVerified": true },
@@ -345,12 +350,12 @@
                 },
                 "actions": { "canApprove": false, "canSuspend": true }
             },
-
             {
                 "restaurantId": "RES015",
                 "status": "Suspended",
                 "restaurantDetail": {
                     "name": "BBQ Nation Local",
+                    "imageUrl": "https://images.unsplash.com/photo-1555992336-03a23c6d1a5f",
                     "rating": 3.8,
                     "tables": 48,
                     "gst": { "gstNumber": "27GST0015", "gstVerified": true },
@@ -370,12 +375,12 @@
                 },
                 "actions": { "canApprove": true, "canSuspend": false }
             },
-
             {
                 "restaurantId": "RES016",
                 "status": "Approved",
                 "restaurantDetail": {
                     "name": "Food Street",
+                    "imageUrl": "https://images.unsplash.com/photo-1551782450-a2132b4ba21d",
                     "rating": 4.4,
                     "tables": 34,
                     "gst": { "gstNumber": "18GST0016", "gstVerified": true },
@@ -395,12 +400,12 @@
                 },
                 "actions": { "canApprove": false, "canSuspend": true }
             },
-
             {
                 "restaurantId": "RES017",
                 "status": "Pending",
                 "restaurantDetail": {
                     "name": "Flavours",
+                    "imageUrl": "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe",
                     "rating": 4.0,
                     "tables": 26,
                     "gst": { "gstNumber": "21GST0017", "gstVerified": false },
@@ -420,12 +425,12 @@
                 },
                 "actions": { "canApprove": true, "canSuspend": true }
             },
-
             {
                 "restaurantId": "RES018",
                 "status": "Approved",
                 "restaurantDetail": {
                     "name": "Zayka Junction",
+                    "imageUrl": "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445",
                     "rating": 4.6,
                     "tables": 36,
                     "gst": { "gstNumber": "20GST0018", "gstVerified": true },
@@ -445,12 +450,12 @@
                 },
                 "actions": { "canApprove": false, "canSuspend": true }
             },
-
             {
                 "restaurantId": "RES019",
                 "status": "Pending",
                 "restaurantDetail": {
                     "name": "Daily Dine",
+                    "imageUrl": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c",
                     "rating": 3.9,
                     "tables": 19,
                     "gst": { "gstNumber": "22GST0019", "gstVerified": false },
@@ -470,12 +475,12 @@
                 },
                 "actions": { "canApprove": true, "canSuspend": true }
             },
-
             {
                 "restaurantId": "RES020",
                 "status": "Approved",
                 "restaurantDetail": {
                     "name": "Midnight Meals",
+                    "imageUrl": "https://images.unsplash.com/photo-1504674900247-0877df9cc836",
                     "rating": 4.5,
                     "tables": 27,
                     "gst": { "gstNumber": "27GST0020", "gstVerified": true },
