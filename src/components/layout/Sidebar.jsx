@@ -6,18 +6,15 @@ import {
   Users,
   UtensilsCrossed,
   Truck,
-  Settings,
-  ChevronDown,
   ChevronLeft,
   ChevronRight,
-  Circle
+  ShoppingBag
 } from 'lucide-react';
 
 const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [isOrdersOpen, setIsOrdersOpen] = useState(false);
   const [activeMenu, setActiveMenu] = useState('dashboard');
   const [hoveredMenu, setHoveredMenu] = useState(null);
 
@@ -46,40 +43,33 @@ const Sidebar = () => {
       icon: Truck,
       path: '/delivery-settings'
     },
-    /*
+    
     {
       id: 'orders',
       label: 'Orders',
       icon: ShoppingBag,
-      badge: '65',
-      hasDropdown: true,
-      subItems: [
-        { id: 'pending', label: 'Pending Orders', path: '/orders/pending' },
-        { id: 'completed', label: 'Completed Orders', path: '/orders/completed' },
-        { id: 'cancelled', label: 'Cancelled Orders', path: '/orders/cancelled' }
-      ]
+      path: '/orders'
     },
-    */
+    
   ];
 
   useEffect(() => {
     const currentPath = location.pathname;
-    const activeItem = menuItems.find(item => item.path === currentPath);
+    // Find an exact match first, or a parent match for sub-routes
+    const activeItem = menuItems.find(item => 
+      item.path === currentPath || (item.path !== '/' && currentPath.startsWith(item.path))
+    );
     if (activeItem) {
       setActiveMenu(activeItem.id);
     } else if (currentPath === '/') {
       setActiveMenu('dashboard');
     }
-  }, [location.pathname]);
+  }, [location.pathname]); // menuItems is static, no need to include
 
   const handleMenuClick = (menuId) => {
     setActiveMenu(menuId);
     const item = menuItems.find(i => i.id === menuId);
-    if (item?.hasDropdown) {
-      if (menuId === 'orders') {
-        setIsOrdersOpen(!isOrdersOpen);
-      }
-    } else if (item?.path) {
+    if (item?.path) {
       navigate(item.path);
     }
   };
@@ -202,28 +192,6 @@ const Sidebar = () => {
                 )}
               </div>
 
-              {/* Dropdown Submenu for Orders */}
-              {item.hasDropdown && !isCollapsed && (
-                <div className={`
-                  overflow-hidden transition-all duration-300 ease-in-out
-                  ${isOrdersOpen ? 'max-h-48 mt-2 opacity-100' : 'max-h-0 opacity-0'}
-                `}>
-                  {item.subItems.map((subItem, subIndex) => (
-                    <div
-                      key={subItem.id}
-                      className="pl-12 pr-4 py-2.5 text-white/90 cursor-pointer text-sm 
-                               transition-all duration-200 rounded-lg mx-1 my-0.5
-                               hover:bg-white/10 hover:pl-14 hover:text-white flex items-center gap-2.5 group"
-                      style={{
-                        transitionDelay: isOrdersOpen ? `${subIndex * 50}ms` : '0ms'
-                      }}
-                    >
-                      <Circle className="w-1.5 h-1.5 fill-current transition-all duration-200 group-hover:scale-150" />
-                      <span className="font-medium">{subItem.label}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
           );
         })}

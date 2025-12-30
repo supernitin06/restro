@@ -23,7 +23,7 @@ const GradientButton = ({
         px-6 py-3 
         rounded-xl
         font-semibold
-        text-white
+        text-#2563eb
         transition-all duration-300
         hover:scale-105
         active:scale-95

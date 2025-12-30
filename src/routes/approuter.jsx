@@ -7,6 +7,7 @@ import RestaurantManagement from "../pages/RestaurantManagement";
 import UserManagement from "../pages/Usermanagement";
 import DeliverySettings from "../pages/DeliverySettings";
 import AuthContainer from "../components/Auth/AuthContainer";
+import Orders from "../pages/Orders";
 
 const AppRouter = createBrowserRouter(
   [
@@ -36,6 +37,10 @@ const AppRouter = createBrowserRouter(
         {
           path: "delivery-settings",
           element: <DeliverySettings />,
+        },
+        {
+          path: "orders",
+          element: <Orders />,
         },
       ],
     },
