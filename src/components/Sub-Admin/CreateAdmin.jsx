@@ -22,6 +22,7 @@ import {
 import Button from '../ui/Button';
 import Card from '../ui/GlassCard';
 import Input from '../ui/InputField';
+import ConfirmationModal from './ConfirmationModal';
 
 const CreateAdmin = () => {
   const navigate = useNavigate();
@@ -38,6 +39,7 @@ const CreateAdmin = () => {
 
   const [selectedPermissions, setSelectedPermissions] = useState([]);
   const [errors, setErrors] = useState({});
+  const [isConfirmModalOpen, setConfirmModalOpen] = useState(false);
 
   const permissionGroups = [
     {
@@ -146,13 +148,15 @@ const CreateAdmin = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
-    if (!validateForm()) {
-      return;
+    if (validateForm()) {
+      setConfirmModalOpen(true);
     }
+  };
 
+  const handleConfirmCreate = () => {
     console.log('Creating sub-admin:', { ...formData, permissions: selectedPermissions });
     alert('Sub-Admin created successfully!');
+    setConfirmModalOpen(false);
     navigate('/sub-admin');
   };
 
@@ -559,6 +563,15 @@ const CreateAdmin = () => {
           </div>
         </form>
       </div>
+
+      <ConfirmationModal
+        isOpen={isConfirmModalOpen}
+        onClose={() => setConfirmModalOpen(false)}
+        onConfirm={handleConfirmCreate}
+        title="Confirm Sub-Admin Creation"
+        message="Are you sure you want to create this new sub-admin with the selected permissions?"
+        confirmText="Create Admin"
+      />
     </div>
   );
 };
