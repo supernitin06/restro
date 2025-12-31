@@ -12,7 +12,9 @@ import {
   FileText,
   RefreshCw,
   Banknote,
-  Receipt
+  Receipt,
+  ShoppingBag,
+  Settings
 } from 'lucide-react';
 import SidebarDropdown from '../ui/DropDown';
 
@@ -33,12 +35,20 @@ const Sidebar = ({ theme = 'light' }) => {
     { id: 'details', label: 'Transaction Details', icon: Receipt, path: '/payments/details' }
   ];
 
+
+
   /* ---------------- Main menu ---------------- */
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '/' },
     { id: 'users', label: 'Users', icon: Users, path: '/users' },
     { id: 'restaurants', label: 'Restaurants', icon: UtensilsCrossed, path: '/restaurants' },
-    { id: 'delivery', label: 'Delivery Settings', icon: Truck, path: '/delivery-settings' },
+
+    // // Order & Delivery Heading
+    // { type: 'heading', label: 'Order & Delivery' },
+    { id: 'orders', label: 'Orders', icon: ShoppingBag, path: '/orders' },
+    { id: 'delivery-partners', label: 'Delivery Partners', icon: Users, path: '/delivery-partners' },
+    { id: 'delivery-settings', label: 'Delivery Settings', icon: Truck, path: '/delivery-settings' },
+
     {
       id: 'payments',
       label: 'Payments',
@@ -63,8 +73,15 @@ const Sidebar = ({ theme = 'light' }) => {
     const paymentMatch = paymentSubItems.find(s => path.startsWith(s.path));
     if (paymentMatch) {
       setActiveMenu('payments');
-      setOpenDropdowns({ payments: true });
+      setOpenDropdowns((prev) => ({ ...prev, payments: true }));
+      return;
     }
+
+    /* 
+       Since we flattened orders/delivery, they are now 'main' items 
+       and matched by the first check above. 
+       We only need to handle sub-items for payments.
+    */
   }, [location.pathname]);
 
   const handleMenuClick = (item) => {
@@ -125,6 +142,17 @@ const Sidebar = ({ theme = 'light' }) => {
                   onToggle={() => handleMenuClick(item)}
                   onSubItemClick={handleSubItemClick}
                 />
+              );
+            }
+
+            if (item.type === 'heading') {
+              if (isCollapsed) return null;
+              return (
+                <div key={item.label} className="px-4 mt-6 mb-2">
+                  <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                    {item.label}
+                  </span>
+                </div>
               );
             }
 
