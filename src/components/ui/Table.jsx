@@ -35,6 +35,7 @@ const UserTable = ({
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     }).format(num);
+    return `$${parseFloat(amount).toFixed(2)}`;
   };
 
   // Format date
@@ -364,10 +365,9 @@ const UserTable = ({
               </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+  
   );
 };
 
 export default UserTable;
+

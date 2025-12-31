@@ -20,6 +20,7 @@ import TransactionDetails from "../pages/payments/TransactionDetails";
 import Refunds from "../pages/payments/Refunds";
 import Invoice from "../pages/payments/Invoice";
 
+import OffersManagement from "../pages/OffersManagement";
 const AppRouter = createBrowserRouter(
   [
     /* 🔐 AUTH ROUTES */
@@ -54,39 +55,8 @@ const AppRouter = createBrowserRouter(
           element: <DeliveryPartnerManagement />,
         },
         {
-          path: "orders",
-          element: <Orders />,
-        },
-
-        /* 💳 PAYMENTS (nested inside Layout) */
-        {
-          path: "payments",
-          children: [
-            {
-              path: "dashboard",
-              element: <PaymentDashboard />,
-            },
-            {
-              path: "transactions",
-              element: <Transactions />,
-            },
-            {
-              path: "transactions/:id",
-              element: <TransactionDetails />,
-            },
-            {
-              path: "refunds",
-              element: <Refunds />,
-            },
-            {
-              path: "invoice",
-              element: <Invoice />,
-            },
-            {
-              path: "details",
-              element: <TransactionDetails/>,
-            }
-          ],
+          path: "offers",                   
+          element: <OffersManagement />,
         },
       ],
     },
