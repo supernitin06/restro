@@ -63,6 +63,7 @@ const Orders = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
+  const [viewMode, setViewMode] = useState('grid');
 
   const handleFilterChange = (key, value) => {
     setFilters(prev => ({ ...prev, [key]: value }));
@@ -125,10 +126,10 @@ const Orders = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 md:p-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 md:p-2">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-2">
           <div className="flex justify-between items-center mb-4">
             <div>
               <h1 className="text-4xl font-bold text-gray-800 mb-2">Orders Management</h1>
@@ -150,10 +151,12 @@ const Orders = () => {
           filters={filters}
           onFilterChange={handleFilterChange}
           onClearFilters={handleClearFilters}
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
         />
 
         {/* Orders Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+        <div className={viewMode === 'grid' ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8" : "flex flex-col gap-4 mt-8"}>
           {currentOrders.map(order => (
             <OrderCard 
               key={order.id} 
@@ -161,6 +164,7 @@ const Orders = () => {
               onDelete={handleDeleteOrder}
               onEdit={() => setEditingOrder(order)}
               onUpdateStatus={handleUpdateStatus}
+              viewMode={viewMode}
             />
           ))}
         </div>
