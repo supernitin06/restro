@@ -81,9 +81,9 @@ const CustomerReviews = () => {
   }, []);
 
   return (
-    <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20 dark:border-gray-700">
+    <div className="bg-primary rounded-2xl p-6 shadow-lg border border-white/20 dark:border-gray-700">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xl font-bold text-gray-800 dark:text-white">Customer Reviews</h3>
+        <h3 className="text-xl font-bold text-primary">Customer Reviews</h3>
         <Button className="text-sm font-medium text-[#2563eb] hover:text-[#1d4ed8] transition-colors bg-transparent shadow-none p-0 w-auto hover:bg-transparent">
           See More Reviews
         </Button>
@@ -110,14 +110,14 @@ const CustomerReviews = () => {
             {reviews.map((review) => (
               <div
                 key={review.id}
-                className="w-[45%] flex-shrink-0 bg-gradient-to-br from-white to-gray-50 dark:from-gray-700 dark:to-gray-800 rounded-2xl p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 group"
+                className="w-[45%] flex-shrink-0 card rounded-2xl p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 group"
               >
                 <div className="flex items-start gap-4 mb-4">
                   <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${review.gradient} dark:from-gray-600 dark:via-gray-700 dark:to-gray-800 flex items-center justify-center text-4xl shadow-md group-hover:scale-110 transition-transform`}>
                     {review.image}
                   </div>
                   <div className="flex-1">
-                    <h4 className="font-bold text-gray-800 dark:text-gray-200 text-lg mb-1">{review.dishName}</h4>
+                    <h4 className="font-bold text-primary text-lg mb-1">{review.dishName}</h4>
                     <div className="flex items-center gap-1 mb-2">
                       {[...Array(5)].map((_, i) => (
                         <Star
@@ -130,19 +130,19 @@ const CustomerReviews = () => {
                             }`}
                         />
                       ))}
-                      <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">{review.rating}</span>
+                      <span className="text-sm font-semibold text-primary opacity-80 ml-1">{review.rating}</span>
                     </div>
                   </div>
                 </div>
 
-                <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed mb-4 line-clamp-3">
+                <p className="text-primary opacity-70 text-sm leading-relaxed mb-4 line-clamp-3">
                   {review.review}
                 </p>
 
                 <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
                   <div>
-                    <p className="font-semibold text-gray-800 dark:text-white text-sm">{review.reviewer}</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">{review.date}</p>
+                    <p className="font-semibold text-primary text-sm">{review.reviewer}</p>
+                    <p className="text-xs text-primary opacity-60">{review.date}</p>
                   </div>
                   <div className="flex gap-1">
                     {[...Array(Math.floor(review.rating))].map((_, i) => (

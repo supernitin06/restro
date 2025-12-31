@@ -11,15 +11,15 @@ const DeliverySettings = () => {
     const [activeTab, setActiveTab] = useState('rules'); // rules | priority
 
     return (
-        <div className="page">
+        <div className="page page-background ">
             <div className="max-w-7xl mx-auto space-y-8">
                 {/* Header Section */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-white dark:bg-gray-800 p-6 md:p-8 rounded-3xl shadow-lg border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-primary p-6 md:p-8 rounded-3xl shadow-lg border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
                     <div>
                         <h1 className="text-heading">
                             Delivery Charge
                         </h1>
-                        <p className="text-gray-500 dark:text-gray-400 mt-2 text-lg font-medium">
+                        <p className="text-primary opacity-70 mt-2 text-lg font-medium">
                             Manage delivery pricing, rules, and priorities across your platform.
                         </p>
                     </div>
@@ -40,12 +40,12 @@ const DeliverySettings = () => {
                 </div>
 
                 {/* Tab Navigation */}
-                <div className="flex space-x-1 bg-white dark:bg-gray-800 p-1.5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 w-fit">
+                <div className="flex space-x-1 bg-primary p-1.5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 w-fit">
                     <button
                         onClick={() => setActiveTab('rules')}
                         className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all duration-200 ${activeTab === 'rules'
-                                ? 'bg-indigo-600 text-white shadow-md'
-                                : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-200'
+                            ? 'bg-indigo-600 text-white shadow-md'
+                            : 'text-primary opacity-60 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-primary active:text-primary'
                             }`}
                     >
                         <FaTruck className={activeTab === 'rules' ? 'animate-pulse' : ''} />
@@ -54,8 +54,8 @@ const DeliverySettings = () => {
                     <button
                         onClick={() => setActiveTab('priority')}
                         className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all duration-200 ${activeTab === 'priority'
-                                ? 'bg-indigo-600 text-white shadow-md'
-                                : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-200'
+                            ? 'bg-indigo-600 text-white shadow-md'
+                            : 'text-primary opacity-60 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-primary active:text-primary'
                             }`}
                     >
                         <FaSortAmountDown />
@@ -79,9 +79,9 @@ const DeliverySettings = () => {
                             </div>
                         </div>
                     ) : (
-                        <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-lg border border-gray-100 dark:border-gray-700 p-8">
-                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Execution Priority</h2>
-                            <p className="text-gray-500 dark:text-gray-400 mb-8 max-w-2xl">
+                        <div className="bg-primary rounded-3xl shadow-lg border border-gray-100 dark:border-gray-700 p-8">
+                            <h2 className="text-2xl font-bold text-primary mb-6">Execution Priority</h2>
+                            <p className="text-primary opacity-70 mb-8 max-w-2xl">
                                 Determine which rule takes precedence when multiple rules apply to a single order. Drag and drop to reorder.
                             </p>
                             <RulePriority />

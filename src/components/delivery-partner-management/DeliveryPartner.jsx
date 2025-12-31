@@ -7,6 +7,7 @@ import {
   FiTruck,
 } from "react-icons/fi";
 import DeliveryPartnerStatusBadge from "./DeliveryPartnerStatusBadge";
+import Button from "../ui/Button";
 
 const DeliveryPartner = ({ partners, onViewDetails, updatePartner }) => {
   const toggleStatus = (partner) => {
@@ -63,7 +64,7 @@ const DeliveryPartner = ({ partners, onViewDetails, updatePartner }) => {
             </div>
 
             {/* INFO */}
-            <div className="flex flex-col gap-1 text-[10px] text-gray-500 bg-gray-50 rounded p-2 mb-2">
+            <div className="flex flex-col gap-1 text-[10px] text-gray-300 bg-gray-800 rounded p-2 mb-2">
               <div className="flex items-center gap-1.5">
                 <FiPhone className="text-primary text-xs shrink-0" />
                 <span>{registrationData?.mobileNumber}</span>
@@ -96,52 +97,50 @@ const DeliveryPartner = ({ partners, onViewDetails, updatePartner }) => {
 
             {/* STATS */}
             <div className="grid grid-cols-2 gap-2 text-[10px] mb-2">
-              <div className="bg-gray-100 rounded p-1.5 text-center">
-                <p className="font-semibold">
+              <div className="bg-gray-800 rounded p-1.5 text-center">
+                <p className="font-semibold text-gray-200">
                   {listView.assignedOrdersCount || 0}
                 </p>
-                <span className="text-secondary">Assigned</span>
+                <span className="text-gray-400">Assigned</span>
               </div>
 
-              <div className="bg-gray-100 rounded p-1.5 text-center">
-                <p className="font-semibold">
+              <div className="bg-gray-800 rounded p-1.5 text-center">
+                <p className="font-semibold text-gray-200">
                   {orderHistory?.length || 0}
                 </p>
-                <span className="text-secondary">Completed</span>
+                <span className="text-gray-400">Completed</span>
               </div>
             </div>
 
             {/* ACTIONS */}
             <div className="flex gap-1">
-              <button
-                className={`btn-sm flex-1 ${
-                  isActive ? "btn-inactive" : "btn-active"
-                }`}
+              <Button
+                className={`btn-sm flex-1 ${isActive ? "btn-inactive" : "btn-active"
+                  }`}
                 onClick={() => toggleStatus(partner)}
               >
                 {isActive ? "Deactivate" : "Activate"}
-              </button>
+              </Button>
 
-              <button
+              <Button
                 className="btn-secondary btn-sm flex-1"
                 onClick={() => onViewDetails(partner)}
               >
                 View
-              </button>
+              </Button>
 
-              <button
+              <Button
                 className="btn-primary btn-sm flex-1"
                 onClick={() => alert("Assign coming soon")}
               >
                 Assign
-              </button>
+              </Button>
             </div>
 
             {/* STATUS BAR */}
             <div
-              className={`h-0.5 mt-2 rounded ${
-                isActive ? "bg-green-500" : "bg-gray-400"
-              }`}
+              className={`h-0.5 mt-2 rounded ${isActive ? "bg-green-500" : "bg-gray-400"
+                }`}
             />
           </div>
         );

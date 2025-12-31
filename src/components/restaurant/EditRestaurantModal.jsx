@@ -15,7 +15,7 @@ const EditRestaurantModal = ({
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 z-50">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
         {/* Modal Header */}
-        <div className="bg-gradient-to-r from-red-600 to-red-700 p-6 text-white">
+        <div className="bg-gradient-sidebar p-6 text-white">
           <div className="flex justify-between items-start">
             <h2 className="text-2xl font-bold">Edit Restaurant</h2>
             <Button

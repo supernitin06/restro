@@ -83,7 +83,7 @@ const Sidebar = ({ theme = 'light' }) => { // Accept theme prop
     <div className={`${theme === 'dark' ? 'dark' : ''} sidebar-wrapper relative`}>
       <div className={`${isCollapsed ? 'w-20' : 'w-64'} h-full`}>
         {/* Header with Logo */}
-        <div className="relative border-b border-sidebar py-5 px-4">
+        <div className="relative border-b border-sidebar py-[18px] px-4">
           <div className="flex items-center justify-between">
             {!isCollapsed && (
               <div className="flex items-center gap-3">
@@ -101,17 +101,17 @@ const Sidebar = ({ theme = 'light' }) => { // Accept theme prop
           </div>
 
           {/* Toggle Button */}
-          <Button
+          <button
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-primary text-sidebar rounded-full shadow-lg flex items-center justify-center hover:shadow-xl hover:scale-110 transition-all duration-200 z-20 p-0"
+            className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6  hover:scale-110 transition-all duration-200 z-20 p-0"
             title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           >
             {isCollapsed ? (
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-4 text-black dark:text-white h-4" />
             ) : (
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="w-4 text-black dark:text-white h-4" />
             )}
-          </Button>
+          </button>
         </div>
 
         {/* Menu Items */}

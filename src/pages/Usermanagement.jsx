@@ -111,13 +111,13 @@ const UserManagement = () => {
   };
 
   return (
-    <div className="page">
-     <div className="flex flex-col mb-6 md:flex-row justify-between items-start md:items-center bg-white dark:bg-gray-800 p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
+    <div className="page page-background ">
+      <div className="flex flex-col mb-6 md:flex-row justify-between items-start md:items-center bg-primary p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
         <div>
           <h1 className="text-heading">
             User Management
           </h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-2 text-lg font-medium">
+          <p className="text-primary opacity-70 mt-2 text-lg font-medium">
             Manage users and their details.
           </p>
         </div>

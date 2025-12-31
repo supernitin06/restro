@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { TrendingUp } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
+import Select from '../../components/ui/Select';
 
 const RevenueChart = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('Last 6 Months');
@@ -24,10 +25,10 @@ const RevenueChart = () => {
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm p-4 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700">
-          <p className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">{payload[0].payload.name}</p>
-          <p className="text-sm text-gray-600 dark:text-gray-400">Revenue: <span className="font-bold text-[#2563eb] dark:text-blue-400">${payload[0].value.toLocaleString()}</span></p>
-          <p className="text-sm text-gray-600 dark:text-gray-400">Orders: <span className="font-bold text-[#eb2528] dark:text-red-400">{payload[1].value}</span></p>
+        <div className="bg-primary p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 h-full">
+          <p className="text-sm font-semibold text-primary mb-2">{payload[0].payload.name}</p>
+          <p className="text-sm text-primary opacity-70">Revenue: <span className="font-bold text-[#2563eb] dark:text-blue-400">${payload[0].value.toLocaleString()}</span></p>
+          <p className="text-sm text-primary opacity-70">Orders: <span className="font-bold text-[#eb2528] dark:text-red-400">{payload[1].value}</span></p>
         </div>
       );
     }
@@ -35,28 +36,24 @@ const RevenueChart = () => {
   };
 
   return (
-    <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20 dark:border-gray-700">
+    <div className="bg-primary rounded-2xl p-6 shadow-lg border border-white/20 dark:border-gray-700">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-1">Total Revenue</h3>
+          <h3 className="text-xl font-bold text-primary mb-1">Total Revenue</h3>
           <div className="flex items-center gap-3">
-            <p className="text-3xl font-bold text-gray-900 dark:text-white">$184,839</p>
+            <p className="text-3xl font-bold text-primary">$184,839</p>
             <div className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400">
               <TrendingUp className="w-3.5 h-3.5" />
               +12.5%
             </div>
           </div>
         </div>
-        <select
+        <Select
           value={selectedPeriod}
           onChange={(e) => setSelectedPeriod(e.target.value)}
-          className="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-200 cursor-pointer hover:border-[#2563eb] focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 transition-all"
-        >
-          <option>Last 6 Months</option>
-          <option>Last 3 Months</option>
-          <option>Last Month</option>
-          <option>This Year</option>
-        </select>
+          options={["Last 6 Months", "Last 3 Months", "Last Month", "This Year"]}
+          className="w-40"
+        />
       </div>
 
       <div className="h-64">
@@ -96,11 +93,11 @@ const RevenueChart = () => {
       <div className="flex items-center justify-center gap-8 mt-4">
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full bg-[#2563eb]"></div>
-          <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Revenue</span>
+          <span className="text-sm font-medium text-primary opacity-70">Revenue</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full bg-[#eb2528]"></div>
-          <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Orders</span>
+          <span className="text-sm font-medium text-primary opacity-70">Orders</span>
         </div>
       </div>
     </div>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import Button from '../ui/Button';
+import Select from '../ui/Select';
 import { useTheme } from '../../context/ThemeContext';
 
 const OrdersOverview = () => {
@@ -24,9 +25,9 @@ const OrdersOverview = () => {
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm p-3 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700">
-          <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">{payload[0].payload.day}</p>
-          <p className="text-sm text-gray-600 dark:text-gray-400">Orders: <span className="font-bold text-[#eb2528] dark:text-red-400">{payload[0].value}</span></p>
+        <div className="bg-primary p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 h-96">
+          <p className="text-sm font-semibold text-primary">{payload[0].payload.day}</p>
+          <p className="text-sm text-primary opacity-70">Orders: <span className="font-bold text-[#eb2528] dark:text-red-400">{payload[0].value}</span></p>
         </div>
       );
     }
@@ -34,25 +35,22 @@ const OrdersOverview = () => {
   };
 
   return (
-    <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20 dark:border-gray-700">
+    <div className="bg-primary rounded-2xl p-6 shadow-lg border border-white/20 dark:border-gray-700">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xl font-bold text-gray-800 dark:text-white">Orders Overview</h3>
+        <h3 className="text-xl font-bold text-primary">Orders Overview</h3>
         <div className="flex gap-2">
           <Button className="px-3 py-1.5 rounded-lg text-sm font-medium bg-gray-800 text-white dark:bg-gray-600">
             Weekly
           </Button>
-          <Button className="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+          <Button className="px-3 py-1.5 rounded-lg text-sm font-medium text-primary opacity-70 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
             Monthly
           </Button>
-          <select
+          <Select
             value={selectedView}
             onChange={(e) => setSelectedView(e.target.value)}
-            className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-200 cursor-pointer hover:border-[#2563eb] focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 transition-all ml-2"
-          >
-            <option>This Week</option>
-            <option>Last Week</option>
-            <option>This Month</option>
-          </select>
+            options={["This Week", "Last Week", "This Month"]}
+            className="w-36 ml-2"
+          />
         </div>
       </div>
 
