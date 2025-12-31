@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Button from '../ui/Button';
+import './sidebar.css';
 import {
   LayoutDashboard,
   Users,
@@ -103,7 +104,7 @@ const Sidebar = ({ theme = 'light' }) => {
   };
 
   return (
-    <div className={`${theme === 'dark' ? 'dark' : ''} sidebar-wrapper`}>
+    <div className={`${theme === 'dark' ? 'dark' : ''} sidebar-wrapper overflow-y-auto scroll-bar-thin overflow-x-hidden`}>
       <div className={`${isCollapsed ? 'w-20' : 'w-64'} h-full`}>
 
         {/* ---------- Header ---------- */}
