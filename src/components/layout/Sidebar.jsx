@@ -15,10 +15,12 @@ import {
   Receipt,
   ShoppingBag,
   Percent,
-  Settings
+  Settings,
+  MessageSquare   
 } from 'lucide-react';
 import SidebarDropdown from '../ui/DropDown';
 import './Sidebar.css';
+
 const Sidebar = ({ theme = 'light' }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -36,18 +38,22 @@ const Sidebar = ({ theme = 'light' }) => {
     { id: 'details', label: 'Transaction Details', icon: Receipt, path: '/payments/details' }
   ];
 
-
-
   /* ---------------- Main menu ---------------- */
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '/' },
     { id: 'users', label: 'Users', icon: Users, path: '/users' },
     { id: 'restaurants', label: 'Restaurants', icon: UtensilsCrossed, path: '/restaurants' },
 
-    // // Order & Delivery Heading
-    // { type: 'heading', label: 'Order & Delivery' },
     { id: 'orders', label: 'Orders', icon: ShoppingBag, path: '/orders' },
     { id: 'offers', label: 'Offers & Coupons', icon: Percent, path: '/offers' },
+
+    {
+      id: 'support-tickets',
+      label: 'Support & Tickets',
+      icon: MessageSquare,
+      path: '/support-tickets'  
+    },
+
     { id: 'delivery-partners', label: 'Delivery Partners', icon: Users, path: '/delivery-partners' },
     { id: 'delivery-settings', label: 'Delivery Settings', icon: Truck, path: '/delivery-settings' },
 
@@ -78,12 +84,6 @@ const Sidebar = ({ theme = 'light' }) => {
       setOpenDropdowns((prev) => ({ ...prev, payments: true }));
       return;
     }
-
-    /* 
-       Since we flattened orders/delivery, they are now 'main' items 
-       and matched by the first check above. 
-       We only need to handle sub-items for payments.
-    */
   }, [location.pathname]);
 
   const handleMenuClick = (item) => {
@@ -166,6 +166,7 @@ const Sidebar = ({ theme = 'light' }) => {
                   ${activeMenu === item.id ? 'sidebar-item-active' : 'text-sidebar hover:bg-white/10'}
                   ${isCollapsed ? 'justify-center' : ''}
                 `}
+                title={isCollapsed ? item.label : ''}
               >
                 <item.icon className="w-5 h-5" />
                 {!isCollapsed && <span>{item.label}</span>}

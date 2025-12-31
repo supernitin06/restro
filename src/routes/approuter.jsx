@@ -64,7 +64,7 @@ const AppRouter = createBrowserRouter(
           element: <OffersManagement />,
         },
         {
-          path: "support",
+          path: "support-tickets",
           element: <SupportManagement />,
         },
         {
