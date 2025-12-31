@@ -34,9 +34,9 @@ const OrderTypes = () => {
   ];
 
   return (
-    <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20 dark:border-gray-700">
+    <div className="bg-primary rounded-2xl p-6 shadow-lg border border-white/20 dark:border-gray-700">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xl font-bold text-gray-800 dark:text-white">Order Types</h3>
+        <h3 className="text-xl font-bold text-primary">Order Types</h3>
         <Button className="text-sm font-medium text-[#2563eb] hover:text-[#1d4ed8] transition-colors bg-transparent shadow-none p-0 w-auto hover:bg-transparent">
           This Month ▼
         </Button>
@@ -52,10 +52,10 @@ const OrderTypes = () => {
                   <div className={`${item.bgColor} dark:bg-opacity-20 p-2.5 rounded-xl group-hover:scale-110 transition-transform duration-300`}>
                     <IconComponent className="w-5 h-5" style={{ color: item.color }} />
                   </div>
-                  <span className="font-semibold text-gray-800 dark:text-gray-200">{item.type}</span>
+                  <span className="font-semibold text-primary">{item.type}</span>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-bold text-gray-800 dark:text-white">{item.orders}</p>
+                  <p className="text-sm font-bold text-primary">{item.orders}</p>
                 </div>
               </div>
 
@@ -70,7 +70,7 @@ const OrderTypes = () => {
               </div>
 
               <div className="flex items-center justify-end mt-1">
-                <span className="text-xs font-medium text-gray-500 dark:text-gray-400">{item.percentage}%</span>
+                <span className="text-xs font-medium text-primary opacity-60">{item.percentage}%</span>
               </div>
             </div>
           );

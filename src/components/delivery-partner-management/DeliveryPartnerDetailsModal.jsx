@@ -14,18 +14,18 @@ const DeliveryPartnerDetailsModal = ({ partner, onClose, updatePartner }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-3">
-      <div className="bg-white w-full max-w-4xl rounded-2xl shadow-xl overflow-hidden">
+    <div className="fixed inset-0 bg-black/40 flex text-primary items-center justify-center z-50 p-3">
+      <div className="bg-primary w-full max-w-4xl rounded-2xl shadow-xl overflow-hidden">
 
         {/* Header */}
-        <div className="bg-gradient-to-r from-white via-red-100 to-red-300 px-5 py-3 flex justify-between items-center">
+        <div className="bg-gradient-sidebar px-5 py-3 flex justify-between items-center">
           <div>
-            <h2 className="text-lg font-semibold text-red-900">{registrationData?.name}</h2>
-            <p className="text-xs text-red-800/70">Partner ID : <span className="font-medium">{partnerId}</span></p>
+            <h2 className="text-lg font-semibold text-white">{registrationData?.name}</h2>
+            <p className="text-xs text-white/70">Partner ID : <span className="font-medium">{partnerId}</span></p>
           </div>
           <div className="flex items-center gap-3">
             <DeliveryPartnerStatusBadge status={listView.status} />
-            <Button onClick={onClose} className="bg-transparent text-red-900 hover:text-red-700 w-auto px-2 py-1" fullWidth={false}>✕</Button>
+            <Button onClick={onClose} className="bg-transparent text-white hover:text-white w-auto px-2 py-1" fullWidth={false}>✕</Button>
           </div>
         </div>
 
@@ -34,11 +34,11 @@ const DeliveryPartnerDetailsModal = ({ partner, onClose, updatePartner }) => {
 
           {/* Profile */}
           <div className="flex gap-4 items-start">
-            <img src={registrationData?.image || "https://images.unsplash.com/photo-1603415526960-f7e0328c63b1"} alt={registrationData?.name} className="w-20 h-20 rounded-xl object-cover border"/>
+            <img src={registrationData?.image || "https://images.unsplash.com/photo-1603415526960-f7e0328c63b1"} alt={registrationData?.name} className="w-20 h-20 rounded-xl object-cover border-white" />
             <div className="flex-1">
               <div className="grid grid-cols-2 gap-x-5 gap-y-2 text-sm">
                 {Object.entries(registrationData || {}).map(([key, value]) => (
-                  <div key={key} className="text-gray-700">
+                  <div key={key} className="text-white">
                     <span className="text-gray-500 capitalize">{key.replace(/([A-Z])/g, " $1")} :</span>{" "}
                     <span className="font-medium">{value || "N/A"}</span>
                   </div>
@@ -57,9 +57,9 @@ const DeliveryPartnerDetailsModal = ({ partner, onClose, updatePartner }) => {
 
           {/* Order History */}
           <div>
-            <h3 className="text-sm font-semibold text-gray-900 mb-2">Order History</h3>
+            <h3 className="text-sm font-semibold text-white mb-2">Order History</h3>
             {orderHistory?.length === 0 ? (
-              <p className="text-xs text-gray-500">No orders yet</p>
+              <p className="text-xs text-white/70">No orders yet</p>
             ) : (
               <div className="max-h-[200px] overflow-auto border rounded-lg">
                 <table className="w-full text-xs">
@@ -72,7 +72,7 @@ const DeliveryPartnerDetailsModal = ({ partner, onClose, updatePartner }) => {
                   </thead>
                   <tbody>
                     {orderHistory.map((order, idx) => (
-                      <tr key={idx} className="hover:bg-gray-50">
+                      <tr key={idx} className="hover:bg-white/10">
                         {Object.values(order).map((val, i) => (
                           <td key={i} className="p-2 border">{val}</td>
                         ))}

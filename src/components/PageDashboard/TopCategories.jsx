@@ -15,9 +15,9 @@ const TopCategories = () => {
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white/95 backdrop-blur-sm p-3 rounded-xl shadow-xl border border-gray-200">
-          <p className="text-sm font-semibold text-gray-800">{payload[0].name}</p>
-          <p className="text-sm text-gray-600">{payload[0].value}%</p>
+        <div className="bg-primary p-3 rounded-xl shadow-xl border border-gray-200">
+          <p className="text-sm font-semibold text-primary">{payload[0].name}</p>
+          <p className="text-sm text-primary opacity-70">{payload[0].value}%</p>
         </div>
       );
     }
@@ -33,8 +33,8 @@ const TopCategories = () => {
               className="w-3 h-3 rounded-full transition-transform group-hover:scale-125"
               style={{ backgroundColor: entry.color }}
             ></div>
-            <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900">
-              {entry.value} <span className="text-gray-500">{data[index].value}%</span>
+            <span className="text-sm font-medium text-primary opacity-80 group-hover:text-primary">
+              {entry.value} <span className="text-primary opacity-60">{data[index].value}%</span>
             </span>
           </div>
         ))}
@@ -43,9 +43,9 @@ const TopCategories = () => {
   };
 
   return (
-    <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20 dark:border-gray-700 hover:shadow-xl transition-all duration-300">
+    <div className="bg-primary rounded-2xl p-6 shadow-lg border border-white/20 dark:border-gray-700 hover:shadow-xl transition-all duration-300">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-xl font-bold text-gray-800 dark:text-white">Top Categories</h3>
+        <h3 className="text-xl font-bold text-primary">Top Categories</h3>
         <Button className="text-sm font-medium text-[#2563eb] hover:text-[#1d4ed8] transition-colors bg-transparent shadow-none p-0 w-auto hover:bg-transparent">
           This Month ▼
         </Button>

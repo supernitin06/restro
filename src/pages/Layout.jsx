@@ -5,7 +5,7 @@ import Sidebar from "../components/layout/Sidebar";
  
 const Layout = () => {
   return (
-    <div className="app flex h-screen">
+    <div className="app flex h-screen ">
       {/* LEFT SIDEBAR */}
       <Sidebar />
  
@@ -23,4 +23,5 @@ const Layout = () => {
   );
 };
  
+
 export default Layout;

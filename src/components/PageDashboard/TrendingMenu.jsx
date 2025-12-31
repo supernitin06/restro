@@ -12,10 +12,10 @@ const trendingItems = [
 
 const TrendingMenu = () => {
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+        <div className="bg-primary rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b">
-                <h3 className="text-sm font-semibold text-gray-800">
+                <h3 className="text-sm font-semibold text-primary">
                     🔥 Trending Menu
                 </h3>
                 <span className="text-xs text-blue-600 cursor-pointer hover:underline">
@@ -32,17 +32,17 @@ const TrendingMenu = () => {
                     >
                         {/* Left */}
                         <div>
-                            <p className="text-sm font-medium text-gray-700">
+                            <p className="text-sm font-medium text-primary">
                                 {item.name}
                             </p>
-                            <p className="text-xs text-gray-500">{item.price}</p>
+                            <p className="text-xs text-primary opacity-60">{item.price}</p>
                         </div>
 
                         {/* Right */}
                         <div className="flex items-center gap-3">
                             <div className="flex items-center gap-1 text-yellow-500 text-xs">
                                 <AiFillStar />
-                                <span className="text-gray-700 font-medium">
+                                <span className="text-primary font-medium">
                                     {item.rating}
                                 </span>
                             </div>

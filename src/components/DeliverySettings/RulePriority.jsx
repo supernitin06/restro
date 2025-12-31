@@ -28,9 +28,9 @@ const RulePriority = () => {
 
             <div className="space-y-4">
                 {rules.map((rule, index) => (
-                    <div key={rule.id} className={`flex items-center gap-6 bg-white dark:bg-gray-800 p-5 rounded-2xl border-2 transition-all duration-300 group hover:scale-[1.01] ${rule.active
-                            ? 'border-indigo-100 dark:border-indigo-900/30 shadow-md dark:shadow-none'
-                            : 'border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 opacity-60 grayscale'
+                    <div key={rule.id} className={`flex items-center gap-6 bg-primary p-5 rounded-2xl border-2 transition-all duration-300 group hover:scale-[1.01] ${rule.active
+                        ? 'border-indigo-100 dark:border-indigo-900/30 shadow-md dark:shadow-none'
+                        : 'border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 opacity-60 grayscale'
                         }`}>
                         <div className="text-gray-300 dark:text-gray-600 cursor-move hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors">
                             <FaGripLines size={20} />

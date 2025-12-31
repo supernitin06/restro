@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Search, MoreVertical } from 'lucide-react';
 import Button from '../ui/Button';
+import Select from '../ui/Select';
 
 const RecentOrders = () => {
+  const [filter, setFilter] = useState('This Week');
   const orders = [
     {
       id: 'ORD7205',
@@ -40,23 +42,24 @@ const RecentOrders = () => {
   ];
 
   return (
-    <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20 dark:border-gray-700">
+    <div className="bg-primary p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 h-full">
       <div className="flex items-center justify-between mb-0">
-        <h3 className="text-xl font-bold text-gray-800 dark:text-white">Recent Orders</h3>
+        <h3 className="text-xl font-bold text-primary">Recent Orders</h3>
         <div className="flex items-center gap-3">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
               placeholder="Search or filter..."
-              className="pl-10 pr-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all w-64"
+              className="pl-10 pr-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm text-primary focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all w-64"
             />
           </div>
-          <select className="px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-200 cursor-pointer hover:border-[#2563eb] focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 transition-all">
-            <option>This Week</option>
-            <option>Last Week</option>
-            <option>This Month</option>
-          </select>
+          <Select
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            options={["This Week", "Last Week", "This Month"]}
+            className="w-36"
+          />
           <Button variant="primary" className="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-sm font-medium hover:border-[#2563eb] hover:bg-opacity-90 transition-all">
             See All Orders
           </Button>
@@ -84,7 +87,7 @@ const RecentOrders = () => {
                 className="border-b border-gray-100 dark:border-gray-700/50 hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-colors group"
               >
                 <td className="py-4 px-4">
-                  <span className="font-semibold text-gray-800 dark:text-gray-200 text-sm">{order.id}</span>
+                  <span className="font-semibold text-primary text-sm">{order.id}</span>
                 </td>
                 <td className="py-4 px-4">
                   <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-100 dark:from-orange-900/40 to-orange-50 dark:to-orange-900/20 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
@@ -93,18 +96,18 @@ const RecentOrders = () => {
                 </td>
                 <td className="py-4 px-4">
                   <div>
-                    <p className="font-semibold text-gray-800 dark:text-gray-200 text-sm">{order.name}</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">{order.description}</p>
+                    <p className="font-semibold text-primary text-sm">{order.name}</p>
+                    <p className="text-xs text-primary opacity-60">{order.description}</p>
                   </div>
                 </td>
                 <td className="py-4 px-4">
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{order.quantity}</span>
+                  <span className="text-sm font-medium text-primary opacity-80">{order.quantity}</span>
                 </td>
                 <td className="py-4 px-4">
-                  <span className="text-sm font-bold text-gray-800 dark:text-white">{order.amount}</span>
+                  <span className="text-sm font-bold text-primary">{order.amount}</span>
                 </td>
                 <td className="py-4 px-4">
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{order.customer}</span>
+                  <span className="text-sm font-medium text-primary opacity-80">{order.customer}</span>
                 </td>
                 <td className="py-4 px-4 ">
                   <span className={`${order.statusColor} text-white px-3 py-1.5 rounded-full text-xs w-20 text-nowrap  font-semibold inline-block`}>

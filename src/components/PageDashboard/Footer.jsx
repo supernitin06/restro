@@ -19,7 +19,7 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border-t border-gray-200 dark:border-gray-700 py-6 mt-8">
+    <footer className="bg-primary border-t border-gray-200 dark:border-gray-700 py-6 mt-8">
       <div className="max-w-[1600px] mx-auto px-8">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           {/* Copyright */}

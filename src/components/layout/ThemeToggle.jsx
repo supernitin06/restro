@@ -1,15 +1,17 @@
 import React from 'react';
 import { Moon, Sun } from 'lucide-react';
 import Button from '../ui/Button';
-import { useTheme } from '../../context/ThemeContext';
 
+import { useTheme } from '../../context/ThemeContext';
+ 
 const ThemeToggle = () => {
   const { theme, toggleTheme } = useTheme();
-
+ 
   return (
     <Button
       type="button"
       onClick={toggleTheme}
+
       className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-300 bg-transparent shadow-none"
     >
       {theme === 'light' ? (
@@ -21,4 +23,5 @@ const ThemeToggle = () => {
   );
 };
 
+ 
 export default ThemeToggle;

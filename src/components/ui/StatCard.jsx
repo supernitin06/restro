@@ -62,7 +62,8 @@ const StatCard = ({
             onClick={onClick}
             className={`relative group cursor-default transition-all duration-300 hover:-translate-y-1 ${className}`}
         >
-            <div className="absolute inset-0 bg-gradient-to-r from-gray-100 to-white dark:from-gray-800 dark:to-gray-900 rounded-2xl shadow-lg border border-white/20 dark:border-gray-700/50" />
+            <div className="absolute inset-0 bg-primary rounded-2xl shadow-lg border border-white/20 dark:border-gray-700/50" />
+
 
             {/* Glow effect on hover */}
             <div className={`absolute -inset-0.5 bg-gradient-to-r ${currentStyle.gradient} rounded-2xl opacity-0 group-hover:opacity-20 blur-md transition-opacity duration-300`} />
@@ -70,6 +71,7 @@ const StatCard = ({
             <div className="relative p-6">
                 <div className="flex justify-between items-start mb-4">
                     <div>
+
                         <p className="text-gray-500 dark:text-gray-400 text-sm font-medium mb-1 font-sans">
                             {title}
                         </p>
@@ -108,7 +110,8 @@ const StatCard = ({
 
                         {/* If simple text/caption needed instead of trendBadge */}
                         {!trend && !progress && (
-                            <span className="text-gray-400 text-xs">Updated just now</span>
+                            <span className="text-primary opacity-50 text-xs">Updated just now</span>
+
                         )}
                     </div>
                 )}

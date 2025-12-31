@@ -27,8 +27,8 @@ const CityBasedCharges = () => {
 
     return (
         <div className={`transition-all duration-300 ${!isEnabled ? 'opacity-60 grayscale' : ''}`}>
-            <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden transform hover:scale-[1.01] transition-transform duration-300 h-full flex flex-col">
-                <div className="px-8 py-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gradient-to-r from-purple-50 to-white dark:from-gray-800 dark:to-gray-800">
+            <div className="card overflow-hidden transform hover:scale-[1.01] transition-transform duration-300 h-full flex flex-col">
+                <div className="card-header flex justify-between items-center bg-gradient-to-r from-purple-50 to-white dark:from-gray-800 dark:to-gray-800">
                     <div className="flex items-center gap-4">
                         <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-2xl text-purple-600 dark:text-purple-400 shadow-inner">
                             <FaCity className="text-xl" />

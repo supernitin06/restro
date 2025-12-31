@@ -40,22 +40,22 @@ const ViewDetailsModal = ({ restaurant, onClose, onApprove, onSuspend }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 z-50">
       <div className="bg-white rounded-3xl shadow-2xl w-full max-w-5xl">
         {/* Header */}
-        <div className="bg-gradient-to-r from-white via-red-100 to-red-400 p-5 text-red-900 rounded-t-3xl">
+        <div className="bg-gradient-sidebar p-5 text-white rounded-t-3xl">
           <div className="flex justify-between items-start">
             <h2 className="text-2xl font-bold">{restaurantDetail?.name}</h2>
             <Button
-              className="text-red-900 hover:text-red-700 text-2xl font-semibold transition p-0 bg-transparent shadow-none w-auto"
+              className="text-white hover:text-white/80 text-2xl font-semibold transition p-0 bg-transparent shadow-none w-auto"
               onClick={onClose}
             >
               ✕
             </Button>
           </div>
           <div className="flex items-center gap-3 mt-2 text-sm">
-            <span className="flex items-center gap-1 bg-white/30 px-2 py-0.5 rounded-full font-medium text-red-900">
+            <span className="flex items-center gap-1 bg-white/20 px-2 py-0.5 rounded-full font-medium text-white">
               ⭐ {restaurantDetail?.rating || "-"}
             </span>
-            <span className="text-red-900/70">•</span>
-            <span className="bg-white/30 px-2 py-0.5 rounded-full font-medium text-red-900">
+            <span className="text-white/70">•</span>
+            <span className="bg-white/20 px-2 py-0.5 rounded-full font-medium text-white">
               {restaurantDetail?.tables || 0} Tables
             </span>
           </div>

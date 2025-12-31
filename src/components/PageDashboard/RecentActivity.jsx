@@ -39,9 +39,9 @@ const RecentActivity = () => {
   ];
 
   return (
-    <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20 dark:border-gray-700 hover:shadow-xl transition-all duration-300">
+    <div className="bg-primary rounded-2xl p-6 shadow-lg border border-white/20 dark:border-gray-700 hover:shadow-xl transition-all duration-300">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xl font-bold text-gray-800 dark:text-white">Recent Activity</h3>
+        <h3 className="text-xl font-bold text-primary">Recent Activity</h3>
         <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
           <MoreHorizontal className="w-5 h-5 text-gray-400" />
         </button>
@@ -60,19 +60,19 @@ const RecentActivity = () => {
                 <div className="flex-1">
                   <div className="flex items-start justify-between mb-1">
                     <div>
-                      <h4 className="font-bold text-gray-800 dark:text-gray-200 text-sm">
+                      <h4 className="font-bold text-primary text-sm">
                         {activity.user}
-                        <span className="ml-2 text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded-full">
+                        <span className="ml-2 text-xs font-medium text-primary opacity-60 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded-full">
                           {activity.role}
                         </span>
                       </h4>
                     </div>
-                    <span className="text-xs text-gray-400">{activity.time}</span>
+                    <span className="text-xs text-primary opacity-50">{activity.time}</span>
                   </div>
 
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-primary opacity-70">
                     {activity.action}{' '}
-                    <span className="font-semibold text-gray-800 dark:text-gray-200">{activity.item}</span>
+                    <span className="font-semibold text-primary">{activity.item}</span>
                   </p>
                 </div>
               </div>
