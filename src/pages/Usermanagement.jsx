@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import StatsGrid from '../components/ui/UserStats';
 import FiltersBar from '../components/ui/UserFilters';
-import UserTable from '../components/ui/UserTable';
+import UserTable from '../components/ui/Table';
 import UserModal from '../components/users/UserModal';
 import Pagination from '../components/ui/Pagination';
 import UserCard from '../components/users/UserCard';
