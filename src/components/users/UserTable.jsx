@@ -1,98 +1,204 @@
-import React from 'react';
-import { Mail, Phone } from 'lucide-react';
-import Badge from '../ui/Badge';
-import ActionButtons from '../users/UserAction';
-import Button from '../ui/Button';
+import React from "react";
+import {
+  Mail,
+  Phone,
+  CreditCard,
+  Calendar,
+  DollarSign,
+  User,
+  FileText,
+  ShoppingBag,
+  CheckCircle,
+  Star,
+  Clock,
+  AlertCircle,
+} from "lucide-react";
+import Badge from "../ui/Badge";
+import ActionButtons from "../ui/UserAction";
 
-const UserTable = ({ users, onView, onEdit, onDelete, onToggleStatus }) => {
-  const handleAction = (action, user) => {
-    switch (action) {
-      case 'view':
-        onView(user);
-        break;
-      case 'edit':
-        onEdit(user);
-        break;
-      case 'delete':
-        onDelete(user.id);
-        break;
+const UserTable = ({
+  users = [],
+  actions = [],
+  onToggleStatus,
+  showPaymentInfo = false,
+  className = "",
+}) => {
+  const formatCurrency = (amount) => {
+    if (!amount) return "$0.00";
+    const num = parseFloat(amount);
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+    }).format(num);
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    return new Date(dateString).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  };
+
+  const getStatusIcon = (status) => {
+    switch (status?.toLowerCase()) {
+      case "active":
+        return <CheckCircle className="w-4 h-4 text-green-500" />;
+      case "inactive":
+        return <AlertCircle className="w-4 h-4 text-red-500" />;
+      case "pending":
+        return <Clock className="w-4 h-4 text-yellow-500" />;
       default:
-        console.log(`Action ${action} triggered for user:`, user);
+        return <User className="w-4 h-4 text-gray-400" />;
     }
   };
 
   return (
-    <div className="overflow-x-auto rounded-2xl border border-white/20">
-      <table className="min-w-full">
-        <thead>
-          <tr className="bg-gradient-to-r from-white/10 to-white/5 border-b border-white/20">
-            <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">Customer</th>
-            <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">Contact</th>
-            <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">Membership</th>
-            <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">Stats</th>
-            <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">Status</th>
-            <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map((user) => (
-            <tr key={user.id} className="border-b border-white/10 hover:bg-white/5 transition-colors">
-              <td className="px-6 py-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white font-bold">
-                    {user.name.charAt(0)}
+    <div
+      className={`rounded-xl border border-gray-200 bg-white shadow-sm ${className}`}
+    >
+      {/* Header */}
+      <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
+        <h2 className="text-lg font-semibold text-gray-900">Customers</h2>
+        <p className="text-sm text-gray-500 mt-1">
+          {users.length} total •{" "}
+          {users.filter((u) => u.status === "active").length} active
+        </p>
+      </div>
+
+      {/* Table */}
+      <div className="overflow-x-auto">
+        <table className="min-w-full">
+          <thead className="bg-gray-50 sticky top-0">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">
+                Customer
+              </th>
+              {showPaymentInfo && (
+                <>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">
+                    Amount
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">
+                    Date
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">
+                    Method
+                  </th>
+                </>
+              )}
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">
+                Contact
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">
+                Membership
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">
+                Stats
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">
+                Status
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">
+                Actions
+              </th>
+            </tr>
+          </thead>
+
+          <tbody className="divide-y divide-gray-100">
+            {users.map((user) => (
+              <tr key={user.id} className="hover:bg-gray-50">
+                {/* Customer */}
+                <td className="px-6 py-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                      <User className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">{user.name}</p>
+                      {user.invoice && (
+                        <p className="text-xs text-gray-500">
+                          #{user.invoice}
+                        </p>
+                      )}
+                    </div>
                   </div>
-                  <div>
-                    <div className="font-semibold text-white">{user.name}</div>
-                    <div className="text-gray-400 text-sm">Joined {user.joinDate}</div>
-                  </div>
-                </div>
-              </td>
-              <td className="px-6 py-4">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2 text-sm text-gray-300">
-                    <Mail className="w-4 h-4" />
+                </td>
+
+                {/* Payment */}
+                {showPaymentInfo && (
+                  <>
+                    <td className="px-6 py-4 font-semibold">
+                      {formatCurrency(user.amount)}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-600">
+                      {formatDate(user.date)}
+                    </td>
+                    <td className="px-6 py-4">
+                      <Badge>{user.method}</Badge>
+                    </td>
+                  </>
+                )}
+
+                {/* Contact */}
+                <td className="px-6 py-4 space-y-1">
+                  <div className="flex items-center gap-2 text-sm text-gray-700">
+                    <Mail className="w-4 h-4 text-blue-600" />
                     {user.email}
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-300">
-                    <Phone className="w-4 h-4" />
-                    {user.phone}
+                  {user.phone && (
+                    <div className="flex items-center gap-2 text-sm text-gray-700">
+                      <Phone className="w-4 h-4 text-green-600" />
+                      {user.phone}
+                    </div>
+                  )}
+                </td>
+
+                {/* Membership */}
+                <td className="px-6 py-4">
+                  <Badge>{user.membership}</Badge>
+                </td>
+
+                {/* Stats */}
+                <td className="px-6 py-4">
+                  <div className="flex items-center gap-2">
+                    <ShoppingBag className="w-4 h-4 text-pink-600" />
+                    <span className="font-medium">
+                      {user.totalOrders || 0} orders
+                    </span>
                   </div>
-                </div>
-              </td>
-              <td className="px-6 py-4">
-                <Badge type={user.membership.toLowerCase()}>
-                  {user.membership}
-                </Badge>
-              </td>
-              <td className="px-6 py-4">
-                <div className="space-y-1">
-                  <div className="text-white font-medium">{user.totalOrders} orders</div>
-                  <div className="text-gray-400 text-sm">{user.totalSpent} spent</div>
-                </div>
-              </td>
-              <td className="px-6 py-4">
-                <Button
-                  onClick={() => onToggleStatus(user.id)}
-                  className="transition-transform hover:scale-105 active:scale-95 p-0 bg-transparent shadow-none w-auto h-auto min-h-0"
-                >
-                  <Badge type={user.status}>
-                    {user.status}
-                  </Badge>
-                </Button>
-              </td>
-              <td className="px-6 py-4">
-                <ActionButtons
-                  item={user}
-                  onAction={handleAction}
-                  showMoreMenu={true}
-                  className="justify-start"
-                />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                </td>
+
+                {/* Status */}
+                <td className="px-6 py-4">
+                  <div className="flex items-center gap-2">
+                    {getStatusIcon(user.status)}
+                    <Badge>{user.status}</Badge>
+                  </div>
+                </td>
+
+                {/* Actions */}
+                <td className="px-6 py-4">
+                  <ActionButtons
+                    item={user}
+                    actions={actions}
+                    size="sm"
+                    variant="ghost"
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Footer */}
+      {users.length > 0 && (
+        <div className="px-6 py-3 border-t bg-gray-50 text-sm text-gray-600">
+          Showing <span className="font-medium">{users.length}</span> customers
+        </div>
+      )}
     </div>
   );
 };

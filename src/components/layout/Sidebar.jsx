@@ -15,12 +15,9 @@ import {
   Banknote,
   Receipt,
   ShoppingBag,
-  Settings,
   ChevronDown,
   Circle,
-  LayoutDashboard,
-  Bike,
-  Percent  
+  Percent
 } from 'lucide-react';
 import SidebarDropdown from '../ui/DropDown';
 
@@ -31,6 +28,7 @@ const Sidebar = ({ theme = 'light' }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [openDropdowns, setOpenDropdowns] = useState({});
   const [activeMenu, setActiveMenu] = useState(null);
+  const [hoveredMenu, setHoveredMenu] = useState(null);
 
   /* ---------------- Payments submenu ---------------- */
   const paymentSubItems = [
@@ -42,8 +40,8 @@ const Sidebar = ({ theme = 'light' }) => {
     {
       id: 'offers-coupons',
       label: 'Offers & Coupons',
-      icon: Percent,          
-      path: '/offers'          
+      icon: Percent,
+      path: '/offers'
     }
   ];
 
@@ -169,6 +167,11 @@ const Sidebar = ({ theme = 'light' }) => {
               );
             }
 
+            const IconComponent = item.icon || Circle;
+            const isActive = activeMenu === item.id;
+            const isHovered = hoveredMenu === item.id;
+            const isOrdersOpen = openDropdowns[item.id];
+
             return (
 
               <div key={item.id} className="mb-1">
@@ -235,13 +238,13 @@ const Sidebar = ({ theme = 'light' }) => {
                     </div>
                   )}
 
-                
+
                   {!isActive && isHovered && (
                     <div className="absolute inset-0 rounded-xl border-2 border-sidebar pointer-events-none"></div>
                   )}
                 </div>
 
-                
+
                 {item.hasDropdown && !isCollapsed && (
                   <div className={`
                     overflow-hidden transition-all duration-300 ease-in-out

@@ -55,8 +55,38 @@ const AppRouter = createBrowserRouter(
           element: <DeliveryPartnerManagement />,
         },
         {
-          path: "offers",                   
+          path: "offers",
           element: <OffersManagement />,
+        },
+        /* 💳 PAYMENTS (nested inside Layout) */
+        {
+          path: "payments",
+          children: [
+            {
+              path: "dashboard",
+              element: <PaymentDashboard />,
+            },
+            {
+              path: "transactions",
+              element: <Transactions />,
+            },
+            {
+              path: "transactions/:id",
+              element: <TransactionDetails />,
+            },
+            {
+              path: "refunds",
+              element: <Refunds />,
+            },
+            {
+              path: "invoice",
+              element: <Invoice />,
+            },
+            {
+              path: "details",
+              element: <TransactionDetails />,
+            }
+          ],
         },
       ],
     },
