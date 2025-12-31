@@ -1,10 +1,18 @@
 import React from "react";
+import {
+  FiPhone,
+  FiMail,
+  FiMapPin,
+  FiHome,
+  FiTruck,
+} from "react-icons/fi";
 import DeliveryPartnerStatusBadge from "./DeliveryPartnerStatusBadge";
 
 const DeliveryPartner = ({ partners, onViewDetails, updatePartner }) => {
   const toggleStatus = (partner) => {
     const newStatus =
       partner.listView.status === "Active" ? "Inactive" : "Active";
+
     updatePartner({
       ...partner,
       listView: {
@@ -15,144 +23,124 @@ const DeliveryPartner = ({ partners, onViewDetails, updatePartner }) => {
   };
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
       {partners.map((partner) => {
-        const { listView, registrationData, partnerId, metrics } = partner;
+        const { partnerId, listView, registrationData, orderHistory } = partner;
         const isActive = listView.status === "Active";
-        const stats = {
-          completed: listView.completedOrders || 0,
-          active: listView.assignedOrdersCount || 0,
-          total: listView.totalOrders || (metrics?.totalOrders || 0),
-          rating: listView.rating || 4.8,
-          earnings: metrics?.totalEarnings || 0,
-          onTimeDelivery: metrics?.onTimeDelivery || "95%",
-        };
 
         return (
           <div
             key={partnerId}
-            className="card relative overflow-hidden p-2 hover:shadow-lg transition-transform duration-200 hover:-translate-y-1"
+            className="card hover:shadow-md transition-all p-3"
           >
-            {/* STATUS GLOW */}
-            <div
-              className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${
-                isActive
-                  ? "bg-gradient-to-br from-green-50/30 to-transparent"
-                  : "bg-gradient-to-br from-gray-50/30 to-transparent"
-              }`}
-            />
-
             {/* HEADER */}
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <div className="relative w-10 h-10 rounded-xl overflow-hidden border-2 border-gray-100">
-                  <img
-                    src={
-                      registrationData?.image ||
-                      `https://api.dicebear.com/7.x/avataaars/svg?seed=${partnerId}&backgroundColor=4f46e5`
-                    }
-                    alt={listView.name}
-                    className="w-full h-full object-cover"
-                  />
-                  <div
-                    className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border border-white ${
-                      isActive ? "bg-green-500" : "bg-gray-400"
-                    }`}
-                  />
-                </div>
+            <div className="flex justify-between items-center mb-2">
+              <div className="flex items-center gap-2 min-w-0">
+                <img
+                  src={
+                    registrationData?.image ||
+                    `https://api.dicebear.com/7.x/avataaars/svg?seed=${partnerId}`
+                  }
+                  className="w-9 h-9 rounded-md border"
+                  alt={registrationData?.name}
+                />
+
                 <div className="min-w-0">
-                  <h3 className="text-sm font-semibold text-gray-900 truncate">
-                    {listView.name}
+                  <h3 className="text-xs font-semibold truncate">
+                    {registrationData?.name}
                   </h3>
-                  <p className="text-xs text-gray-500 mt-0.5 font-medium">
-                    #{partnerId.slice(-6)}
+                  <p className="text-[10px] text-secondary">
+                    #{partnerId}
                   </p>
                 </div>
               </div>
-              <DeliveryPartnerStatusBadge status={listView.status} />
+
+              {/* Smaller Status Badge */}
+              <DeliveryPartnerStatusBadge
+                status={listView.status}
+                className="text-[9px] px-2 py-1 ml-2"
+              />
             </div>
 
             {/* INFO */}
-            <div className="flex justify-around mb-2 py-1 bg-gray-50 rounded-md text-xs">
-              <div className="text-center">
-                <div className="w-6 h-6 rounded bg-blue-100 flex items-center justify-center mx-auto mb-1">
-                  📍
-                </div>
-                <p className="font-medium text-gray-700 truncate">{listView.city}</p>
+            <div className="flex flex-col gap-1 text-[10px] text-gray-500 bg-gray-50 rounded p-2 mb-2">
+              <div className="flex items-center gap-1.5">
+                <FiPhone className="text-primary text-xs shrink-0" />
+                <span>{registrationData?.mobileNumber}</span>
               </div>
-              <div className="text-center">
-                <div className="w-6 h-6 rounded bg-green-100 flex items-center justify-center mx-auto mb-1">
-                  📞
-                </div>
-                <p className="font-medium text-gray-700 truncate">{listView.phone}</p>
+
+              <div className="flex items-center gap-1.5 min-w-0">
+                <FiMail className="text-primary text-xs shrink-0" />
+                <span className="truncate">
+                  {registrationData?.email || "—"}
+                </span>
               </div>
-              <div className="text-center">
-                <div className="w-6 h-6 rounded bg-purple-100 flex items-center justify-center mx-auto mb-1">
-                  🛵
-                </div>
-                <p className="font-medium text-gray-700 truncate">
-                  {listView.vehicleType || "Bike"}
-                </p>
+
+              <div className="flex items-center gap-1.5">
+                <FiMapPin className="text-primary text-xs shrink-0" />
+                <span>{listView.city}</span>
+              </div>
+
+              <div className="flex items-center gap-1.5 min-w-0">
+                <FiHome className="text-primary text-xs shrink-0" />
+                <span className="truncate">
+                  {registrationData?.cityArea}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-1.5">
+                <FiTruck className="text-primary text-xs shrink-0" />
+                <span>{registrationData?.vehicleType}</span>
               </div>
             </div>
 
             {/* STATS */}
-            <div className="grid grid-cols-3 gap-1 mb-2 text-center text-xs">
-              <div className="p-1.5 bg-gray-50 rounded-md">
-                <div className="font-bold text-gray-900">{stats.completed}</div>
-                <div className="text-gray-500 font-medium">Completed</div>
+            <div className="grid grid-cols-2 gap-2 text-[10px] mb-2">
+              <div className="bg-gray-100 rounded p-1.5 text-center">
+                <p className="font-semibold">
+                  {listView.assignedOrdersCount || 0}
+                </p>
+                <span className="text-secondary">Assigned</span>
               </div>
-              <div className="p-1.5 bg-gray-50 rounded-md">
-                <div className="font-bold text-gray-900">{stats.active}</div>
-                <div className="text-gray-500 font-medium">Active</div>
-              </div>
-              <div className="p-1.5 bg-gray-50 rounded-md">
-                <div className="font-bold text-gray-900">{stats.total}</div>
-                <div className="text-gray-500 font-medium">Total</div>
-              </div>
-            </div>
 
-            <div className="flex justify-between text-xs mb-2">
-              <div className="flex items-center gap-1">
-                <span className="text-amber-500 font-bold">★</span>
-                <span className="font-semibold text-gray-900">{stats.rating}</span>
+              <div className="bg-gray-100 rounded p-1.5 text-center">
+                <p className="font-semibold">
+                  {orderHistory?.length || 0}
+                </p>
+                <span className="text-secondary">Completed</span>
               </div>
-              <div className="flex items-center gap-1 text-green-600 font-semibold">
-                {stats.onTimeDelivery} on-time
-              </div>
-              {stats.earnings > 0 && (
-                <div className="text-blue-600 font-semibold">${stats.earnings} earned</div>
-              )}
             </div>
 
             {/* ACTIONS */}
             <div className="flex gap-1">
               <button
-                onClick={() => toggleStatus(partner)}
-                className={`flex-1 btn-secondary btn-sm ${
-                  isActive ? "hover:bg-red-600 border-red-600" : "bg-green-500 text-white border-green-500"
+                className={`btn-sm flex-1 ${
+                  isActive ? "btn-inactive" : "btn-active"
                 }`}
+                onClick={() => toggleStatus(partner)}
               >
                 {isActive ? "Deactivate" : "Activate"}
               </button>
+
               <button
+                className="btn-secondary btn-sm flex-1"
                 onClick={() => onViewDetails(partner)}
-                className="flex-1 btn-secondary btn-sm hover:bg-gray-700"
               >
                 View
               </button>
+
               <button
-                onClick={() => onViewDetails(partner)}
-                className="flex-1 btn-primary btn-sm hover:bg-blue-700"
+                className="btn-primary btn-sm flex-1"
+                onClick={() => alert("Assign coming soon")}
               >
                 Assign
               </button>
             </div>
 
-            {/* BOTTOM ACCENT */}
+            {/* STATUS BAR */}
             <div
-              className={`h-0.5 w-full mt-2 ${
-                isActive ? "bg-green-500/50" : "bg-gray-400/50"
+              className={`h-0.5 mt-2 rounded ${
+                isActive ? "bg-green-500" : "bg-gray-400"
               }`}
             />
           </div>

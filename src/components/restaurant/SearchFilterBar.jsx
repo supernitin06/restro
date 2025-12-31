@@ -33,9 +33,8 @@ const SearchFilterBar = ({ searchTerm, setSearchTerm, statusFilter, setStatusFil
             "
           >
             <option value="All">All Status</option>
-            <option value="Pending">Pending</option>
-            <option value="Approved">Approved</option>
-            <option value="Suspended">Suspended</option>
+            <option value="Active">Active</option>
+            <option value="Deactive">Deactive</option>
           </select>
 
           <button
