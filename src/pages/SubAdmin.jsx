@@ -118,7 +118,7 @@ const SubAdmin = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col mb-6 md:flex-row justify-between items-start md:items-center bg-primary p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
-          <div>
+          <div className="w-full md:w-auto">
             <h1 className="text-heading">
               Sub-Admin Management
             </h1>
@@ -126,7 +126,7 @@ const SubAdmin = () => {
               Manage administrators and control their access levels
             </p>
           </div>
-          <div className="flex gap-3 mt-4 md:mt-0">
+          <div className="flex flex-col sm:flex-row gap-3 mt-4 md:mt-0 w-full md:w-auto">
             <Button
               onClick={() => navigate('/sub-admin/create')}
               className="btn-primary w-auto px-4 py-2 flex items-center gap-2"
@@ -137,7 +137,7 @@ const SubAdmin = () => {
             </Button>
             <Button
               onClick={() => navigate('/sub-admin/assign')}
-              className="bg-white text-primary hover:bg-gray-50 w-auto px-4 py-2 flex items-center gap-2 rounded-lg font-medium transition-colors"
+              className="bg-white text-primary hover:bg-gray-50 w-auto px-4 py-2 flex items-center gap-2 rounded-lg font-medium transition-colors justify-center"
               fullWidth={false}
             >
               <Shield size={18} />
@@ -171,19 +171,21 @@ const SubAdmin = () => {
                 startIcon={<Search size={18} />}
               />
             </div>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                className="input px-4 py-2 rounded-lg min-w-[140px]"
-              >
-                <option value="all">All Status</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-              </select>
+            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+              <div className="w-full sm:w-auto">
+                <select
+                  value={filterStatus}
+                  onChange={(e) => setFilterStatus(e.target.value)}
+                  className="input w-full px-4 py-2 rounded-lg"
+                >
+                  <option value="all">All Status</option>
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                </select>
+              </div>
               <Button 
                 variant="secondary" 
-                className="flex items-center justify-center gap-2 whitespace-nowrap"
+                className="flex items-center justify-center gap-2 whitespace-nowrap w-full sm:w-auto"
               >
                 <Filter size={18} />
                 <span className="hidden sm:inline">Apply Filter</span>
@@ -365,70 +367,72 @@ const SubAdmin = () => {
             <div className="lg:hidden space-y-4">
               {filteredAdmins.map((admin) => (
                 <Card key={admin.id} className="p-4">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
-                        {admin.name.charAt(0)}
+                  <div className="space-y-4">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-md flex-shrink-0">
+                          {admin.name.charAt(0)}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-bold text-gray-800 dark:text-gray-100 truncate">{admin.name}</p>
+                          <p className="text-sm text-muted truncate">{admin.email}</p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-bold text-gray-800 dark:text-gray-100">{admin.name}</p>
-                        <p className="text-sm text-muted">{admin.email}</p>
+                      <div className="relative flex-shrink-0">
+                        <button
+                          onClick={() => setShowDropdown(showDropdown === admin.id ? null : admin.id)}
+                          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all text-gray-600 dark:text-gray-400"
+                        >
+                          <MoreVertical size={18} />
+                        </button>
+
+                        {showDropdown === admin.id && (
+                          <>
+                            <div 
+                              className="fixed inset-0 z-10" 
+                              onClick={() => setShowDropdown(null)}
+                            ></div>
+                            <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-20 overflow-hidden">
+                              <button
+                                onClick={() => {
+                                  navigate('/sub-admin/assign');
+                                  setShowDropdown(null);
+                                }}
+                                className="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-3 text-sm font-medium transition-colors"
+                              >
+                                <Edit size={16} className="text-blue-600" />
+                                <span>Edit Permissions</span>
+                              </button>
+                              <button
+                                onClick={() => handleStatusToggle(admin.id)}
+                                className="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-3 text-sm font-medium transition-colors"
+                              >
+                                {admin.status === 'active' ? (
+                                  <>
+                                    <Lock size={16} className="text-red-600" />
+                                    <span>Deactivate</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Unlock size={16} className="text-green-600" />
+                                    <span>Activate</span>
+                                  </>
+                                )}
+                              </button>
+                              <div className="h-px bg-gray-200 dark:bg-gray-700"></div>
+                              <button
+                                onClick={() => handleDelete(admin.id)}
+                                className="w-full px-4 py-3 text-left hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-3 text-sm font-medium text-red-600 dark:text-red-400 transition-colors"
+                              >
+                                <Trash2 size={16} />
+                                <span>Delete Admin</span>
+                              </button>
+                            </div>
+                          </>
+                        )}
                       </div>
                     </div>
-                    <button
-                      onClick={() => setShowDropdown(showDropdown === admin.id ? null : admin.id)}
-                      className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all text-gray-600 dark:text-gray-400"
-                    >
-                      <MoreVertical size={18} />
-                    </button>
 
-                    {showDropdown === admin.id && (
-                      <>
-                        <div 
-                          className="fixed inset-0 z-10" 
-                          onClick={() => setShowDropdown(null)}
-                        ></div>
-                        <div className="absolute right-4 mt-10 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-20 overflow-hidden">
-                          <button
-                            onClick={() => {
-                              navigate('/sub-admin/assign');
-                              setShowDropdown(null);
-                            }}
-                            className="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-3 text-sm font-medium transition-colors"
-                          >
-                            <Edit size={16} className="text-blue-600" />
-                            <span>Edit Permissions</span>
-                          </button>
-                          <button
-                            onClick={() => handleStatusToggle(admin.id)}
-                            className="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-3 text-sm font-medium transition-colors"
-                          >
-                            {admin.status === 'active' ? (
-                              <>
-                                <Lock size={16} className="text-red-600" />
-                                <span>Deactivate</span>
-                              </>
-                            ) : (
-                              <>
-                                <Unlock size={16} className="text-green-600" />
-                                <span>Activate</span>
-                              </>
-                            )}
-                          </button>
-                          <div className="h-px bg-gray-200 dark:bg-gray-700"></div>
-                          <button
-                            onClick={() => handleDelete(admin.id)}
-                            className="w-full px-4 py-3 text-left hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-3 text-sm font-medium text-red-600 dark:text-red-400 transition-colors"
-                          >
-                            <Trash2 size={16} />
-                            <span>Delete Admin</span>
-                          </button>
-                        </div>
-                      </>
-                    )}
-                  </div>
-
-                  <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-muted font-medium">Role</span>
                       <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5">
@@ -436,7 +440,7 @@ const SubAdmin = () => {
                         {admin.role}
                       </span>
                     </div>
-
+                    
                     <div>
                       <span className="text-xs text-muted font-medium block mb-2">Permissions</span>
                       <div className="flex flex-wrap gap-1.5">
