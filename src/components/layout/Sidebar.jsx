@@ -11,7 +11,8 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
-  Circle
+  Circle,
+  Bike
 } from 'lucide-react';
 
 const Sidebar = ({ theme = 'light' }) => { // Accept theme prop
@@ -46,6 +47,12 @@ const Sidebar = ({ theme = 'light' }) => { // Accept theme prop
       label: 'Delivery Settings',
       icon: Truck,
       path: '/delivery-settings'
+    },
+    {
+      id: 'delivery-partners',
+      label: 'Delivery Partners',
+      icon: Bike,
+      path: '/delivery-partners'
     },
   ];
 
