@@ -4,7 +4,7 @@ import { Plus } from 'lucide-react';
 import OrderCard from '../components/OrderPages/OderCards';
 import OrderFormModal from '../components/OrderPages/OrderForm';
 import OrderFilters from '../components/OrderPages/OrderFilters';
-import GradientButton from '../components/ui/GradientButton';
+import Button from '../components/ui/Button';
 import Pagination from '../components/ui/Pagination';
 
 const Orders = () => {
@@ -222,7 +222,7 @@ const Orders = () => {
   const filteredOrders = orders.filter(order => {
     const matchesStatus = filters.status === 'all' || order.status === filters.status;
     const matchesSearch = order.customer.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          order.orderId.toLowerCase().includes(searchQuery.toLowerCase());
+      order.orderId.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesStatus && matchesSearch;
   });
 
@@ -252,7 +252,7 @@ const Orders = () => {
 
   // Update order
   const handleUpdateOrder = (updatedOrder) => {
-    setOrders(orders.map(order => 
+    setOrders(orders.map(order =>
       order.id === updatedOrder.id ? updatedOrder : order
     ));
     setEditingOrder(null);
@@ -267,7 +267,7 @@ const Orders = () => {
 
   // Update order status
   const handleUpdateStatus = (orderId, newStatus) => {
-    setOrders(orders.map(order => 
+    setOrders(orders.map(order =>
       order.id === orderId ? { ...order, status: newStatus } : order
     ));
   };
@@ -286,17 +286,18 @@ const Orders = () => {
                 Track and manage all restaurant orders
               </p>
             </div>
-            <GradientButton
+            <Button
               onClick={() => setShowAddForm(true)}
-              icon={Plus}
+              variant="primary"
             >
+              <Plus size={20} />
               Add New Order
-            </GradientButton>
+            </Button>
           </div>
         </div>
 
         {/* Filters */}
-        <OrderFilters 
+        <OrderFilters
           searchTerm={searchQuery}
           onSearch={setSearchQuery}
           filters={filters}
@@ -308,13 +309,13 @@ const Orders = () => {
 
         {/* Orders Grid/List */}
         <div className={
-          viewMode === 'grid' 
+          viewMode === 'grid'
             ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8'
             : 'space-y-4 mt-8'
         }>
           {currentOrders.map(order => (
-            <OrderCard 
-              key={order.id} 
+            <OrderCard
+              key={order.id}
               order={order}
               onDelete={handleDeleteOrder}
               onEdit={() => setEditingOrder(order)}
@@ -333,7 +334,7 @@ const Orders = () => {
 
         {/* Pagination */}
         {filteredOrders.length > itemsPerPage && (
-          <Pagination 
+          <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
             onPageChange={setCurrentPage}

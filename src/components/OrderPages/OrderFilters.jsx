@@ -7,9 +7,9 @@ const OrderFilters = ({ searchTerm, onSearch, filters, onFilterChange, onClearFi
   const hasActiveFilters = searchTerm !== '' || filters.status !== 'all';
 
   return (
-    <GlassCard className="mb-6">
+    <div className="card mb-6">
       <div className="p-4 flex flex-col lg:flex-row items-center gap-4">
-        
+
         {/* Label */}
         <div className="flex items-center gap-2 text-gray-700 dark:text-gray-200 font-bold shrink-0">
           <Filter size={20} />
@@ -62,7 +62,7 @@ const OrderFilters = ({ searchTerm, onSearch, filters, onFilterChange, onClearFi
           </div>
 
           {hasActiveFilters && (
-            <button 
+            <button
               onClick={onClearFilters}
               className="h-[52px] w-[52px] flex items-center justify-center bg-red-50 text-red-500 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/40 rounded-xl transition-colors shrink-0 border-2 border-transparent"
               title="Clear Filters"
@@ -72,7 +72,7 @@ const OrderFilters = ({ searchTerm, onSearch, filters, onFilterChange, onClearFi
           )}
         </div>
       </div>
-    </GlassCard>
+    </div>
   );
 };
 

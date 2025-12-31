@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { X, Store, User, Phone, MapPin, Mail, Bike, Package, CreditCard, DollarSign, Calendar, Clock, Info } from 'lucide-react';
 import RestaurantDetailsModal from './RestaurantDetailsModal';
+import Button from '../ui/Button';
 
 const OrderDetailsModal = ({ order, onClose }) => {
   const [showRestaurant, setShowRestaurant] = useState(false);
@@ -10,23 +11,23 @@ const OrderDetailsModal = ({ order, onClose }) => {
     <>
       <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-3xl w-full my-8">
-          
+
           {/* Header */}
-          <div className=" p-5 flex justify-between items-center rounded-t-2xl sticky top-0 z-10">
+          <div className="bg-gradient-sidebar p-5 flex justify-between items-center rounded-t-2xl sticky top-0 z-10">
             <div>
-              <h2 className="text-2xl font-bold">Order Details</h2>
-              <p className=" text-sm mt-1">{order.orderId}</p>
+              <h2 className="text-2xl font-bold text-white">Order Details</h2>
+              <p className="text-sm mt-1 text-white/80">{order.orderId}</p>
             </div>
-            <button 
-              onClick={onClose} 
-              className="hover:bg-white/20 p-2 rounded-lg transition-all"
+            <button
+              onClick={onClose}
+              className="hover:bg-white/20 p-2 rounded-lg transition-all text-white"
             >
               <X size={24} />
             </button>
           </div>
 
           <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
-            
+
             {/* Restaurant Info */}
             <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-700 dark:to-gray-600 rounded-xl p-4">
               <div className="flex items-center justify-between mb-3">
@@ -144,8 +145,8 @@ const OrderDetailsModal = ({ order, onClose }) => {
               </h3>
               <div className="space-y-2">
                 {order.items.map((item, index) => (
-                  <div 
-                    key={index} 
+                  <div
+                    key={index}
                     className="flex items-center justify-between p-3 bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-600 dark:to-gray-500 rounded-lg"
                   >
                     <div className="flex items-center gap-3 flex-1">
@@ -242,9 +243,9 @@ const OrderDetailsModal = ({ order, onClose }) => {
 
           {/* Footer */}
           <div className="p-4 bg-gray-50 dark:bg-gray-700/50 border-t border-gray-200 dark:border-gray-700 sticky bottom-0">
-            <button onClick={onClose} className="w-full btn btn-primary">
+            <Button onClick={onClose} className="w-full" variant="primary">
               Close Details
-            </button>
+            </Button>
           </div>
         </div>
       </div>

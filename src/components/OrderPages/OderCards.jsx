@@ -3,32 +3,32 @@ import React, { useState } from 'react';
 import { Edit, Trash2, CheckCircle, XCircle, Clock, Info, Bike, CreditCard, Eye } from 'lucide-react';
 import OrderItem from './OrderItem';
 import OrderDetailsModal from './OrderDetailsModal';
-import GlassCard from '../ui/GlassCard';
+
 
 const OrderCard = ({ order, onDelete, onEdit, onUpdateStatus, viewMode }) => {
   const [showDetails, setShowDetails] = useState(false);
 
   const statusConfig = {
-    'completed': { 
-      bg: 'bg-green-100 dark:bg-green-900/30', 
-      text: 'text-green-700 dark:text-green-400', 
-      icon: CheckCircle, 
-      label: 'Completed' 
+    'completed': {
+      bg: 'bg-green-100 dark:bg-green-900/30',
+      text: 'text-green-700 dark:text-green-400',
+      icon: CheckCircle,
+      label: 'Completed'
     },
-    'cancelled': { 
-      bg: 'bg-red-100 dark:bg-red-900/30', 
-      text: 'text-red-700 dark:text-red-400', 
-      icon: XCircle, 
-      label: 'Cancelled' 
+    'cancelled': {
+      bg: 'bg-red-100 dark:bg-red-900/30',
+      text: 'text-red-700 dark:text-red-400',
+      icon: XCircle,
+      label: 'Cancelled'
     },
-    'on-process': { 
-      bg: 'bg-blue-100 dark:bg-blue-900/30', 
-      text: 'text-blue-700 dark:text-blue-400', 
-      icon: Clock, 
-      label: 'Processing' 
+    'on-process': {
+      bg: 'bg-blue-100 dark:bg-blue-900/30',
+      text: 'text-blue-700 dark:text-blue-400',
+      icon: Clock,
+      label: 'Processing'
     }
   };
-  
+
   const config = statusConfig[order.status];
   const StatusIcon = config.icon;
 
@@ -36,10 +36,10 @@ const OrderCard = ({ order, onDelete, onEdit, onUpdateStatus, viewMode }) => {
   if (viewMode === 'list') {
     return (
       <>
-        <GlassCard className="overflow-hidden hover:border-primary/50 transition-all duration-300">
+        <div className="card hover:border-primary/50 transition-all duration-300">
           <div className="p-3.5">
             <div className="flex items-center justify-between gap-3 flex-wrap">
-              
+
               {/* Order Info */}
               <div className="flex items-center gap-3 flex-1 min-w-[180px]">
                 <div className="flex-shrink-0">
@@ -121,7 +121,7 @@ const OrderCard = ({ order, onDelete, onEdit, onUpdateStatus, viewMode }) => {
                 >
                   <Eye size={15} />
                 </button>
-                
+
                 {order.status === 'on-process' && (
                   <>
                     <button
@@ -140,7 +140,7 @@ const OrderCard = ({ order, onDelete, onEdit, onUpdateStatus, viewMode }) => {
                     </button>
                   </>
                 )}
-                
+
                 <button
                   onClick={() => onEdit(order)}
                   className="p-1.5 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all text-primary"
@@ -148,7 +148,7 @@ const OrderCard = ({ order, onDelete, onEdit, onUpdateStatus, viewMode }) => {
                 >
                   <Edit size={15} />
                 </button>
-                
+
                 <button
                   onClick={() => onDelete(order.id)}
                   className="p-1.5 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all text-red-600 dark:text-red-400"
@@ -159,14 +159,15 @@ const OrderCard = ({ order, onDelete, onEdit, onUpdateStatus, viewMode }) => {
               </div>
             </div>
           </div>
-        </GlassCard>
+        </div>
 
         {showDetails && (
-          <OrderDetailsModal 
-            order={order} 
-            onClose={() => setShowDetails(false)} 
+          <OrderDetailsModal
+            order={order}
+            onClose={() => setShowDetails(false)}
           />
-        )}
+        )
+        }
       </>
     );
   }
@@ -174,22 +175,22 @@ const OrderCard = ({ order, onDelete, onEdit, onUpdateStatus, viewMode }) => {
   // ============= GRID VIEW (CARD) =============
   return (
     <>
-      <GlassCard className="overflow-hidden hover:border-primary/50 transition-all duration-300 flex flex-col">
-        
+      <div className="card hover:border-primary/50 transition-all duration-300 flex flex-col">
+
         {/* Header */}
         <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
           <div className="flex justify-between items-start mb-3">
             <div className="flex-1 min-w-0 flex items-center gap-2">
-                <h3 className="text-base font-bold text-gray-800 dark:text-gray-100 truncate">
-                  {order.customer}
-                </h3>
-                <button
-                  onClick={() => setShowDetails(true)}
-                  className="p-1 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-all text-blue-600 dark:text-blue-400"
-                  title="View Full Details"
-                >
-                  <Info size={14} />
-                </button>
+              <h3 className="text-base font-bold text-gray-800 dark:text-gray-100 truncate">
+                {order.customer}
+              </h3>
+              <button
+                onClick={() => setShowDetails(true)}
+                className="p-1 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-all text-blue-600 dark:text-blue-400"
+                title="View Full Details"
+              >
+                <Info size={14} />
+              </button>
             </div>
             <div className="flex gap-1">
               <button
@@ -208,7 +209,7 @@ const OrderCard = ({ order, onDelete, onEdit, onUpdateStatus, viewMode }) => {
               </button>
             </div>
           </div>
-          
+
           <div className="flex flex-col gap-3">
             {/* Row 1: Order ID & Time (Left) - Payment (Right) */}
             <div className="flex justify-between items-center">
@@ -273,7 +274,7 @@ const OrderCard = ({ order, onDelete, onEdit, onUpdateStatus, viewMode }) => {
               ${order.total.toFixed(2)}
             </span>
           </div>
-          
+
           {/* Status Action Buttons */}
           {order.status === 'on-process' && (
             <div className="flex gap-2 mb-3">
@@ -303,12 +304,12 @@ const OrderCard = ({ order, onDelete, onEdit, onUpdateStatus, viewMode }) => {
             View Full Details
           </button> */}
         </div>
-      </GlassCard>
+      </div>
 
       {showDetails && (
-        <OrderDetailsModal 
-          order={order} 
-          onClose={() => setShowDetails(false)} 
+        <OrderDetailsModal
+          order={order}
+          onClose={() => setShowDetails(false)}
         />
       )}
     </>

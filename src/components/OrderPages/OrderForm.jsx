@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X, Plus, Minus, Trash2 } from 'lucide-react';
 import InputField from '../ui/InputField';
-import GradientButton from '../ui/GradientButton';
+import Button from '../ui/Button';
 
 const OrderFormModal = ({ order, onClose, onSubmit }) => {
   const [formData, setFormData] = useState({
@@ -65,7 +65,7 @@ const OrderFormModal = ({ order, onClose, onSubmit }) => {
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="bg-gradient-to-r from-primary to-primary-hover text- p-5 flex justify-between items-center">
+        <div className="bg-gradient-sidebar text-white p-5 flex justify-between items-center">
           <h2 className="text-xl font-bold">{order ? 'Edit Order' : 'Create New Order'}</h2>
           <button onClick={onClose} className="hover:bg-white/20 p-2 rounded-lg transition-all">
             <X size={22} />
@@ -163,9 +163,10 @@ const OrderFormModal = ({ order, onClose, onSubmit }) => {
                 </select>
               </div>
             </div>
-            <GradientButton onClick={handleAddItem} className="w-full" icon={Plus}>
+            <Button onClick={handleAddItem} className="w-full" variant="primary">
+              <Plus size={18} />
               Add Item to Order
-            </GradientButton>
+            </Button>
           </div>
 
           {/* Items List */}
@@ -226,16 +227,17 @@ const OrderFormModal = ({ order, onClose, onSubmit }) => {
 
           {/* Actions */}
           <div className="flex gap-3">
-            <GradientButton onClick={onClose} variant="ghost" className="flex-1">
+            <Button onClick={onClose} variant="secondary" className="flex-1">
               Cancel
-            </GradientButton>
-            <GradientButton
+            </Button>
+            <Button
               onClick={handleSubmit}
               className="flex-1"
+              variant="primary"
               disabled={!formData.customer || formData.items.length === 0}
             >
               {order ? 'Update Order' : 'Create Order'}
-            </GradientButton>
+            </Button>
           </div>
         </div>
       </div>
