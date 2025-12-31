@@ -55,6 +55,10 @@ const AppRouter = createBrowserRouter(
           element: <DeliveryPartnerManagement />,
         },
         {
+          path: "orders",
+          element: <Orders />,
+        },
+        {
           path: "offers",
           element: <OffersManagement />,
         },
