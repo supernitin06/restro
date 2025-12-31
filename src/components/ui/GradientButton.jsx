@@ -20,7 +20,11 @@ const GradientButton = ({
     <button
       onClick={onClick}
       className={`
-        btn
+        px-6 py-3 
+        rounded-xl
+        font-semibold
+        text-#2563eb
+        transition-all duration-300
         hover:scale-105
         active:scale-95
         ${variants[variant]}

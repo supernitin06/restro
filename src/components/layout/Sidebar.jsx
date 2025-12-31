@@ -7,19 +7,17 @@ import {
   Users,
   UtensilsCrossed,
   Truck,
-  Settings,
-  ChevronDown,
   ChevronLeft,
   ChevronRight,
   Circle,
-  Bike
+  Bike,
+  ShoppingBag
 } from 'lucide-react';
 
 const Sidebar = ({ theme = 'light' }) => { // Accept theme prop
   const navigate = useNavigate();
   const location = useLocation();
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [isOrdersOpen, setIsOrdersOpen] = useState(false);
   const [activeMenu, setActiveMenu] = useState('dashboard');
   const [hoveredMenu, setHoveredMenu] = useState(null);
 
@@ -54,26 +52,33 @@ const Sidebar = ({ theme = 'light' }) => { // Accept theme prop
       icon: Bike,
       path: '/delivery-partners'
     },
+    
+    {
+      id: 'orders',
+      label: 'Orders',
+      icon: ShoppingBag,
+      path: '/orders'
+    },
+    
   ];
 
   useEffect(() => {
     const currentPath = location.pathname;
-    const activeItem = menuItems.find(item => item.path === currentPath);
+    // Find an exact match first, or a parent match for sub-routes
+    const activeItem = menuItems.find(item => 
+      item.path === currentPath || (item.path !== '/' && currentPath.startsWith(item.path))
+    );
     if (activeItem) {
       setActiveMenu(activeItem.id);
     } else if (currentPath === '/') {
       setActiveMenu('dashboard');
     }
-  }, [location.pathname]);
+  }, [location.pathname]); // menuItems is static, no need to include
 
   const handleMenuClick = (menuId) => {
     setActiveMenu(menuId);
     const item = menuItems.find(i => i.id === menuId);
-    if (item?.hasDropdown) {
-      if (menuId === 'orders') {
-        setIsOrdersOpen(!isOrdersOpen);
-      }
-    } else if (item?.path) {
+    if (item?.path) {
       navigate(item.path);
     }
   };
@@ -230,6 +235,21 @@ const Sidebar = ({ theme = 'light' }) => { // Accept theme prop
           </div>
         )}
       </div>
+            </div>
+          );
+        }
+      </nav>
+
+      {/* Collapsed State Tooltip */}
+      {isCollapsed && hoveredMenu && (
+        <div className="fixed left-20 bg-gray-900 text-white px-3 py-2 rounded-lg shadow-xl text-sm font-medium pointer-events-none z-50"
+          style={{
+            top: `${document.querySelector(`[title="${menuItems.find(m => m.id === hoveredMenu)?.label}"]`)?.getBoundingClientRect().top}px`
+          }}>
+          {menuItems.find(m => m.id === hoveredMenu)?.label}
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 w-2 h-2 bg-gray-900 rotate-45"></div>
+        </div>
+      )}
     </div>
   );
 };

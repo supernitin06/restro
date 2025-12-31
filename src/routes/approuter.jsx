@@ -8,6 +8,7 @@ import UserManagement from "../pages/Usermanagement";
 import DeliverySettings from "../pages/DeliverySettings";
 import DeliveryPartnerManagement from "../pages/DeliveryPartnerManagement";  // <-- Import the new page component
 import AuthContainer from "../components/Auth/AuthContainer";
+import Orders from "../pages/Orders";
 
 const AppRouter = createBrowserRouter(
   [
@@ -41,6 +42,11 @@ const AppRouter = createBrowserRouter(
         {
           path: "delivery-partners",        // <-- New route for delivery partner management
           element: <DeliveryPartnerManagement />,
+          
+        },
+        {
+          path: "orders",
+          element: <Orders />,
         },
       ],
     },
