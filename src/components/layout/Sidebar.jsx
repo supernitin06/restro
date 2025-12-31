@@ -12,10 +12,11 @@ import {
   ChevronLeft,
   ChevronRight,
   Circle,
-  Bike
+  Bike,
+  Percent  
 } from 'lucide-react';
 
-const Sidebar = ({ theme = 'light' }) => { // Accept theme prop
+const Sidebar = ({ theme = 'light' }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -54,6 +55,12 @@ const Sidebar = ({ theme = 'light' }) => { // Accept theme prop
       icon: Bike,
       path: '/delivery-partners'
     },
+    {
+      id: 'offers-coupons',
+      label: 'Offers & Coupons',
+      icon: Percent,          
+      path: '/offers'          
+    }
   ];
 
   useEffect(() => {
@@ -79,7 +86,6 @@ const Sidebar = ({ theme = 'light' }) => { // Accept theme prop
   };
 
   return (
-    // Apply theme class dynamically based on prop
     <div className={`${theme === 'dark' ? 'dark' : ''} sidebar-wrapper relative`}>
       <div className={`${isCollapsed ? 'w-20' : 'w-64'} h-full`}>
         {/* Header with Logo */}
@@ -186,19 +192,19 @@ const Sidebar = ({ theme = 'light' }) => { // Accept theme prop
                     </div>
                   )}
 
-                  {/* Hover Effect Border */}
+                
                   {!isActive && isHovered && (
                     <div className="absolute inset-0 rounded-xl border-2 border-sidebar pointer-events-none"></div>
                   )}
                 </div>
 
-                {/* Dropdown Submenu */}
+                
                 {item.hasDropdown && !isCollapsed && (
                   <div className={`
                     overflow-hidden transition-all duration-300 ease-in-out
                     ${isOrdersOpen ? 'max-h-48 mt-2 opacity-100' : 'max-h-0 opacity-0'}
                   `}>
-                    {item.subItems.map((subItem, subIndex) => (
+                    {item.subItems?.map((subItem, subIndex) => (
                       <div
                         key={subItem.id}
                         className="pl-12 pr-4 py-2.5 text-sidebar/90 cursor-pointer text-sm 
@@ -219,12 +225,9 @@ const Sidebar = ({ theme = 'light' }) => { // Accept theme prop
           })}
         </nav>
 
-        {/* Collapsed State Tooltip */}
+        {/* Collapsed Tooltip */}
         {isCollapsed && hoveredMenu && (
-          <div className="fixed left-20 bg-primary text-sidebar px-3 py-2 rounded-lg shadow-xl text-sm font-medium pointer-events-none z-50"
-            style={{
-              top: `${document.querySelector(`[title="${menuItems.find(m => m.id === hoveredMenu)?.label}"]`)?.getBoundingClientRect().top}px`
-            }}>
+          <div className="fixed left-20 bg-primary text-sidebar px-3 py-2 rounded-lg shadow-xl text-sm font-medium pointer-events-none z-50">
             {menuItems.find(m => m.id === hoveredMenu)?.label}
             <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 w-2 h-2 bg-primary rotate-45"></div>
           </div>
