@@ -64,16 +64,18 @@ const StatCard = ({
         >
             <div className="absolute inset-0 bg-primary rounded-2xl shadow-lg border border-white/20 dark:border-gray-700/50" />
 
+
             {/* Glow effect on hover */}
             <div className={`absolute -inset-0.5 bg-gradient-to-r ${currentStyle.gradient} rounded-2xl opacity-0 group-hover:opacity-20 blur-md transition-opacity duration-300`} />
 
             <div className="relative p-6">
                 <div className="flex justify-between items-start mb-4">
                     <div>
-                        <p className="text-primary opacity-60 text-sm font-medium mb-1 font-sans">
+
+                        <p className="text-gray-500 dark:text-gray-400 text-sm font-medium mb-1 font-sans">
                             {title}
                         </p>
-                        <h3 className="text-3xl font-bold text-primary tracking-tight">
+                        <h3 className="text-3xl font-bold text-gray-800 dark:text-white tracking-tight">
                             {value}
                         </h3>
                     </div>
@@ -109,6 +111,7 @@ const StatCard = ({
                         {/* If simple text/caption needed instead of trendBadge */}
                         {!trend && !progress && (
                             <span className="text-primary opacity-50 text-xs">Updated just now</span>
+
                         )}
                     </div>
                 )}

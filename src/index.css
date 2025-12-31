@@ -1,4 +1,25 @@
 @import "tailwindcss";
-
 /* Enable class-based dark mode (Tailwind v4) */
 @custom-variant dark (&:where(.dark, .dark *));
+/* Hide scrollbar but allow scroll */
+
+
+.scrollbar-hide {
+  overflow: auto;
+}
+
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Firefox */
+.scrollbar-hide {
+  scrollbar-width: none;
+}
+
+/* Edge / IE */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+}
+
