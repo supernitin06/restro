@@ -52,20 +52,20 @@ const Sidebar = ({ theme = 'light' }) => { // Accept theme prop
       icon: Bike,
       path: '/delivery-partners'
     },
-    
+
     {
       id: 'orders',
       label: 'Orders',
       icon: ShoppingBag,
       path: '/orders'
     },
-    
+
   ];
 
   useEffect(() => {
     const currentPath = location.pathname;
     // Find an exact match first, or a parent match for sub-routes
-    const activeItem = menuItems.find(item => 
+    const activeItem = menuItems.find(item =>
       item.path === currentPath || (item.path !== '/' && currentPath.startsWith(item.path))
     );
     if (activeItem) {
@@ -235,21 +235,6 @@ const Sidebar = ({ theme = 'light' }) => { // Accept theme prop
           </div>
         )}
       </div>
-            </div>
-          );
-        }
-      </nav>
-
-      {/* Collapsed State Tooltip */}
-      {isCollapsed && hoveredMenu && (
-        <div className="fixed left-20 bg-gray-900 text-white px-3 py-2 rounded-lg shadow-xl text-sm font-medium pointer-events-none z-50"
-          style={{
-            top: `${document.querySelector(`[title="${menuItems.find(m => m.id === hoveredMenu)?.label}"]`)?.getBoundingClientRect().top}px`
-          }}>
-          {menuItems.find(m => m.id === hoveredMenu)?.label}
-          <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 w-2 h-2 bg-gray-900 rotate-45"></div>
-        </div>
-      )}
     </div>
   );
 };

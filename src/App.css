@@ -66,6 +66,8 @@
   .page {
     padding: 1.5rem;
     padding-bottom: 2.5rem;
+  }
+}
 
 .page {
   min-height: 100vh;
@@ -162,6 +164,11 @@
   border-color: var(--border-sidebar) !important;
 }
 
+.bg-gradient-sidebar {
+  background: linear-gradient(135deg, var(--bg-sidebar), #4f46e5);
+  color: #ffffff;
+}
+
 
 /* Buttons */
 
@@ -232,16 +239,6 @@
   background-color: #374151;
   /* gray-700 */
 }
-
-
-
-
-
-
-
-
-
-
 
 
 /* Cards */
@@ -327,7 +324,7 @@
 
 /* Link */
 .link {
-  color: var(--primary);  
+  color: var(--primary);
   text-decoration: none;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -349,25 +346,7 @@ a {
   box-shadow: 0 0 12px var(--focus-ring);
 }
 
-/* Sidebar specific styles */
-.sidebar-wrapper {
-  background-color: var(--bg-sidebar);
-  color: var(--text-sidebar);
-  transition: all 0.3s ease;
-}
 
-.sidebar-divider {
-  border-color: var(--border-sidebar);
-}
-
-.sidebar-item-active {
-  background-color: var(--primary) !important;
-  color: white !important;
-}
-
-.sidebar-item-hover {
-  background-color: var(--bg-hover);
-}
 
 .text-heading {
   /* Text size & weight */
@@ -388,9 +367,6 @@ a {
   /* Fallback */
   color: var(--text-main);
 }
-
-
-
 
 
 /* Button */
@@ -471,6 +447,7 @@ a {
   background-color: #b91c1c;
   /* red-700 */
 }
+
 /* Cursor / hover polish */
 .button,
 a {
