@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Star, ChevronLeft, ChevronRight } from 'lucide-react';
+import Button from '../ui/Button';
 
 const CustomerReviews = () => {
   const scrollRef = useRef(null);
@@ -83,20 +84,20 @@ const CustomerReviews = () => {
     <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20 dark:border-gray-700">
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-xl font-bold text-gray-800 dark:text-white">Customer Reviews</h3>
-        <button className="text-sm font-medium text-[#2563eb] hover:text-[#1d4ed8] transition-colors">
+        <Button className="text-sm font-medium text-[#2563eb] hover:text-[#1d4ed8] transition-colors bg-transparent shadow-none p-0 w-auto hover:bg-transparent">
           See More Reviews
-        </button>
+        </Button>
       </div>
 
       <div className="relative overflow-hidden">
         {/* Left Scroll Button */}
         {canScrollLeft && (
-          <button
+          <Button
             onClick={() => scroll('left')}
-            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white dark:bg-gray-700 rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-600 transition-all hover:scale-110"
+            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white dark:bg-gray-700 rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-600 transition-all hover:scale-110 p-0"
           >
             <ChevronLeft className="w-5 h-5 text-gray-700 dark:text-gray-200" />
-          </button>
+          </Button>
         )}
 
         {/* Scrollable Container */}
@@ -122,10 +123,10 @@ const CustomerReviews = () => {
                         <Star
                           key={i}
                           className={`w-4 h-4 ${i < Math.floor(review.rating)
+                            ? 'fill-yellow-400 text-yellow-400'
+                            : review.rating % 1 !== 0 && i === Math.floor(review.rating)
                               ? 'fill-yellow-400 text-yellow-400'
-                              : review.rating % 1 !== 0 && i === Math.floor(review.rating)
-                                ? 'fill-yellow-400 text-yellow-400'
-                                : 'text-gray-300 dark:text-gray-600'
+                              : 'text-gray-300 dark:text-gray-600'
                             }`}
                         />
                       ))}
@@ -155,12 +156,12 @@ const CustomerReviews = () => {
 
           {/* Right Scroll Button */}
           {canScrollRight && (
-            <button
+            <Button
               onClick={() => scroll('right')}
-              className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white dark:bg-gray-700 rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-600 transition-all hover:scale-110"
+              className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white dark:bg-gray-700 rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-600 transition-all hover:scale-110 p-0"
             >
               <ChevronRight className="w-5 h-5 text-gray-700 dark:text-gray-200" />
-            </button>
+            </Button>
           )}
         </div>
       </div>

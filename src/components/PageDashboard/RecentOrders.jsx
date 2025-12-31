@@ -1,5 +1,6 @@
 import React from 'react';
 import { Search, MoreVertical } from 'lucide-react';
+import Button from '../ui/Button';
 
 const RecentOrders = () => {
   const orders = [
@@ -56,9 +57,9 @@ const RecentOrders = () => {
             <option>Last Week</option>
             <option>This Month</option>
           </select>
-          <button className="px-4 py-2 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm font-medium text-gray-700 dark:text-gray-200 hover:border-[#2563eb] hover:text-[#2563eb] transition-all">
+          <Button variant="primary" className="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-sm font-medium hover:border-[#2563eb] hover:bg-opacity-90 transition-all">
             See All Orders
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -105,15 +106,15 @@ const RecentOrders = () => {
                 <td className="py-4 px-4">
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{order.customer}</span>
                 </td>
-                <td className="py-4 px-4">
-                  <span className={`${order.statusColor} text-white px-3 py-1.5 rounded-full text-xs font-semibold inline-block`}>
+                <td className="py-4 px-4 ">
+                  <span className={`${order.statusColor} text-white px-3 py-1.5 rounded-full text-xs w-20 text-nowrap  font-semibold inline-block`}>
                     {order.status}
                   </span>
                 </td>
                 <td className="py-4 px-4">
-                  <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700/50 rounded-lg transition-colors">
+                  <Button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700/50 rounded-lg transition-colors bg-transparent shadow-none w-auto">
                     <MoreVertical className="w-4 h-4 text-gray-400" />
-                  </button>
+                  </Button>
                 </td>
               </tr>
             ))}

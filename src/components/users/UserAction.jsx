@@ -1,6 +1,6 @@
-// components/ui/ActionButtons.jsx
 import React from 'react';
 import { Eye, Edit2, Trash2, MoreVertical } from 'lucide-react';
+import Button from '../ui/Button';
 
 
 const ActionButtons = ({
@@ -51,7 +51,7 @@ const ActionButtons = ({
 
   const renderActionButton = (actionKey, actionConfig) => {
     if (!actionConfig.show) return null;
-    
+
     const Icon = actionConfig.icon;
     const colorClass = {
       cyan: 'hover:bg-cyan-500/20 text-cyan-300 hover:text-cyan-200',
@@ -63,7 +63,7 @@ const ActionButtons = ({
     }[actionConfig.color] || 'hover:bg-white/20 text-gray-300 hover:text-white';
 
     return (
-      <button
+      <Button
         key={actionKey}
         onClick={(e) => {
           e.stopPropagation();
@@ -83,7 +83,7 @@ const ActionButtons = ({
         aria-label={actionConfig.label}
       >
         <Icon className={iconSize[size]} />
-      </button>
+      </Button>
     );
   };
 
@@ -97,10 +97,10 @@ const ActionButtons = ({
     return (
       <div className={`flex gap-1 ${className}`}>
         {primaryActions.map(([key, config]) => renderActionButton(key, config))}
-        
+
         {/* Dropdown for additional actions */}
         <div className="relative group">
-          <button
+          <Button
             className={`
               ${sizeClasses[size]} 
               rounded-lg bg-white/10 
@@ -113,8 +113,8 @@ const ActionButtons = ({
             aria-label="More actions"
           >
             <MoreVertical className={iconSize[size]} />
-          </button>
-          
+          </Button>
+
           <div className="
             absolute right-0 top-full mt-1 
             bg-gray-900/95 backdrop-blur-md
@@ -126,7 +126,7 @@ const ActionButtons = ({
             z-50
           ">
             {dropdownActions.map(([key, config]) => (
-              <button
+              <Button
                 key={key}
                 onClick={(e) => {
                   e.stopPropagation();
@@ -139,11 +139,12 @@ const ActionButtons = ({
                   text-sm text-gray-300 hover:text-white hover:bg-white/10
                   rounded-lg transition-colors
                   flex items-center gap-2
+                  shadow-none bg-transparent hover:bg-white/10
                 "
               >
                 <config.icon className="w-4 h-4" />
                 {config.label}
-              </button>
+              </Button>
             ))}
           </div>
         </div>

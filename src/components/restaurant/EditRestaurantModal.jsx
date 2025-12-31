@@ -18,12 +18,12 @@ const EditRestaurantModal = ({
         <div className="bg-gradient-to-r from-red-600 to-red-700 p-6 text-white">
           <div className="flex justify-between items-start">
             <h2 className="text-2xl font-bold">Edit Restaurant</h2>
-            <button
-              className="text-white hover:text-red-200 text-2xl"
+            <Button
+              className="text-white hover:text-red-200 text-2xl p-0 bg-transparent shadow-none w-8 h-8 flex items-center justify-center p-0 !p-0"
               onClick={onCancel}
             >
               ✕
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -75,21 +75,7 @@ const EditRestaurantModal = ({
               />
             </div>
 
-            {/* Number of Tables (Duplicate?) */}
-            <div className="flex items-center"  >
-              <InputField
-                label="Number of Tables"
-                type="number"
-                min="0"
-                value={editRestaurant.table}
-                onChange={(e) =>
-                  setEditRestaurant({
-                    ...editRestaurant,
-                    table: parseInt(e.target.value) || 0,
-                  })
-                }
-              />
-            </div>
+
 
             {/* Address */}
             <div>
@@ -165,13 +151,14 @@ const EditRestaurantModal = ({
             {/* Form Actions */}
             <div className="flex gap-3 pt-6 border-t border-gray-200">
               <Button
+                variant="primary"
                 className="flex-1"
                 onClick={onSave}
               >
                 Save Changes
               </Button>
               <Button
-                variant="outline"
+                variant="danger"
                 className="flex-1"
                 onClick={onCancel}
               >

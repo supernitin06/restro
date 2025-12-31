@@ -73,16 +73,18 @@ function RestaurantManagement() {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--bg-soft)] p-4 md:p-8">
+    <div className="page">
 
       {/* ===== PREMIUM HEADER ===== */}
-      <div className="card mb-6 p-6">
-        <h1 className="text-3xl font-bold text-primary mb-1">
-          Restaurant Management
-        </h1>
-        <p className="text-secondary text-sm">
-          Manage restaurant pricing, rules, and priorities across your platform.
-        </p>
+      <div className="flex flex-col mb-6 md:flex-row justify-between items-start md:items-center bg-white dark:bg-gray-800 p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
+        <div>
+          <h1 className="text-heading">
+            Restaurant Management
+          </h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-2 text-lg font-medium">
+            Manage restaurant pricing, rules, and priorities across your platform.
+          </p>
+        </div>
       </div>
 
       {/* ===== SEARCH & FILTER ===== */}

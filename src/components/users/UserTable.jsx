@@ -2,6 +2,7 @@ import React from 'react';
 import { Mail, Phone } from 'lucide-react';
 import Badge from '../ui/Badge';
 import ActionButtons from '../users/UserAction';
+import Button from '../ui/Button';
 
 const UserTable = ({ users, onView, onEdit, onDelete, onToggleStatus }) => {
   const handleAction = (action, user) => {
@@ -71,14 +72,14 @@ const UserTable = ({ users, onView, onEdit, onDelete, onToggleStatus }) => {
                 </div>
               </td>
               <td className="px-6 py-4">
-                <button 
+                <Button
                   onClick={() => onToggleStatus(user.id)}
-                  className="transition-transform hover:scale-105 active:scale-95"
+                  className="transition-transform hover:scale-105 active:scale-95 p-0 bg-transparent shadow-none w-auto h-auto min-h-0"
                 >
                   <Badge type={user.status}>
                     {user.status}
                   </Badge>
-                </button>
+                </Button>
               </td>
               <td className="px-6 py-4">
                 <ActionButtons

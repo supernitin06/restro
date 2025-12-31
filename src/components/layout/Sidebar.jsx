@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import Button from '../ui/Button';
 import { useEffect } from 'react';
 import {
   LayoutDashboard,
@@ -93,9 +94,9 @@ const Sidebar = ({ theme = 'light' }) => { // Accept theme prop
           </div>
 
           {/* Toggle Button */}
-          <button
+          <Button
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-primary text-sidebar rounded-full shadow-lg flex items-center justify-center hover:shadow-xl hover:scale-110 transition-all duration-200 z-20"
+            className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-primary text-sidebar rounded-full shadow-lg flex items-center justify-center hover:shadow-xl hover:scale-110 transition-all duration-200 z-20 p-0"
             title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           >
             {isCollapsed ? (
@@ -103,7 +104,7 @@ const Sidebar = ({ theme = 'light' }) => { // Accept theme prop
             ) : (
               <ChevronLeft className="w-4 h-4" />
             )}
-          </button>
+          </Button>
         </div>
 
         {/* Menu Items */}

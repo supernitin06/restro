@@ -10,6 +10,7 @@ import {
   FiXCircle,
 } from "react-icons/fi";
 import { AiFillStar } from "react-icons/ai";
+import Button from '../ui/Button';
 
 const RestaurantCard = ({
   restaurant,
@@ -28,12 +29,7 @@ const RestaurantCard = ({
   return (
     <div
       className="
-        group relative rounded-2xl overflow-hidden
-        bg-white dark:bg-[#0f172a]
-        border border-gray-100 dark:border-white/10
-        shadow-sm hover:shadow-2xl
-        transition-all duration-300 ease-out
-        hover:-translate-y-2 hover:scale-[1.01]
+      card
       "
     >
       {/* IMAGE */}
@@ -63,26 +59,26 @@ const RestaurantCard = ({
 
         {/* Edit / Delete */}
         <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-all">
-          <button
+          <Button
             onClick={() => onEdit(restaurant)}
             className="
               p-2 rounded-full bg-white/90 dark:bg-black/60
               hover:text-blue-600 hover:scale-110
-              shadow transition
+              shadow transition items-center justify-center
             "
           >
             <FiEdit3 size={13} />
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => onDelete(restaurantId)}
             className="
               p-2 rounded-full bg-white/90 dark:bg-black/60
               hover:text-red-500 hover:scale-110
-              shadow transition
+              shadow transition items-center justify-center
             "
           >
             <FiTrash2 size={13} />
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -143,50 +139,41 @@ const RestaurantCard = ({
 
         {/* ACTIONS */}
         <div className="grid grid-cols-3 gap-2">
-          <button
+          <Button
             onClick={() => onApprove(restaurantId)}
             disabled={status === "Approved"}
+            variant="active"
+            size="sm"
             className={`
-              py-1.5 rounded-lg text-[11px] font-semibold
-              transition-all
-              ${
-                status === "Approved"
-                  ? "bg-green-100 text-green-700 dark:bg-green-500/20"
-                  : "bg-green-500 text-white hover:bg-green-600 hover:scale-105"
-              }
+              w-full
+              ${status === "Approved" ? "opacity-50 cursor-not-allowed" : "hover:scale-105"}
             `}
           >
             Approve
-          </button>
+          </Button>
 
-          <button
+          <Button
             onClick={() => onSuspend(restaurantId)}
             disabled={status === "Suspended"}
+            variant="inactive"
+            size="sm"
             className={`
-              py-1.5 rounded-lg text-[11px] font-semibold
-              transition-all
-              ${
-                status === "Suspended"
-                  ? "bg-red-100 text-red-700 dark:bg-red-500/20"
-                  : "bg-red-500 text-white hover:bg-red-600 hover:scale-105"
-              }
+              w-full
+              ${status === "Suspended" ? "opacity-50 cursor-not-allowed" : "hover:scale-105"}
             `}
           >
             Suspend
-          </button>
+          </Button>
 
-          <button
+          <Button
             onClick={() => onView(restaurant)}
-            className="
-              flex items-center justify-center gap-1
-              py-1.5 rounded-lg text-[11px] font-semibold
-              bg-gray-900 dark:bg-white text-white dark:text-black
-              hover:scale-105 transition
-            "
+            variant="primary"
+            size="sm"
+            className="w-full hover:scale-105"
           >
             <FiEye size={12} />
             View
-          </button>
+          </Button>
         </div>
       </div>
     </div>

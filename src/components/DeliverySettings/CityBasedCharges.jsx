@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { FaCity, FaPlus, FaTrash, FaMapPin } from 'react-icons/fa';
+import Button from '../ui/Button';
 import InputField from '../ui/InputField';
 
 const CityBasedCharges = () => {
@@ -68,13 +69,13 @@ const CityBasedCharges = () => {
                                     startIcon={<span className="text-xs">₹</span>}
                                 />
                             </div>
-                            <button
+                            <Button
                                 type="submit"
                                 disabled={!newCity || !newFee}
                                 className="mt-1 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white p-3.5 rounded-xl transition-all shadow-md hover:shadow-lg transform active:scale-95 flex items-center justify-center min-w-[50px]"
                             >
                                 <FaPlus />
-                            </button>
+                            </Button>
                         </form>
 
                         {/* City List */}
@@ -94,12 +95,12 @@ const CityBasedCharges = () => {
                                         </div>
                                         <div className="flex items-center gap-6">
                                             <span className="font-black text-gray-800 dark:text-white bg-white dark:bg-gray-800 px-3 py-1 rounded-lg border border-gray-100 dark:border-gray-600">₹{rule.fee}</span>
-                                            <button
+                                            <Button
                                                 onClick={() => removeCity(rule.id)}
-                                                className="text-gray-400 hover:text-red-500 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all transform hover:scale-110"
+                                                className="text-gray-400 hover:text-red-500 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all transform hover:scale-110 p-0 bg-transparent shadow-none w-auto"
                                             >
                                                 <FaTrash size={16} />
-                                            </button>
+                                            </Button>
                                         </div>
                                     </div>
                                 ))

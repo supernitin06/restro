@@ -54,10 +54,10 @@ const UserManagement = () => {
   // Filter users
   const filteredUsers = users.filter(user => {
     const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         user.email.toLowerCase().includes(searchTerm.toLowerCase());
+      user.email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = filters.status === 'all' || user.status === filters.status;
     const matchesMembership = filters.membership === 'all' || user.membership === filters.membership;
-    
+
     return matchesSearch && matchesStatus && matchesMembership;
   });
 
@@ -97,8 +97,8 @@ const UserManagement = () => {
   };
 
   const handleToggleStatus = (userId) => {
-    setUsers(users.map(user => 
-      user.id === userId 
+    setUsers(users.map(user =>
+      user.id === userId
         ? { ...user, status: user.status === 'active' ? 'inactive' : 'active' }
         : user
     ));
@@ -112,6 +112,18 @@ const UserManagement = () => {
 
   return (
     <div className="page">
+     <div className="flex flex-col mb-6 md:flex-row justify-between items-start md:items-center bg-white dark:bg-gray-800 p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
+        <div>
+          <h1 className="text-heading">
+            User Management
+          </h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-2 text-lg font-medium">
+            Manage users and their details.
+          </p>
+        </div>
+      </div>
+
+
       {/* Background effects */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 left-1/4 w-72 h-72 bg-cyan-500/10 rounded-full blur-3xl" />

@@ -43,12 +43,12 @@ const ViewDetailsModal = ({ restaurant, onClose, onApprove, onSuspend }) => {
         <div className="bg-gradient-to-r from-white via-red-100 to-red-400 p-5 text-red-900 rounded-t-3xl">
           <div className="flex justify-between items-start">
             <h2 className="text-2xl font-bold">{restaurantDetail?.name}</h2>
-            <button
-              className="text-red-900 hover:text-red-700 text-2xl font-semibold transition"
+            <Button
+              className="text-red-900 hover:text-red-700 text-2xl font-semibold transition p-0 bg-transparent shadow-none w-auto"
               onClick={onClose}
             >
               ✕
-            </button>
+            </Button>
           </div>
           <div className="flex items-center gap-3 mt-2 text-sm">
             <span className="flex items-center gap-1 bg-white/30 px-2 py-0.5 rounded-full font-medium text-red-900">
@@ -109,7 +109,7 @@ const ViewDetailsModal = ({ restaurant, onClose, onApprove, onSuspend }) => {
         <div className="flex justify-end gap-3 p-6">
           {/* Approve Button */}
           <Button
-            variant="success"
+            variant="active"
             className={`py-2 px-4 text-sm ${status === "Approved" ? "opacity-50 cursor-not-allowed" : ""}`}
             onClick={handleApprove}
             disabled={status === "Approved"}
@@ -119,7 +119,7 @@ const ViewDetailsModal = ({ restaurant, onClose, onApprove, onSuspend }) => {
 
           {/* Suspend Button */}
           <Button
-            variant="danger"
+            variant="inactive"
             className={`py-2 px-4 text-sm ${status === "Suspended" || status === "Approved" ? "opacity-50 cursor-not-allowed" : ""}`}
             onClick={handleSuspend}
             disabled={status === "Suspended" || status === "Approved"}
@@ -129,8 +129,7 @@ const ViewDetailsModal = ({ restaurant, onClose, onApprove, onSuspend }) => {
 
           {/* Close Button */}
           <Button
-            variant="outline"
-            className="py-2 px-4 text-sm border-gray-400 text-gray-700 hover:bg-gray-50"
+            className="py-2 px-4 text-sm border border-gray-400 text-gray-700 hover:bg-gray-50 bg-white"
             onClick={onClose}
           >
             Close

@@ -1,18 +1,19 @@
 import React from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import GradientButton from './GradientButton';
+import Button from './Button';
 
 const Pagination = ({ currentPage, totalPages, onPageChange }) => {
   const pages = [];
   const maxVisible = 5;
-  
+
   let start = Math.max(1, currentPage - Math.floor(maxVisible / 2));
   let end = Math.min(totalPages, start + maxVisible - 1);
-  
+
   if (end - start + 1 < maxVisible) {
     start = Math.max(1, end - maxVisible + 1);
   }
-  
+
   for (let i = start; i <= end; i++) {
     pages.push(i);
   }
@@ -22,7 +23,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
       <div className="text-gray-400 text-sm">
         Page {currentPage} of {totalPages}
       </div>
-      
+
       <div className="flex items-center gap-2">
         <GradientButton
           onClick={() => onPageChange(currentPage - 1)}
@@ -32,13 +33,13 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
         >
           <ChevronLeft className="w-4 h-4" />
         </GradientButton>
-        
+
         {pages.map((page) => (
-          <button
+          <Button
             key={page}
             onClick={() => onPageChange(page)}
             className={`
-              w-10 h-10 rounded-xl font-medium transition-all
+              w-10 h-10 rounded-xl font-medium transition-all p-0
               ${currentPage === page
                 ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/25'
                 : 'bg-white/10 text-gray-300 hover:bg-white/20 border border-white/20'
@@ -46,9 +47,9 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
             `}
           >
             {page}
-          </button>
+          </Button>
         ))}
-        
+
         <GradientButton
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Home, ShoppingBag, Bike } from 'lucide-react';
+import Button from '../ui/Button';
 
 const OrderTypes = () => {
   const orderTypes = [
@@ -36,9 +37,9 @@ const OrderTypes = () => {
     <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20 dark:border-gray-700">
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-xl font-bold text-gray-800 dark:text-white">Order Types</h3>
-        <button className="text-sm font-medium text-[#2563eb] hover:text-[#1d4ed8] transition-colors">
+        <Button className="text-sm font-medium text-[#2563eb] hover:text-[#1d4ed8] transition-colors bg-transparent shadow-none p-0 w-auto hover:bg-transparent">
           This Month ▼
-        </button>
+        </Button>
       </div>
 
       <div className="space-y-5">

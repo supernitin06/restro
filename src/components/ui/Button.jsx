@@ -2,51 +2,49 @@ import React from 'react';
 
 const Button = ({
   children,
-  onClick,
   type = 'button',
-  loading = false,
+  onClick,
   disabled = false,
+  loading = false,
   className = '',
-  fullWidth = true,
-  variant = 'primary'
+  fullWidth = false,
+  variant = '', // primary, danger, active, inactive
+  size = '', // sm
+  ...props
 }) => {
+  const hasWidth = className.includes('w-');
+  // Only apply default padding if no size class AND no manual padding class is present
+  const hasPaddingY = className.includes('py-') || className.includes('p-');
+  const hasPaddingX = className.includes('px-') || className.includes('p-');
+
+  // Map props to classes
+  const variantClass = variant ? `btn-${variant}` : '';
+  const sizeClass = size ? `btn-${size}` : '';
+
   return (
     <button
       type={type}
       onClick={onClick}
       disabled={disabled || loading}
       className={`
-        ${fullWidth ? 'w-full' : ''}
-        ${variant === 'primary'
-          ? 'bg-gradient-to-r from-red-600 to-pink-500 text-white hover:from-purple-700 hover:to-pink-600 shadow-lg hover:shadow-xl'
-          : ''}
-        ${variant === 'blue'
-          ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg hover:shadow-xl'
-          : ''}
-        ${variant === 'success'
-          ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:from-green-600 hover:to-emerald-700 shadow-lg hover:shadow-xl'
-          : ''}
-        ${variant === 'danger'
-          ? 'bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700 shadow-lg hover:shadow-xl'
-          : ''}
-        ${variant === 'outline'
-          ? 'border-2 border-red-600 text-red-600 hover:bg-red-50'
-          : ''}
-        ${variant === 'ghost'
-          ? 'text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800'
-          : ''}
-        font-bold py-3 px-4 rounded-lg 
-        transition duration-300 
-        disabled:opacity-50 flex items-center justify-center
+        ${!hasWidth && fullWidth ? 'w-full' : ''}
+        ${!hasPaddingY && !size ? 'py-3' : ''} 
+        ${!hasPaddingX && !size ? 'px-4' : ''}
+        btn
+        ${variantClass}
+        ${sizeClass}
         ${className}
       `}
+      {...props}
     >
       {loading ? (
-        <div className="flex items-center">
-          <div className="w-5 h-5 border-t-2 border-white rounded-full animate-spin mr-2"></div>
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
           Processing...
         </div>
-      ) : children}
+      ) : (
+        children
+      )}
     </button>
   );
 };

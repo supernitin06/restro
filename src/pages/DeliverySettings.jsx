@@ -11,12 +11,12 @@ const DeliverySettings = () => {
     const [activeTab, setActiveTab] = useState('rules'); // rules | priority
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-8 font-sans transition-colors duration-300">
+        <div className="page">
             <div className="max-w-7xl mx-auto space-y-8">
                 {/* Header Section */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-white dark:bg-gray-800 p-6 md:p-8 rounded-3xl shadow-lg border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
                     <div>
-                        <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600 dark:from-indigo-400 dark:to-violet-400 tracking-tight">
+                        <h1 className="text-heading">
                             Delivery Charge
                         </h1>
                         <p className="text-gray-500 dark:text-gray-400 mt-2 text-lg font-medium">

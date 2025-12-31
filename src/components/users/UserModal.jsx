@@ -2,6 +2,7 @@ import React from 'react';
 import { X, Mail, Phone, MapPin, Calendar, Clock, Award, Heart, Trash2, CreditCard, Star, Package, Users, Shield, ChevronRight } from 'lucide-react';
 import GlassCard from '../ui/GlassCard';
 import GradientButton from '../ui/GradientButton';
+import Button from '../ui/Button';
 import Badge from '../ui/Badge';
 
 const UserModal = ({ user, onClose, onEdit, onDelete }) => {
@@ -13,10 +14,10 @@ const UserModal = ({ user, onClose, onEdit, onDelete }) => {
         {/* Custom scrollbar container */}
         <div className="overflow-y-auto max-h-[90vh] scrollbar-hide">
           <GlassCard className="p-8 bg-gradient-to-br from-white/5 to-white/[0.02] border-white/10">
-            
+
             {/* Header with gradient background */}
             <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-r from-cyan-500/20 via-blue-500/20 to-purple-500/20 rounded-t-2xl" />
-            
+
             <div className="relative">
               {/* Profile Header */}
               <div className="flex items-start justify-between mb-10">
@@ -43,8 +44,8 @@ const UserModal = ({ user, onClose, onEdit, onDelete }) => {
                       <p className="text-gray-300">{user.email}</p>
                     </div>
                     <div className="flex items-center gap-3">
-                      <Badge 
-                        type={user.membership.toLowerCase()} 
+                      <Badge
+                        type={user.membership.toLowerCase()}
                         className="shadow-lg px-4 py-1.5 backdrop-blur-md"
                       >
                         <Shield className="w-3 h-3 mr-1.5" />
@@ -54,47 +55,47 @@ const UserModal = ({ user, onClose, onEdit, onDelete }) => {
                     </div>
                   </div>
                 </div>
-                <button
+                <Button
                   onClick={onClose}
                   className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 backdrop-blur-md border border-white/10 hover:border-cyan-500/30 transition-all duration-300 group"
                 >
                   <X className="w-5 h-5 text-gray-400 group-hover:text-white group-hover:rotate-90 transition-all" />
-                </button>
+                </Button>
               </div>
 
               {/* Stats Cards - Animated hover effects */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
                 {[
-                  { 
-                    label: 'Total Orders', 
-                    value: user.totalOrders, 
-                    icon: Package, 
+                  {
+                    label: 'Total Orders',
+                    value: user.totalOrders,
+                    icon: Package,
                     color: 'from-cyan-500/20 to-blue-500/20',
                     iconColor: 'text-cyan-400'
                   },
-                  { 
-                    label: 'Total Spent', 
-                    value: `₹${user.totalSpent}`, 
-                    icon: CreditCard, 
+                  {
+                    label: 'Total Spent',
+                    value: `₹${user.totalSpent}`,
+                    icon: CreditCard,
                     color: 'from-emerald-500/20 to-green-500/20',
                     iconColor: 'text-emerald-400'
                   },
-                  { 
-                    label: 'Loyalty Points', 
-                    value: user.loyaltyPoints, 
-                    icon: Star, 
+                  {
+                    label: 'Loyalty Points',
+                    value: user.loyaltyPoints,
+                    icon: Star,
                     color: 'from-amber-500/20 to-orange-500/20',
                     iconColor: 'text-amber-400'
                   },
-                  { 
-                    label: 'Success Rate', 
-                    value: '98%', 
-                    icon: Award, 
+                  {
+                    label: 'Success Rate',
+                    value: '98%',
+                    icon: Award,
                     color: 'from-purple-500/20 to-pink-500/20',
                     iconColor: 'text-purple-400'
                   }
                 ].map((stat, index) => (
-                  <div 
+                  <div
                     key={index}
                     className="group relative overflow-hidden"
                   >
@@ -189,7 +190,7 @@ const UserModal = ({ user, onClose, onEdit, onDelete }) => {
                   </h3>
                   <div className="flex flex-wrap gap-2.5">
                     {user.dietaryPreferences?.map((pref, index) => (
-                      <span 
+                      <span
                         key={index}
                         className="px-4 py-2 bg-gradient-to-r from-emerald-500/10 to-emerald-500/5 backdrop-blur-sm border border-emerald-500/20 rounded-full text-sm text-emerald-300 hover:scale-105 hover:border-emerald-500/40 transition-all duration-300"
                       >
@@ -209,7 +210,7 @@ const UserModal = ({ user, onClose, onEdit, onDelete }) => {
                   </h3>
                   <div className="space-y-3">
                     {user.favoriteItems?.map((item, index) => (
-                      <div 
+                      <div
                         key={index}
                         className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-white/5 to-white/2 hover:from-white/10 hover:to-white/5 transition-all duration-300 group"
                       >
@@ -226,7 +227,7 @@ const UserModal = ({ user, onClose, onEdit, onDelete }) => {
               {/* Action Buttons - Floating effect */}
               <div className="sticky bottom-0 pt-8 mt-8 border-t border-white/10 bg-gradient-to-t from-black/80 via-black/60 to-transparent">
                 <div className="flex flex-col sm:flex-row gap-4 justify-between">
-                  <GradientButton 
+                  <GradientButton
                     onClick={() => onEdit(user)}
                     variant="primary"
                     className="flex-1 group relative overflow-hidden"
@@ -234,8 +235,8 @@ const UserModal = ({ user, onClose, onEdit, onDelete }) => {
                     <span className="relative z-10">Edit Profile</span>
                     <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 opacity-0 group-hover:opacity-100 transition-opacity" />
                   </GradientButton>
-                  
-                  <GradientButton 
+
+                  <GradientButton
                     onClick={() => {
                       if (window.confirm(`Send message to ${user.name}?`)) {
                         alert(`Message sent to ${user.name}`);
@@ -247,8 +248,8 @@ const UserModal = ({ user, onClose, onEdit, onDelete }) => {
                     <Mail className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" />
                     Send Message
                   </GradientButton>
-                  
-                  <GradientButton 
+
+                  <GradientButton
                     onClick={() => {
                       if (window.confirm(`Delete ${user.name} permanently?`)) {
                         onDelete(user.id);
