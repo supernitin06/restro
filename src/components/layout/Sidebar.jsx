@@ -11,7 +11,11 @@ import {
   ChevronRight,
   Circle,
   Bike,
-  ShoppingBag
+  ShoppingBag,
+  ShieldCheck,
+  ChevronDown,
+  UserPlus,
+  Shield
 } from 'lucide-react';
 
 const Sidebar = ({ theme = 'light' }) => { // Accept theme prop
@@ -19,6 +23,7 @@ const Sidebar = ({ theme = 'light' }) => { // Accept theme prop
   const location = useLocation();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [activeMenu, setActiveMenu] = useState('dashboard');
+  const [expandedMenu, setExpandedMenu] = useState(null);
   const [hoveredMenu, setHoveredMenu] = useState(null);
 
   const menuItems = [
@@ -59,6 +64,17 @@ const Sidebar = ({ theme = 'light' }) => { // Accept theme prop
       icon: ShoppingBag,
       path: '/orders'
     },
+    {
+      id: 'sub-admin',
+      label: 'Sub Admin',
+      icon: ShieldCheck,
+      path: '/sub-admin',
+      hasDropdown: true,
+      subItems: [
+        { id: 'create-subadmin', label: 'Create SubAdmin', path: '/sub-admin/create', icon: UserPlus },
+        { id: 'assign-admin', label: 'Assign Admin', path: '/sub-admin/assign', icon: Shield }
+      ]
+    },
 
   ];
 
@@ -70,16 +86,27 @@ const Sidebar = ({ theme = 'light' }) => { // Accept theme prop
     );
     if (activeItem) {
       setActiveMenu(activeItem.id);
+      if (activeItem.hasDropdown) {
+        setExpandedMenu(activeItem.id);
+      }
     } else if (currentPath === '/') {
       setActiveMenu('dashboard');
     }
   }, [location.pathname]); // menuItems is static, no need to include
 
   const handleMenuClick = (menuId) => {
-    setActiveMenu(menuId);
     const item = menuItems.find(i => i.id === menuId);
-    if (item?.path) {
-      navigate(item.path);
+    if (item?.hasDropdown) {
+      setExpandedMenu(expandedMenu === menuId ? null : menuId);
+      if (item.path) {
+        navigate(item.path);
+        setActiveMenu(menuId);
+      }
+    } else {
+      setActiveMenu(menuId);
+      if (item?.path) {
+        navigate(item.path);
+      }
     }
   };
 
@@ -125,6 +152,8 @@ const Sidebar = ({ theme = 'light' }) => { // Accept theme prop
             const IconComponent = item.icon;
             const isActive = activeMenu === item.id;
             const isHovered = hoveredMenu === item.id;
+            const isExpanded = expandedMenu === item.id;
+            const isParentActive = isActive || (item.hasDropdown && item.subItems?.some(sub => sub.path === location.pathname));
 
             return (
               <div key={item.id} className="mb-1">
@@ -135,7 +164,7 @@ const Sidebar = ({ theme = 'light' }) => { // Accept theme prop
                   onMouseLeave={() => setHoveredMenu(null)}
                   className={`
                     flex items-center justify-between px-4 py-3.5 cursor-pointer transition-all duration-300 relative group rounded-xl
-                    ${isActive
+                    ${isParentActive
                       ? 'sidebar-item-active shadow-lg scale-[1.02] font-semibold'
                       : 'text-sidebar hover:bg-white/10'
                     }
@@ -144,14 +173,14 @@ const Sidebar = ({ theme = 'light' }) => { // Accept theme prop
                   title={isCollapsed ? item.label : ''}
                 >
                   {/* Active Indicator */}
-                  {isActive && (
+                  {isParentActive && (
                     <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-primary rounded-r-full"></div>
                   )}
 
                   <div className="flex items-center gap-3 flex-1">
                     <div className={`
                       relative transition-all duration-300
-                      ${isActive ? 'scale-110' : ''}
+                      ${isParentActive ? 'scale-110' : ''}
                       ${isHovered && !isActive ? 'scale-105' : ''}
                     `}>
                       <IconComponent className="w-5 h-5" />
@@ -171,7 +200,7 @@ const Sidebar = ({ theme = 'light' }) => { // Accept theme prop
                       {item.badge && (
                         <span className={`
                           px-2.5 py-0.5 rounded-full text-xs font-bold transition-all duration-300
-                          ${isActive
+                          ${isParentActive
                             ? 'bg-primary text-sidebar shadow-md'
                             : 'bg-white/20 text-sidebar'
                           }
@@ -184,7 +213,7 @@ const Sidebar = ({ theme = 'light' }) => { // Accept theme prop
                         <ChevronDown
                           className={`
                             w-4 h-4 transition-all duration-300
-                            ${isOrdersOpen ? 'rotate-180' : 'rotate-0'}
+                            ${isExpanded ? 'rotate-180' : 'rotate-0'}
                           `}
                         />
                       )}
@@ -201,22 +230,30 @@ const Sidebar = ({ theme = 'light' }) => { // Accept theme prop
                 {item.hasDropdown && !isCollapsed && (
                   <div className={`
                     overflow-hidden transition-all duration-300 ease-in-out
-                    ${isOrdersOpen ? 'max-h-48 mt-2 opacity-100' : 'max-h-0 opacity-0'}
+                    ${isExpanded ? 'max-h-48 mt-2 opacity-100' : 'max-h-0 opacity-0'}
+                    bg-white/5 rounded-xl mx-2 border border-white/10
                   `}>
-                    {item.subItems.map((subItem, subIndex) => (
+                    {item.subItems.map((subItem, subIndex) => {
+                      const isSubActive = location.pathname === subItem.path;
+                      const SubIcon = subItem.icon || Circle;
+                      return (
                       <div
                         key={subItem.id}
-                        className="pl-12 pr-4 py-2.5 text-sidebar/90 cursor-pointer text-sm 
-                                 transition-all duration-200 rounded-lg mx-1 my-0.5
-                                 hover:bg-white/10 hover:pl-14 hover:text-sidebar flex items-center gap-2.5 group"
+                        className={`
+                          px-4 py-2.5 cursor-pointer text-sm 
+                          transition-all duration-200 rounded-lg mx-2 my-1.5
+                          flex items-center gap-3 group
+                          ${isSubActive ? 'bg-primary/20 text-primary font-semibold shadow-sm' : 'text-sidebar/70 hover:bg-white/10 hover:text-sidebar'}
+                        `}
                         style={{
-                          transitionDelay: isOrdersOpen ? `${subIndex * 50}ms` : '0ms'
+                          transitionDelay: isExpanded ? `${subIndex * 50}ms` : '0ms'
                         }}
+                        onClick={() => navigate(subItem.path)}
                       >
-                        <Circle className="w-1.5 h-1.5 fill-current transition-all duration-200 group-hover:scale-150" />
-                        <span className="font-medium">{subItem.label}</span>
+                        <SubIcon className={`w-4 h-4 transition-all duration-300 ${isSubActive ? 'text-primary scale-110' : 'text-sidebar/40 group-hover:text-sidebar/80'}`} />
+                        <span className="">{subItem.label}</span>
                       </div>
-                    ))}
+                    )})}
                   </div>
                 )}
               </div>

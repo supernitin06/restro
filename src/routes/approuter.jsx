@@ -9,6 +9,9 @@ import DeliverySettings from "../pages/DeliverySettings";
 import DeliveryPartnerManagement from "../pages/DeliveryPartnerManagement";  // <-- Import the new page component
 import AuthContainer from "../components/Auth/AuthContainer";
 import Orders from "../pages/Orders";
+import SubAdmin from "../pages/SubAdmin";
+import CreateAdmin from "../components/Sub-Admin/createAdmin";
+import AssignAdmin from "../components/Sub-Admin/AssignAdmin";
 
 const AppRouter = createBrowserRouter(
   [
@@ -47,6 +50,18 @@ const AppRouter = createBrowserRouter(
         {
           path: "orders",
           element: <Orders />,
+        },
+        {
+          path: "sub-admin",
+          element: <SubAdmin />,
+        },
+        {
+          path: "sub-admin/create",
+          element: <CreateAdmin />,
+        },
+        {
+          path: "sub-admin/assign",
+          element: <AssignAdmin />,
         },
       ],
     },
