@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import UserStats from '../components/ui/UserStats';
-import paymentStatsData from '../assets/json/PaymentData/paymentStats.json';
-import recentActivitiesData from '../assets/json/PaymentData/recentActivities.json';
-import transactionsData from '../assets/json/PaymentData/transactions.json';
+import UserStats from '../../components/ui/UserStats';
+import paymentStatsData from '../../assets/json/PaymentData/paymentStats.json';
+import recentActivitiesData from '../../assets/json/PaymentData/recentActivities.json';
+import transactionsData from '../../assets/json/PaymentData/transactions.json';
 
 const PaymentDashboard = () => {
   const [paymentStats, setPaymentStats] = useState([]);

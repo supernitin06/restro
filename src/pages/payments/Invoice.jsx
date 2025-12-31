@@ -10,9 +10,9 @@ import {
   CheckCircle,
   AlertCircle
 } from 'lucide-react';
-import UserTable from '../components/ui/Table';
-import FilterBar from '../components/ui/UserFilters';
-import PaymentModal from '../components/Payment/PaymentModal';
+import UserTable from '../../components/ui/Table';
+import FilterBar from '../../components/ui/UserFilters';
+import PaymentModal from '../../components/Payment/PaymentModal';
 
 const Invoice = () => {
   const [modalOpen, setModalOpen] = useState(false);

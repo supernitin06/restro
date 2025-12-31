@@ -9,10 +9,10 @@ import {
   Download,
   Mail
 } from 'lucide-react';
-import UserTable from '../components/ui/Table';
-import FilterBar from '../components/ui/UserFilters';
-import PaymentModal from '../components/Payment/PaymentModal'; // Fixed typo
-import refundsData from '../assets/json/PaymentData/refunds.json';
+import UserTable from '../../components/ui/Table';
+import FilterBar from '../../components/ui/UserFilters';
+import PaymentModal from '../../components/Payment/PaymentModal'; // Fixed typo
+import refundsData from '../../assets/json/PaymentData/refunds.json';
 
 const Refunds = () => {
   const [refunds, setRefunds] = useState(refundsData);

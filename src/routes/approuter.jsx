@@ -1,23 +1,34 @@
 import React from "react";
 import { createBrowserRouter } from "react-router-dom";
-import Dashboard from "../pages/Dashboard";
+
+// Layout & Pages
 import Layout from "../pages/Layout";
+import Dashboard from "../pages/Dashboard";
 import RestaurantManagement from "../pages/RestaurantManagement";
 import UserManagement from "../pages/Usermanagement";
 import DeliverySettings from "../pages/DeliverySettings";
-import DeliveryPartnerManagement from "../pages/DeliveryPartnerManagement";  // <-- Import the new page component
-import AuthContainer from "../components/Auth/AuthContainer";
+import DeliveryPartnerManagement from "../pages/DeliveryPartnerManagement";
 import Orders from "../pages/Orders";
+
+// Auth
+import AuthContainer from "../components/Auth/AuthContainer";
+
+// Payments Pages
+import PaymentDashboard from "../pages/payments/PaymentDashboard";
+import Transactions from "../pages/payments/Transection";
+import TransactionDetails from "../pages/payments/TransactionDetails";
+import Refunds from "../pages/payments/Refunds";
+import Invoice from "../pages/payments/Invoice";
 
 const AppRouter = createBrowserRouter(
   [
-    // 🔐 Auth Routes
+    /* 🔐 AUTH ROUTES */
     {
       path: "/auth",
       element: <AuthContainer />,
     },
 
-    // 🏠 Main App Layout
+    /* 🏠 MAIN APP */
     {
       path: "/",
       element: <Layout />,
@@ -39,13 +50,43 @@ const AppRouter = createBrowserRouter(
           element: <DeliverySettings />,
         },
         {
-          path: "delivery-partners",        // <-- New route for delivery partner management
+          path: "delivery-partners",
           element: <DeliveryPartnerManagement />,
-          
         },
         {
           path: "orders",
           element: <Orders />,
+        },
+
+        /* 💳 PAYMENTS (nested inside Layout) */
+        {
+          path: "payments",
+          children: [
+            {
+              path: "dashboard",
+              element: <PaymentDashboard />,
+            },
+            {
+              path: "transactions",
+              element: <Transactions />,
+            },
+            {
+              path: "transactions/:id",
+              element: <TransactionDetails />,
+            },
+            {
+              path: "refunds",
+              element: <Refunds />,
+            },
+            {
+              path: "invoice",
+              element: <Invoice />,
+            },
+            {
+              path: "details",
+              element: <TransactionDetails/>,
+            }
+          ],
         },
       ],
     },

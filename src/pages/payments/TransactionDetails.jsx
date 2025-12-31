@@ -1,6 +1,6 @@
 // src/admin/payments/pages/TransactionDetails.jsx
 import React from 'react';
-import Badge from '../components/ui/Badge';
+import Badge from '../../components/ui/Badge';
 
 const TransactionDetails = ({ transaction, onBack }) => {
   if (!transaction) {
