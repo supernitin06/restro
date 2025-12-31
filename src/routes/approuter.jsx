@@ -6,6 +6,7 @@ import Layout from "../pages/Layout";
 import RestaurantManagement from "../pages/RestaurantManagement";
 import UserManagement from "../pages/Usermanagement";
 import DeliverySettings from "../pages/DeliverySettings";
+import DeliveryPartnerManagement from "../pages/DeliveryPartnerManagement";  // <-- Import the new page component
 import AuthContainer from "../components/Auth/AuthContainer";
 
 const AppRouter = createBrowserRouter(
@@ -36,6 +37,10 @@ const AppRouter = createBrowserRouter(
         {
           path: "delivery-settings",
           element: <DeliverySettings />,
+        },
+        {
+          path: "delivery-partners",        // <-- New route for delivery partner management
+          element: <DeliveryPartnerManagement />,
         },
       ],
     },

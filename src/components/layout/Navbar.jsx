@@ -1,6 +1,6 @@
 import React from 'react';
 import ThemeToggle from './ThemeToggle';
-
+ 
 const Navbar = () => {
   return (
     <div className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 px-8 py-4 transition-colors duration-300">
@@ -9,7 +9,7 @@ const Navbar = () => {
         <div>
           <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Dashboard</h1>
         </div>
-
+ 
         {/* Right Side - Icons and User Profile */}
         <div className="flex items-center gap-6">
           <ThemeToggle />
@@ -22,7 +22,7 @@ const Navbar = () => {
               12
             </span>
           </div>
-
+ 
           {/* Message Icon with Badge */}
           <div className="relative cursor-pointer hover:opacity-80 transition-opacity">
             <svg className="w-6 h-6 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -32,7 +32,7 @@ const Navbar = () => {
               6
             </span>
           </div>
-
+ 
           {/* Gift/Present Icon with Badge */}
           <div className="relative cursor-pointer hover:opacity-80 transition-opacity">
             <svg className="w-6 h-6 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -42,7 +42,7 @@ const Navbar = () => {
               2
             </span>
           </div>
-
+ 
           {/* Settings Icon with Badge */}
           <div className="relative cursor-pointer hover:opacity-80 transition-opacity">
             <svg className="w-6 h-6 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -53,10 +53,10 @@ const Navbar = () => {
               1
             </span>
           </div>
-
+ 
           {/* Divider Line */}
           <div className="w-px h-8 bg-gray-300 dark:bg-gray-600"></div>
-
+ 
           {/* User Profile Section */}
           <div className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity">
             <div className="text-right">
@@ -64,9 +64,9 @@ const Navbar = () => {
               <p className="text-sm font-semibold text-gray-800 dark:text-white">James Sullivan</p>
             </div>
             <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center overflow-hidden">
-              <img 
-                src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop" 
-                alt="User Avatar" 
+              <img
+                src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop"
+                alt="User Avatar"
                 className="w-full h-full object-cover"
               />
             </div>
@@ -76,5 +76,5 @@ const Navbar = () => {
     </div>
   );
 };
-
+ 
 export default Navbar;
