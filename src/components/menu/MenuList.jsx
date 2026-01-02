@@ -47,7 +47,13 @@ const MenuList = () => {
   useEffect(() => {
     const saved = localStorage.getItem("menuData");
     if (saved) {
-      setMenus(JSON.parse(saved).menus);
+      const parsed = JSON.parse(saved);
+      // Handle both old format (array) and new format (object with menus)
+      if (Array.isArray(parsed)) {
+        setMenus(transformMenuData(parsed).menus);
+      } else {
+        setMenus(parsed.menus);
+      }
     } else {
       setMenus(transformMenuData(menuData.data).menus);
     }
