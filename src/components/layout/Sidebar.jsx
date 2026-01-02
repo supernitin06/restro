@@ -16,14 +16,17 @@ import {
   ShieldCheck,
   Circle,
   Receipt,
-  RefreshCw,
   FileText,
+  RefreshCw,
+  Headphones,
+  MessageSquare,
+  Settings,
 } from "lucide-react";
 
 import Button from "../ui/Button";
 import "./Sidebar.css";
 
-const Sidebar = ({ theme = "dark" }) => {
+const Sidebar = ({ theme = "light" }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -69,6 +72,8 @@ const Sidebar = ({ theme = "dark" }) => {
       icon: ShoppingBag,
       path: "/orders",
     },
+
+    /* ---------- Payments ---------- */
     {
       id: "payments",
       label: "Payments",
@@ -85,7 +90,7 @@ const Sidebar = ({ theme = "dark" }) => {
           id: "transactions",
           label: "Transactions",
           path: "/payments/transactions",
-          icon: Receipt,
+          icon: FileText,
         },
         {
           id: "refunds",
@@ -97,10 +102,21 @@ const Sidebar = ({ theme = "dark" }) => {
           id: "invoice",
           label: "Invoice",
           path: "/payments/invoice",
-          icon: FileText,
+          icon: Receipt,
         },
       ],
     },
+
+    /* ---------- Support & Tickets ---------- */
+    {
+      id: "support",
+      label: "Support & Tickets",
+      icon: Headphones,
+      hasDropdown: true,
+     
+    },
+
+    /* ---------- Sub Admin ---------- */
     {
       id: "sub-admin",
       label: "Sub Admin",
@@ -135,10 +151,10 @@ const Sidebar = ({ theme = "dark" }) => {
       }
 
       if (item.hasDropdown) {
-        const sub = item.subItems.find((s) =>
+        const match = item.subItems.find((s) =>
           current.startsWith(s.path)
         );
-        if (sub) {
+        if (match) {
           setActiveMenu(item.id);
           setExpandedMenu(item.id);
           return;
@@ -161,7 +177,7 @@ const Sidebar = ({ theme = "dark" }) => {
 
   return (
     <div className={`${theme === "dark" ? "dark" : ""} sidebar-wrapper h-screen`}>
-      <div className={`${isCollapsed ? "w-20" : "w-64"} h-screen`}>
+      <div className={`${isCollapsed ? "w-20" : "w-64"} h-full`}>
 
         {/* ---------- Header ---------- */}
         <div className="relative border-b border-sidebar px-4 py-5">
@@ -180,11 +196,7 @@ const Sidebar = ({ theme = "dark" }) => {
             onClick={() => setIsCollapsed(!isCollapsed)}
             className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-primary text-sidebar rounded-full"
           >
-            {isCollapsed ? (
-              <ChevronRight size={14} />
-            ) : (
-              <ChevronLeft size={14} />
-            )}
+            {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
           </Button>
         </div>
 
@@ -197,7 +209,6 @@ const Sidebar = ({ theme = "dark" }) => {
 
             return (
               <div key={item.id} className="mb-1">
-
                 {/* Main Item */}
                 <div
                   onClick={() => handleMenuClick(item)}

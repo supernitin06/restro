@@ -24,6 +24,7 @@ import Refunds from "../pages/payments/Refunds";
 import Invoice from "../pages/payments/Invoice";
 
 import OffersManagement from "../pages/OffersManagement";
+import SupportManagement from "../pages/SupportManagement";
 const AppRouter = createBrowserRouter(
   [
     /* 🔐 AUTH ROUTES */
@@ -66,6 +67,10 @@ const AppRouter = createBrowserRouter(
           element: <OffersManagement />,
         },
 
+        {
+          path: "support-tickets",
+          element: <SupportManagement />,
+        },
         {
           path: "payments",
           children: [
