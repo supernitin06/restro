@@ -1,110 +1,179 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import Button from '../ui/Button';
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
   Users,
   UtensilsCrossed,
   Truck,
+  Bike,
+  ShoppingBag,
   CreditCard,
   ChevronLeft,
   ChevronRight,
-  FileText,
-  RefreshCw,
-  Banknote,
+  ChevronDown,
+  UserPlus,
+  Shield,
+  ShieldCheck,
+  Circle,
   Receipt,
-  ShoppingBag,
-  Settings
-} from 'lucide-react';
-import SidebarDropdown from '../ui/DropDown';
+  RefreshCw,
+  FileText,
+} from "lucide-react";
 
-const Sidebar = ({ theme = 'light' }) => {
+import Button from "../ui/Button";
+// import "./Sidebar.css";
+
+const Sidebar = ({ theme = "dark" }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [openDropdowns, setOpenDropdowns] = useState({});
-  const [activeMenu, setActiveMenu] = useState(null);
+  const [activeMenu, setActiveMenu] = useState("dashboard");
+  const [expandedMenu, setExpandedMenu] = useState(null);
 
-  /* ---------------- Payments submenu ---------------- */
-  const paymentSubItems = [
-    { id: 'payment-dashboard', label: 'Payment Dashboard', icon: LayoutDashboard, path: '/payments/dashboard' },
-    { id: 'transactions', label: 'Transactions', icon: FileText, path: '/payments/transactions', badge: '24' },
-    { id: 'refunds', label: 'Refunds', icon: RefreshCw, path: '/payments/refunds', badge: '5' },
-    { id: 'invoice', label: 'Invoice', icon: Banknote, path: '/payments/invoice' },
-    { id: 'details', label: 'Transaction Details', icon: Receipt, path: '/payments/details' }
-  ];
-
-
-
-  /* ---------------- Main menu ---------------- */
+  /* ---------------- Menu config ---------------- */
   const menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '/' },
-    { id: 'users', label: 'Users', icon: Users, path: '/users' },
-    { id: 'restaurants', label: 'Restaurants', icon: UtensilsCrossed, path: '/restaurants' },
-
-    // // Order & Delivery Heading
-    // { type: 'heading', label: 'Order & Delivery' },
-    { id: 'orders', label: 'Orders', icon: ShoppingBag, path: '/orders' },
-    { id: 'delivery-partners', label: 'Delivery Partners', icon: Users, path: '/delivery-partners' },
-    { id: 'delivery-settings', label: 'Delivery Settings', icon: Truck, path: '/delivery-settings' },
-
     {
-      id: 'payments',
-      label: 'Payments',
+      id: "dashboard",
+      label: "Dashboard",
+      icon: LayoutDashboard,
+      path: "/",
+    },
+    {
+      id: "users",
+      label: "Users",
+      icon: Users,
+      path: "/users",
+    },
+    {
+      id: "restaurants",
+      label: "Restaurants",
+      icon: UtensilsCrossed,
+      path: "/restaurants",
+    },
+    {
+      id: "delivery-settings",
+      label: "Delivery Settings",
+      icon: Truck,
+      path: "/delivery-settings",
+    },
+    {
+      id: "delivery-partners",
+      label: "Delivery Partners",
+      icon: Bike,
+      path: "/delivery-partners",
+    },
+    {
+      id: "orders",
+      label: "Orders",
+      icon: ShoppingBag,
+      path: "/orders",
+    },
+    {
+      id: "payments",
+      label: "Payments",
       icon: CreditCard,
       hasDropdown: true,
-      badge: '3',
-      subItems: paymentSubItems
+      subItems: [
+        {
+          id: "pay-dashboard",
+          label: "Dashboard",
+          path: "/payments/dashboard",
+          icon: LayoutDashboard,
+        },
+        {
+          id: "transactions",
+          label: "Transactions",
+          path: "/payments/transactions",
+          icon: Receipt,
+        },
+        {
+          id: "refunds",
+          label: "Refunds",
+          path: "/payments/refunds",
+          icon: RefreshCw,
+        },
+        {
+          id: "invoice",
+          label: "Invoice",
+          path: "/payments/invoice",
+          icon: FileText,
+        },
+      ],
+    },
+    {
+      id: "sub-admin",
+      label: "Sub Admin",
+      icon: ShieldCheck,
+      hasDropdown: true,
+      subItems: [
+        {
+          id: "create-sub",
+          label: "Create SubAdmin",
+          path: "/sub-admin/create",
+          icon: UserPlus,
+        },
+        {
+          id: "assign-admin",
+          label: "Assign Admin",
+          path: "/sub-admin/assign",
+          icon: Shield,
+        },
+      ],
+    },
+    {
+      id:"support",
+      label:"Support & Tickets",
+      icon:Shield,
+      path:"/support/tickets",
+    },
+    {
+      id:"settings",
+      label:"Settings",
+      icon:Shield,
+      path:"/settings",
     }
   ];
 
-  /* ---------------- Active menu sync ---------------- */
+  /* ---------------- Sync active route ---------------- */
   useEffect(() => {
-    const path = location.pathname;
+    const current = location.pathname;
 
-    const main = menuItems.find(m => m.path === path);
-    if (main) {
-      setActiveMenu(main.id);
-      setOpenDropdowns({});
-      return;
+    for (const item of menuItems) {
+      if (item.path === current) {
+        setActiveMenu(item.id);
+        setExpandedMenu(null);
+        return;
+      }
+
+      if (item.hasDropdown) {
+        const sub = item.subItems.find((s) =>
+          current.startsWith(s.path)
+        );
+        if (sub) {
+          setActiveMenu(item.id);
+          setExpandedMenu(item.id);
+          return;
+        }
+      }
     }
-
-    const paymentMatch = paymentSubItems.find(s => path.startsWith(s.path));
-    if (paymentMatch) {
-      setActiveMenu('payments');
-      setOpenDropdowns((prev) => ({ ...prev, payments: true }));
-      return;
-    }
-
-    /* 
-       Since we flattened orders/delivery, they are now 'main' items 
-       and matched by the first check above. 
-       We only need to handle sub-items for payments.
-    */
   }, [location.pathname]);
 
+  /* ---------------- Handlers ---------------- */
   const handleMenuClick = (item) => {
     if (item.hasDropdown) {
-      setOpenDropdowns(prev => ({
-        ...prev,
-        [item.id]: !prev[item.id]
-      }));
+      setExpandedMenu(expandedMenu === item.id ? null : item.id);
       setActiveMenu(item.id);
     } else {
       navigate(item.path);
       setActiveMenu(item.id);
-      setOpenDropdowns({});
+      setExpandedMenu(null);
     }
   };
 
-  const handleSubItemClick = (sub) => {
-    navigate(sub.path);
-  };
-
   return (
-    <div className={`${theme === 'dark' ? 'dark' : ''} sidebar-wrapper`}>
-      <div className={`${isCollapsed ? 'w-20' : 'w-64'} h-full`}>
+    <div className={`${theme === "dark" ? "dark" : ""} sidebar-wrapper h-screen`}>
+      <div className={`${isCollapsed ? "w-20" : "w-64"} h-screen`}>
 
         {/* ---------- Header ---------- */}
         <div className="relative border-b border-sidebar px-4 py-5">
@@ -113,60 +182,95 @@ const Sidebar = ({ theme = 'light' }) => {
               <UtensilsCrossed className="w-6 h-6 text-sidebar" />
             </div>
             {!isCollapsed && (
-              <span className="text-2xl font-bold text-sidebar">Restro</span>
+              <span className="text-2xl font-bold text-sidebar">
+                Restro
+              </span>
             )}
           </div>
 
           <Button
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-primary text-sidebar rounded-full flex items-center justify-center"
+            className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-primary text-sidebar rounded-full"
           >
-            {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+            {isCollapsed ? (
+              <ChevronRight size={14} />
+            ) : (
+              <ChevronLeft size={14} />
+            )}
           </Button>
         </div>
 
         {/* ---------- Menu ---------- */}
-        <nav className="py-6 px-3">
-          {menuItems.map(item => {
-            if (item.hasDropdown) {
-              return (
-                <SidebarDropdown
-                  key={item.id}
-                  label={item.label}
-                  icon={item.icon}
-                  badge={item.badge}
-                  isOpen={openDropdowns[item.id]}
-                  isCollapsed={isCollapsed}
-                  isActive={activeMenu === item.id}
-                  subItems={item.subItems}
-                  onToggle={() => handleMenuClick(item)}
-                  onSubItemClick={handleSubItemClick}
-                />
-              );
-            }
-
-            if (item.type === 'heading') {
-              if (isCollapsed) return null;
-              return (
-                <div key={item.label} className="px-4 mt-6 mb-2">
-                  <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                    {item.label}
-                  </span>
-                </div>
-              );
-            }
+        <nav className="py-4 px-3 overflow-y-auto sidebar-scroll">
+          {menuItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = activeMenu === item.id;
+            const isExpanded = expandedMenu === item.id;
 
             return (
-              <div
-                key={item.id}
-                onClick={() => handleMenuClick(item)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition
-                  ${activeMenu === item.id ? 'sidebar-item-active' : 'text-sidebar hover:bg-white/10'}
-                  ${isCollapsed ? 'justify-center' : ''}
-                `}
-              >
-                <item.icon className="w-5 h-5" />
-                {!isCollapsed && <span>{item.label}</span>}
+              <div key={item.id} className="mb-1">
+
+                {/* Main Item */}
+                <div
+                  onClick={() => handleMenuClick(item)}
+                  className={`
+                    flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer transition
+                    ${
+                      isActive
+                        ? "sidebar-item-active font-semibold"
+                        : "text-sidebar hover:bg-white/10"
+                    }
+                    ${isCollapsed ? "justify-center" : ""}
+                  `}
+                >
+                  <div className="flex items-center gap-3">
+                    <Icon className="w-5 h-5" />
+                    {!isCollapsed && <span>{item.label}</span>}
+                  </div>
+
+                  {!isCollapsed && item.hasDropdown && (
+                    <ChevronDown
+                      className={`w-4 h-4 transition ${
+                        isExpanded ? "rotate-180" : ""
+                      }`}
+                    />
+                  )}
+                </div>
+
+                {/* Dropdown */}
+                {item.hasDropdown && !isCollapsed && (
+                  <div
+                    className={`
+                      overflow-hidden transition-all duration-300 ml-4
+                      ${isExpanded ? "max-h-96 mt-2" : "max-h-0"}
+                    `}
+                  >
+                    {item.subItems.map((sub) => {
+                      const SubIcon = sub.icon || Circle;
+                      const isSubActive =
+                        location.pathname === sub.path;
+
+                      return (
+                        <div
+                          key={sub.id}
+                          onClick={() => navigate(sub.path)}
+                          className={`
+                            flex items-center gap-3 px-3 py-2 rounded-lg text-sm cursor-pointer
+                            transition-all duration-200
+                            ${
+                              isSubActive
+                                ? "bg-primary/20 text-primary font-semibold translate-x-2"
+                                : "text-sidebar/70 hover:bg-white/10 hover:translate-x-2"
+                            }
+                          `}
+                        >
+                          <SubIcon className="w-4 h-4" />
+                          <span>{sub.label}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             );
           })}
