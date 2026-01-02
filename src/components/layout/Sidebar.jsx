@@ -113,7 +113,20 @@ const Sidebar = ({ theme = "light" }) => {
       label: "Support & Tickets",
       icon: Headphones,
       hasDropdown: true,
-     
+      subItems: [
+        {
+          id: "tickets",
+          label: "All Tickets",
+          path: "/support/tickets",
+          icon: MessageSquare,
+        },
+        {
+          id: "settings",
+          label: "Support Settings",
+          path: "/support/settings",
+          icon: Settings,
+        },
+      ],
     },
 
     /* ---------- Sub Admin ---------- */
@@ -150,7 +163,7 @@ const Sidebar = ({ theme = "light" }) => {
         return;
       }
 
-      if (item.hasDropdown) {
+      if (item.hasDropdown && item.subItems) {
         const match = item.subItems.find((s) =>
           current.startsWith(s.path)
         );
@@ -214,10 +227,9 @@ const Sidebar = ({ theme = "light" }) => {
                   onClick={() => handleMenuClick(item)}
                   className={`
                     flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer transition
-                    ${
-                      isActive
-                        ? "sidebar-item-active font-semibold"
-                        : "text-sidebar hover:bg-white/10"
+                    ${isActive
+                      ? "sidebar-item-active font-semibold"
+                      : "text-sidebar hover:bg-white/10"
                     }
                     ${isCollapsed ? "justify-center" : ""}
                   `}
@@ -229,15 +241,14 @@ const Sidebar = ({ theme = "light" }) => {
 
                   {!isCollapsed && item.hasDropdown && (
                     <ChevronDown
-                      className={`w-4 h-4 transition ${
-                        isExpanded ? "rotate-180" : ""
-                      }`}
+                      className={`w-4 h-4 transition ${isExpanded ? "rotate-180" : ""
+                        }`}
                     />
                   )}
                 </div>
 
                 {/* Dropdown */}
-                {item.hasDropdown && !isCollapsed && (
+                {item.hasDropdown && !isCollapsed && item.subItems && (
                   <div
                     className={`
                       overflow-hidden transition-all duration-300 ml-4
@@ -256,10 +267,9 @@ const Sidebar = ({ theme = "light" }) => {
                           className={`
                             flex items-center gap-3 px-3 py-2 rounded-lg text-sm cursor-pointer
                             transition-all duration-200
-                            ${
-                              isSubActive
-                                ? "bg-primary/20 text-primary font-semibold translate-x-2"
-                                : "text-sidebar/70 hover:bg-white/10 hover:translate-x-2"
+                            ${isSubActive
+                              ? "bg-primary/20 text-primary font-semibold translate-x-2"
+                              : "text-sidebar/70 hover:bg-white/10 hover:translate-x-2"
                             }
                           `}
                         >
