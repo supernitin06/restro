@@ -100,6 +100,10 @@ const AppRouter = createBrowserRouter(
           element: <SubAdmin />,
         },
         {
+          path: "offers",
+          element: <OffersManagement />,
+        },
+        {
           path: "sub-admin/create",
           element: <CreateAdmin />,
         },

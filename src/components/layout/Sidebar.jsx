@@ -70,6 +70,12 @@ const Sidebar = ({ theme = "dark" }) => {
       icon: ShoppingBag,
       path: "/orders",
     },
+     {
+      id:"offers",
+      label:"Offers",
+      icon:FaCog,
+      path:"/offers",
+    },
     {
       id: "payments",
       label: "Payments",
@@ -126,13 +132,15 @@ const Sidebar = ({ theme = "dark" }) => {
       id:"support",
       label:"Support & Tickets",
       icon:Shield,
+      path:"/support-tickets",
     },
     {
       id:"settings",
       label:"Settings",
       icon:FaCog,
       path:"/settings",
-    }
+    },
+   
   ];
 
   /* ---------------- Sync active route ---------------- */
