@@ -23,7 +23,6 @@ const Navbar = ({ toggleSidebar }) => {
           >
             <Menu className="w-6 h-6" />
           </button>
-
           {/* Search Bar */}
           <div className="hidden md:flex items-center w-full max-w-md relative group">
             <Search className="absolute left-3 w-5 h-5 text-gray-400 group-focus-within:text-primary transition-colors" />
@@ -39,7 +38,6 @@ const Navbar = ({ toggleSidebar }) => {
 
           <div className="flex items-center gap-1 sm:gap-2">
             <ThemeToggle />
-
             {/* Notifications */}
             <IconButton count={12} icon={<Bell className="w-5 h-5" />} />
 
@@ -68,6 +66,7 @@ const Navbar = ({ toggleSidebar }) => {
                 />
               </div>
               <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white dark:border-gray-900 rounded-full" />
+
             </div>
           </div>
         </div>

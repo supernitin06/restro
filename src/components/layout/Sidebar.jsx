@@ -16,9 +16,8 @@ import {
   Shield,
   ShieldCheck,
   Circle,
-  Receipt,
-  RefreshCw,
-  FileText,
+  Menu,
+  X,
 } from "lucide-react";
 
 import Button from "../ui/Button";
@@ -30,6 +29,7 @@ const Sidebar = ({ theme = "dark", isCollapsed, toggleSidebar }) => {
 
   const [activeMenu, setActiveMenu] = useState("dashboard");
   const [expandedMenu, setExpandedMenu] = useState(null);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   /* ---------------- Menu config ---------------- */
   const menuItems = [
@@ -111,6 +111,7 @@ const Sidebar = ({ theme = "dark", isCollapsed, toggleSidebar }) => {
       id: "sub-admin",
       label: "Sub Admin",
       icon: ShieldCheck,
+      path: "/sub-admin",
       hasDropdown: true,
       subItems: [
         {
@@ -149,7 +150,7 @@ const Sidebar = ({ theme = "dark", isCollapsed, toggleSidebar }) => {
     for (const item of menuItems) {
       if (item.path === current) {
         setActiveMenu(item.id);
-        setExpandedMenu(null);
+        setExpandedMenu(item.hasDropdown ? item.id : null);
         return;
       }
 
@@ -171,20 +172,48 @@ const Sidebar = ({ theme = "dark", isCollapsed, toggleSidebar }) => {
     if (item.hasDropdown) {
       setExpandedMenu(expandedMenu === item.id ? null : item.id);
       setActiveMenu(item.id);
+      if (item.path) navigate(item.path);
+      if (item.path) setIsMobileOpen(false);
     } else {
       navigate(item.path);
       setActiveMenu(item.id);
       setExpandedMenu(null);
+      setIsMobileOpen(false);
     }
   };
 
   return (
-    <div className={`${theme === "dark" ? "dark" : ""} sidebar-wrapper h-screen overflow-y-auto`}>
+    <>
+      {/* Mobile Toggle Button */}
+      <div className={`lg:hidden fixed top-4 left-4 z-50 ${isMobileOpen ? "hidden" : ""}`}>
+        <Button
+          onClick={() => setIsMobileOpen(!isMobileOpen)}
+          className="p-2 text-sidebar"
+        >
+          <Menu size={24} />
+        </Button>
+      </div>
 
-      <div className={`${isCollapsed ? "w-20" : "w-64"} h-screen`}>
+      {/* Mobile Overlay */}
+      {isMobileOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={() => setIsMobileOpen(false)}
+        />
+      )}
+
+      <div className={`${theme === "dark" ? "dark" : ""} sidebar-wrapper h-full`}>
+        <div
+          className={`
+            fixed lg:static top-0 left-0 z-50 h-full bg-white dark:bg-gray-900 border-r border-sidebar
+            transition-all duration-300 ease-in-out
+            ${isMobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
+            ${isCollapsed ? "lg:w-20" : "lg:w-64"} w-64
+          `}
+        >
 
         {/* ---------- Header ---------- */}
-        <div className="relative border-b border-sidebar px-4 py-5">
+        <div className="relative border-b border-sidebar p-4 ">
           <div className="flex items-center gap-3">
             <div className="w-11 h-11 bg-primary rounded-xl flex items-center justify-center">
               <UtensilsCrossed className="w-6 h-6 text-sidebar" />
@@ -195,17 +224,33 @@ const Sidebar = ({ theme = "dark", isCollapsed, toggleSidebar }) => {
               </span>
             )}
           </div>
+<button
+  onClick={() => setIsCollapsed(!isCollapsed)}
+            className="hidden lg:flex absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 items-center justify-center z-50 bg-white dark:bg-gray-900 border border-sidebar rounded-full shadow-md text-sidebar"
+>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="14"
+    height="14"
+    viewBox="0 0 24 24"
+    fill="none"
+              stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d={isCollapsed ? "m9 18 6-6-6-6" : "m15 18-6-6 6-6"} />
+  </svg>
+</button>
 
-          <Button
-            onClick={toggleSidebar}
-            className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-primary text-sidebar rounded-full "
+
+          {/* Mobile Close Button */}
+          {isMobileOpen && (<Button
+            onClick={() => setIsMobileOpen(false)}
+            className="lg:hidden absolute right-4 top-1/2 -translate-y-1/2 text-sidebar"
           >
-            {isCollapsed ? (
-              <ChevronRight size={14} />
-            ) : (
-              <ChevronLeft size={14} />
-            )}
-          </Button>
+            <X size={20} />
+          </Button>)}
         </div>
 
         {/* ---------- Menu ---------- */}
@@ -221,12 +266,8 @@ const Sidebar = ({ theme = "dark", isCollapsed, toggleSidebar }) => {
                 {/* Main Item */}
                 <div
                   onClick={() => handleMenuClick(item)}
-                  className={`
-                    flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer transition
-                    ${isActive
-                      ? "sidebar-item-active font-semibold"
-                      : "text-sidebar hover:bg-white/10"
-                    }
+                  className={`flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer transition border-l-4
+                    ${isActive ? "sidebar-item-active border-white" : "text-sidebar hover:bg-white/10 border-transparent hover:border-white"}
                     ${isCollapsed ? "justify-center" : ""}
                   `}
                 >
@@ -282,6 +323,7 @@ const Sidebar = ({ theme = "dark", isCollapsed, toggleSidebar }) => {
         </nav>
       </div>
     </div>
+    </>
   );
 };
 
