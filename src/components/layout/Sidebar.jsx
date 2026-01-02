@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { FaCog } from "react-icons/fa";
 import {
   LayoutDashboard,
   Users,
@@ -125,12 +126,11 @@ const Sidebar = ({ theme = "dark" }) => {
       id:"support",
       label:"Support & Tickets",
       icon:Shield,
-      path:"/support-tickets",
     },
     {
       id:"settings",
       label:"Settings",
-      icon:Shield,
+      icon:FaCog,
       path:"/settings",
     }
   ];
@@ -173,6 +173,7 @@ const Sidebar = ({ theme = "dark" }) => {
 
   return (
     <div className={`${theme === "dark" ? "dark" : ""} sidebar-wrapper h-screen overflow-y-auto`}>
+
       <div className={`${isCollapsed ? "w-20" : "w-64"} h-screen`}>
 
         {/* ---------- Header ---------- */}

@@ -1,7 +1,5 @@
 import React from "react";
 import { createBrowserRouter } from "react-router-dom";
-
-// Layout & Pages
 import Layout from "../pages/Layout";
 import Dashboard from "../pages/Dashboard";
 import RestaurantManagement from "../pages/RestaurantManagement";
@@ -12,16 +10,13 @@ import Orders from "../pages/Orders";
 import SubAdmin from "../pages/SubAdmin";
 import CreateAdmin from "../components/Sub-Admin/createAdmin";
 import AssignAdmin from "../components/Sub-Admin/AssignAdmin";
-
-// Auth
 import AuthContainer from "../components/Auth/AuthContainer";
-
-// Payments Pages
 import PaymentDashboard from "../pages/payments/PaymentDashboard";
 import Transactions from "../pages/payments/Transection";
 import TransactionDetails from "../pages/payments/TransactionDetails";
 import Refunds from "../pages/payments/Refunds";
 import Invoice from "../pages/payments/Invoice";
+import Settings from "../components/settings/Settings"
 
 import OffersManagement from "../pages/OffersManagement";
 import SupportManagement from "../pages/SupportManagement";
@@ -63,8 +58,8 @@ const AppRouter = createBrowserRouter(
           element: <Orders />,
         },
         {
-          path: "offers",
-          element: <OffersManagement />,
+          path: "settings",
+          element: <Settings />,
         },
 
         {
