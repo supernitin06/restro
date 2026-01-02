@@ -53,7 +53,7 @@ const InputField = ({
           className={`
             w-full text-sm font-medium shadow-sm input
             transition-all duration-200
-            ${startIcon ? "pl-12" : "pl-4"}
+            ${startIcon ? "pl-14" : "pl-4"}
             ${endIcon ? "pr-12" : "pr-4"}
             ${disabled ? "opacity-60 cursor-not-allowed" : ""}
           `}

@@ -1,78 +1,65 @@
-import React from 'react';
-import { Filter } from 'lucide-react';
-import GlassCard from './GlassCard';
-import GradientButton from './GradientButton';
+import React, { useMemo } from 'react';
+import { Search, X } from 'lucide-react';
 import InputField from './InputField';
 import Select from './Select';
+import Button from './Button';
 
 const FiltersBar = ({
-  search = {
-    value: '',
-    placeholder: 'Search...',
-    onChange: () => { }
-  },
-  filters = [], // [{ key, value, options, icon }]
-  onFilterChange = () => { },
-  onClear = () => { }
+  // Option 1: Direct Props
+  search,
+  filters: propFilters = [],
+  onFilterChange,
+  onClear,
+
+  // Option 2: Config Helper (kept for backward compatibility logic if any)
+  filterConfig
 }) => {
 
-  // Shared style for consistency across all filter inputs
-  const commonInputClass = `
-    w-full px-4 py-3
-    !bg-white/10 backdrop-blur-sm
-    !border !border-white/20
-    rounded-xl
-    !text-white
-    placeholder-gray-400
-    focus:outline-none focus:!ring-2 focus:!ring-cyan-500/50 focus:!border-white/20
-    transition-all duration-300
-    !appearance-none
-  `;
+  // Normalize props logic (simplified for readability)
+  // Assuming propFilters is the primary source of truth as refactored previously.
+  const filters = propFilters;
 
   return (
-    <GlassCard className="p-6 mb-6">
-      <div className="flex flex-col lg:flex-row gap-4">
+        <div className="mb-8 card p-4 rounded-xl shadow-sm border border-gray-200">
+      <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
 
-        {/* Search */}
-        {search && (
-          <div className="flex-1">
+        {/* Search Input */}
+        <div className="relative w-full md:w-2/3">
+          {search ? (
             <InputField
               name="search"
               type="text"
-              placeholder={search.placeholder}
+              placeholder={search.placeholder || "Search..."}
               value={search.value}
               onChange={(e) => search.onChange(e.target.value)}
-              className="mb-0"
-              inputClassName={commonInputClass}
+              className="w-full"
             />
-          </div>
-        )}
+          ) : filterConfig?.showSearch ? (
+            // Fallback for config usage if needed (though we prefer search prop)
+            <div className="text-red-500 text-sm">Search prop missing in parent component</div>
+          ) : null}
+        </div>
 
-        {/* Filters */}
-        <div className="flex flex-wrap gap-3">
+        {/* Filters & Actions */}
+        <div className="flex flex-wrap gap-4 w-full md:w-auto items-center justify-end">
+
           {filters.map((filter) => (
-            <div key={filter.key} className="min-w-[180px]">
+            <div key={filter.key} className="flex-1 md:w-40 min-w-[140px]">
               <Select
                 value={filter.value}
                 onChange={(e) => onFilterChange(filter.key, e.target.value)}
                 options={filter.options}
-                icon={filter.icon || Filter}
+                icon={filter.icon}
+                placeholder={filter.label || filter.placeholder}
                 className="w-full"
-                selectClassName={commonInputClass}
-                placeholder={filter.placeholder || "Select option"}
               />
             </div>
           ))}
 
-          {/* Clear */}
-          {onClear && (
-            <GradientButton variant="ghost" onClick={onClear} className="px-6 py-3 h-full">
-              Clear Filters
-            </GradientButton>
-          )}
+        
         </div>
       </div>
-    </GlassCard>
+    </div>
   );
 };
 

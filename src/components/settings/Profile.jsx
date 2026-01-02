@@ -6,7 +6,7 @@ const Profile = () => {
   return (
     <div className="card space-y-6">
       <div>
-        <h2 className="text-heading">Restaurant Profile</h2>
+        <h2 className="highlight text-3xl font-bold">Restaurant Profile</h2>
         <p className="text-muted mt-1">Public restaurant information</p>
       </div>
 

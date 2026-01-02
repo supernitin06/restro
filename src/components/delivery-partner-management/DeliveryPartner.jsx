@@ -47,10 +47,10 @@ const DeliveryPartner = ({ partners, onViewDetails, updatePartner }) => {
                 />
 
                 <div className="min-w-0">
-                  <h3 className="text-xs font-semibold truncate">
+                  <h3 className="text-xs font-semibold truncate text-gray-900 dark:text-gray-100">
                     {registrationData?.name}
                   </h3>
-                  <p className="text-[10px] text-secondary">
+                  <p className="text-[10px] text-gray-500 dark:text-gray-400">
                     #{partnerId}
                   </p>
                 </div>
@@ -64,7 +64,7 @@ const DeliveryPartner = ({ partners, onViewDetails, updatePartner }) => {
             </div>
 
             {/* INFO */}
-            <div className="flex flex-col gap-1 text-[10px] text-gray-300 bg-gray-800 rounded p-2 mb-2">
+            <div className="flex flex-col gap-1 text-[10px] text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 rounded p-2 mb-2">
               <div className="flex items-center gap-1.5">
                 <FiPhone className="text-primary text-xs shrink-0" />
                 <span>{registrationData?.mobileNumber}</span>
@@ -97,18 +97,18 @@ const DeliveryPartner = ({ partners, onViewDetails, updatePartner }) => {
 
             {/* STATS */}
             <div className="grid grid-cols-2 gap-2 text-[10px] mb-2">
-              <div className="bg-gray-800 rounded p-1.5 text-center">
-                <p className="font-semibold text-gray-200">
+              <div className="bg-gray-50 dark:bg-gray-800 rounded p-1.5 text-center border border-gray-100 dark:border-gray-700">
+                <p className="font-semibold text-gray-800 dark:text-gray-200">
                   {listView.assignedOrdersCount || 0}
                 </p>
-                <span className="text-gray-400">Assigned</span>
+                <span className="text-gray-500 dark:text-gray-400">Assigned</span>
               </div>
 
-              <div className="bg-gray-800 rounded p-1.5 text-center">
-                <p className="font-semibold text-gray-200">
+              <div className="bg-gray-50 dark:bg-gray-800 rounded p-1.5 text-center border border-gray-100 dark:border-gray-700">
+                <p className="font-semibold text-gray-800 dark:text-gray-200">
                   {orderHistory?.length || 0}
                 </p>
-                <span className="text-gray-400">Completed</span>
+                <span className="text-gray-500 dark:text-gray-400">Completed</span>
               </div>
             </div>
 
@@ -139,7 +139,7 @@ const DeliveryPartner = ({ partners, onViewDetails, updatePartner }) => {
 
             {/* STATUS BAR */}
             <div
-              className={`h-0.5 mt-2 rounded ${isActive ? "bg-green-500" : "bg-gray-400"
+              className={`h-0.5 mt-2 rounded ${isActive ? "bg-green-500" : "bg-gray-300 dark:bg-gray-600"
                 }`}
             />
           </div>

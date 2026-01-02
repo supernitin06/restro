@@ -23,11 +23,11 @@ const UserModal = ({ user, onClose, onEdit, onDelete }) => {
               <div className="flex items-start justify-between mb-10">
                 <div className="flex items-center gap-5">
                   <div className="relative">
-                    <div className="w-24 h-24 rounded-full bg-gradient-to-br from-cyan-500 via-blue-600 to-purple-600 flex items-center justify-center text-white text-3xl font-bold shadow-2xl shadow-cyan-500/30">
+                    <div className="w-24 h-24 rounded-full bg-gradient-to-br from-cyan-500 via-blue-600 to-purple-600 flex items-center justify-center text-white text-3xl font-bold shadow-sm shadow-cyan-500/30">
                       {user.name.charAt(0)}
                     </div>
                     <div className="absolute -bottom-3 -right-3 transform rotate-12">
-                      <Badge type={user.status} className="shadow-lg">
+                      <Badge type={user.status} className="shadow-sm">
                         {user.status}
                       </Badge>
                     </div>
@@ -46,7 +46,7 @@ const UserModal = ({ user, onClose, onEdit, onDelete }) => {
                     <div className="flex items-center gap-3">
                       <Badge
                         type={user.membership.toLowerCase()}
-                        className="shadow-lg px-4 py-1.5 backdrop-blur-md"
+                        className="shadow-sm px-4 py-1.5 backdrop-blur-md"
                       >
                         <Shield className="w-3 h-3 mr-1.5" />
                         {user.membership} Member

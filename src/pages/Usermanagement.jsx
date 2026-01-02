@@ -44,12 +44,12 @@ const UserManagement = () => {
 
   return (
     /* ✅ FIXED BACKGROUND */
-    <div className="page-background px-6 py-8 relative">
+    <div className="page px-6 py-8 relative">
 
       {/* ✅ Header */}
-    <div className="flex flex-col mb-6 md:flex-row justify-between items-start md:items-center bg-white dark:bg-gray-800 p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
+      <div className="flex bg-primary flex-col mb-6 md:flex-row justify-between items-start md:items-center bg-white dark:bg-gray-800 p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
         <div>
-          <h1 className="text-heading">User Management</h1>
+          <h1 className="highlight text-4xl font-extrabold tracking-tight">User Management</h1>
           <p className="text-gray-500 dark:text-gray-400 mt-2 text-lg font-medium">
             Manage users and their profiles.
           </p>

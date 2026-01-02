@@ -4,7 +4,7 @@ import Button from "../../components/ui/Button";
 const Menu = () => {
   return (
     <div className="card space-y-6">
-      <h2 className="text-heading">Menu Settings</h2>
+      <h2 className="highlight text-3xl font-bold">Menu Settings</h2>
 
       <div className="flex justify-between items-center">
         <p className="font-medium">Show Menu on Website</p>

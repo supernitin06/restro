@@ -4,7 +4,7 @@ import Button from "../../components/ui/Button";
 const Notifications = () => {
   return (
     <div className="card space-y-6">
-      <h2 className="text-heading">Notifications</h2>
+      <h2 className="highlight text-3xl font-bold">Notifications</h2>
 
       <div className="space-y-3">
         <Button variant="active" fullWidth>Email Notifications</Button>

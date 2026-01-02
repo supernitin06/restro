@@ -24,11 +24,10 @@ import {
 import Button from "../ui/Button";
 import "./Sidebar.css";
 
-const Sidebar = ({ theme = "dark" }) => {
+const Sidebar = ({ theme = "dark", isCollapsed, toggleSidebar }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [isCollapsed, setIsCollapsed] = useState(false);
   const [activeMenu, setActiveMenu] = useState("dashboard");
   const [expandedMenu, setExpandedMenu] = useState(null);
 
@@ -70,11 +69,11 @@ const Sidebar = ({ theme = "dark" }) => {
       icon: ShoppingBag,
       path: "/orders",
     },
-     {
-      id:"offers",
-      label:"Offers",
-      icon:FaCog,
-      path:"/offers",
+    {
+      id: "offers",
+      label: "Offers",
+      icon: FaCog,
+      path: "/offers",
     },
     {
       id: "payments",
@@ -129,18 +128,18 @@ const Sidebar = ({ theme = "dark" }) => {
       ],
     },
     {
-      id:"support",
-      label:"Support & Tickets",
-      icon:Shield,
-      path:"/support-tickets",
+      id: "support",
+      label: "Support & Tickets",
+      icon: Shield,
+      path: "/support-tickets",
     },
     {
-      id:"settings",
-      label:"Settings",
-      icon:FaCog,
-      path:"/settings",
+      id: "settings",
+      label: "Settings",
+      icon: FaCog,
+      path: "/settings",
     },
-   
+
   ];
 
   /* ---------------- Sync active route ---------------- */
@@ -198,8 +197,8 @@ const Sidebar = ({ theme = "dark" }) => {
           </div>
 
           <Button
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-primary text-sidebar rounded-full"
+            onClick={toggleSidebar}
+            className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-primary text-sidebar rounded-full "
           >
             {isCollapsed ? (
               <ChevronRight size={14} />
@@ -224,10 +223,9 @@ const Sidebar = ({ theme = "dark" }) => {
                   onClick={() => handleMenuClick(item)}
                   className={`
                     flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer transition
-                    ${
-                      isActive
-                        ? "sidebar-item-active font-semibold"
-                        : "text-sidebar hover:bg-white/10"
+                    ${isActive
+                      ? "sidebar-item-active font-semibold"
+                      : "text-sidebar hover:bg-white/10"
                     }
                     ${isCollapsed ? "justify-center" : ""}
                   `}
@@ -239,9 +237,8 @@ const Sidebar = ({ theme = "dark" }) => {
 
                   {!isCollapsed && item.hasDropdown && (
                     <ChevronDown
-                      className={`w-4 h-4 transition ${
-                        isExpanded ? "rotate-180" : ""
-                      }`}
+                      className={`w-4 h-4 transition ${isExpanded ? "rotate-180" : ""
+                        }`}
                     />
                   )}
                 </div>
@@ -266,10 +263,9 @@ const Sidebar = ({ theme = "dark" }) => {
                           className={`
                             flex items-center gap-3 px-3 py-2 rounded-lg text-sm cursor-pointer
                             transition-all duration-200
-                            ${
-                              isSubActive
-                                ? "bg-primary/20 text-primary font-semibold translate-x-2"
-                                : "text-sidebar/70 hover:bg-white/10 hover:translate-x-2"
+                            ${isSubActive
+                              ? "bg-primary/20 text-primary font-semibold translate-x-2"
+                              : "text-sidebar/70 hover:bg-white/10 hover:translate-x-2"
                             }
                           `}
                         >

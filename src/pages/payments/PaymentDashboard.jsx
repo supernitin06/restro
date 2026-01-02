@@ -15,7 +15,7 @@ const PaymentDashboard = () => {
     setPaymentStats(paymentStatsData);
     setRecentActivities(recentActivitiesData);
     setTransactions(transactionsData);
-    
+
     // Simulate loading delay
     setTimeout(() => {
       setLoading(false);
@@ -32,25 +32,25 @@ const PaymentDashboard = () => {
       return sum + amount;
     }, 0);
 
-    const completedTransactions = transactions.filter(t => 
+    const completedTransactions = transactions.filter(t =>
       t.status === 'completed'
     ).length;
 
-    const successRate = transactions.length > 0 
+    const successRate = transactions.length > 0
       ? Math.round((completedTransactions / transactions.length) * 100)
       : 0;
 
-    const avgTransaction = transactions.length > 0 
+    const avgTransaction = transactions.length > 0
       ? totalRevenue / transactions.length
       : 0;
 
-    const pendingTransactions = transactions.filter(t => 
+    const pendingTransactions = transactions.filter(t =>
       t.status === 'pending'
     ).length;
 
     // Map JSON data with real calculations
     return paymentStats.map(stat => {
-      switch(stat.title) {
+      switch (stat.title) {
         case 'Total Revenue':
           return {
             ...stat,
@@ -101,16 +101,16 @@ const PaymentDashboard = () => {
   return (
     <div className="min-h-screen page  space-y-8">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-primary p-6 md:p-8 rounded-3xl shadow-lg border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
-            <div>
-              <h1 className="text-heading">
-                Payment Management
-              </h1>
-              <p className="text-primary opacity-70 mt-2 text-lg font-medium">
-                Track and manage all restaurant payments
-              </p>
-            </div>
-          </div>
+      <div className="flex bg-primary flex-col md:flex-row justify-between items-start md:items-center p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
+        <div>
+          <h1 className="highlight text-4xl font-extrabold tracking-tight">
+            Payment Management
+          </h1>
+          <p className="text-primary opacity-70 mt-2 text-lg font-medium">
+            Track and manage all restaurant payments
+          </p>
+        </div>
+      </div>
 
       {/* Stats Grid - Apna UserStats component */}
       <UserStats paymentStats={updatedPaymentStats} />
@@ -118,36 +118,34 @@ const PaymentDashboard = () => {
       {/* Transaction Overview Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         {/* Recent Transactions Card */}
-        <div className="relative group">
-          <div className="absolute inset-0 bg-gradient-to-r from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-2xl shadow-2xl border border-white/10" />
-          <div className="relative p-6">
+        <div className="card shadow-sm border border-gray-100 dark:border-gray-700 cursor-pointer">
+          <div className="p-6">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-white">Recent Transactions</h2>
-              <button className="text-sm text-blue-400 hover:text-blue-300 font-medium transition-colors">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Recent Transactions</h2>
+              <button className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium transition-colors">
                 View All →
               </button>
             </div>
-            
+
             <div className="space-y-4">
               {transactions.slice(0, 4).map(transaction => (
-                <div 
-                  key={transaction.id} 
-                  className="flex items-center justify-between p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-all duration-300 group/item"
+                <div
+                  key={transaction.id}
+                  className="flex items-center justify-between p-4 rounded-xl bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-300 group/item border border-gray-100 dark:border-gray-600"
                 >
                   <div className="flex items-center">
-                    <div className={`w-3 h-3 rounded-full mr-4 ${
-                      transaction.status === 'completed' ? 'bg-green-500' :
+                    <div className={`w-3 h-3 rounded-full mr-4 ${transaction.status === 'completed' ? 'bg-green-500' :
                       transaction.status === 'pending' ? 'bg-yellow-500' :
-                      'bg-red-500'
-                    }`}></div>
+                        'bg-red-500'
+                      }`}></div>
                     <div>
-                      <p className="font-medium text-white">{transaction.name}</p>
-                      <p className="text-sm text-gray-400">{transaction.method}</p>
+                      <p className="font-medium text-gray-900 dark:text-white">{transaction.name}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">{transaction.method}</p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-bold text-white text-lg">{transaction.amount}</p>
-                    <p className="text-sm text-gray-400">{transaction.date}</p>
+                    <p className="font-bold text-gray-900 dark:text-white text-lg">{transaction.amount}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{transaction.date}</p>
                   </div>
                 </div>
               ))}
@@ -156,34 +154,33 @@ const PaymentDashboard = () => {
         </div>
 
         {/* Payment Methods Card */}
-        <div className="relative group">
-          <div className="absolute inset-0 bg-gradient-to-r from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-2xl shadow-2xl border border-white/10" />
-          <div className="relative p-6">
-            <h2 className="text-xl font-bold text-white mb-6">Payment Methods</h2>
-            
+        <div className="card shadow-sm border border-gray-100 dark:border-gray-700 cursor-pointer">
+          <div className="p-6">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Payment Methods</h2>
+
             <div className="space-y-6">
               {['Credit Card', 'PayPal', 'Bank Transfer'].map((method, index) => {
                 const count = transactions.filter(t => t.method === method).length;
-                const percentage = transactions.length > 0 
+                const percentage = transactions.length > 0
                   ? Math.round((count / transactions.length) * 100)
                   : 0;
-                
+
                 const colors = [
                   'from-blue-500 to-cyan-500',
                   'from-purple-500 to-pink-500',
                   'from-emerald-500 to-green-500'
                 ];
-                
+
                 return (
                   <div key={method} className="space-y-2">
                     <div className="flex justify-between">
-                      <span className="text-gray-300">{method}</span>
-                      <span className="font-medium text-white">
-                        {count} <span className="text-gray-400">({percentage}%)</span>
+                      <span className="text-gray-600 dark:text-gray-300">{method}</span>
+                      <span className="font-medium text-gray-900 dark:text-white">
+                        {count} <span className="text-gray-500 dark:text-gray-400">({percentage}%)</span>
                       </span>
                     </div>
-                    <div className="w-full bg-gray-700 rounded-full h-2.5">
-                      <div 
+                    <div className="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-2.5">
+                      <div
                         className={`h-2.5 rounded-full bg-gradient-to-r ${colors[index]} transition-all duration-1000`}
                         style={{ width: `${percentage}%` }}
                       ></div>
@@ -197,39 +194,37 @@ const PaymentDashboard = () => {
       </div>
 
       {/* Recent Activity */}
-      <div className="relative group">
-        <div className="absolute inset-0 bg-gradient-to-r from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-2xl shadow-2xl border border-white/10" />
-        <div className="relative p-6">
+      <div className="card shadow-sm border border-gray-100 dark:border-gray-700 cursor-pointer">
+        <div className="p-6">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-bold text-white">Recent Activity</h2>
-            <button className="text-sm text-blue-400 hover:text-blue-300 font-medium transition-colors">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Recent Activity</h2>
+            <button className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium transition-colors">
               View All Activity →
             </button>
           </div>
-          
+
           <div className="space-y-4">
             {recentActivities.slice(0, 5).map((activity, index) => (
-              <div 
-                key={index} 
-                className="flex items-center justify-between p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-all duration-300"
+              <div
+                key={index}
+                className="flex items-center justify-between p-4 rounded-xl bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-300 border border-gray-100 dark:border-gray-600"
               >
                 <div className="flex items-center">
-                  <div className={`p-2 rounded-lg mr-4 ${
-                    activity.action.includes('received') ? 'bg-green-500/20' :
-                    activity.action.includes('failed') ? 'bg-red-500/20' :
-                    'bg-yellow-500/20'
-                  }`}>
+                  <div className={`p-2 rounded-lg mr-4 ${activity.action.includes('received') ? 'bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400' :
+                    activity.action.includes('failed') ? 'bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400' :
+                      'bg-yellow-100 dark:bg-yellow-500/20 text-yellow-600 dark:text-yellow-400'
+                    }`}>
                     {activity.action.includes('received') ? '💰' :
-                     activity.action.includes('failed') ? '❌' : '📧'}
+                      activity.action.includes('failed') ? '❌' : '📧'}
                   </div>
                   <div>
-                    <p className="font-medium text-white">{activity.action}</p>
-                    <p className="text-sm text-gray-400">{activity.customer}</p>
+                    <p className="font-medium text-gray-900 dark:text-white">{activity.action}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{activity.customer}</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-bold text-white">{activity.amount}</p>
-                  <p className="text-sm text-gray-400">{activity.time}</p>
+                  <p className="font-bold text-gray-900 dark:text-white">{activity.amount}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{activity.time}</p>
                 </div>
               </div>
             ))}

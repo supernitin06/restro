@@ -9,9 +9,10 @@ import {
   Download,
   Mail
 } from 'lucide-react';
+import Button from '../../components/ui/Button';
 import UserTable from '../../components/ui/Table';
 import FilterBar from '../../components/ui/UserFilters';
-import PaymentModal from '../../components/Payment/PaymentModal'; // Fixed typo
+import PaymentModal from '../../components/Payment/PaymentModal';
 import refundsData from '../../assets/json/PaymentData/refunds.json';
 
 const Refunds = () => {
@@ -229,76 +230,50 @@ const Refunds = () => {
   return (
     <div className="min-h-screen page space-y-8">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-primary p-6 md:p-8 rounded-3xl shadow-lg border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
+      <div className="flex bg-primary flex-col md:flex-row justify-between items-start md:items-center p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
         <div>
-          <h1 className="text-heading">
+          <h1 className="highlight text-4xl font-extrabold tracking-tight">
             Refunds Management
           </h1>
           <p className="text-primary opacity-70 mt-2 text-lg font-medium">
             Process and manage all refund requests
           </p>
         </div>
-        <button
+        <Button
           onClick={handleCreateRefund}
-          className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-green-500 text-white rounded-xl hover:opacity-90 transition-opacity font-medium flex items-center gap-2"
+          variant="secondary"
+          className="flex items-center gap-2"
         >
           <RefreshCw className="w-5 h-5" />
           Process New Refund
-        </button>
+        </Button>
       </div>
 
       {/* Filter Bar */}
-      <div className="mb-6">
-        <FilterBar
-          search={{
-            value: filterValues.search,
-            placeholder: "Search by name, email or refund ID...",
-            onChange: (val) => onFilterChange('search', val)
-          }}
-          filters={[
-            {
-              key: 'status',
-              value: filterValues.status,
-              options: [
-                { value: 'all', label: 'All Status' },
-                { value: 'completed', label: 'Completed' },
-                { value: 'pending', label: 'Pending' },
-                { value: 'failed', label: 'Failed' }
-              ]
-            },
-            {
-              key: 'membership',
-              value: filterValues.membership,
-              options: [
-                { value: 'all', label: 'All Memberships' },
-                { value: 'basic', label: 'Basic' },
-                { value: 'premium', label: 'Premium' }
-              ]
-            },
-            {
-              key: 'method',
-              value: filterValues.method,
-              options: [
-                { value: 'all', label: 'All Methods' },
-                { value: 'Credit Card', label: 'Credit Card' },
-                { value: 'PayPal', label: 'PayPal' },
-                { value: 'Bank Transfer', label: 'Bank Transfer' }
-              ]
-            }
-          ]}
-          onFilterChange={onFilterChange}
-          onClear={handleClearFilters}
-        />
-      </div>
+
 
       {/* Refunds Table */}
-      <div className="bg-gray-900/50 backdrop-blur-sm border border-white/20 rounded-2xl p-4">
-        <UserTable
-          users={filteredRefunds}
-          actions={refundActions}
-          onToggleStatus={handleToggleStatus}
-          showPaymentInfo={true}
-        />
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 cursor-pointer">
+        {filteredRefunds.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-gray-500 dark:text-gray-400">No refunds found.</p>
+            <p className="text-gray-500 dark:text-gray-400 text-sm mt-2">
+              Total refunds in system: {refunds.length}
+            </p>
+          </div>
+        ) : (
+          <>
+            <div className="text-gray-600 dark:text-gray-400 text-sm mb-4">
+              Showing {filteredRefunds.length} of {refunds.length} refunds
+            </div>
+            <UserTable
+              users={filteredRefunds}
+              actions={refundActions}
+              onToggleStatus={handleToggleStatus}
+              showPaymentInfo={true}
+            />
+          </>
+        )}
       </div>
 
       {/* Payment Modal */}

@@ -4,29 +4,29 @@ import { CheckCircle, XCircle, Star, Award } from 'lucide-react';
 const BADGE_CONFIG = {
   active: {
     icon: CheckCircle,
-    className: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+    className: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-300 border-emerald-200 dark:border-emerald-500/30',
   },
   inactive: {
     icon: XCircle,
-    className: 'bg-rose-500/20 text-rose-300 border-rose-500/30',
+    className: 'bg-rose-100 text-rose-800 dark:bg-rose-500/20 dark:text-rose-300 border-rose-200 dark:border-rose-500/30',
   },
   gold: {
     icon: Award,
     className:
-      'bg-gradient-to-r from-yellow-500/20 to-amber-500/20 text-yellow-300 border-yellow-500/30',
+      'bg-amber-100 text-amber-800 dark:bg-amber-500/20 dark:text-amber-300 border-amber-200 dark:border-amber-500/30',
   },
   silver: {
     icon: Star,
     className:
-      'bg-gradient-to-r from-gray-400/20 to-gray-300/20 text-gray-300 border-gray-400/30',
+      'bg-slate-100 text-slate-800 dark:bg-slate-400/20 dark:text-slate-300 border-slate-200 dark:border-slate-400/30',
   },
   bronze: {
     icon: Star,
     className:
-      'bg-gradient-to-r from-orange-500/20 to-red-500/20 text-orange-300 border-orange-500/30',
+      'bg-orange-100 text-orange-800 dark:bg-orange-500/20 dark:text-orange-300 border-orange-200 dark:border-orange-500/30',
   },
   default: {
-    className: 'bg-gray-500/20 text-gray-300 border-gray-500/30',
+    className: 'bg-gray-100 text-gray-800 dark:bg-gray-500/20 dark:text-gray-300 border-gray-200 dark:border-gray-500/30',
   },
 };
 

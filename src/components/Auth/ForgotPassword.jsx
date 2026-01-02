@@ -58,6 +58,7 @@ const ForgotPasswordPage = ({ onBackToLogin }) => {
 
         <Button
           type="submit"
+          variant="primary"
           loading={loading}
           fullWidth
           className="text-lg py-4"

@@ -1,10 +1,10 @@
 // pages/SubAdmin.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  UserPlus, 
-  Shield, 
-  Users, 
+import {
+  UserPlus,
+  Shield,
+  Users,
   Search,
   Filter,
   MoreVertical,
@@ -92,14 +92,14 @@ const SubAdmin = () => {
 
   const filteredAdmins = subAdmins.filter(admin => {
     const matchesSearch = admin.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         admin.email.toLowerCase().includes(searchTerm.toLowerCase());
+      admin.email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFilter = filterStatus === 'all' || admin.status === filterStatus;
     return matchesSearch && matchesFilter;
   });
 
   const handleStatusToggle = (id) => {
-    setSubAdmins(subAdmins.map(admin => 
-      admin.id === id 
+    setSubAdmins(subAdmins.map(admin =>
+      admin.id === id
         ? { ...admin, status: admin.status === 'active' ? 'inactive' : 'active' }
         : admin
     ));
@@ -117,9 +117,9 @@ const SubAdmin = () => {
     <div className="page">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex flex-col mb-6 md:flex-row justify-between items-start md:items-center bg-primary p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
+        <div className="flex bg-primary flex-col mb-6 md:flex-row justify-between items-start md:items-center bg-white dark:bg-gray-800 p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
           <div className="w-full md:w-auto">
-            <h1 className="text-heading">
+            <h1 className="highlight text-4xl font-extrabold tracking-tight">
               Sub-Admin Management
             </h1>
             <p className="text-primary opacity-70 mt-2 text-lg font-medium">
@@ -183,8 +183,8 @@ const SubAdmin = () => {
                   <option value="inactive">Inactive</option>
                 </select>
               </div>
-              <Button 
-                variant="secondary" 
+              <Button
+                variant="secondary"
                 className="flex items-center justify-center gap-2 whitespace-nowrap w-full sm:w-auto"
               >
                 <Filter size={18} />
@@ -204,8 +204,8 @@ const SubAdmin = () => {
               No Sub-Admins Found
             </h3>
             <p className="text-muted mb-6">
-              {searchTerm || filterStatus !== 'all' 
-                ? 'Try adjusting your search or filters' 
+              {searchTerm || filterStatus !== 'all'
+                ? 'Try adjusting your search or filters'
                 : 'Get started by creating your first sub-admin'}
             </p>
             {!searchTerm && filterStatus === 'all' && (
@@ -321,8 +321,8 @@ const SubAdmin = () => {
 
                               {showDropdown === admin.id && (
                                 <>
-                                  <div 
-                                    className="fixed inset-0 z-10" 
+                                  <div
+                                    className="fixed inset-0 z-10"
                                     onClick={() => setShowDropdown(null)}
                                   ></div>
                                   <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-20 overflow-hidden">
@@ -388,8 +388,8 @@ const SubAdmin = () => {
 
                         {showDropdown === admin.id && (
                           <>
-                            <div 
-                              className="fixed inset-0 z-10" 
+                            <div
+                              className="fixed inset-0 z-10"
                               onClick={() => setShowDropdown(null)}
                             ></div>
                             <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-20 overflow-hidden">
@@ -440,7 +440,7 @@ const SubAdmin = () => {
                         {admin.role}
                       </span>
                     </div>
-                    
+
                     <div>
                       <span className="text-xs text-muted font-medium block mb-2">Permissions</span>
                       <div className="flex flex-wrap gap-1.5">

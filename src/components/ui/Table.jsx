@@ -56,12 +56,12 @@ const UserTable = ({
 
   return (
     <div
-      className={`rounded-xl border border-gray-200 bg-white shadow-sm ${className}`}
+      className={`rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm ${className}`}
     >
       {/* Header */}
-      <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
-        <h2 className="text-lg font-semibold text-gray-900">Customers</h2>
-        <p className="text-sm text-gray-500 mt-1">
+      <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Customers</h2>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
           {users.length} total •{" "}
           {users.filter((u) => u.status === "active").length} active
         </p>
@@ -70,55 +70,55 @@ const UserTable = ({
       {/* Table */}
       <div className="overflow-x-auto">
         <table className="min-w-full">
-          <thead className="bg-gray-50 sticky top-0">
+          <thead className="bg-gray-50 dark:bg-gray-900/50 sticky top-0">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 Customer
               </th>
               {showPaymentInfo && (
                 <>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Amount
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Date
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Method
                   </th>
                 </>
               )}
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 Contact
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 Membership
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 Stats
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 Status
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 Actions
               </th>
             </tr>
           </thead>
 
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
             {users.map((user) => (
-              <tr key={user.id} className="hover:bg-gray-50">
+              <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                 {/* Customer */}
-                <td className="px-6 py-4">
+                <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-                      <User className="w-5 h-5 text-blue-600" />
+                    <div className="w-10 h-10 rounded-lg highlight-bg flex items-center justify-center">
+                      <User className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <p className="font-medium text-gray-900">{user.name}</p>
+                      <p className="font-medium text-gray-900 dark:text-white">{user.name}</p>
                       {user.invoice && (
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
                           #{user.invoice}
                         </p>
                       )}
@@ -129,49 +129,49 @@ const UserTable = ({
                 {/* Payment */}
                 {showPaymentInfo && (
                   <>
-                    <td className="px-6 py-4 font-semibold">
+                    <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white whitespace-nowrap">
                       {formatCurrency(user.amount)}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">
+                    <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">
                       {formatDate(user.date)}
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-4 whitespace-nowrap">
                       <Badge>{user.method}</Badge>
                     </td>
                   </>
                 )}
 
                 {/* Contact */}
-                <td className="px-6 py-4 space-y-1">
-                  <div className="flex items-center gap-2 text-sm text-gray-700">
-                    <Mail className="w-4 h-4 text-blue-600" />
+                <td className="px-6 py-4 space-y-1 whitespace-nowrap">
+                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                    <Mail className="w-4 h-4 text-blue-500" />
                     {user.email}
                   </div>
                   {user.phone && (
-                    <div className="flex items-center gap-2 text-sm text-gray-700">
-                      <Phone className="w-4 h-4 text-green-600" />
+                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                      <Phone className="w-4 h-4 text-green-500" />
                       {user.phone}
                     </div>
                   )}
                 </td>
 
                 {/* Membership */}
-                <td className="px-6 py-4">
+                <td className="px-6 py-4 whitespace-nowrap">
                   <Badge>{user.membership}</Badge>
                 </td>
 
                 {/* Stats */}
-                <td className="px-6 py-4">
+                <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center gap-2">
-                    <ShoppingBag className="w-4 h-4 text-pink-600" />
-                    <span className="font-medium">
+                    <ShoppingBag className="w-4 h-4 text-pink-500" />
+                    <span className="font-medium text-gray-900 dark:text-white">
                       {user.totalOrders || 0} orders
                     </span>
                   </div>
                 </td>
 
                 {/* Status */}
-                <td className="px-6 py-4">
+                <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center gap-2">
                     {getStatusIcon(user.status)}
                     <Badge>{user.status}</Badge>
@@ -179,7 +179,7 @@ const UserTable = ({
                 </td>
 
                 {/* Actions */}
-                <td className="px-6 py-4">
+                <td className="px-6 py-4 whitespace-nowrap">
                   <ActionButtons
                     item={user}
                     actions={actions}
@@ -195,8 +195,8 @@ const UserTable = ({
 
       {/* Footer */}
       {users.length > 0 && (
-        <div className="px-6 py-3 border-t bg-gray-50 text-sm text-gray-600">
-          Showing <span className="font-medium">{users.length}</span> customers
+        <div className="px-6 py-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-sm text-gray-500 dark:text-gray-400">
+          Showing <span className="font-medium text-gray-900 dark:text-white">{users.length}</span> customers
         </div>
       )}
     </div>

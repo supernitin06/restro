@@ -1,12 +1,12 @@
 // components/Sub-Admin/createAdmin.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  ArrowLeft, 
-  User, 
-  Mail, 
-  Phone, 
-  Lock, 
+import {
+  ArrowLeft,
+  User,
+  Mail,
+  Phone,
+  Lock,
   Shield,
   Eye,
   EyeOff,
@@ -107,7 +107,7 @@ const CreateAdmin = () => {
   };
 
   const togglePermission = (permissionId) => {
-    setSelectedPermissions(prev => 
+    setSelectedPermissions(prev =>
       prev.includes(permissionId)
         ? prev.filter(id => id !== permissionId)
         : [...prev, permissionId]
@@ -117,9 +117,9 @@ const CreateAdmin = () => {
   const toggleCategoryPermissions = (category) => {
     const group = permissionGroups.find(g => g.category === category);
     const categoryPerms = group?.permissions.map(p => p.id) || [];
-    
+
     const allSelected = categoryPerms.every(id => selectedPermissions.includes(id));
-    
+
     if (allSelected) {
       setSelectedPermissions(prev => prev.filter(id => !categoryPerms.includes(id)));
     } else {
@@ -165,16 +165,10 @@ const CreateAdmin = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <button
-            onClick={() => navigate('/sub-admin')}
-            className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 mb-4 transition-all group"
-          >
-            <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
-            <span className="font-medium">Back to Sub-Admins</span>
-          </button>
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-primary p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
+  
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
             <div>
-              <h1 className="text-heading">
+              <h1 className="highlight text-4xl font-extrabold tracking-tight">
                 Create New Sub-Admin
               </h1>
               <p className="text-primary opacity-70 mt-2 text-lg font-medium">
@@ -188,7 +182,7 @@ const CreateAdmin = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Left Column - Form */}
             <div className="lg:col-span-2 space-y-6">
-              
+
               {/* Basic Information */}
               <Card className="overflow-hidden">
                 <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-700 px-6 py-4 border-b border-gray-200 dark:border-gray-700">
@@ -388,15 +382,13 @@ const CreateAdmin = () => {
                       const selectedCount = group.permissions.filter(p => selectedPermissions.includes(p.id)).length;
 
                       return (
-                        <div 
-                          key={group.category} 
-                          className={`border-2 ${
-                            someSelected ? group.borderClass : 'border-gray-200 dark:border-gray-700'
-                          } rounded-xl overflow-hidden transition-all`}
+                        <div
+                          key={group.category}
+                          className={`border-2 ${someSelected ? group.borderClass : 'border-gray-200 dark:border-gray-700'
+                            } rounded-xl overflow-hidden transition-all`}
                         >
-                          <div className={`${group.bgClass} px-4 py-3 border-b ${
-                            someSelected ? group.borderClass : 'border-gray-200 dark:border-gray-700'
-                          }`}>
+                          <div className={`${group.bgClass} px-4 py-3 border-b ${someSelected ? group.borderClass : 'border-gray-200 dark:border-gray-700'
+                            }`}>
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-3">
                                 <div className={`w-9 h-9 rounded-lg bg-white dark:bg-gray-900 shadow-sm flex items-center justify-center`}>
@@ -414,11 +406,10 @@ const CreateAdmin = () => {
                               <button
                                 type="button"
                                 onClick={() => toggleCategoryPermissions(group.category)}
-                                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm ${
-                                  allSelected
-                                    ? 'bg-white dark:bg-gray-900 ' + group.textClass
-                                    : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 hover:' + group.textClass
-                                }`}
+                                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm ${allSelected
+                                  ? 'bg-white dark:bg-gray-900 ' + group.textClass
+                                  : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 hover:' + group.textClass
+                                  }`}
                               >
                                 {allSelected ? (
                                   <span className="flex items-center gap-1">
@@ -435,15 +426,14 @@ const CreateAdmin = () => {
                           <div className="p-3 space-y-2">
                             {group.permissions.map((permission) => {
                               const isSelected = selectedPermissions.includes(permission.id);
-                              
+
                               return (
                                 <label
                                   key={permission.id}
-                                  className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all border-2 ${
-                                    isSelected
-                                      ? group.bgClass + ' ' + group.borderClass
-                                      : 'bg-gray-50 dark:bg-gray-800 border-transparent hover:border-gray-300 dark:hover:border-gray-600'
-                                  }`}
+                                  className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all border-2 ${isSelected
+                                    ? group.bgClass + ' ' + group.borderClass
+                                    : 'bg-gray-50 dark:bg-gray-800 border-transparent hover:border-gray-300 dark:hover:border-gray-600'
+                                    }`}
                                 >
                                   <input
                                     type="checkbox"
@@ -482,7 +472,7 @@ const CreateAdmin = () => {
                       Creation Summary
                     </h3>
                   </div>
-                  
+
                   <div className="p-5 space-y-4">
                     <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
                       <p className="text-xs text-muted mb-2 font-medium uppercase tracking-wide">Admin Name</p>
@@ -512,12 +502,12 @@ const CreateAdmin = () => {
                         <div className="mt-3 pt-3 border-t border-green-200 dark:border-green-800">
                           <div className="flex flex-wrap gap-1.5">
                             {permissionGroups.map(group => {
-                              const count = group.permissions.filter(p => 
+                              const count = group.permissions.filter(p =>
                                 selectedPermissions.includes(p.id)
                               ).length;
                               if (count === 0) return null;
                               return (
-                                <span 
+                                <span
                                   key={group.category}
                                   className={`px-2 py-1 ${group.bgClass} ${group.textClass} rounded text-xs font-semibold`}
                                 >
@@ -534,7 +524,7 @@ const CreateAdmin = () => {
                       <Button
                         type="submit"
                         variant="primary"
-                        className="w-full flex items-center justify-center gap-2 py-3 text-base font-bold shadow-lg hover:shadow-xl transition-all"
+                        className="w-full flex items-center justify-center gap-2 py-3 text-base font-bold shadow-sm hover:shadow-md transition-all"
                       >
                         <Save size={18} />
                         Create Sub-Admin

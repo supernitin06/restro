@@ -10,8 +10,7 @@ const UserCard = ({ user, onView, onEdit, onDelete }) => {
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
           <div className="relative">
-            <div className="w-14 h-14 rounded-full flex items-center justify-center font-bold text-xl"
-              style={{ background: 'var(--primary)', color: '#000' }}>
+            <div className="w-14 h-14 rounded-full flex items-center justify-center font-bold text-xl highlight-bg">
               {user.name.charAt(0)}
             </div>
             <div className="absolute -bottom-1 -right-1">
@@ -29,7 +28,7 @@ const UserCard = ({ user, onView, onEdit, onDelete }) => {
           {user.membership}
         </Badge>
       </div>
-      
+
       <div className="space-y-3 mb-6">
         <div className="flex items-center gap-2 text-muted">
           <Phone className="w-4 h-4" />
@@ -40,7 +39,7 @@ const UserCard = ({ user, onView, onEdit, onDelete }) => {
           <span className="text-sm">{user.address}</span>
         </div>
       </div>
-      
+
       <div className="grid grid-cols-2 gap-4 mb-6">
         <div className="text-center p-3 rounded-xl card">
           <div className="text-2xl font-bold">{user.totalOrders}</div>
@@ -51,23 +50,23 @@ const UserCard = ({ user, onView, onEdit, onDelete }) => {
           <div className="text-muted text-xs">Spent</div>
         </div>
       </div>
-      
+
       <div className="flex gap-2">
-        <GradientButton 
+        <GradientButton
           onClick={() => onView(user)}
           variant="primary"
           className="flex-1"
         >
           View
         </GradientButton>
-        <GradientButton 
+        <GradientButton
           onClick={() => onEdit(user)}
           variant="secondary"
           className="flex-1"
         >
           Edit
         </GradientButton>
-        <GradientButton 
+        <GradientButton
           onClick={() => onDelete(user.id)}
           variant="danger"
         >

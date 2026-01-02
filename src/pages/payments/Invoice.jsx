@@ -10,6 +10,7 @@ import {
   CheckCircle,
   AlertCircle
 } from 'lucide-react';
+import Button from '../../components/ui/Button';
 import UserTable from '../../components/ui/Table';
 import FilterBar from '../../components/ui/UserFilters';
 import PaymentModal from '../../components/Payment/PaymentModal';
@@ -315,22 +316,23 @@ const Invoice = () => {
   return (
     <div className="min-h-screen page space-y-8">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-primary p-6 md:p-8 rounded-3xl shadow-lg border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
+      <div className="flex bg-primary flex-col md:flex-row justify-between items-start md:items-center p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
         <div>
-          <h1 className="text-heading">
+          <h1 className="highlight text-4xl font-extrabold tracking-tight">
             Payment Management
           </h1>
           <p className="text-primary opacity-70 mt-2 text-lg font-medium">
             Track and manage all restaurant payments
           </p>
         </div>
-        <button
+        <Button
           onClick={handleCreateInvoice}
-          className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center gap-2"
+          variant="secondary"
+          className="flex items-center gap-2"
         >
           <FileText className="w-5 h-5" />
           Create New Invoice
-        </button>
+        </Button>
       </div>
 
       {/* Filter Bar */}
@@ -380,10 +382,10 @@ const Invoice = () => {
       </div>
 
       {/* Invoices Table */}
-      <div className="bg-white rounded-lg shadow border">
-        <div className="p-4 border-b">
-          <h2 className="text-xl font-bold text-gray-800">All Invoices</h2>
-          <p className="text-gray-600 text-sm">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 cursor-pointer">
+        <div className="p-4 border-b border-gray-100 dark:border-gray-700">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">All Invoices</h2>
+          <p className="text-gray-600 dark:text-gray-400 text-sm">
             Showing {filteredInvoices.length} invoices • Total: ${totalAmount.toFixed(2)}
           </p>
         </div>

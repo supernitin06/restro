@@ -156,6 +156,7 @@ const LoginForm = ({ onSwitchToSignup, onSwitchToForgotPassword }) => {
 
         <Button
           type="submit"
+          variant="primary"
           loading={loading}
           fullWidth
           className="text-lg py-4 mt-6"
