@@ -3,10 +3,10 @@ import ThemeToggle from "./ThemeToggle";
 
 const Navbar = () => {
   return (
-    <div className="bg-sidebar border-b border-sidebar text-sidebar px-8 py-4 transition-colors duration-300">
+    <div className=" border-b border-sidebar text-primary shadow-sm px-8 py-4 transition-colors duration-300">
       <div className="flex items-center justify-between">
         {/* Left - Title */}
-        <h1 className="text-2xl font-bold text-sidebar">Dashboard</h1>
+        <h1 className="text-2xl font-bold text-primary">Dashboard</h1>
 
         {/* Right Section */}
         <div className="flex items-center gap-6">

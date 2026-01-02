@@ -6,6 +6,7 @@ const Select = ({
     value,
     onChange,
     className = '',
+    selectClassName = '',
     placeholder = 'Select option',
     icon: Icon,
     disabled = false,
@@ -36,6 +37,7 @@ const Select = ({
           disabled:opacity-50 disabled:cursor-not-allowed
           ${Icon ? 'pl-10' : ''}
           pr-10
+          ${selectClassName}
         `}
                 {...props}
             >

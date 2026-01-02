@@ -125,7 +125,7 @@ const Sidebar = ({ theme = "dark" }) => {
       id:"support",
       label:"Support & Tickets",
       icon:Shield,
-      path:"/support/tickets",
+      path:"/support-tickets",
     },
     {
       id:"settings",

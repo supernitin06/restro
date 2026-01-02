@@ -7,8 +7,8 @@ const OrderFilters = ({ searchTerm, onSearch, filters, onFilterChange, onClearFi
   const hasActiveFilters = searchTerm !== '' || filters.status !== 'all';
 
   return (
-    <div className="card mb-6">
-      <div className="p-4 flex flex-col lg:flex-row items-center gap-4">
+      <div className="mb-8 card p-4 rounded-xl shadow-sm border border-gray-200">
+      <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
 
         {/* Label */}
         <div className="flex items-center gap-2 text-gray-700 dark:text-gray-200 font-bold shrink-0">
