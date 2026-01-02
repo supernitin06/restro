@@ -15,6 +15,8 @@ import {
   Shield,
   ShieldCheck,
   Circle,
+  Menu,
+  X,
 } from "lucide-react";
 
 import Button from "../ui/Button";
@@ -27,6 +29,7 @@ const Sidebar = ({ theme = "dark" }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [activeMenu, setActiveMenu] = useState("dashboard");
   const [expandedMenu, setExpandedMenu] = useState(null);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   /* ---------------- Menu config ---------------- */
   const menuItems = [
@@ -82,6 +85,7 @@ const Sidebar = ({ theme = "dark" }) => {
       id: "sub-admin",
       label: "Sub Admin",
       icon: ShieldCheck,
+      path: "/sub-admin",
       hasDropdown: true,
       subItems: [
         { id: "create-sub", label: "Create SubAdmin", path: "/sub-admin/create", icon: UserPlus },
@@ -97,7 +101,7 @@ const Sidebar = ({ theme = "dark" }) => {
     for (const item of menuItems) {
       if (item.path === current) {
         setActiveMenu(item.id);
-        setExpandedMenu(null);
+        setExpandedMenu(item.hasDropdown ? item.id : null);
         return;
       }
 
@@ -117,16 +121,45 @@ const Sidebar = ({ theme = "dark" }) => {
     if (item.hasDropdown) {
       setExpandedMenu(expandedMenu === item.id ? null : item.id);
       setActiveMenu(item.id);
+      if (item.path) navigate(item.path);
+      if (item.path) setIsMobileOpen(false);
     } else {
       navigate(item.path);
       setActiveMenu(item.id);
       setExpandedMenu(null);
+      setIsMobileOpen(false);
     }
   };
 
   return (
-    <div className={`${theme === "dark" ? "dark" : ""} sidebar-wrapper`}>
-      <div className={`${isCollapsed ? "w-20" : "w-64"} h-full`}>
+    <>
+      {/* Mobile Toggle Button */}
+      <div className={`lg:hidden fixed top-4 left-4 z-50 ${isMobileOpen ? "hidden" : ""}`}>
+        <Button
+          onClick={() => setIsMobileOpen(!isMobileOpen)}
+          className="p-2 text-sidebar"
+        >
+          <Menu size={24} />
+        </Button>
+      </div>
+
+      {/* Mobile Overlay */}
+      {isMobileOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={() => setIsMobileOpen(false)}
+        />
+      )}
+
+      <div className={`${theme === "dark" ? "dark" : ""} sidebar-wrapper h-full`}>
+        <div
+          className={`
+            fixed lg:static top-0 left-0 z-50 h-full bg-white dark:bg-gray-900 border-r border-sidebar
+            transition-all duration-300 ease-in-out
+            ${isMobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
+            ${isCollapsed ? "lg:w-20" : "lg:w-64"} w-64
+          `}
+        >
 
         {/* ---------- Header ---------- */}
         <div className="relative border-b border-sidebar px-4 py-5">
@@ -141,10 +174,18 @@ const Sidebar = ({ theme = "dark" }) => {
 
           <Button
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-primary text-sidebar rounded-full"
+            className="hidden lg:flex absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-primary text-sidebar rounded-full"
           >
             {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
           </Button>
+
+          {/* Mobile Close Button */}
+          {isMobileOpen && (<Button
+            onClick={() => setIsMobileOpen(false)}
+            className="lg:hidden absolute right-4 top-1/2 -translate-y-1/2 text-sidebar"
+          >
+            <X size={20} />
+          </Button>)}
         </div>
 
         {/* ---------- Menu ---------- */}
@@ -208,6 +249,7 @@ const Sidebar = ({ theme = "dark" }) => {
         </nav>
       </div>
     </div>
+    </>
   );
 };
 
