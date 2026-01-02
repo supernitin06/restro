@@ -22,6 +22,9 @@ import Button from '../components/ui/Button';
 import StatCard from '../components/ui/StatCard';
 import Card from '../components/ui/GlassCard';
 import Input from '../components/ui/InputField';
+// import PageHeader from '../components/ui/PageHeader';
+import Select from '../components/ui/Select';
+import ActionButtons from '../components/ui/UserAction';
 
 const SubAdmin = () => {
   const navigate = useNavigate();
@@ -71,22 +74,22 @@ const SubAdmin = () => {
       title: 'Total Sub-Admins',
       value: subAdmins.length,
       icon: Users,
-      color: 'blue',
-      change: '+2 this month'
+      trendValue: '+2 this month',
+      color: 'blue'
     },
     {
       title: 'Active Admins',
       value: subAdmins.filter(a => a.status === 'active').length,
       icon: CheckCircle,
-      color: 'green',
-      change: 'All online'
+      trendValue: 'All online',
+      color: 'green'
     },
     {
       title: 'Inactive Admins',
       value: subAdmins.filter(a => a.status === 'inactive').length,
       icon: XCircle,
-      color: 'red',
-      change: 'Needs attention'
+      trendValue: 'Needs attention',
+      color: 'red'
     }
   ];
 
@@ -112,6 +115,37 @@ const SubAdmin = () => {
       setShowDropdown(null);
     }
   };
+
+  const tableActions = [
+    {
+      key: 'view',
+      label: 'View Details',
+      icon: Eye,
+      color: 'blue',
+      onClick: (item) => console.log('View', item), // Placeholder
+    },
+    {
+      key: 'edit',
+      label: 'Edit Permissions',
+      icon: Edit,
+      color: 'purple',
+      onClick: () => navigate('/sub-admin/assign'),
+    },
+    {
+      key: 'toggle',
+      label: (item) => (item.status === 'active' ? 'Deactivate' : 'Activate'),
+      icon: (item) => (item.status === 'active' ? Lock : Unlock),
+      color: (item) => (item.status === 'active' ? 'amber' : 'emerald'),
+      onClick: (item) => handleStatusToggle(item.id),
+    },
+    {
+      key: 'delete',
+      label: 'Delete Admin',
+      icon: Trash2,
+      color: 'rose',
+      onClick: (item) => handleDelete(item.id),
+    },
+  ];
 
   return (
     <div className="page">
@@ -154,7 +188,7 @@ const SubAdmin = () => {
               title={stat.title}
               value={stat.value}
               icon={stat.icon}
-              trend={stat.change}
+              trendValue={stat.change}
               color={stat.color}
             />
           ))}
@@ -173,15 +207,16 @@ const SubAdmin = () => {
             </div>
             <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
               <div className="w-full sm:w-auto">
-                <select
+                <Select
                   value={filterStatus}
                   onChange={(e) => setFilterStatus(e.target.value)}
-                  className="input w-full px-4 py-2 rounded-lg"
-                >
-                  <option value="all">All Status</option>
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
-                </select>
+                  options={[
+                    { value: 'all', label: 'All Status' },
+                    { value: 'active', label: 'Active' },
+                    { value: 'inactive', label: 'Inactive' },
+                  ]}
+                  className="w-full sm:w-48"
+                />
               </div>
               <Button 
                 variant="secondary" 
@@ -298,62 +333,13 @@ const SubAdmin = () => {
                             <p className="text-xs text-muted mt-1">Joined {admin.createdAt}</p>
                           </td>
                           <td className="px-6 py-4">
-                            <div className="flex items-center justify-center gap-2 relative">
-                              <button
-                                className="p-2 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all text-blue-600 dark:text-blue-400"
-                                title="View Details"
-                              >
-                                <Eye size={18} />
-                              </button>
-                              <button
-                                className="p-2 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-all text-purple-600 dark:text-purple-400"
-                                onClick={() => navigate('/sub-admin/assign')}
-                                title="Edit Permissions"
-                              >
-                                <Edit size={18} />
-                              </button>
-                              <button
-                                onClick={() => setShowDropdown(showDropdown === admin.id ? null : admin.id)}
-                                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all text-gray-600 dark:text-gray-400"
-                              >
-                                <MoreVertical size={18} />
-                              </button>
-
-                              {showDropdown === admin.id && (
-                                <>
-                                  <div 
-                                    className="fixed inset-0 z-10" 
-                                    onClick={() => setShowDropdown(null)}
-                                  ></div>
-                                  <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-20 overflow-hidden">
-                                    <button
-                                      onClick={() => handleStatusToggle(admin.id)}
-                                      className="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-3 text-sm font-medium transition-colors"
-                                    >
-                                      {admin.status === 'active' ? (
-                                        <>
-                                          <Lock size={16} className="text-red-600" />
-                                          <span>Deactivate</span>
-                                        </>
-                                      ) : (
-                                        <>
-                                          <Unlock size={16} className="text-green-600" />
-                                          <span>Activate</span>
-                                        </>
-                                      )}
-                                    </button>
-                                    <div className="h-px bg-gray-200 dark:bg-gray-700"></div>
-                                    <button
-                                      onClick={() => handleDelete(admin.id)}
-                                      className="w-full px-4 py-3 text-left hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-3 text-sm font-medium text-red-600 dark:text-red-400 transition-colors"
-                                    >
-                                      <Trash2 size={16} />
-                                      <span>Delete Admin</span>
-                                    </button>
-                                  </div>
-                                </>
-                              )}
-                            </div>
+                            <ActionButtons 
+                              item={admin}
+                              actions={tableActions}
+                              maxVisible={3}
+                              size="md"
+                              className="justify-center"
+                            />
                           </td>
                         </tr>
                       ))}
@@ -379,57 +365,12 @@ const SubAdmin = () => {
                         </div>
                       </div>
                       <div className="relative flex-shrink-0">
-                        <button
-                          onClick={() => setShowDropdown(showDropdown === admin.id ? null : admin.id)}
-                          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all text-gray-600 dark:text-gray-400"
-                        >
-                          <MoreVertical size={18} />
-                        </button>
-
-                        {showDropdown === admin.id && (
-                          <>
-                            <div 
-                              className="fixed inset-0 z-10" 
-                              onClick={() => setShowDropdown(null)}
-                            ></div>
-                            <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-20 overflow-hidden">
-                              <button
-                                onClick={() => {
-                                  navigate('/sub-admin/assign');
-                                  setShowDropdown(null);
-                                }}
-                                className="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-3 text-sm font-medium transition-colors"
-                              >
-                                <Edit size={16} className="text-blue-600" />
-                                <span>Edit Permissions</span>
-                              </button>
-                              <button
-                                onClick={() => handleStatusToggle(admin.id)}
-                                className="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-3 text-sm font-medium transition-colors"
-                              >
-                                {admin.status === 'active' ? (
-                                  <>
-                                    <Lock size={16} className="text-red-600" />
-                                    <span>Deactivate</span>
-                                  </>
-                                ) : (
-                                  <>
-                                    <Unlock size={16} className="text-green-600" />
-                                    <span>Activate</span>
-                                  </>
-                                )}
-                              </button>
-                              <div className="h-px bg-gray-200 dark:bg-gray-700"></div>
-                              <button
-                                onClick={() => handleDelete(admin.id)}
-                                className="w-full px-4 py-3 text-left hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-3 text-sm font-medium text-red-600 dark:text-red-400 transition-colors"
-                              >
-                                <Trash2 size={16} />
-                                <span>Delete Admin</span>
-                              </button>
-                            </div>
-                          </>
-                        )}
+                        <ActionButtons 
+                          item={admin}
+                          actions={tableActions}
+                          maxVisible={0}
+                          size="md"
+                        />
                       </div>
                     </div>
 

@@ -33,7 +33,7 @@ const InputField = ({
       <div className="relative group">
         {/* Start Icon */}
         {startIcon && (
-          <div className="absolute left-4 top-1/2 -translate-y-1/2
+          <div className="absolute right-4 top-1/2 -translate-y-1/2
                           text-gray-400 group-focus-within:text-indigo-500
                           transition-colors pointer-events-none">
             {startIcon}

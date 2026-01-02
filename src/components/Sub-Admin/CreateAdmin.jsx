@@ -17,12 +17,23 @@ import {
   CheckCircle,
   Save,
   XCircle,
-  AlertCircle
+  AlertCircle,
+  LayoutDashboard,
+  Bike,
+  CreditCard,
+  ShieldCheck,
+  Menu,
+  Ticket,
+  FileText,
+  Headphones,
+  Settings,
+  ChevronDown
 } from 'lucide-react';
 import Button from '../ui/Button';
 import Card from '../ui/GlassCard';
 import Input from '../ui/InputField';
 import ConfirmationModal from './ConfirmationModal';
+import sidebarData from '../../assets/json/sidebar.json';
 
 const CreateAdmin = () => {
   const navigate = useNavigate();
@@ -38,6 +49,9 @@ const CreateAdmin = () => {
   });
 
   const [selectedPermissions, setSelectedPermissions] = useState([]);
+  const [selectedSidebarItems, setSelectedSidebarItems] = useState([]);
+  const [expandedGroups, setExpandedGroups] = useState({});
+  const [isSidebarExpanded, setIsSidebarExpanded] = useState(false);
   const [errors, setErrors] = useState({});
   const [isConfirmModalOpen, setConfirmModalOpen] = useState(false);
 
@@ -97,6 +111,26 @@ const CreateAdmin = () => {
     }
   ];
 
+  const iconMapping = {
+    "Dashboard": LayoutDashboard,
+    "Users": Users,
+    "Restaurants": UtensilsCrossed,
+    "Delivery Partners": Bike,
+    "Orders": ShoppingBag,
+    "Payments": CreditCard,
+    "Coupons": Ticket,
+    "Reports": FileText,
+    "Support": Headphones,
+    "Sub-Admins": ShieldCheck,
+    "Settings": Settings
+  };
+
+  const sidebarOptions = sidebarData.map(item => ({
+    id: item.name.toLowerCase().replace(/\s+/g, '-'),
+    label: item.name,
+    icon: iconMapping[item.name] || Menu
+  }));
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -127,6 +161,29 @@ const CreateAdmin = () => {
     }
   };
 
+  const toggleSidebarItem = (itemId) => {
+    setSelectedSidebarItems(prev => 
+      prev.includes(itemId)
+        ? prev.filter(id => id !== itemId)
+        : [...prev, itemId]
+    );
+  };
+
+  const toggleAllSidebarItems = () => {
+    if (selectedSidebarItems.length === sidebarOptions.length) {
+      setSelectedSidebarItems([]);
+    } else {
+      setSelectedSidebarItems(sidebarOptions.map(item => item.id));
+    }
+  };
+
+  const toggleGroup = (category) => {
+    setExpandedGroups(prev => ({
+      ...prev,
+      [category]: !prev[category]
+    }));
+  };
+
   const validateForm = () => {
     const newErrors = {};
 
@@ -154,7 +211,7 @@ const CreateAdmin = () => {
   };
 
   const handleConfirmCreate = () => {
-    console.log('Creating sub-admin:', { ...formData, permissions: selectedPermissions });
+    console.log('Creating sub-admin:', { ...formData, permissions: selectedPermissions, sidebarAccess: selectedSidebarItems });
     alert('Sub-Admin created successfully!');
     setConfirmModalOpen(false);
     navigate('/sub-admin');
@@ -270,7 +327,7 @@ const CreateAdmin = () => {
                         Role Title <span className="text-red-500">*</span>
                       </label>
                       <div className="relative">
-                        <Shield size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                        <Shield size={18} className="absolute right-8 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
                         <select
                           name="role"
                           value={formData.role}
@@ -291,7 +348,7 @@ const CreateAdmin = () => {
                         Password <span className="text-red-500">*</span>
                       </label>
                       <div className="relative">
-                        <Lock size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none z-10" />
+                        <Lock size={18} className="absolute right-8 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none z-10" />
                         <input
                           type={showPassword ? 'text' : 'password'}
                           name="password"
@@ -321,7 +378,7 @@ const CreateAdmin = () => {
                         Confirm Password <span className="text-red-500">*</span>
                       </label>
                       <div className="relative">
-                        <Lock size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none z-10" />
+                        <Lock size={18} className="absolute right-8 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none z-10" />
                         <input
                           type={showConfirmPassword ? 'text' : 'password'}
                           name="confirmPassword"
@@ -347,6 +404,87 @@ const CreateAdmin = () => {
                     </div>
                   </div>
                 </div>
+              </Card>
+               {/* Sidebar Access Control */}
+              <Card className="overflow-hidden">
+                <div 
+                  onClick={() => setIsSidebarExpanded(!isSidebarExpanded)}
+                  className="bg-gradient-to-r from-orange-50 to-amber-50 dark:from-gray-800 dark:to-gray-700 px-6 py-4 border-b border-gray-200 dark:border-gray-700 cursor-pointer"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-white dark:bg-gray-900 shadow-sm flex items-center justify-center">
+                        <Menu size={20} className="text-orange-600 dark:text-orange-400" />
+                      </div>
+                      <div>
+                        <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100">Sidebar Access</h2>
+                        <p className="text-sm text-muted">Control which menu items are visible</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleAllSidebarItems();
+                      }}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm ${
+                        selectedSidebarItems.length === sidebarOptions.length
+                          ? 'bg-white dark:bg-gray-900 text-orange-600 dark:text-orange-400'
+                          : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 hover:text-orange-600'
+                      }`}
+                    >
+                      {selectedSidebarItems.length === sidebarOptions.length ? (
+                        <span className="flex items-center gap-1">
+                          <CheckCircle size={14} />
+                          All Visible
+                        </span>
+                      ) : (
+                        'Select All'
+                      )}
+                    </button>
+                    <ChevronDown size={20} className={`text-gray-500 transition-transform duration-300 ${isSidebarExpanded ? 'rotate-180' : ''}`} />
+                    </div>
+                  </div>
+                </div>
+
+                {isSidebarExpanded && (
+                <div className="p-6 animate-in slide-in-from-top-2 duration-200">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {sidebarOptions.map((item) => {
+                      const Icon = item.icon;
+                      const isSelected = selectedSidebarItems.includes(item.id);
+                      
+                      return (
+                        <label
+                          key={item.id}
+                          className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all border-2 ${
+                            isSelected
+                              ? 'bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800'
+                              : 'bg-gray-50 dark:bg-gray-800 border-transparent hover:border-gray-300 dark:hover:border-gray-600'
+                          }`}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={() => toggleSidebarItem(item.id)}
+                            className="w-5 h-5 rounded border-gray-300 dark:border-gray-600 text-orange-600 focus:ring-orange-500 cursor-pointer"
+                          />
+                          <div className="w-8 h-8 rounded-lg bg-white dark:bg-gray-900 flex items-center justify-center shadow-sm">
+                            <Icon size={16} className={isSelected ? "text-orange-600 dark:text-orange-400" : "text-gray-500"} />
+                          </div>
+                          <span className="font-semibold text-gray-800 dark:text-gray-100 text-sm">
+                            {item.label}
+                          </span>
+                          {isSelected && (
+                            <CheckCircle size={16} className="text-orange-600 dark:text-orange-400 ml-auto" />
+                          )}
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
+                )}
               </Card>
 
               {/* Permissions */}
@@ -386,6 +524,7 @@ const CreateAdmin = () => {
                       const allSelected = group.permissions.every(p => selectedPermissions.includes(p.id));
                       const someSelected = group.permissions.some(p => selectedPermissions.includes(p.id));
                       const selectedCount = group.permissions.filter(p => selectedPermissions.includes(p.id)).length;
+                      const isExpanded = expandedGroups[group.category];
 
                       return (
                         <div 
@@ -394,7 +533,9 @@ const CreateAdmin = () => {
                             someSelected ? group.borderClass : 'border-gray-200 dark:border-gray-700'
                           } rounded-xl overflow-hidden transition-all`}
                         >
-                          <div className={`${group.bgClass} px-4 py-3 border-b ${
+                          <div 
+                            onClick={() => toggleGroup(group.category)}
+                            className={`${group.bgClass} px-4 py-3 border-b cursor-pointer ${
                             someSelected ? group.borderClass : 'border-gray-200 dark:border-gray-700'
                           }`}>
                             <div className="flex items-center justify-between">
@@ -411,9 +552,13 @@ const CreateAdmin = () => {
                                   </p>
                                 </div>
                               </div>
+                              <div className="flex items-center gap-3">
                               <button
                                 type="button"
-                                onClick={() => toggleCategoryPermissions(group.category)}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  toggleCategoryPermissions(group.category);
+                                }}
                                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm ${
                                   allSelected
                                     ? 'bg-white dark:bg-gray-900 ' + group.textClass
@@ -429,10 +574,13 @@ const CreateAdmin = () => {
                                   'Select All'
                                 )}
                               </button>
+                              <ChevronDown size={18} className={`text-gray-500 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
+                              </div>
                             </div>
                           </div>
 
-                          <div className="p-3 space-y-2">
+                          {isExpanded && (
+                          <div className="p-3 space-y-2 animate-in slide-in-from-top-2 duration-200">
                             {group.permissions.map((permission) => {
                               const isSelected = selectedPermissions.includes(permission.id);
                               
@@ -464,12 +612,15 @@ const CreateAdmin = () => {
                               );
                             })}
                           </div>
+                          )}
                         </div>
                       );
                     })}
                   </div>
                 </div>
               </Card>
+
+             
             </div>
 
             {/* Right Column - Summary */}
@@ -528,6 +679,16 @@ const CreateAdmin = () => {
                           </div>
                         </div>
                       )}
+                    </div>
+
+                    <div className="p-4 bg-orange-50 dark:bg-orange-900/20 rounded-xl border border-orange-200 dark:border-orange-800">
+                      <p className="text-xs text-muted mb-2 font-medium uppercase tracking-wide">Sidebar Access</p>
+                      <div className="flex items-baseline gap-2">
+                        <p className="text-3xl font-bold text-orange-600 dark:text-orange-400">
+                          {selectedSidebarItems.length}
+                        </p>
+                        <p className="text-sm text-muted">menus visible</p>
+                      </div>
                     </div>
 
                     <div className="pt-4 space-y-3">
