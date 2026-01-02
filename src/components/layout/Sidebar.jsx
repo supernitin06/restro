@@ -16,17 +16,14 @@ import {
   ShieldCheck,
   Circle,
   Receipt,
-  FileText,
   RefreshCw,
-  Headphones,
-  MessageSquare,
-  Settings,
+  FileText,
 } from "lucide-react";
 
 import Button from "../ui/Button";
 import "./Sidebar.css";
 
-const Sidebar = ({ theme = "light" }) => {
+const Sidebar = ({ theme = "dark" }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -72,8 +69,6 @@ const Sidebar = ({ theme = "light" }) => {
       icon: ShoppingBag,
       path: "/orders",
     },
-
-    /* ---------- Payments ---------- */
     {
       id: "payments",
       label: "Payments",
@@ -90,7 +85,7 @@ const Sidebar = ({ theme = "light" }) => {
           id: "transactions",
           label: "Transactions",
           path: "/payments/transactions",
-          icon: FileText,
+          icon: Receipt,
         },
         {
           id: "refunds",
@@ -102,34 +97,10 @@ const Sidebar = ({ theme = "light" }) => {
           id: "invoice",
           label: "Invoice",
           path: "/payments/invoice",
-          icon: Receipt,
+          icon: FileText,
         },
       ],
     },
-
-    /* ---------- Support & Tickets ---------- */
-    {
-      id: "support",
-      label: "Support & Tickets",
-      icon: Headphones,
-      hasDropdown: true,
-      subItems: [
-        {
-          id: "tickets",
-          label: "All Tickets",
-          path: "/support/tickets",
-          icon: MessageSquare,
-        },
-        {
-          id: "settings",
-          label: "Support Settings",
-          path: "/support/settings",
-          icon: Settings,
-        },
-      ],
-    },
-
-    /* ---------- Sub Admin ---------- */
     {
       id: "sub-admin",
       label: "Sub Admin",
@@ -150,6 +121,18 @@ const Sidebar = ({ theme = "light" }) => {
         },
       ],
     },
+    {
+      id:"support",
+      label:"Support & Tickets",
+      icon:Shield,
+      path:"/support/tickets",
+    },
+    {
+      id:"settings",
+      label:"Settings",
+      icon:Shield,
+      path:"/settings",
+    }
   ];
 
   /* ---------------- Sync active route ---------------- */
@@ -163,11 +146,11 @@ const Sidebar = ({ theme = "light" }) => {
         return;
       }
 
-      if (item.hasDropdown && item.subItems) {
-        const match = item.subItems.find((s) =>
+      if (item.hasDropdown) {
+        const sub = item.subItems.find((s) =>
           current.startsWith(s.path)
         );
-        if (match) {
+        if (sub) {
           setActiveMenu(item.id);
           setExpandedMenu(item.id);
           return;
@@ -189,8 +172,8 @@ const Sidebar = ({ theme = "light" }) => {
   };
 
   return (
-    <div className={`${theme === "dark" ? "dark" : ""} sidebar-wrapper h-screen`}>
-      <div className={`${isCollapsed ? "w-20" : "w-64"} h-full`}>
+    <div className={`${theme === "dark" ? "dark" : ""} sidebar-wrapper h-screen overflow-y-auto`}>
+      <div className={`${isCollapsed ? "w-20" : "w-64"} h-screen`}>
 
         {/* ---------- Header ---------- */}
         <div className="relative border-b border-sidebar px-4 py-5">
@@ -209,7 +192,11 @@ const Sidebar = ({ theme = "light" }) => {
             onClick={() => setIsCollapsed(!isCollapsed)}
             className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-primary text-sidebar rounded-full"
           >
-            {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
+            {isCollapsed ? (
+              <ChevronRight size={14} />
+            ) : (
+              <ChevronLeft size={14} />
+            )}
           </Button>
         </div>
 
@@ -222,14 +209,16 @@ const Sidebar = ({ theme = "light" }) => {
 
             return (
               <div key={item.id} className="mb-1">
+
                 {/* Main Item */}
                 <div
                   onClick={() => handleMenuClick(item)}
                   className={`
                     flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer transition
-                    ${isActive
-                      ? "sidebar-item-active font-semibold"
-                      : "text-sidebar hover:bg-white/10"
+                    ${
+                      isActive
+                        ? "sidebar-item-active font-semibold"
+                        : "text-sidebar hover:bg-white/10"
                     }
                     ${isCollapsed ? "justify-center" : ""}
                   `}
@@ -241,14 +230,15 @@ const Sidebar = ({ theme = "light" }) => {
 
                   {!isCollapsed && item.hasDropdown && (
                     <ChevronDown
-                      className={`w-4 h-4 transition ${isExpanded ? "rotate-180" : ""
-                        }`}
+                      className={`w-4 h-4 transition ${
+                        isExpanded ? "rotate-180" : ""
+                      }`}
                     />
                   )}
                 </div>
 
                 {/* Dropdown */}
-                {item.hasDropdown && !isCollapsed && item.subItems && (
+                {item.hasDropdown && !isCollapsed && (
                   <div
                     className={`
                       overflow-hidden transition-all duration-300 ml-4
@@ -267,9 +257,10 @@ const Sidebar = ({ theme = "light" }) => {
                           className={`
                             flex items-center gap-3 px-3 py-2 rounded-lg text-sm cursor-pointer
                             transition-all duration-200
-                            ${isSubActive
-                              ? "bg-primary/20 text-primary font-semibold translate-x-2"
-                              : "text-sidebar/70 hover:bg-white/10 hover:translate-x-2"
+                            ${
+                              isSubActive
+                                ? "bg-primary/20 text-primary font-semibold translate-x-2"
+                                : "text-sidebar/70 hover:bg-white/10 hover:translate-x-2"
                             }
                           `}
                         >
