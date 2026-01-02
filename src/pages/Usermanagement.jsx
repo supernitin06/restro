@@ -1,13 +1,11 @@
-import React, { useState } from 'react';
-import StatsGrid from '../components/ui/UserStats';
+import React, { useState, useMemo } from 'react';
 import FiltersBar from '../components/ui/UserFilters';
 import UserTable from '../components/ui/Table';
 import UserModal from '../components/users/UserModal';
-import Pagination from '../components/ui/Pagination';
 import UserCard from '../components/users/UserCard';
-import { Grid, List, Eye, Edit2, Trash2 } from 'lucide-react';
+import { Grid, List, TrendingUp, TrendingDown } from 'lucide-react';
 import GradientButton from '../components/ui/GradientButton';
-import Button from '../components/ui/Button';
+import StatCard from '../components/ui/StatCard';
 
 const initialUsers = [
   {
@@ -26,6 +24,39 @@ const initialUsers = [
     membership: "gold",
     lastOrder: "2024-01-10",
   },
+  {
+    id: 1,
+    name: "Aarav Sharma",
+    email: "aarav@example.com",
+    phone: "+91 98765 43210",
+    joinDate: "2023-01-15",
+    totalOrders: 45,
+    totalSpent: "₹45,200",
+    loyaltyPoints: 1200,
+    address: "MG Road, Bangalore",
+    dietaryPreferences: ["Vegetarian"],
+    favoriteItems: ["Butter Chicken"],
+    status: "active",
+    membership: "gold",
+    lastOrder: "2024-01-10",
+  },
+  {
+    id: 1,
+    name: "Aarav Sharma",
+    email: "aarav@example.com",
+    phone: "+91 98765 43210",
+    joinDate: "2023-01-15",
+    totalOrders: 45,
+    totalSpent: "₹45,200",
+    loyaltyPoints: 1200,
+    address: "MG Road, Bangalore",
+    dietaryPreferences: ["Vegetarian"],
+    favoriteItems: ["Butter Chicken"],
+    status: "active",
+    membership: "gold",
+    lastOrder: "2024-01-10",
+  },
+  // Add more users here
 ];
 
 const UserManagement = () => {
@@ -33,53 +64,144 @@ const UserManagement = () => {
   const [viewMode, setViewMode] = useState('grid');
   const [selectedUser, setSelectedUser] = useState(null);
   const [showModal, setShowModal] = useState(false);
+
+  // Search & filter state
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState({ status: 'all', membership: 'all' });
+
+  // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
 
-  const filteredUsers = users.filter(user =>
-    user.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Handle filter changes
+  const handleFilterChange = (key, value) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
+    setCurrentPage(1); // Reset page on filter change
+  };
+
+  const handleClearFilters = () => {
+    setFilters({ status: 'all', membership: 'all' });
+    setSearchTerm('');
+    setCurrentPage(1);
+  };
+
+  // Filtered & searched users
+  const filteredUsers = useMemo(() => {
+    return users.filter(user => {
+      const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesStatus = filters.status === 'all' || user.status === filters.status;
+      const matchesMembership = filters.membership === 'all' || user.membership === filters.membership;
+
+      return matchesSearch && matchesStatus && matchesMembership;
+    });
+  }, [users, searchTerm, filters]);
+
+  // Stats calculations
+  const totalUsers = users.length;
+  const activeUsers = users.filter(u => u.status === 'active').length;
+  const inactiveUsers = users.filter(u => u.status === 'inactive').length;
 
   return (
-    /* ✅ FIXED BACKGROUND */
-    <div className="page-background px-6 py-8 relative">
+    <div className="px-6 py-8 relative">
 
-      {/* ✅ Header */}
-    <div className="flex flex-col mb-6 md:flex-row justify-between items-start md:items-center bg-white dark:bg-gray-800 p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
+      {/* Page Header */}
+      <div className="flex flex-col mb-6 md:flex-row justify-between items-start md:items-center bg-primary dark:bg-gray-800 p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-70 dark:bg-opacity-90">
         <div>
-          <h1 className="text-heading">User Management</h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-2 text-lg font-medium">
+          <h1 className="text-primary">User Management</h1>
+          <p className="text-primary dark:text-gray-400 mt-2 text-lg font-medium">
             Manage users and their profiles.
           </p>
         </div>
       </div>
 
-      {/* ✅ Glow Effects */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl" />
-      </div>
+     
 
       <div className="relative z-10">
 
-        {/* Stats */}
-        <StatsGrid stats={[
-          { title: 'Total Users', value: users.length },
-          { title: 'Active Users', value: users.length },
-        ]} />
+        {/* Stats Cards */}
+       {/* Stats Cards */}
+<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-6">
+  <StatCard
+    title="Total Users"
+    value={totalUsers}
+    icon={TrendingUp}
+    trend="up"
+    trendValue={`${totalUsers - 5} since last month`}
+    color="blue"
+  />
+  <StatCard
+    title="Active Users"
+    value={activeUsers}
+    icon={TrendingUp}
+    trend="up"
+    trendValue={`${((activeUsers / totalUsers) * 100).toFixed(0)}%`}
+    color="green"
+  />
+  <StatCard
+    title="Inactive Users"
+    value={inactiveUsers}
+    icon={TrendingDown}
+    trend="down"
+    trendValue={`${((inactiveUsers / totalUsers) * 100).toFixed(0)}%`}
+    color="red"
+  />
+  <StatCard
+    title="Total Orders"
+    value={users.reduce((acc, user) => acc + user.totalOrders, 0)}
+    icon={TrendingUp}
+    trend="up"
+    trendValue="10% since last month"
+    color="purple"
+  />
+</div>
+
+
+        {/* Filters */}
+      <FiltersBar
+  search={{
+    value: searchTerm,
+    placeholder: 'Search by name...',
+    onChange: setSearchTerm,
+  }}
+  filters={[
+    {
+      key: 'status',
+      value: filters.status,
+      options: [
+        { label: 'All', value: 'all' },
+        { label: 'Active', value: 'active' },
+        { label: 'Inactive', value: 'inactive' },
+      ],
+      placeholder: 'Status',
+    },
+    {
+      key: 'membership',
+      value: filters.membership,
+      options: [
+        { label: 'All', value: 'all' },
+        { label: 'Gold', value: 'gold' },
+        { label: 'Silver', value: 'silver' },
+        { label: 'Bronze', value: 'bronze' },
+      ],
+      placeholder: 'Membership',
+    },
+  ]}
+  onFilterChange={handleFilterChange}
+  onClear={handleClearFilters}
+>
+  {/* 👇 Inject ANY component here */}
+  <div className="flex gap-1">
+    <GradientButton onClick={() => setViewMode('grid')}>
+      <Grid size={16} />
+    </GradientButton>
+    <GradientButton onClick={() => setViewMode('table')}>
+      <List size={16} />
+    </GradientButton>
+  </div>
+</FiltersBar>
 
         {/* View Toggle */}
-        <div className="flex justify-end gap-2 my-6">
-          <GradientButton onClick={() => setViewMode('grid')}>
-            <Grid size={16} /> Grid
-          </GradientButton>
-          <GradientButton onClick={() => setViewMode('table')}>
-            <List size={16} /> Table
-          </GradientButton>
-        </div>
-
+ 
         {/* Users */}
         {viewMode === 'grid' ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -91,17 +213,20 @@ const UserManagement = () => {
           <UserTable users={filteredUsers} />
         )}
 
-        {/* Empty */}
+        {/* Empty State */}
         {filteredUsers.length === 0 && (
           <div className="text-center py-16 text-muted">
             No users found
           </div>
         )}
+
       </div>
 
+      {/* User Modal */}
       {showModal && selectedUser && (
         <UserModal user={selectedUser} onClose={() => setShowModal(false)} />
       )}
+
     </div>
   );
 };

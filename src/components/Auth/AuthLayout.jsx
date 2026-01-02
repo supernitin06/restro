@@ -1,6 +1,7 @@
 // src/components/auth/AuthLayout.jsx
 import React from 'react';
 import { FaSearch, FaMapMarkerAlt, FaStar, FaShareAlt, FaGlobe, FaUtensils } from 'react-icons/fa';
+import InputField from '../ui/InputField';
 
 const AuthLayout = ({ children, activeTab = 'login', onTabChange }) => {
   return (
