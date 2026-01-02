@@ -2,7 +2,7 @@ import React from 'react';
 import { Calendar, User, MessageSquare } from 'lucide-react';
 import TicketStatusBadge from './TicketStatusBadge';
 import TicketPriorityBadge from './TicketPriorityBadge';
-import ActionButtons from '../ui/ActionButton';
+import Table from '../ui/Table';
 import { FiEye, FiMessageSquare, FiX } from 'react-icons/fi';
 
 const TicketsTable = ({ tickets = [], onView, onReply, onClose }) => {
@@ -11,60 +11,40 @@ const TicketsTable = ({ tickets = [], onView, onReply, onClose }) => {
   }
 
   return (
-    <div className="overflow-x-auto rounded-2xl border border-white/20">
-      <table className="min-w-full divide-y divide-white/10">
-        <thead className="bg-white/5">
-          <tr>
-            <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">Ticket ID</th>
-            <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">Subject</th>
-            <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">Customer</th>
-            <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">Priority</th>
-            <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">Status</th>
-            <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">Created</th>
-            <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">Actions</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-white/10">
-          {tickets.map((ticket) => (
-            <tr key={ticket.ticketId} className="hover:bg-white/5 transition-colors">
-              <td className="px-6 py-4 font-mono text-primary">{ticket.ticketId}</td>
-              <td className="px-6 py-4">
-                <div className="flex items-center gap-2">
-                  <MessageSquare className="w-4 h-4 text-gray-500" />
-                  <span className="font-medium">{ticket.subject}</span>
-                </div>
-              </td>
-              <td className="px-6 py-4">
-                <div className="flex items-center gap-2">
-                  <User className="w-4 h-4 text-gray-500" />
-                  <div>
-                    <p className="font-medium">{ticket.customerName}</p>
-                    <p className="text-xs text-gray-500">{ticket.customerEmail}</p>
-                  </div>
-                </div>
-              </td>
-              <td className="px-6 py-4"><TicketPriorityBadge priority={ticket.priority} /></td>
-              <td className="px-6 py-4"><TicketStatusBadge status={ticket.status} /></td>
-              <td className="px-6 py-4 text-sm text-gray-400">
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4" />
-                  {new Date(ticket.createdAt).toLocaleDateString()}
-                </div>
-              </td>
-              <td className="px-6 py-4">
-                <ActionButtons
-                  actions={[
-                    { key: 'view', icon: FiEye, color: 'blue', onClick: () => onView(ticket) },
-                    { key: 'reply', icon: FiMessageSquare, color: 'cyan', onClick: () => onReply(ticket), disabled: ['closed', 'resolved'].includes(ticket.status) },
-                    { key: 'close', icon: FiX, color: 'rose', onClick: () => onClose(ticket.ticketId), disabled: ticket.status === 'closed' }
-                  ]}
-                />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <Table
+      data={tickets}
+      columns={[
+        { header: "Ticket ID", key: "ticketId", render: (ticket) => <span className="font-mono text-primary">{ticket.ticketId}</span> },
+        { header: "Subject", key: "subject", render: (ticket) => (
+          <div className="flex items-center gap-2">
+            <MessageSquare className="w-4 h-4 text-gray-500" />
+            <span className="font-medium">{ticket.subject}</span>
+          </div>
+        ) },
+        { header: "Customer", key: "customerName", render: (ticket) => (
+          <div className="flex items-center gap-2">
+            <User className="w-4 h-4 text-gray-500" />
+            <div>
+              <p className="font-medium">{ticket.customerName}</p>
+              <p className="text-xs text-gray-500">{ticket.customerEmail}</p>
+            </div>
+          </div>
+        ) },
+        { header: "Priority", key: "priority", render: (ticket) => <TicketPriorityBadge priority={ticket.priority} /> },
+        { header: "Status", key: "status", render: (ticket) => <TicketStatusBadge status={ticket.status} /> },
+        { header: "Created", key: "createdAt", render: (ticket) => (
+          <div className="flex items-center gap-2 text-sm text-gray-400">
+            <Calendar className="w-4 h-4" />
+            {new Date(ticket.createdAt).toLocaleDateString()}
+          </div>
+        ) },
+      ]}
+      actions={[
+        { key: 'view', icon: FiEye, color: 'blue', onClick: (ticket) => onView(ticket) },
+        { key: 'reply', icon: FiMessageSquare, color: 'cyan', onClick: (ticket) => onReply(ticket), disabled: (ticket) => ['closed', 'resolved'].includes(ticket.status) },
+        { key: 'close', icon: FiX, color: 'rose', onClick: (ticket) => onClose(ticket.ticketId), disabled: (ticket) => ticket.status === 'closed' }
+      ]}
+    />
   );
 };
 

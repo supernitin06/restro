@@ -16,12 +16,13 @@ import {
 import Badge from "../ui/Badge";
 import ActionButtons from "../ui/UserAction";
 
-const UserTable = ({
-  users = [],
+const Table = ({
+  data = [],
+  columns = [],
   actions = [],
-  onToggleStatus,
-  showPaymentInfo = false,
   className = "",
+  title = "",
+  subtitle = "",
 }) => {
   const formatCurrency = (amount) => {
     if (!amount) return "$0.00";
@@ -59,134 +60,52 @@ const UserTable = ({
       className={`rounded-xl border border-gray-200 bg-white shadow-sm ${className}`}
     >
       {/* Header */}
-      <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
-        <h2 className="text-lg font-semibold text-gray-900">Customers</h2>
-        <p className="text-sm text-gray-500 mt-1">
-          {users.length} total •{" "}
-          {users.filter((u) => u.status === "active").length} active
-        </p>
-      </div>
+      {title && (
+        <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
+          <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
+          {subtitle && <p className="text-sm text-gray-500 mt-1">{subtitle}</p>}
+        </div>
+      )}
 
       {/* Table */}
       <div className="overflow-x-auto">
         <table className="min-w-full">
           <thead className="bg-gray-50 sticky top-0">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">
-                Customer
-              </th>
-              {showPaymentInfo && (
-                <>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">
-                    Amount
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">
-                    Date
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">
-                    Method
-                  </th>
-                </>
+              {columns.map((col, index) => (
+                <th
+                  key={index}
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase"
+                >
+                  {col.header}
+                </th>
+              ))}
+              {actions.length > 0 && (
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">
+                  Actions
+                </th>
               )}
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">
-                Contact
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">
-                Membership
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">
-                Stats
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">
-                Status
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">
-                Actions
-              </th>
             </tr>
           </thead>
 
           <tbody className="divide-y divide-gray-100">
-            {users.map((user) => (
-              <tr key={user.id} className="hover:bg-gray-50">
-                {/* Customer */}
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-                      <User className="w-5 h-5 text-blue-600" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-gray-900">{user.name}</p>
-                      {user.invoice && (
-                        <p className="text-xs text-gray-500">
-                          #{user.invoice}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </td>
-
-                {/* Payment */}
-                {showPaymentInfo && (
-                  <>
-                    <td className="px-6 py-4 font-semibold">
-                      {formatCurrency(user.amount)}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">
-                      {formatDate(user.date)}
-                    </td>
-                    <td className="px-6 py-4">
-                      <Badge>{user.method}</Badge>
-                    </td>
-                  </>
+            {data.map((item, index) => (
+              <tr key={item.id || index} className="hover:bg-gray-50">
+                {columns.map((col, colIndex) => (
+                  <td key={colIndex} className="px-6 py-4">
+                    {col.render ? col.render(item) : item[col.key]}
+                  </td>
+                ))}
+                {actions.length > 0 && (
+                  <td className="px-6 py-4">
+                    <ActionButtons
+                      item={item}
+                      actions={actions}
+                      size="sm"
+                      variant="ghost"
+                    />
+                  </td>
                 )}
-
-                {/* Contact */}
-                <td className="px-6 py-4 space-y-1">
-                  <div className="flex items-center gap-2 text-sm text-gray-700">
-                    <Mail className="w-4 h-4 text-blue-600" />
-                    {user.email}
-                  </div>
-                  {user.phone && (
-                    <div className="flex items-center gap-2 text-sm text-gray-700">
-                      <Phone className="w-4 h-4 text-green-600" />
-                      {user.phone}
-                    </div>
-                  )}
-                </td>
-
-                {/* Membership */}
-                <td className="px-6 py-4">
-                  <Badge>{user.membership}</Badge>
-                </td>
-
-                {/* Stats */}
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-2">
-                    <ShoppingBag className="w-4 h-4 text-pink-600" />
-                    <span className="font-medium">
-                      {user.totalOrders || 0} orders
-                    </span>
-                  </div>
-                </td>
-
-                {/* Status */}
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-2">
-                    {getStatusIcon(user.status)}
-                    <Badge>{user.status}</Badge>
-                  </div>
-                </td>
-
-                {/* Actions */}
-                <td className="px-6 py-4">
-                  <ActionButtons
-                    item={user}
-                    actions={actions}
-                    size="sm"
-                    variant="ghost"
-                  />
-                </td>
               </tr>
             ))}
           </tbody>
@@ -194,13 +113,13 @@ const UserTable = ({
       </div>
 
       {/* Footer */}
-      {users.length > 0 && (
+      {data.length > 0 && (
         <div className="px-6 py-3 border-t bg-gray-50 text-sm text-gray-600">
-          Showing <span className="font-medium">{users.length}</span> customers
+          Showing <span className="font-medium">{data.length}</span> items
         </div>
       )}
     </div>
   );
 };
 
-export default UserTable;
+export default Table;
