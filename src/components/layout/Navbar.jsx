@@ -3,13 +3,13 @@ import ThemeToggle from "./ThemeToggle";
 
 const Navbar = () => {
   return (
-    <div className="bg-sidebar border-b border-sidebar text-sidebar px-8 py-4 transition-colors duration-300">
+    <div className="bg-sidebar border-b border-sidebar text-sidebar px-4 md:px-8 py-4 transition-colors duration-300">
       <div className="flex items-center justify-between">
         {/* Left - Title */}
-        <h1 className="text-2xl font-bold text-sidebar">Dashboard</h1>
+        <h1 className="text-xl md:text-2xl font-bold text-sidebar pl-14 lg:pl-0">Dashboard</h1>
 
         {/* Right Section */}
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-2 sm:gap-4 md:gap-6">
           <ThemeToggle />
 
           {/* 🔔 Notification */}
@@ -43,15 +43,15 @@ const Navbar = () => {
           </IconBadge>
 
           {/* Divider */}
-          <div className="w-px h-8 bg-border-sidebar" />
+          <div className="w-px h-8 bg-border-sidebar hidden md:block" />
 
           {/* 👤 Profile */}
           <div className="flex items-center gap-3 cursor-pointer hover:opacity-80">
-            <div className="text-right">
+            <div className="text-right hidden md:block">
               <p className="text-xs opacity-80">Good Morning</p>
               <p className="text-sm font-semibold">James Sullivan</p>
             </div>
-            <div className="w-12 h-12 rounded-full bg-gradient-sidebar overflow-hidden">
+            <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-sidebar overflow-hidden">
               <img
                 src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop"
                 alt="User"

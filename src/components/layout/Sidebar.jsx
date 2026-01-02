@@ -162,7 +162,7 @@ const Sidebar = ({ theme = "dark" }) => {
         >
 
         {/* ---------- Header ---------- */}
-        <div className="relative border-b border-sidebar px-4 py-5">
+        <div className="relative border-b border-sidebar p-4 ">
           <div className="flex items-center gap-3">
             <div className="w-11 h-11 bg-primary rounded-xl flex items-center justify-center">
               <UtensilsCrossed className="w-6 h-6 text-sidebar" />
@@ -171,13 +171,25 @@ const Sidebar = ({ theme = "dark" }) => {
               <span className="text-2xl font-bold text-sidebar">Restro</span>
             )}
           </div>
+<button
+  onClick={() => setIsCollapsed(!isCollapsed)}
+            className="hidden lg:flex absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 items-center justify-center z-50 bg-white dark:bg-gray-900 border border-sidebar rounded-full shadow-md text-sidebar"
+>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="14"
+    height="14"
+    viewBox="0 0 24 24"
+    fill="none"
+              stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d={isCollapsed ? "m9 18 6-6-6-6" : "m15 18-6-6 6-6"} />
+  </svg>
+</button>
 
-          <Button
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className="hidden lg:flex absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-primary text-sidebar rounded-full"
-          >
-            {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
-          </Button>
 
           {/* Mobile Close Button */}
           {isMobileOpen && (<Button
@@ -200,8 +212,8 @@ const Sidebar = ({ theme = "dark" }) => {
                 {/* Main Item */}
                 <div
                   onClick={() => handleMenuClick(item)}
-                  className={`flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer transition
-                    ${isActive ? "sidebar-item-active" : "text-sidebar hover:bg-white/10"}
+                  className={`flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer transition border-l-4
+                    ${isActive ? "sidebar-item-active border-white" : "text-sidebar hover:bg-white/10 border-transparent hover:border-white"}
                     ${isCollapsed ? "justify-center" : ""}
                   `}
                 >
