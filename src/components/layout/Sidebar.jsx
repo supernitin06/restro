@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { FaCog } from "react-icons/fa";
 import {
   LayoutDashboard,
   Users,
@@ -130,7 +131,7 @@ const Sidebar = ({ theme = "dark" }) => {
     {
       id:"settings",
       label:"Settings",
-      icon:Shield,
+      icon:FaCog,
       path:"/settings",
     }
   ];
