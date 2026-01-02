@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { 
-  Eye, 
-  Edit, 
-  Trash2, 
-  Mail, 
-  Download, 
+import {
+  Eye,
+  Edit,
+  Trash2,
+  Mail,
+  Download,
   Printer,
   FileText,
   CheckCircle,
@@ -18,6 +18,14 @@ const Invoice = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState('view');
   const [selectedInvoice, setSelectedInvoice] = useState(null);
+
+  const [filterValues, setFilterValues] = useState({
+    status: 'all',
+    membership: 'all',
+    method: 'all',
+    search: ''
+  });
+
   const [invoices, setInvoices] = useState([
     {
       id: 'INV-001',
@@ -81,6 +89,13 @@ const Invoice = () => {
     }
   ]);
 
+  const [filteredInvoices, setFilteredInvoices] = useState(invoices);
+
+  // Update filtered invoices when original invoices change
+  React.useEffect(() => {
+    applyFilters(filterValues);
+  }, [invoices]);
+
   const handleViewInvoice = (invoice) => {
     setSelectedInvoice(invoice);
     setModalMode('view');
@@ -113,9 +128,9 @@ const Invoice = () => {
       };
       setInvoices([...invoices, newInvoice]);
     } else if (modalMode === 'edit') {
-      setInvoices(invoices.map(inv => 
-        inv.id === data.id ? { 
-          ...inv, 
+      setInvoices(invoices.map(inv =>
+        inv.id === data.id ? {
+          ...inv,
           ...data,
           name: data.customerName || data.name || inv.name,
           email: data.email || inv.email
@@ -136,7 +151,7 @@ const Invoice = () => {
   };
 
   const handleMarkAsPaid = (id) => {
-    setInvoices(invoices.map(inv => 
+    setInvoices(invoices.map(inv =>
       inv.id === id ? { ...inv, status: 'paid' } : inv
     ));
     alert(`Invoice ${id} marked as paid`);
@@ -222,7 +237,7 @@ const Invoice = () => {
   ];
 
   // Handle filter changes
-  const handleFilterChange = (filters) => {
+  const applyFilters = (filters) => {
     let filtered = [...invoices];
 
     // Filter by status
@@ -237,7 +252,7 @@ const Invoice = () => {
 
     // Filter by payment method
     if (filters.method && filters.method !== 'all') {
-      filtered = filtered.filter(inv => 
+      filtered = filtered.filter(inv =>
         inv.method.toLowerCase() === filters.method.toLowerCase()
       );
     }
@@ -252,7 +267,24 @@ const Invoice = () => {
       );
     }
 
-    console.log('Filtered invoices:', filtered);
+    setFilteredInvoices(filtered);
+  };
+
+  const onFilterChange = (key, value) => {
+    const newFilters = { ...filterValues, [key]: value };
+    setFilterValues(newFilters);
+    applyFilters(newFilters);
+  };
+
+  const handleClearFilters = () => {
+    const defaultFilters = {
+      status: 'all',
+      membership: 'all',
+      method: 'all',
+      search: ''
+    };
+    setFilterValues(defaultFilters);
+    applyFilters(defaultFilters);
   };
 
   // Handle status toggle
@@ -264,58 +296,86 @@ const Invoice = () => {
       'overdue': 'draft'
     };
 
-    setInvoices(invoices.map(invoice => 
-      invoice.id === id 
-        ? { 
-            ...invoice, 
-            status: statusMap[invoice.status] || 'draft'
-          }
+    setInvoices(invoices.map(invoice =>
+      invoice.id === id
+        ? {
+          ...invoice,
+          status: statusMap[invoice.status] || 'draft'
+        }
         : invoice
     ));
   };
 
   // Calculate summary stats
-  const totalAmount = invoices.reduce((sum, inv) => {
+  const totalAmount = filteredInvoices.reduce((sum, inv) => {
     const amount = parseFloat(inv.amount?.replace('$', '') || 0);
     return sum + amount;
   }, 0);
 
-  const paidInvoices = invoices.filter(inv => inv.status === 'paid').length;
-  const pendingInvoices = invoices.filter(inv => inv.status === 'pending').length;
-  const overdueInvoices = invoices.filter(inv => inv.status === 'overdue').length;
-
   return (
-    <div className="p-6 min-h-screen">
+    <div className="min-h-screen page space-y-8">
       {/* Header */}
-      <div className="mb-8">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-800">Invoice Management</h1>
-            <p className="text-gray-600">Create, send, and manage customer invoices</p>
-          </div>
-          <button
-            onClick={handleCreateInvoice}
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center gap-2"
-          >
-            <FileText className="w-5 h-5" />
-            Create New Invoice
-          </button>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-primary p-6 md:p-8 rounded-3xl shadow-lg border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
+        <div>
+          <h1 className="text-heading">
+            Payment Management
+          </h1>
+          <p className="text-primary opacity-70 mt-2 text-lg font-medium">
+            Track and manage all restaurant payments
+          </p>
         </div>
+        <button
+          onClick={handleCreateInvoice}
+          className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center gap-2"
+        >
+          <FileText className="w-5 h-5" />
+          Create New Invoice
+        </button>
       </div>
-
-      
 
       {/* Filter Bar */}
       <div className="mb-6">
-        <FilterBar 
-          onFilterChange={handleFilterChange}
-          filterConfig={{
-            status: ['all', 'paid', 'pending', 'overdue', 'draft'],
-            membership: ['all', 'premium', 'enterprise', 'basic'],
-            method: ['all', 'Credit Card', 'PayPal', 'Bank Transfer'],
-            showSearch: true,
-            searchPlaceholder: "Search by name, email or invoice ID..."
+        <FilterBar
+          search={{
+            value: filterValues.search,
+            placeholder: "Search by name, email or invoice ID...",
+            onChange: (val) => onFilterChange('search', val)
           }}
+          filters={[
+            {
+              key: 'status',
+              value: filterValues.status,
+              options: [
+                { value: 'all', label: 'All Status' },
+                { value: 'paid', label: 'Paid' },
+                { value: 'pending', label: 'Pending' },
+                { value: 'overdue', label: 'Overdue' },
+                { value: 'draft', label: 'Draft' }
+              ]
+            },
+            {
+              key: 'membership',
+              value: filterValues.membership,
+              options: [
+                { value: 'all', label: 'All Memberships' },
+                { value: 'premium', label: 'Premium' },
+                { value: 'enterprise', label: 'Enterprise' },
+                { value: 'basic', label: 'Basic' }
+              ]
+            },
+            {
+              key: 'method',
+              value: filterValues.method,
+              options: [
+                { value: 'all', label: 'All Methods' },
+                { value: 'Credit Card', label: 'Credit Card' },
+                { value: 'PayPal', label: 'PayPal' },
+                { value: 'Bank Transfer', label: 'Bank Transfer' }
+              ]
+            }
+          ]}
+          onFilterChange={onFilterChange}
+          onClear={handleClearFilters}
         />
       </div>
 
@@ -324,12 +384,12 @@ const Invoice = () => {
         <div className="p-4 border-b">
           <h2 className="text-xl font-bold text-gray-800">All Invoices</h2>
           <p className="text-gray-600 text-sm">
-            Showing {invoices.length} invoices • Total: ${totalAmount.toFixed(2)}
+            Showing {filteredInvoices.length} invoices • Total: ${totalAmount.toFixed(2)}
           </p>
         </div>
         <div className="p-4">
           <UserTable
-            users={invoices}
+            users={filteredInvoices}
             actions={invoiceActions}
             onToggleStatus={handleToggleStatus}
             showPaymentInfo={true}
@@ -342,9 +402,8 @@ const Invoice = () => {
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
         onSubmit={handleModalSubmit}
-        transaction={selectedInvoice}
+        paymentData={selectedInvoice}
         mode={modalMode}
-        isInvoice={true}
       />
     </div>
   );

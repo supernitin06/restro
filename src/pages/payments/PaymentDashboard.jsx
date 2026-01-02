@@ -99,16 +99,18 @@ const PaymentDashboard = () => {
   const updatedPaymentStats = getUpdatedPaymentStats();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black p-4 md:p-6">
+    <div className="min-h-screen page  space-y-8">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
-          Payment Dashboard
-        </h1>
-        <p className="text-gray-400">
-          Real-time overview of your payment performance
-        </p>
-      </div>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-primary p-6 md:p-8 rounded-3xl shadow-lg border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
+            <div>
+              <h1 className="text-heading">
+                Payment Management
+              </h1>
+              <p className="text-primary opacity-70 mt-2 text-lg font-medium">
+                Track and manage all restaurant payments
+              </p>
+            </div>
+          </div>
 
       {/* Stats Grid - Apna UserStats component */}
       <UserStats paymentStats={updatedPaymentStats} />

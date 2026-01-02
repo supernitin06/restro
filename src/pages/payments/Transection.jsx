@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { 
-  Eye, 
-  Download, 
-  RefreshCw, 
-  Mail, 
+import {
+  Eye,
+  Download,
+  RefreshCw,
+  Mail,
   Trash2,
   Edit,
   Printer,
@@ -27,7 +27,7 @@ const Transactions = () => {
   useEffect(() => {
     console.log("Initial transactionsData:", transactionsData);
     console.log("Number of transactions:", transactionsData.length);
-    
+
     setTransactions(transactionsData);
     setFilteredTransactions(transactionsData);
   }, []);
@@ -40,7 +40,7 @@ const Transactions = () => {
 
   const calculatePaymentStats = (data) => {
     console.log("Calculating stats for:", data.length, "transactions");
-    
+
     if (!data || data.length === 0) {
       console.log("No data to calculate stats");
       setPaymentStats([]);
@@ -217,7 +217,7 @@ const Transactions = () => {
   // Handle filter changes
   const handleFilterChange = (filters) => {
     console.log("Filters changed:", filters);
-    
+
     let filtered = [...transactions];
 
     // Filter by status
@@ -232,7 +232,7 @@ const Transactions = () => {
 
     // Filter by payment method
     if (filters.method && filters.method !== 'all') {
-      filtered = filtered.filter(t => 
+      filtered = filtered.filter(t =>
         t.method.toLowerCase() === filters.method.toLowerCase()
       );
     }
@@ -253,21 +253,21 @@ const Transactions = () => {
 
   // Handle status toggle
   const handleToggleStatus = (id) => {
-    setTransactions(prev => prev.map(transaction => 
-      transaction.id === id 
-        ? { 
-            ...transaction, 
-            status: transaction.status === 'completed' ? 'pending' : 'completed' 
-          }
+    setTransactions(prev => prev.map(transaction =>
+      transaction.id === id
+        ? {
+          ...transaction,
+          status: transaction.status === 'completed' ? 'pending' : 'completed'
+        }
         : transaction
     ));
-    
-    setFilteredTransactions(prev => prev.map(transaction => 
-      transaction.id === id 
-        ? { 
-            ...transaction, 
-            status: transaction.status === 'completed' ? 'pending' : 'completed' 
-          }
+
+    setFilteredTransactions(prev => prev.map(transaction =>
+      transaction.id === id
+        ? {
+          ...transaction,
+          status: transaction.status === 'completed' ? 'pending' : 'completed'
+        }
         : transaction
     ));
   };
@@ -279,7 +279,7 @@ const Transactions = () => {
         <div className="mb-6 p-4 bg-red-900/20 border border-red-500/30 rounded-lg">
           <p className="text-red-300">No stats data available. Check console for details.</p>
           <p className="text-red-400 text-sm">
-            Transactions loaded: {transactions.length} | 
+            Transactions loaded: {transactions.length} |
             Filtered: {filteredTransactions.length}
           </p>
         </div>
@@ -290,10 +290,17 @@ const Transactions = () => {
   };
 
   return (
-    <div className="p-6 bg-gradient-to-br from-gray-900 to-black min-h-screen">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white">Payment Transactions</h1>
-        <p className="text-gray-400">Manage and view all payment records</p>
+    <div className="min-h-screen page  space-y-8">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-primary p-6 md:p-8 rounded-3xl shadow-lg border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
+        <div>
+          <h1 className="text-heading">
+            Payment Management
+          </h1>
+          <p className="text-primary opacity-70 mt-2 text-lg font-medium">
+            Track and manage all restaurant payments
+          </p>
+        </div>
       </div>
 
       {/* Debug info */}
@@ -305,13 +312,13 @@ const Transactions = () => {
           {/* Try one of these: */}
           {/* Option 1: stats={paymentStats} */}
           <UserStats stats={paymentStats} />
-          
+
           {/* Option 2: paymentStats={paymentStats} */}
           {/* <UserStats paymentStats={paymentStats} /> */}
-          
+
           {/* Option 3: data={paymentStats} */}
           {/* <UserStats data={paymentStats} /> */}
-          
+
           {/* Option 4: Try a simple fallback */}
           {/* <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {paymentStats.map((stat, index) => (
@@ -329,7 +336,7 @@ const Transactions = () => {
 
       {/* Filter Bar */}
       <div className="mb-6">
-        <FilterBar 
+        <FilterBar
           onFilterChange={handleFilterChange}
           filterConfig={{
             status: ['all', 'completed', 'pending', 'failed'],

@@ -11,8 +11,8 @@ const DeliverySettings = () => {
     const [activeTab, setActiveTab] = useState('rules'); // rules | priority
 
     return (
-        <div className="page page-background ">
-            <div className="max-w-7xl mx-auto space-y-8">
+        <div className="page ">
+            <div className=" space-y-8">
                 {/* Header Section */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-primary p-6 md:p-8 rounded-3xl shadow-lg border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
                     <div>

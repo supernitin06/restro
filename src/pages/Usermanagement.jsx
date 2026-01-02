@@ -47,13 +47,13 @@ const UserManagement = () => {
     <div className="page-background px-6 py-8 relative">
 
       {/* ✅ Header */}
-      <div className="bg-primary rounded-3xl p-8 mb-8 shadow-lg border border-default">
-        <h1 className="text-3xl font-bold text-white">
-          User Management
-        </h1>
-        <p className="text-white/70 mt-2">
-          Manage users and their details
-        </p>
+    <div className="flex flex-col mb-6 md:flex-row justify-between items-start md:items-center bg-white dark:bg-gray-800 p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
+        <div>
+          <h1 className="text-heading">User Management</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-2 text-lg font-medium">
+            Manage users and their profiles.
+          </p>
+        </div>
       </div>
 
       {/* ✅ Glow Effects */}

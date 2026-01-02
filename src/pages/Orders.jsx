@@ -274,18 +274,19 @@ const Orders = () => {
 
   return (
     <div className="app page">
-      <div className="max-w-7xl mx-auto">
+      <div className=" mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <div className="flex justify-between items-center mb-4">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-primary p-6 md:p-8 rounded-3xl shadow-lg border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
             <div>
-              <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+              <h1 className="text-heading">
                 Orders Management
               </h1>
-              <p className="text-gray-500 dark:text-gray-400">
+              <p className="text-primary opacity-70 mt-2 text-lg font-medium">
                 Track and manage all restaurant orders
               </p>
             </div>
+
             <Button
               onClick={() => setShowAddForm(true)}
               variant="primary"

@@ -15,6 +15,9 @@ import {
   Shield,
   ShieldCheck,
   Circle,
+  Receipt,
+  RefreshCw,
+  FileText,
 } from "lucide-react";
 
 import Button from "../ui/Button";
@@ -72,10 +75,30 @@ const Sidebar = ({ theme = "dark" }) => {
       icon: CreditCard,
       hasDropdown: true,
       subItems: [
-        { id: "pay-dashboard", label: "Dashboard", path: "/payments/dashboard" },
-        { id: "transactions", label: "Transactions", path: "/payments/transactions" },
-        { id: "refunds", label: "Refunds", path: "/payments/refunds" },
-        { id: "invoice", label: "Invoice", path: "/payments/invoice" },
+        {
+          id: "pay-dashboard",
+          label: "Dashboard",
+          path: "/payments/dashboard",
+          icon: LayoutDashboard,
+        },
+        {
+          id: "transactions",
+          label: "Transactions",
+          path: "/payments/transactions",
+          icon: Receipt,
+        },
+        {
+          id: "refunds",
+          label: "Refunds",
+          path: "/payments/refunds",
+          icon: RefreshCw,
+        },
+        {
+          id: "invoice",
+          label: "Invoice",
+          path: "/payments/invoice",
+          icon: FileText,
+        },
       ],
     },
     {
@@ -84,8 +107,18 @@ const Sidebar = ({ theme = "dark" }) => {
       icon: ShieldCheck,
       hasDropdown: true,
       subItems: [
-        { id: "create-sub", label: "Create SubAdmin", path: "/sub-admin/create", icon: UserPlus },
-        { id: "assign-admin", label: "Assign Admin", path: "/sub-admin/assign", icon: Shield },
+        {
+          id: "create-sub",
+          label: "Create SubAdmin",
+          path: "/sub-admin/create",
+          icon: UserPlus,
+        },
+        {
+          id: "assign-admin",
+          label: "Assign Admin",
+          path: "/sub-admin/assign",
+          icon: Shield,
+        },
       ],
     },
   ];
@@ -102,7 +135,9 @@ const Sidebar = ({ theme = "dark" }) => {
       }
 
       if (item.hasDropdown) {
-        const sub = item.subItems.find((s) => current.startsWith(s.path));
+        const sub = item.subItems.find((s) =>
+          current.startsWith(s.path)
+        );
         if (sub) {
           setActiveMenu(item.id);
           setExpandedMenu(item.id);
@@ -125,8 +160,8 @@ const Sidebar = ({ theme = "dark" }) => {
   };
 
   return (
-    <div className={`${theme === "dark" ? "dark" : ""} sidebar-wrapper`}>
-      <div className={`${isCollapsed ? "w-20" : "w-64"} h-full`}>
+    <div className={`${theme === "dark" ? "dark" : ""} sidebar-wrapper h-screen`}>
+      <div className={`${isCollapsed ? "w-20" : "w-64"} h-screen`}>
 
         {/* ---------- Header ---------- */}
         <div className="relative border-b border-sidebar px-4 py-5">
@@ -135,7 +170,9 @@ const Sidebar = ({ theme = "dark" }) => {
               <UtensilsCrossed className="w-6 h-6 text-sidebar" />
             </div>
             {!isCollapsed && (
-              <span className="text-2xl font-bold text-sidebar">Restro</span>
+              <span className="text-2xl font-bold text-sidebar">
+                Restro
+              </span>
             )}
           </div>
 
@@ -143,7 +180,11 @@ const Sidebar = ({ theme = "dark" }) => {
             onClick={() => setIsCollapsed(!isCollapsed)}
             className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-primary text-sidebar rounded-full"
           >
-            {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
+            {isCollapsed ? (
+              <ChevronRight size={14} />
+            ) : (
+              <ChevronLeft size={14} />
+            )}
           </Button>
         </div>
 
@@ -156,11 +197,17 @@ const Sidebar = ({ theme = "dark" }) => {
 
             return (
               <div key={item.id} className="mb-1">
+
                 {/* Main Item */}
                 <div
                   onClick={() => handleMenuClick(item)}
-                  className={`flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer transition
-                    ${isActive ? "sidebar-item-active" : "text-sidebar hover:bg-white/10"}
+                  className={`
+                    flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer transition
+                    ${
+                      isActive
+                        ? "sidebar-item-active font-semibold"
+                        : "text-sidebar hover:bg-white/10"
+                    }
                     ${isCollapsed ? "justify-center" : ""}
                   `}
                 >
@@ -171,7 +218,9 @@ const Sidebar = ({ theme = "dark" }) => {
 
                   {!isCollapsed && item.hasDropdown && (
                     <ChevronDown
-                      className={`w-4 h-4 transition ${isExpanded ? "rotate-180" : ""}`}
+                      className={`w-4 h-4 transition ${
+                        isExpanded ? "rotate-180" : ""
+                      }`}
                     />
                   )}
                 </div>
@@ -179,20 +228,28 @@ const Sidebar = ({ theme = "dark" }) => {
                 {/* Dropdown */}
                 {item.hasDropdown && !isCollapsed && (
                   <div
-                    className={`overflow-hidden transition-all duration-300 ml-4
+                    className={`
+                      overflow-hidden transition-all duration-300 ml-4
                       ${isExpanded ? "max-h-96 mt-2" : "max-h-0"}
                     `}
                   >
                     {item.subItems.map((sub) => {
                       const SubIcon = sub.icon || Circle;
-                      const isSubActive = location.pathname === sub.path;
+                      const isSubActive =
+                        location.pathname === sub.path;
 
                       return (
                         <div
                           key={sub.id}
                           onClick={() => navigate(sub.path)}
-                          className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm cursor-pointer
-                            ${isSubActive ? "bg-primary/20 text-primary" : "text-sidebar/70 hover:bg-white/10"}
+                          className={`
+                            flex items-center gap-3 px-3 py-2 rounded-lg text-sm cursor-pointer
+                            transition-all duration-200
+                            ${
+                              isSubActive
+                                ? "bg-primary/20 text-primary font-semibold translate-x-2"
+                                : "text-sidebar/70 hover:bg-white/10 hover:translate-x-2"
+                            }
                           `}
                         >
                           <SubIcon className="w-4 h-4" />

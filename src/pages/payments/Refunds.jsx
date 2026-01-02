@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { 
-  Eye, 
-  Edit, 
-  Trash2, 
-  CheckCircle, 
+import {
+  Eye,
+  Edit,
+  Trash2,
+  CheckCircle,
   XCircle,
   RefreshCw,
   Download,
@@ -20,6 +20,13 @@ const Refunds = () => {
   const [selectedRefund, setSelectedRefund] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState('view');
+
+  const [filterValues, setFilterValues] = useState({
+    status: 'all',
+    membership: 'all',
+    method: 'all',
+    search: ''
+  });
 
   const handleCreateRefund = () => {
     setSelectedRefund(null);
@@ -47,7 +54,7 @@ const Refunds = () => {
       setRefunds(updatedRefunds);
       setFilteredRefunds(updatedRefunds);
     } else if (modalMode === 'edit' && selectedRefund) {
-      const updatedRefunds = refunds.map(r => 
+      const updatedRefunds = refunds.map(r =>
         r.id === selectedRefund.id ? { ...r, ...data } : r
       );
       setRefunds(updatedRefunds);
@@ -76,7 +83,7 @@ const Refunds = () => {
       icon: CheckCircle,
       onClick: (refund) => {
         if (refund.status !== 'completed') {
-          const updatedRefunds = refunds.map(r => 
+          const updatedRefunds = refunds.map(r =>
             r.id === refund.id ? { ...r, status: 'completed' } : r
           );
           setRefunds(updatedRefunds);
@@ -116,7 +123,7 @@ const Refunds = () => {
       icon: XCircle,
       onClick: (refund) => {
         if (window.confirm(`Reject refund ${refund.id}?`)) {
-          const updatedRefunds = refunds.map(r => 
+          const updatedRefunds = refunds.map(r =>
             r.id === refund.id ? { ...r, status: 'failed' } : r
           );
           setRefunds(updatedRefunds);
@@ -144,7 +151,7 @@ const Refunds = () => {
   ];
 
   // Handle filter changes
-  const handleFilterChange = (filters) => {
+  const applyFilters = (filters) => {
     let filtered = [...refunds];
 
     // Filter by status
@@ -159,7 +166,7 @@ const Refunds = () => {
 
     // Filter by refund method
     if (filters.method && filters.method !== 'all') {
-      filtered = filtered.filter(r => 
+      filtered = filtered.filter(r =>
         r.refundMethod?.toLowerCase().includes(filters.method.toLowerCase()) ||
         r.method.toLowerCase() === filters.method.toLowerCase()
       );
@@ -178,17 +185,34 @@ const Refunds = () => {
     setFilteredRefunds(filtered);
   };
 
+  const onFilterChange = (key, value) => {
+    const newFilters = { ...filterValues, [key]: value };
+    setFilterValues(newFilters);
+    applyFilters(newFilters);
+  };
+
+  const handleClearFilters = () => {
+    const defaultFilters = {
+      status: 'all',
+      membership: 'all',
+      method: 'all',
+      search: ''
+    };
+    setFilterValues(defaultFilters);
+    applyFilters(defaultFilters);
+  };
+
   // Handle status toggle
   const handleToggleStatus = (id) => {
-    const updatedRefunds = refunds.map(refund => 
-      refund.id === id 
-        ? { 
-            ...refund, 
-            status: refund.status === 'completed' ? 'pending' : 'completed' 
-          }
+    const updatedRefunds = refunds.map(refund =>
+      refund.id === id
+        ? {
+          ...refund,
+          status: refund.status === 'completed' ? 'pending' : 'completed'
+        }
         : refund
     );
-    
+
     setRefunds(updatedRefunds);
     setFilteredRefunds(updatedRefunds);
   };
@@ -203,37 +227,67 @@ const Refunds = () => {
   const pendingRefunds = filteredRefunds.filter(r => r.status === 'pending').length;
 
   return (
-    <div className="p-6 bg-gradient-to-br from-gray-900 to-black min-h-screen">
+    <div className="min-h-screen page space-y-8">
       {/* Header */}
-      <div className="mb-8">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl md:text-4xl font-bold text-white">Refunds Management</h1>
-            <p className="text-gray-400">Process and manage all refund requests</p>
-          </div>
-          <button
-            onClick={handleCreateRefund}
-            className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-green-500 text-white rounded-xl hover:opacity-90 transition-opacity font-medium flex items-center gap-2"
-          >
-            <RefreshCw className="w-5 h-5" />
-            Process New Refund
-          </button>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-primary p-6 md:p-8 rounded-3xl shadow-lg border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
+        <div>
+          <h1 className="text-heading">
+            Refunds Management
+          </h1>
+          <p className="text-primary opacity-70 mt-2 text-lg font-medium">
+            Process and manage all refund requests
+          </p>
         </div>
+        <button
+          onClick={handleCreateRefund}
+          className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-green-500 text-white rounded-xl hover:opacity-90 transition-opacity font-medium flex items-center gap-2"
+        >
+          <RefreshCw className="w-5 h-5" />
+          Process New Refund
+        </button>
       </div>
-
-      
 
       {/* Filter Bar */}
       <div className="mb-6">
-        <FilterBar 
-          onFilterChange={handleFilterChange}
-          filterConfig={{
-            status: ['all', 'completed', 'pending', 'processing', 'failed'],
-            membership: ['all', 'premium', 'basic'],
-            method: ['all', 'Original Payment', 'Store Credit', 'Bank Transfer'],
-            showSearch: true,
-            searchPlaceholder: "Search by name, email or refund ID..."
+        <FilterBar
+          search={{
+            value: filterValues.search,
+            placeholder: "Search by name, email or refund ID...",
+            onChange: (val) => onFilterChange('search', val)
           }}
+          filters={[
+            {
+              key: 'status',
+              value: filterValues.status,
+              options: [
+                { value: 'all', label: 'All Status' },
+                { value: 'completed', label: 'Completed' },
+                { value: 'pending', label: 'Pending' },
+                { value: 'failed', label: 'Failed' }
+              ]
+            },
+            {
+              key: 'membership',
+              value: filterValues.membership,
+              options: [
+                { value: 'all', label: 'All Memberships' },
+                { value: 'basic', label: 'Basic' },
+                { value: 'premium', label: 'Premium' }
+              ]
+            },
+            {
+              key: 'method',
+              value: filterValues.method,
+              options: [
+                { value: 'all', label: 'All Methods' },
+                { value: 'Credit Card', label: 'Credit Card' },
+                { value: 'PayPal', label: 'PayPal' },
+                { value: 'Bank Transfer', label: 'Bank Transfer' }
+              ]
+            }
+          ]}
+          onFilterChange={onFilterChange}
+          onClear={handleClearFilters}
         />
       </div>
 
@@ -247,14 +301,13 @@ const Refunds = () => {
         />
       </div>
 
-      {/* Payment Modal for Refunds */}
+      {/* Payment Modal */}
       <PaymentModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSubmit={modalMode !== 'view' ? handleModalSubmit : null}
-        transaction={selectedRefund}
+        onSubmit={handleModalSubmit}
+        paymentData={selectedRefund}
         mode={modalMode}
-        isRefund={true}
       />
     </div>
   );

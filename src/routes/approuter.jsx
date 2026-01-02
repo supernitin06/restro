@@ -65,7 +65,7 @@ const AppRouter = createBrowserRouter(
           path: "offers",
           element: <OffersManagement />,
         },
-        /* 💳 PAYMENTS (nested inside Layout) */
+
         {
           path: "payments",
           children: [
@@ -94,6 +94,8 @@ const AppRouter = createBrowserRouter(
               element: <TransactionDetails />,
             }
           ],
+        },
+        {
           path: "sub-admin",
           element: <SubAdmin />,
         },
