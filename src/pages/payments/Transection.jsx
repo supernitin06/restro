@@ -10,11 +10,11 @@ import {
   Share2,
   FileText
 } from 'lucide-react';
-import UserTable from "../../components/ui/Table";
-import FilterBar from "../../components/ui/UserFilters";
+import Table from "../../components/ui/Table";
+import Badge from "../../components/ui/Badge";
+import { User,  Phone, ShoppingBag } from "lucide-react";
 import PaymentModal from "../../components/Payment/PaymentModal";
 import transactionsData from "../../assets/json/PaymentData/transactions.json";
-import StatCard from "../../components/ui/StatCard";
 
 const Transactions = () => {
   const [transactions, setTransactions] = useState([]);
@@ -311,9 +311,8 @@ const Transactions = () => {
       )} */}
 
 
-      {/* UserTable */}
+      {/* Transactions Table */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4">
-        {/* Debug table info */}
         {filteredTransactions.length === 0 ? (
           <div className="text-center py-8">
             <p className="text-gray-500 dark:text-gray-400">No transactions found.</p>
@@ -326,11 +325,90 @@ const Transactions = () => {
             <div className="text-gray-600 dark:text-gray-400 text-sm mb-4">
               Showing {filteredTransactions.length} of {transactions.length} transactions
             </div>
-            <UserTable
-              users={filteredTransactions}
+            <Table
+              data={filteredTransactions}
+              columns={[
+                {
+                  header: "Customer",
+                  key: "customer",
+                  render: (transaction) => (
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg highlight-bg flex items-center justify-center">
+                        <User className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900 dark:text-white">{transaction.name}</p>
+                        {transaction.invoice && (
+                          <p className="text-xs text-gray-500">#{transaction.invoice}</p>
+                        )}
+                      </div>
+                    </div>
+                  ),
+                },
+                {
+                  header: "Amount",
+                  key: "amount",
+                  render: (transaction) => (
+                    <span className="font-semibold text-gray-900 dark:text-white">
+                      {transaction.amount}
+                    </span>
+                  ),
+                },
+                {
+                  header: "Date",
+                  key: "date",
+                  render: (transaction) => (
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                      {new Date(transaction.date).toLocaleDateString()}
+                    </span>
+                  ),
+                },
+                {
+                  header: "Method",
+                  key: "method",
+                  render: (transaction) => <Badge>{transaction.method}</Badge>,
+                },
+                {
+                  header: "Contact",
+                  key: "contact",
+                  render: (transaction) => (
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                        <Mail className="w-4 h-4 text-blue-500" />
+                        {transaction.email}
+                      </div>
+                      {transaction.phone && (
+                        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                          <Phone className="w-4 h-4 text-green-500" />
+                          {transaction.phone}
+                        </div>
+                      )}
+                    </div>
+                  ),
+                },
+                {
+                  header: "Membership",
+                  key: "membership",
+                  render: (transaction) => <Badge>{transaction.membership}</Badge>,
+                },
+                {
+                  header: "Stats",
+                  key: "stats",
+                  render: (transaction) => (
+                    <div className="flex items-center gap-2">
+                      <ShoppingBag className="w-4 h-4 text-pink-600" />
+                      <span className="font-medium">{transaction.totalOrders || 0} orders</span>
+                    </div>
+                  ),
+                },
+                {
+                  header: "Status",
+                  key: "status",
+                  render: (transaction) => <Badge>{transaction.status}</Badge>,
+                },
+              ]}
               actions={paymentActions}
-              onToggleStatus={handleToggleStatus}
-              showPaymentInfo={true}
+              title="Transactions"
             />
           </>
         )}

@@ -31,7 +31,7 @@ const RestaurantCard = ({
   return (
     <div className="card group border rounded-lg overflow-hidden shadow hover:shadow-md transition">
       {/* IMAGE */}
-      <div className="relative h-44 overflow-hidden">
+      <div className="relative h-44  overflow-hidden">
         <img
           src={restaurantDetail?.imageUrl || "/placeholder.jpg"}
           alt={restaurantDetail?.name}
@@ -56,13 +56,14 @@ const RestaurantCard = ({
           onClick={() => (window.location.href = "/menu-management/:restaurantId")} // <-- yaha change
           disabled={status === "Suspended"}
           className="
-            absolute top-3 right-12
+            absolute bottom-3 right-1
             px-2 py-[2px]
             text-[10px]
             rounded-full
             bg-black/50 text-white
             hover:scale-105
             shadow
+            h-7
             flex items-center gap-1
           "
         >

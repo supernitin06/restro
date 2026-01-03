@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import MenuList from "../../components/menu/MenuList";
 import Button from "../../components/ui/Button";
 import { FiPlus } from "react-icons/fi";
-
+ 
 /**
  * Unified Add Menu Page
  * Combines Add Category, SubCategory, and Product in a single form
@@ -11,18 +11,18 @@ import { FiPlus } from "react-icons/fi";
 const MenuManagement = () => {
   const navigate = useNavigate();
   const [menuList, setMenuList] = useState([]); // Local menu list state
-
+ 
   // Navigate to Add Menu Page
   const handleAddMenu = () => {
     navigate("/menu-management/add");
   };
-
+ 
   // Handle Edit Menu (placeholder for now)
   const handleEdit = (item) => {
     // TODO: Implement edit functionality
     console.log("Edit item:", item);
   };
-
+ 
   return (
     <div className="p-6">
       {/* ✅ Header */}
@@ -38,13 +38,13 @@ const MenuManagement = () => {
           Add Menu
         </Button>
       </div>
-
+ 
       {/* ✅ Glow Effects */}
-      <div className="fixed inset-0 pointer-events-none">
+      {/* <div className="fixed inset-0 pointer-events-none">
         <div className="absolute top-0 left-1/4 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl" />
         <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl" />
-      </div>
-
+      </div> */}
+ 
       <div className="relative z-10">
         {/* Menu List */}
         <MenuList
@@ -55,5 +55,5 @@ const MenuManagement = () => {
     </div>
   );
 };
-
+ 
 export default MenuManagement;

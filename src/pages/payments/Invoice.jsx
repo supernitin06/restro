@@ -8,10 +8,11 @@ import {
   Printer,
   FileText,
   CheckCircle,
-  AlertCircle
 } from 'lucide-react';
 import Button from '../../components/ui/Button';
-import UserTable from '../../components/ui/Table';
+import Table from '../../components/ui/Table';
+import Badge from '../../components/ui/Badge';
+import { User, Phone, ShoppingBag } from 'lucide-react';
 import FilterBar from '../../components/ui/UserFilters';
 import PaymentModal from '../../components/Payment/PaymentModal';
 
@@ -390,11 +391,90 @@ const Invoice = () => {
           </p>
         </div>
         <div className="p-4">
-          <UserTable
-            users={filteredInvoices}
+          <Table
+            data={filteredInvoices}
+            columns={[
+              {
+                header: "Customer",
+                key: "customer",
+                render: (invoice) => (
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg highlight-bg flex items-center justify-center">
+                      <User className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900 dark:text-white">{invoice.name}</p>
+                      {invoice.invoice && (
+                        <p className="text-xs text-gray-500">#{invoice.invoice}</p>
+                      )}
+                    </div>
+                  </div>
+                ),
+              },
+              {
+                header: "Amount",
+                key: "amount",
+                render: (invoice) => (
+                  <span className="font-semibold text-gray-900 dark:text-white">
+                    {invoice.amount}
+                  </span>
+                ),
+              },
+              {
+                header: "Date",
+                key: "date",
+                render: (invoice) => (
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                    {new Date(invoice.date).toLocaleDateString()}
+                  </span>
+                ),
+              },
+              {
+                header: "Method",
+                key: "method",
+                render: (invoice) => <Badge>{invoice.method}</Badge>,
+              },
+              {
+                header: "Contact",
+                key: "contact",
+                render: (invoice) => (
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                      <Mail className="w-4 h-4 text-blue-500" />
+                      {invoice.email}
+                    </div>
+                    {invoice.phone && (
+                      <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                        <Phone className="w-4 h-4 text-green-500" />
+                        {invoice.phone}
+                      </div>
+                    )}
+                  </div>
+                ),
+              },
+              {
+                header: "Membership",
+                key: "membership",
+                render: (invoice) => <Badge>{invoice.membership}</Badge>,
+              },
+              {
+                header: "Stats",
+                key: "stats",
+                render: (invoice) => (
+                  <div className="flex items-center gap-2">
+                    <ShoppingBag className="w-4 h-4 text-pink-600" />
+                    <span className="font-medium">{invoice.totalOrders || 0} orders</span>
+                  </div>
+                ),
+              },
+              {
+                header: "Status",
+                key: "status",
+                render: (invoice) => <Badge>{invoice.status}</Badge>,
+              },
+            ]}
             actions={invoiceActions}
-            onToggleStatus={handleToggleStatus}
-            showPaymentInfo={true}
+            title="Invoices"
           />
         </div>
       </div>

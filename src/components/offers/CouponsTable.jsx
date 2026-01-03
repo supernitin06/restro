@@ -3,7 +3,6 @@ import { Tag, Percent, DollarSign } from 'lucide-react';
 import Badge from '../ui/Badge';
 import Table from '../ui/Table';
 import { FiEdit, FiEye, FiTrash2 } from 'react-icons/fi';
-import Table from '../ui/Table';
 
 const CouponTable = ({
     coupons = [],
@@ -26,18 +25,23 @@ const CouponTable = ({
         return `$${parseFloat(amount).toFixed(2)}`;
     };
 
-    if (coupons.length === 0) {
-        return (
-            <div className={`rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-12 text-center text-gray-500 dark:text-gray-400 ${className}`}>
-                <p>No coupons found</p>
-            </div>
-        );
-    }
-
     return (
-        <Table
-            data={coupons}
-            columns={[
+        <div className={`bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 cursor-pointer ${className}`}>
+            {coupons.length === 0 ? (
+                <div className="text-center py-8">
+                    <p className="text-gray-500 dark:text-gray-400">No coupons found.</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-sm mt-2">
+                        Total coupons in system: {coupons.length}
+                    </p>
+                </div>
+            ) : (
+                <>
+                    <div className="text-gray-600 dark:text-gray-400 text-sm mb-4">
+                        Showing {coupons.length} of {coupons.length} coupons
+                    </div>
+                    <Table
+                        data={coupons}
+                        columns={[
                 { header: "Coupon Code", key: "code", render: (coupon) => (
                     <div className="flex items-center gap-3">
                         <Tag className="w-5 h-5 text-gray-500" />
@@ -99,9 +103,14 @@ const CouponTable = ({
                 { key: 'edit', icon: FiEdit, color: 'cyan', onClick: (coupon) => onEdit?.(coupon) },
                 { key: 'delete', icon: FiTrash2, color: 'rose', onClick: (coupon) => onDelete?.(coupon.id) }
             ]}
-            className={className}
-        />
+            title="Coupons"
+                    />
+                </>
+            )}
+        </div>
     );
 };
 
-export default CouponTable;
+const CouponsTable = CouponTable;
+export default CouponsTable;
+export { CouponTable };

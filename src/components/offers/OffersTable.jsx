@@ -5,18 +5,23 @@ import Table from "../ui/Table";
 import { FiEye, FiEdit, FiTrash2 } from "react-icons/fi";
 
 const OffersTable = ({ offers = [], onView, onEdit, onDelete }) => {
-  if (offers.length === 0) {
-    return (
-      <div className="rounded-2xl border border-white/20 p-12 text-center text-gray-400 text-lg">
-        No offers found
-      </div>
-    );
-  }
-
   return (
-    <Table
-      data={offers}
-      columns={[
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 cursor-pointer">
+      {offers.length === 0 ? (
+        <div className="text-center py-8">
+          <p className="text-gray-500 dark:text-gray-400">No offers found.</p>
+          <p className="text-gray-500 dark:text-gray-400 text-sm mt-2">
+            Total offers in system: {offers.length}
+          </p>
+        </div>
+      ) : (
+        <>
+          <div className="text-gray-600 dark:text-gray-400 text-sm mb-4">
+            Showing {offers.length} of {offers.length} offers
+          </div>
+          <Table
+            data={offers}
+            columns={[
         { header: "Offer ID", key: "offerId", render: (offer) => <span className="font-mono text-primary">{offer.offerId}</span> },
         { header: "Offer", key: "title", render: (offer) => (
           <div className="flex items-center gap-2">
@@ -25,7 +30,7 @@ const OffersTable = ({ offers = [], onView, onEdit, onDelete }) => {
               <p className="font-medium">{offer.title}</p>
               {offer.code && (
                 <p className="text-xs text-gray-500">{offer.code}</p>
-              )}s
+              )}
             </div>
           </div>
         ) },
@@ -64,7 +69,11 @@ const OffersTable = ({ offers = [], onView, onEdit, onDelete }) => {
         { key: 'edit', icon: FiEdit, color: 'cyan', onClick: (offer) => onEdit(offer) },
         { key: 'delete', icon: FiTrash2, color: 'rose', onClick: (offer) => onDelete(offer.offerId) }
       ]}
-    />
+      title="Offers"
+          />
+        </>
+      )}
+    </div>
   );
 };
 
