@@ -8,7 +8,7 @@ import DeliverySettings from "../pages/DeliverySettings";
 import DeliveryPartnerManagement from "../pages/DeliveryPartnerManagement";
 import Orders from "../pages/Orders";
 import SubAdmin from "../pages/SubAdmin";
-import CreateAdmin from "../components/Sub-Admin/createAdmin";
+import CreateAdmin from "../components/Sub-Admin/CreateAdmin";
 import AssignAdmin from "../components/Sub-Admin/AssignAdmin";
 import AuthContainer from "../components/Auth/AuthContainer";
 import PaymentDashboard from "../pages/payments/PaymentDashboard";
@@ -18,6 +18,7 @@ import Refunds from "../pages/payments/Refunds";
 import Invoice from "../pages/payments/Invoice";
 import Settings from "../components/settings/Settings"
 
+import CustomerReviewsPage from "../components/PageDashboard/ReviewCustomer/CustomerReviewsPage";
 import OffersManagement from "../pages/OffersManagement";
 import SupportManagement from "../pages/SupportManagement";
 const AppRouter = createBrowserRouter(
@@ -66,6 +67,11 @@ const AppRouter = createBrowserRouter(
           path: "support-tickets",
           element: <SupportManagement />,
         },
+        {
+          path: "reviews",
+          element: <CustomerReviewsPage />,
+        },
+        /* 💳 PAYMENTS (nested inside Layout) */
         {
           path: "payments",
           children: [
