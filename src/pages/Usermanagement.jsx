@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import StatsGrid from '../components/ui/UserStats';
 import FiltersBar from '../components/ui/UserFilters';
 import UserTable from '../components/ui/Table';
 import UserModal from '../components/users/UserModal';
@@ -64,12 +63,6 @@ const UserManagement = () => {
 
       <div className="relative z-10">
 
-        {/* Stats */}
-        <StatsGrid stats={[
-          { title: 'Total Users', value: users.length },
-          { title: 'Active Users', value: users.length },
-        ]} />
-
         {/* View Toggle */}
         <div className="flex justify-end gap-2 my-6">
           <GradientButton onClick={() => setViewMode('grid')}>
@@ -88,7 +81,7 @@ const UserManagement = () => {
             ))}
           </div>
         ) : (
-          <UserTable users={filteredUsers} />
+          <StatCard users={filteredUsers} />
         )}
 
         {/* Empty */}

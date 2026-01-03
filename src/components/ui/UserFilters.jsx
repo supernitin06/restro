@@ -10,6 +10,7 @@ const FiltersBar = ({
   filters: propFilters = [],
   onFilterChange,
   onClear,
+  children,
 
   // Option 2: Config Helper (kept for backward compatibility logic if any)
   filterConfig
@@ -20,7 +21,7 @@ const FiltersBar = ({
   const filters = propFilters;
 
   return (
-        <div className="mb-8 card p-4 rounded-xl shadow-sm border border-gray-200">
+    <div className="mb-8 card p-4 rounded-xl shadow-sm border border-gray-200">
       <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
 
         {/* Search Input */}
@@ -56,7 +57,10 @@ const FiltersBar = ({
             </div>
           ))}
 
-        
+          {/* Custom Actions/Buttons */}
+          {children}
+
+
         </div>
       </div>
     </div>

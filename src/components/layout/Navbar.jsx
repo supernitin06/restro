@@ -11,7 +11,7 @@ import InputField from "../ui/InputField";
 
 const Navbar = ({ toggleSidebar }) => {
   return (
-    <div className="sticky top-0 z-40 w-full backdrop-blur-lg bg-white/80 dark:bg-gray-900/80 border-b border-gray-200 dark:border-gray-800 transition-colors duration-300">
+    <div className="sticky top-0 z-40 w-full h-22 backdrop-blur-lg bg-white/80 dark:bg-gray-900/80 border-b border-gray-200 dark:border-gray-800 transition-colors duration-300">
       <div className="px-6 py-4 flex items-center justify-between gap-4">
 
         {/* Left Section - Search & Toggle */}

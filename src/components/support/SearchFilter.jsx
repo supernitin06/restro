@@ -1,46 +1,50 @@
 import React from 'react';
-import InputField from '../ui/InputField';
+import FilterBar from '../ui/UserFilters';
 
 const SearchFilter = ({
   searchText, setSearchText,
   filterStatus, setFilterStatus,
   filterPriority, setFilterPriority
 }) => {
+
+  const handleFilterChange = (key, value) => {
+    if (key === 'status') setFilterStatus(value);
+    if (key === 'priority') setFilterPriority(value);
+  };
+
   return (
-    <div className="flex flex-col sm:flex-row gap-4 mb-6">
-      <InputField
-        placeholder="Search by ticket ID, subject, customer..."
-        value={searchText}
-        onChange={(e) => setSearchText(e.target.value)}
-        className="w-full sm:w-96"
-      />
-
-      
-      <select
-        value={filterStatus}
-        onChange={(e) => setFilterStatus(e.target.value)}
-        className="select select-bordered w-full sm:max-w-[180px] bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600"
-      >
-        <option value="">All Status</option>
-        <option value="open">Open</option>
-        <option value="pending">Pending</option>
-        <option value="resolved">Resolved</option>
-        <option value="closed">Closed</option>
-      </select>
-
-      {/* Priority Dropdown - same treatment */}
-      <select
-        value={filterPriority}
-        onChange={(e) => setFilterPriority(e.target.value)}
-        className="select select-bordered w-full sm:max-w-[180px] bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600"
-      >
-        <option value="">All Priority</option>
-        <option value="urgent">Urgent</option>
-        <option value="high">High</option>
-        <option value="medium">Medium</option>
-        <option value="low">Low</option>
-      </select>
-    </div>
+    <FilterBar
+      search={{
+        value: searchText,
+        onChange: setSearchText,
+        placeholder: "Search by ticket ID, subject, customer..."
+      }}
+      filters={[
+        {
+          key: 'status',
+          value: filterStatus,
+          options: [
+            { value: "", label: "All Status" },
+            { value: "open", label: "Open" },
+            { value: "pending", label: "Pending" },
+            { value: "resolved", label: "Resolved" },
+            { value: "closed", label: "Closed" }
+          ]
+        },
+        {
+          key: 'priority',
+          value: filterPriority,
+          options: [
+            { value: "", label: "All Priority" },
+            { value: "urgent", label: "Urgent" },
+            { value: "high", label: "High" },
+            { value: "medium", label: "Medium" },
+            { value: "low", label: "Low" }
+          ]
+        }
+      ]}
+      onFilterChange={handleFilterChange}
+    />
   );
 };
 

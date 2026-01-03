@@ -15,7 +15,7 @@ import UserTable from '../../components/ui/Table';
 import FilterBar from '../../components/ui/UserFilters';
 import PaymentModal from '../../components/Payment/PaymentModal';
 
-const Invoice = () => {
+const Invoice = () => { 
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState('view');
   const [selectedInvoice, setSelectedInvoice] = useState(null);

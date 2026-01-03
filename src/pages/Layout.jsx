@@ -13,8 +13,8 @@ const Layout = () => {
   return (
     <div className="app flex h-screen ">
       {/* LEFT SIDEBAR */}
-      <div className=" sticky top-0">
-        <Sidebar isCollapsed={isCollapsed} toggleSidebar={toggleSidebar} />
+      <div className="lg:sticky lg:top-0">
+        <Sidebar />
       </div>
 
       {/* RIGHT SECTION */}

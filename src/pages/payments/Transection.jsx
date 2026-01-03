@@ -14,7 +14,7 @@ import UserTable from "../../components/ui/Table";
 import FilterBar from "../../components/ui/UserFilters";
 import PaymentModal from "../../components/Payment/PaymentModal";
 import transactionsData from "../../assets/json/PaymentData/transactions.json";
-import UserStats from "../../components/ui/UserStats";
+import StatCard from "../../components/ui/StatCard";
 
 const Transactions = () => {
   const [transactions, setTransactions] = useState([]);
@@ -303,31 +303,13 @@ const Transactions = () => {
         </div>
       </div>
 
-      {/* Stats Section */}
+      {/* Stats Section
       {paymentStats.length > 0 && (
         <div className="mb-6">
-          <UserStats paymentStats={paymentStats} />
+          <StatCard paymentStats={paymentStats} />
         </div>
-      )}
+      )} */}
 
-      {/* Filter Bar */}
-      <div className="mb-6">
-        <FilterBar
-          onFilterChange={handleFilterChange}
-          filterConfig={{ // Note: Check how UserFilters/FilterBar accepts props. If it's a monolithic object or separate props.
-            // Based on previous View, UserFilters accepts: search, filters, onFilterChange, onClear, OR filterConfig IF updated.
-            // Let's check FilterBar implementation again first.
-            // WAIT. UserFilters.jsx (lines 8-17) takes: search, filters (array), onFilterChange, onClear.
-            // It does NOT take filterConfig. My previous edit to UserFilters was likely to standardize Styles not props.
-            // However, Transection.jsx calls it with filterConfig.
-            // I need to update UserFilters.jsx to accept filterConfig or adapt Transection.jsx.
-            // The user request is "user filder ui same like other filter".
-            // OrderFilters (other filter) uses InputField and Select directly.
-            // UserFilters tries to be generic. 
-            // Let's REWRITE UserFilters.jsx to look like OrderFilters but generic.
-          }}
-        />
-      </div>
 
       {/* UserTable */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4">

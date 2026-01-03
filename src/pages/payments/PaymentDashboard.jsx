@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import UserStats from '../../components/ui/UserStats';
 import paymentStatsData from '../../assets/json/PaymentData/paymentStats.json';
 import recentActivitiesData from '../../assets/json/PaymentData/recentActivities.json';
 import transactionsData from '../../assets/json/PaymentData/transactions.json';
@@ -112,8 +111,7 @@ const PaymentDashboard = () => {
         </div>
       </div>
 
-      {/* Stats Grid - Apna UserStats component */}
-      <UserStats paymentStats={updatedPaymentStats} />
+
 
       {/* Transaction Overview Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">

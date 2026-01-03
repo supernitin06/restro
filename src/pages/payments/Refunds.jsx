@@ -14,8 +14,9 @@ import UserTable from '../../components/ui/Table';
 import FilterBar from '../../components/ui/UserFilters';
 import PaymentModal from '../../components/Payment/PaymentModal';
 import refundsData from '../../assets/json/PaymentData/refunds.json';
-
+import { useNavigate } from 'react-router-dom';
 const Refunds = () => {
+  const navigate = useNavigate();
   const [refunds, setRefunds] = useState(refundsData);
   const [filteredRefunds, setFilteredRefunds] = useState(refundsData);
   const [selectedRefund, setSelectedRefund] = useState(null);

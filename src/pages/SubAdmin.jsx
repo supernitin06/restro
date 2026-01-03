@@ -22,6 +22,7 @@ import Button from '../components/ui/Button';
 import StatCard from '../components/ui/StatCard';
 import Card from '../components/ui/GlassCard';
 import Input from '../components/ui/InputField';
+import Table from '../components/ui/Table';
 
 const SubAdmin = () => {
   const navigate = useNavigate();
@@ -222,145 +223,137 @@ const SubAdmin = () => {
           <>
             {/* Desktop Table View */}
             <div className="hidden lg:block">
-              <Card className="overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead className="bg-gray-50 dark:bg-gray-800 border-b-2 border-gray-200 dark:border-gray-700">
-                      <tr>
-                        <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
-                          Admin Details
-                        </th>
-                        <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
-                          Role
-                        </th>
-                        <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
-                          Permissions
-                        </th>
-                        <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
-                          Status
-                        </th>
-                        <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
-                          Activity
-                        </th>
-                        <th className="px-6 py-4 text-center text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
-                          Actions
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                      {filteredAdmins.map((admin) => (
-                        <tr key={admin.id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                          <td className="px-6 py-4">
-                            <div className="flex items-center gap-3">
-                              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
-                                {admin.name.charAt(0)}
-                              </div>
-                              <div>
-                                <p className="font-bold text-gray-800 dark:text-gray-100">{admin.name}</p>
-                                <p className="text-sm text-muted">{admin.email}</p>
-                                <p className="text-xs text-muted">{admin.phone}</p>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4">
-                            <span className="px-3 py-1.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-lg text-sm font-semibold inline-flex items-center gap-1.5">
-                              <Shield size={14} />
-                              {admin.role}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4">
-                            <div className="flex flex-wrap gap-1.5 max-w-xs">
-                              {admin.permissions.slice(0, 2).map((perm, idx) => (
-                                <span key={idx} className="px-2.5 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-md text-xs font-semibold">
-                                  {perm}
-                                </span>
-                              ))}
-                              {admin.permissions.length > 2 && (
-                                <span className="px-2.5 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md text-xs font-semibold">
-                                  +{admin.permissions.length - 2} more
-                                </span>
-                              )}
-                            </div>
-                          </td>
-                          <td className="px-6 py-4">
-                            <div className="flex items-center gap-2">
-                              <div className={`w-2.5 h-2.5 rounded-full ${admin.status === 'active' ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></div>
-                              <span className={`text-sm font-bold ${admin.status === 'active' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-                                {admin.status === 'active' ? 'Active' : 'Inactive'}
-                              </span>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4">
-                            <div className="flex items-center gap-2 text-sm">
-                              <Clock size={14} className="text-gray-400" />
-                              <span className="text-gray-600 dark:text-gray-400">{admin.lastActive}</span>
-                            </div>
-                            <p className="text-xs text-muted mt-1">Joined {admin.createdAt}</p>
-                          </td>
-                          <td className="px-6 py-4">
-                            <div className="flex items-center justify-center gap-2 relative">
-                              <button
-                                className="p-2 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all text-blue-600 dark:text-blue-400"
-                                title="View Details"
-                              >
-                                <Eye size={18} />
-                              </button>
-                              <button
-                                className="p-2 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-all text-purple-600 dark:text-purple-400"
-                                onClick={() => navigate('/sub-admin/assign')}
-                                title="Edit Permissions"
-                              >
-                                <Edit size={18} />
-                              </button>
-                              <button
-                                onClick={() => setShowDropdown(showDropdown === admin.id ? null : admin.id)}
-                                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all text-gray-600 dark:text-gray-400"
-                              >
-                                <MoreVertical size={18} />
-                              </button>
+              <Table
+                data={filteredAdmins}
+                columns={[
+                  {
+                    header: "Admin Details",
+                    render: (admin) => (
+                      <div className="flex items-center gap-3">
+                        <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
+                          {admin.name.charAt(0)}
+                        </div>
+                        <div>
+                          <p className="font-bold text-gray-800 dark:text-gray-100">{admin.name}</p>
+                          <p className="text-sm text-muted">{admin.email}</p>
+                          <p className="text-xs text-muted">{admin.phone}</p>
+                        </div>
+                      </div>
+                    )
+                  },
+                  {
+                    header: "Role",
+                    render: (admin) => (
+                      <span className="px-3 py-1.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-lg text-sm font-semibold inline-flex items-center gap-1.5">
+                        <Shield size={14} />
+                        {admin.role}
+                      </span>
+                    )
+                  },
+                  {
+                    header: "Permissions",
+                    render: (admin) => (
+                      <div className="flex flex-wrap gap-1.5 max-w-xs">
+                        {admin.permissions.slice(0, 2).map((perm, idx) => (
+                          <span key={idx} className="px-2.5 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-md text-xs font-semibold">
+                            {perm}
+                          </span>
+                        ))}
+                        {admin.permissions.length > 2 && (
+                          <span className="px-2.5 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md text-xs font-semibold">
+                            +{admin.permissions.length - 2} more
+                          </span>
+                        )}
+                      </div>
+                    )
+                  },
+                  {
+                    header: "Status",
+                    render: (admin) => (
+                      <div className="flex items-center gap-2">
+                        <div className={`w-2.5 h-2.5 rounded-full ${admin.status === 'active' ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></div>
+                        <span className={`text-sm font-bold ${admin.status === 'active' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                          {admin.status === 'active' ? 'Active' : 'Inactive'}
+                        </span>
+                      </div>
+                    )
+                  },
+                  {
+                    header: "Activity",
+                    render: (admin) => (
+                      <div>
+                        <div className="flex items-center gap-2 text-sm">
+                          <Clock size={14} className="text-gray-400" />
+                          <span className="text-gray-600 dark:text-gray-400">{admin.lastActive}</span>
+                        </div>
+                        <p className="text-xs text-muted mt-1">Joined {admin.createdAt}</p>
+                      </div>
+                    )
+                  },
+                  {
+                    header: "Actions",
+                    tdClassName: "text-center",
+                    render: (admin) => (
+                      <div className="flex items-center justify-center gap-2 relative">
+                        <button
+                          className="p-2 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all text-blue-600 dark:text-blue-400"
+                          title="View Details"
+                        >
+                          <Eye size={18} />
+                        </button>
+                        <button
+                          className="p-2 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-all text-purple-600 dark:text-purple-400"
+                          onClick={() => navigate('/sub-admin/assign')}
+                          title="Edit Permissions"
+                        >
+                          <Edit size={18} />
+                        </button>
+                        <button
+                          onClick={() => setShowDropdown(showDropdown === admin.id ? null : admin.id)}
+                          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all text-gray-600 dark:text-gray-400"
+                        >
+                          <MoreVertical size={18} />
+                        </button>
 
-                              {showDropdown === admin.id && (
-                                <>
-                                  <div
-                                    className="fixed inset-0 z-10"
-                                    onClick={() => setShowDropdown(null)}
-                                  ></div>
-                                  <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-20 overflow-hidden">
-                                    <button
-                                      onClick={() => handleStatusToggle(admin.id)}
-                                      className="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-3 text-sm font-medium transition-colors"
-                                    >
-                                      {admin.status === 'active' ? (
-                                        <>
-                                          <Lock size={16} className="text-red-600" />
-                                          <span>Deactivate</span>
-                                        </>
-                                      ) : (
-                                        <>
-                                          <Unlock size={16} className="text-green-600" />
-                                          <span>Activate</span>
-                                        </>
-                                      )}
-                                    </button>
-                                    <div className="h-px bg-gray-200 dark:bg-gray-700"></div>
-                                    <button
-                                      onClick={() => handleDelete(admin.id)}
-                                      className="w-full px-4 py-3 text-left hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-3 text-sm font-medium text-red-600 dark:text-red-400 transition-colors"
-                                    >
-                                      <Trash2 size={16} />
-                                      <span>Delete Admin</span>
-                                    </button>
-                                  </div>
-                                </>
-                              )}
+                        {showDropdown === admin.id && (
+                          <>
+                            <div
+                              className="fixed inset-0 z-10 cursor-default"
+                              onClick={() => setShowDropdown(null)}
+                            ></div>
+                            <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-20 overflow-hidden text-left">
+                              <button
+                                onClick={() => handleStatusToggle(admin.id)}
+                                className="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-3 text-sm font-medium transition-colors"
+                              >
+                                {admin.status === 'active' ? (
+                                  <>
+                                    <Lock size={16} className="text-red-600" />
+                                    <span>Deactivate</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Unlock size={16} className="text-green-600" />
+                                    <span>Activate</span>
+                                  </>
+                                )}
+                              </button>
+                              <div className="h-px bg-gray-200 dark:bg-gray-700"></div>
+                              <button
+                                onClick={() => handleDelete(admin.id)}
+                                className="w-full px-4 py-3 text-left hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-3 text-sm font-medium text-red-600 dark:text-red-400 transition-colors"
+                              >
+                                <Trash2 size={16} />
+                                <span>Delete Admin</span>
+                              </button>
                             </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </Card>
+                          </>
+                        )}
+                      </div>
+                    )
+                  }
+                ]}
+              />
             </div>
 
             {/* Mobile/Tablet Card View */}

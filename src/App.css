@@ -5,13 +5,14 @@
   --bg-main: #ffffff;
   --bg-card: #ffffff;
   --bg-hover: #e5e7eb;
-  --bg-sidebar: #1d3973;
+   --bg-sidebar: #0f5474;
+
 
   --text-main: #000000;
   --text-muted: #6b7280;
   --text-sidebar: #ffffff;
 
-  --primary: #f97316;
+  --primary: #f91616;
 
 
   --primary-hover: #dc2626;
@@ -25,19 +26,19 @@
 .dark {
 
   --bg-page: #0a182f;
-  --bg-main: #04163c;
-  --bg-card: #04163c;
+  --bg-main: #1E2939;
+  --bg-card: #1E2939;
   --bg-hover: #0f172a;
-  --bg-sidebar: #04163c;
+  --bg-sidebar: #0f5474;
 
   --text-main: #bebebe;
   --text-muted: #9ca3af;
   --text-sidebar: #f9fafb;
 
 
-  --primary: #f97316;
+  --primary: #f91616;
 
-  --primary-hover: #ea580c;
+  --primary-hover: #ea0c0c;
 
   --border: #1f2937;
   --border-sidebar: rgba(255, 255, 255, 0.1);
@@ -217,7 +218,7 @@
 /* Inputs */
 
 .input {
-  background-color: var(--bg-card);
+  background-color: var(--bg-page);
   color: var(--text-main);
   border: 1px solid var(--border);
   padding: 0.5rem 0.75rem;
