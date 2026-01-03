@@ -58,7 +58,7 @@ const Navbar = ({ toggleSidebar }) => {
               <p className="text-sm font-bold text-gray-800 dark:text-white leading-none mt-0.5">James Sullivan</p>
             </div>
             <div className="relative">
-              <div className="w-10 h-10 rounded-full p-0.5 bg-gradient-to-tr from-primary to-purple-600">
+              <div className="w-10 h-10 rounded-full p-0.5 bg-linear-to-tr from-primary to-purple-600">
                 <img
                   src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop"
                   alt="User"
