@@ -2,25 +2,33 @@ import React from "react";
 import {
   Mail,
   Phone,
-  CreditCard,
-  Calendar,
-  DollarSign,
   User,
-  FileText,
   ShoppingBag,
   CheckCircle,
-  Star,
   Clock,
   AlertCircle,
 } from "lucide-react";
 import Badge from "../ui/Badge";
 import ActionButtons from "../ui/UserAction";
 
+// Default column configuration
+const DEFAULT_COLUMNS = [
+  { key: "customer", label: "Customer" },
+  { key: "amount", label: "Amount", payment: true },
+  { key: "date", label: "Date", payment: true },
+  { key: "method", label: "Method", payment: true },
+  { key: "contact", label: "Contact" },
+  { key: "membership", label: "Membership" },
+  { key: "stats", label: "Stats" },
+  { key: "status", label: "Status" },
+  { key: "actions", label: "Actions" },
+];
+
 const UserTable = ({
   users = [],
   actions = [],
-  onToggleStatus,
   showPaymentInfo = false,
+  columns = DEFAULT_COLUMNS,
   className = "",
 }) => {
   const formatCurrency = (amount) => {
@@ -54,6 +62,11 @@ const UserTable = ({
     }
   };
 
+  // Filter columns based on showPaymentInfo
+  const visibleColumns = columns.filter(
+    (col) => showPaymentInfo || !col.payment
+  );
+
   return (
     <div
       className={`rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm ${className}`}
@@ -70,39 +83,17 @@ const UserTable = ({
       {/* Table */}
       <div className="overflow-x-auto">
         <table className="min-w-full">
-          <thead className="bg-gray-50 dark:bg-gray-900/50 sticky top-0">
+          {/* Reusable Table Head */}
+          <thead className="bg-gray-50 sticky top-0">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Customer
-              </th>
-              {showPaymentInfo && (
-                <>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Amount
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Date
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Method
-                  </th>
-                </>
-              )}
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Contact
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Membership
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Stats
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Status
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Actions
-              </th>
+              {visibleColumns.map((col) => (
+                <th
+                  key={col.key}
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase"
+                >
+                  {col.label}
+                </th>
+              ))}
             </tr>
           </thead>
 
@@ -118,9 +109,7 @@ const UserTable = ({
                     <div>
                       <p className="font-medium text-gray-900 dark:text-white">{user.name}</p>
                       {user.invoice && (
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                          #{user.invoice}
-                        </p>
+                        <p className="text-xs text-gray-500">#{user.invoice}</p>
                       )}
                     </div>
                   </div>
@@ -163,10 +152,8 @@ const UserTable = ({
                 {/* Stats */}
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center gap-2">
-                    <ShoppingBag className="w-4 h-4 text-pink-500" />
-                    <span className="font-medium text-gray-900 dark:text-white">
-                      {user.totalOrders || 0} orders
-                    </span>
+                    <ShoppingBag className="w-4 h-4 text-pink-600" />
+                    <span className="font-medium">{user.totalOrders || 0} orders</span>
                   </div>
                 </td>
 

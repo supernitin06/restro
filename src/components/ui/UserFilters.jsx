@@ -46,6 +46,10 @@ const FiltersBar = ({
 
           {filters.map((filter) => (
             <div key={filter.key} className="flex-1 md:w-40 min-w-[140px]">
+        {/* Filters */}
+        <div className="flex flex-wrap gap-3 items-center">
+          {filters.map((filter) => (
+            <div key={filter.key} className="min-w-[180px] w-full lg:w-auto">
               <Select
                 value={filter.value}
                 onChange={(e) => onFilterChange(filter.key, e.target.value)}
@@ -53,6 +57,9 @@ const FiltersBar = ({
                 icon={filter.icon}
                 placeholder={filter.label || filter.placeholder}
                 className="w-full"
+
+                selectClassName={commonInputClass}
+                placeholder={filter.placeholder || 'Select option'}
               />
             </div>
           ))}
@@ -61,8 +68,19 @@ const FiltersBar = ({
           {children}
 
 
-        </div>
-      </div>
+          {/* Clear Filters Button */}
+          {onClear && (
+            <GradientButton
+              variant="ghost"
+              onClick={onClear}
+              className="px-6 py-3 h-full mt-2 lg:mt-0"
+            >
+              Clear Filters
+            </GradientButton>
+          )}
+          {children && (
+    <div className="ml-auto w-full lg:w-auto">
+      {children}
     </div>
   );
 };

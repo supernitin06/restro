@@ -1,193 +1,220 @@
-import React, { useState } from 'react';
-import { FaEnvelope, FaLock } from 'react-icons/fa';
+import React, { useState } from "react";
+import restaurantImage from "../../assets/loginimage1.jpg";
 
-import InputField from '../ui/InputField';
-import Button from '../ui/Button';
-
-const LoginForm = ({ onSwitchToSignup, onSwitchToForgotPassword }) => {
+const LoginForm = ({ role = "admin", onRoleChange }) => {
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    rememberMe: false
+    email: "",
+    password: "",
+    rememberMe: false,
   });
-  const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === "checkbox" ? checked : value,
     }));
-
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
-    }
-  };
-
-  const validateForm = () => {
-    const newErrors = {};
-
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email';
-    }
-
-    if (!formData.password) {
-      newErrors.password = 'Password is required';
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
-    }
-
-    return newErrors;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    const formErrors = validateForm();
-    if (Object.keys(formErrors).length > 0) {
-      setErrors(formErrors);
-      return;
-    }
-
+    setError("");
     setLoading(true);
-    setMessage('');
 
-    // Demo login logic
     setTimeout(() => {
-      const demoUsers = [
-        { email: 'user@example.com', password: 'password123' },
-        { email: 'demo@demo.com', password: 'demo123' }
-      ];
-
-      const isValid = demoUsers.some(
-        user => user.email === formData.email && user.password === formData.password
-      );
-
-      if (isValid) {
-        setMessage('✅ Login successful! Welcome back.');
-
-        // Store demo data
-        localStorage.setItem('auth_user', JSON.stringify({
-          email: formData.email,
-          name: 'Demo User',
-          timestamp: new Date().toISOString()
-        }));
-
-        setTimeout(() => {
-          alert('Redirecting to dashboard...');
-        }, 1500);
-      } else {
-        setMessage('❌ Invalid credentials. Try: demo@demo.com / demo123');
-      }
-
+      console.log("LOGIN DATA 👉", { role, ...formData });
       setLoading(false);
     }, 1500);
   };
 
   return (
-    <div>
-      <div className="text-center mb-10">
-        <h2 className="text-4xl font-bold text-gray-800 mb-2">Welcome Back!</h2>
-        <p className="text-gray-600">Sign in to continue to your account</p>
-      </div>
+    <div style={styles.container}>
+      <div style={styles.card}>
+        {/* LEFT IMAGE */}
+        <div style={styles.imageSection}>
+          <img src={restaurantImage} alt="Restaurant" style={styles.image} />
+        </div>
 
-      {message && (
-        <div className={`mb-6 p-4 rounded-lg ${message.includes('✅') ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
-          <div className="flex items-center">
-            <span className="mr-2">{message.includes('✅') ? '✅' : '❌'}</span>
-            <span>{message.replace('✅', '').replace('❌', '')}</span>
+        {/* RIGHT FORM */}
+        <div style={styles.formSection}>
+          <div style={styles.header}>
+            <h1 style={styles.title}>Welcome Back</h1>
+            <p style={styles.subtitle}>
+              Login as {role === "admin" ? "Admin" : "Sub Admin"}
+            </p>
           </div>
-          {message.includes('Invalid') && (
-            <div className="text-sm mt-2 bg-yellow-50 p-2 rounded">
-              <strong>Demo Credentials:</strong> demo@demo.com / demo123
-            </div>
-          )}
-        </div>
-      )}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <InputField
-          label="Email Address"
-          name="email"
-          type="email"
-          placeholder="Enter your email"
-          value={formData.email}
-          onChange={handleChange}
-          error={errors.email}
-          startIcon={<FaEnvelope />}
-          required
-        />
-
-        <InputField
-          label="Password"
-          name="password"
-          type="password"
-          placeholder="Enter your password"
-          value={formData.password}
-          onChange={handleChange}
-          error={errors.password}
-          startIcon={<FaLock />}
-          required
-        />
-
-        <div className="flex items-center justify-between">
-          <label className="flex items-center cursor-pointer">
-            <input
-              type="checkbox"
-              name="rememberMe"
-              checked={formData.rememberMe}
-              onChange={handleChange}
-              className="h-5 w-5 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
-            />
-            <span className="ml-2 text-gray-700 font-medium">Remember me</span>
-          </label>
-          <button
-            type="button"
-            onClick={onSwitchToForgotPassword}
-            className="text-purple-600 hover:text-purple-800 font-medium hover:underline"
-          >
-            Forgot password?
-          </button>
-        </div>
-
-        <Button
-          type="submit"
-          variant="primary"
-          loading={loading}
-          fullWidth
-          className="text-lg py-4 mt-6"
-        >
-          Sign In
-        </Button>
-
-        <div className="text-center mt-8">
-          <p className="text-gray-600">
-            Don't have an account?{' '}
+          {/* ROLE SWITCH */}
+          <div style={styles.roleSwitcher}>
             <button
               type="button"
-              onClick={onSwitchToSignup}
-              className="text-purple-600 font-bold hover:text-purple-800 hover:underline text-lg"
+              style={{
+                ...styles.roleButton,
+                ...(role === "admin" ? styles.roleButtonActive : {}),
+              }}
+              onClick={() => onRoleChange("admin")}
             >
-              Create Account
+              Admin
             </button>
-          </p>
-        </div>
-      </form>
+            <button
+              type="button"
+              style={{
+                ...styles.roleButton,
+                ...(role === "sub_admin" ? styles.roleButtonActive : {}),
+              }}
+              onClick={() => onRoleChange("sub_admin")}
+            >
+              Sub Admin
+            </button>
+          </div>
 
-      <div className="mt-12 pt-8 border-t border-gray-200">
-        <p className="text-center text-gray-500 text-sm">
-          By signing in, you agree to our{' '}
-          <a href="#terms" className="text-purple-600 hover:underline">Terms</a>
-          {' '}and{' '}
-          <a href="#privacy" className="text-purple-600 hover:underline">Privacy Policy</a>
-        </p>
+          {/* FORM */}
+          <form onSubmit={handleSubmit} style={styles.form}>
+            {/* EMAIL */}
+            <div style={styles.formGroup}>
+              <input
+                type="email"
+                name="email"
+                placeholder={
+                  role === "admin"
+                    ? "admin@restaurant.com"
+                    : "subadmin@restaurant.com"
+                }
+                value={formData.email}
+                onChange={handleChange}
+                required
+                style={styles.input}
+              />
+            </div>
+
+            {/* PASSWORD */}
+            <div style={styles.formGroup}>
+              <input
+                type="password"
+                name="password"
+                placeholder="••••••••"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                style={styles.input}
+              />
+            </div>
+
+            {/* REMEMBER */}
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <input
+                type="checkbox"
+                name="rememberMe"
+                checked={formData.rememberMe}
+                onChange={handleChange}
+              />
+              <span style={{ fontSize: "0.85rem", color: "#374151" }}>
+                Remember me
+              </span>
+            </div>
+
+            {error && <div style={styles.errorMessage}>{error}</div>}
+
+            <button type="submit" style={styles.loginButton} disabled={loading}>
+              {loading ? "Logging in..." : "Login"}
+            </button>
+          </form>
+
+          <div style={styles.footer}>
+            <p>&copy; 2026 Restaurant Admin</p>
+          </div>
+        </div>
       </div>
     </div>
   );
+};
+
+const styles = {
+  container: {
+    minHeight: "100vh",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    background: "#f8fafc",
+    padding: "1rem",
+  },
+  card: {
+    display: "flex",
+    background: "#fff",
+    borderRadius: "16px",
+    overflow: "hidden",
+    maxWidth: "900px",
+    width: "100%",
+    boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
+  },
+  imageSection: { flex: 1 },
+  image: { width: "100%", height: "100%", objectFit: "cover" },
+  formSection: {
+    flex: 1,
+    padding: "2rem",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+  },
+  header: { textAlign: "center", marginBottom: "1.5rem" },
+  title: { fontSize: "1.75rem", fontWeight: 700 },
+  subtitle: { color: "#6b7280", fontSize: "0.9rem" },
+  roleSwitcher: {
+    display: "flex",
+    justifyContent: "center",
+    marginBottom: "1.5rem",
+    background: "#f3f4f6",
+    borderRadius: "8px",
+    padding: "4px",
+  },
+  roleButton: {
+    padding: "0.5rem 1rem",
+    border: "none",
+    background: "transparent",
+    cursor: "pointer",
+    fontWeight: 600,
+    color: "#6b7280",
+  },
+  roleButtonActive: {
+    background: "#fff",
+    borderRadius: "6px",
+    color: "#111827",
+    boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
+  },
+  form: { maxWidth: "320px", margin: "0 auto" },
+  formGroup: { marginBottom: "1rem" },
+  input: {
+    width: "100%",
+    padding: "0.75rem",
+    borderRadius: "8px",
+    border: "1px solid #e5e7eb",
+  },
+  loginButton: {
+    marginTop: "1rem",
+    width: "100%",
+    padding: "0.75rem",
+    background: "#4f46e5",
+    color: "#fff",
+    border: "none",
+    borderRadius: "8px",
+    cursor: "pointer",
+    fontWeight: 600,
+  },
+  errorMessage: {
+    background: "#fee2e2",
+    color: "#b91c1c",
+    padding: "0.5rem",
+    borderRadius: "6px",
+    marginTop: "0.5rem",
+  },
+  footer: {
+    marginTop: "2rem",
+    textAlign: "center",
+    fontSize: "0.8rem",
+    color: "#9ca3af",
+  },
 };
 
 export default LoginForm;
