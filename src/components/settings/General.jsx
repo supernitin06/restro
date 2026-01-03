@@ -4,10 +4,10 @@ import Button from "../../components/ui/Button";
 
 const General = () => {
   return (
-    <div className="card space-y-6">
+    <div className="bg-primary space-y-6">
       {/* Header */}
       <div>
-        <h2 className="highlight text-3xl font-bold">General Settings</h2>
+        <h2 className="highlight text-3xl mb-2 font-bold">General Settings</h2>
         <p className="text-muted mt-1">
           Basic restaurant and website configuration
         </p>

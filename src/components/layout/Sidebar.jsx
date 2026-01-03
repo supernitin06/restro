@@ -140,14 +140,14 @@ const Sidebar = ({ theme = "dark" }) => {
       hasDropdown: true,
       subItems: [
         {
-          id: "create-sub",
+          id: "create-sub-admin",
           label: "Create SubAdmin",
           path: "/sub-admin/create",
           icon: UserPlus,
         },
         {
-          id: "assign-admin",
-          label: "Assign Admin",
+          id: "assign-sub-admin",
+          label: "Assign SubAdmin",
           path: "/sub-admin/assign",
           icon: Shield,
         },

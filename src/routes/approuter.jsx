@@ -62,14 +62,14 @@ const AppRouter = createBrowserRouter(
         },
         {
           path: "menu-management",
-          children:[
+          children: [
             {
-              index:true,
-              element:<MenuManagement/>
+              index: true,
+              element: <MenuManagement />
             },
             {
-              path:"add",
-              element:<AddMenu/>
+              path: "add",
+              element: <AddMenu />
             }
           ]
         },
@@ -126,7 +126,6 @@ const AppRouter = createBrowserRouter(
 
         {
           path: "sub-admin",
-          element: <SubAdmin />,
           children: [
             {
               index: true, // /sub-admin
