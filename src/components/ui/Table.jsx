@@ -1,193 +1,202 @@
 import React from "react";
-import {
-  Mail,
-  Phone,
-  User,
-  ShoppingBag,
-  CheckCircle,
-  Clock,
-  AlertCircle,
-} from "lucide-react";
-import Badge from "../ui/Badge";
-import ActionButtons from "../ui/UserAction";
+import ActionButtons from "./UserAction";
 
-// Default column configuration
-const DEFAULT_COLUMNS = [
-  { key: "customer", label: "Customer" },
-  { key: "amount", label: "Amount", payment: true },
-  { key: "date", label: "Date", payment: true },
-  { key: "method", label: "Method", payment: true },
-  { key: "contact", label: "Contact" },
-  { key: "membership", label: "Membership" },
-  { key: "stats", label: "Stats" },
-  { key: "status", label: "Status" },
-  { key: "actions", label: "Actions" },
-];
+const Table = ({
+  data = [],
+  columns = [],
 
-const UserTable = ({
-  users = [],
   actions = [],
-  showPaymentInfo = false,
-  columns = DEFAULT_COLUMNS,
   className = "",
+  title = "",
+  subtitle = "",
 }) => {
-  const formatCurrency = (amount) => {
-    if (!amount) return "$0.00";
-    const num = parseFloat(amount);
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(num);
-  };
-
-  const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
-    return new Date(dateString).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
-  };
-
-  const getStatusIcon = (status) => {
-    switch (status?.toLowerCase()) {
-      case "active":
-        return <CheckCircle className="w-4 h-4 text-green-500" />;
-      case "inactive":
-        return <AlertCircle className="w-4 h-4 text-red-500" />;
-      case "pending":
-        return <Clock className="w-4 h-4 text-yellow-500" />;
-      default:
-        return <User className="w-4 h-4 text-gray-400" />;
-    }
-  };
-
-  // Filter columns based on showPaymentInfo
-  const visibleColumns = columns.filter(
-    (col) => showPaymentInfo || !col.payment
+  // Check if actions column should be added
+  const hasActionsColumn = columns.some(
+    (col) => col.header === "Actions" || col.key === "actions"
   );
+  const displayColumns = hasActionsColumn
+    ? columns
+    : actions.length > 0
+    ? [...columns, { header: "Actions", key: "actions" }]
+    : columns;
 
   return (
     <div
       className={`rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm ${className}`}
     >
       {/* Header */}
-      <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Customers</h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-          {users.length} total •{" "}
-          {users.filter((u) => u.status === "active").length} active
-        </p>
-      </div>
+      {(title || subtitle) && (
+        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
+          {title && (
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+              {title}
+            </h2>
+          )}
+          {subtitle && (
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              {subtitle}
+            </p>
+          )}
+        </div>
+      )}
 
-      {/* Table */}
       <div className="overflow-x-auto">
         <table className="min-w-full">
-          {/* Reusable Table Head */}
-          <thead className="bg-gray-50 sticky top-0">
+          <thead className="bg-primary z-50 sticky top-0">
             <tr>
-              {visibleColumns.map((col) => (
+              {displayColumns.map((col, index) => (
                 <th
-                  key={col.key}
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase"
+                  key={col.key || index}
+                  className={`px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider ${
+                    index === 0
+                      ? "sticky z-50 left-0 bg-primary "
+                      : ""
+                  }`}
                 >
-                  {col.label}
+                  {(() => {
+                    const header = col.header || col.label;
+                    if (typeof header === 'string') {
+                      return header;
+                    }
+                    if (typeof header === 'function') {
+                      return header();
+                    }
+                    if (React.isValidElement(header)) {
+                      return header;
+                    }
+                    return String(header || '');
+                  })()}
                 </th>
               ))}
             </tr>
           </thead>
 
           <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-            {users.map((user) => (
-              <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                {/* Customer */}
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg highlight-bg flex items-center justify-center">
-                      <User className="w-5 h-5 text-white" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-gray-900 dark:text-white">{user.name}</p>
-                      {user.invoice && (
-                        <p className="text-xs text-gray-500">#{user.invoice}</p>
-                      )}
-                    </div>
-                  </div>
-                </td>
-
-                {/* Payment */}
-                {showPaymentInfo && (
-                  <>
-                    <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white whitespace-nowrap">
-                      {formatCurrency(user.amount)}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">
-                      {formatDate(user.date)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <Badge>{user.method}</Badge>
-                    </td>
-                  </>
-                )}
-
-                {/* Contact */}
-                <td className="px-6 py-4 space-y-1 whitespace-nowrap">
-                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-                    <Mail className="w-4 h-4 text-blue-500" />
-                    {user.email}
-                  </div>
-                  {user.phone && (
-                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-                      <Phone className="w-4 h-4 text-green-500" />
-                      {user.phone}
-                    </div>
-                  )}
-                </td>
-
-                {/* Membership */}
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <Badge>{user.membership}</Badge>
-                </td>
-
-                {/* Stats */}
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center gap-2">
-                    <ShoppingBag className="w-4 h-4 text-pink-600" />
-                    <span className="font-medium">{user.totalOrders || 0} orders</span>
-                  </div>
-                </td>
-
-                {/* Status */}
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center gap-2">
-                    {getStatusIcon(user.status)}
-                    <Badge>{user.status}</Badge>
-                  </div>
-                </td>
-
-                {/* Actions */}
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <ActionButtons
-                    item={user}
-                    actions={actions}
-                    size="sm"
-                    variant="ghost"
-                  />
+            {data.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={displayColumns.length}
+                  className="px-6 py-12 text-center text-gray-500 dark:text-gray-400"
+                >
+                  No data available
                 </td>
               </tr>
-            ))}
+            ) : (
+              data.map((row, rowIndex) => {
+                const rowKey = row.id || row._id || `row-${rowIndex}`;
+
+                return (
+                  <tr
+                    key={rowKey}
+                    className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                  >
+                    {displayColumns.map((col, colIndex) => {
+                      if (col.key === "actions") {
+                        return (
+                          <td
+                            key="actions"
+                            className="px-6 py-4 whitespace-nowrap"
+                          >
+                            <ActionButtons
+                              item={row}
+                              actions={actions}
+                              size="sm"
+                              variant="ghost"
+                            />
+                          </td>
+                        );
+                      }
+
+                      // Use render function if provided
+                      if (col.render && typeof col.render === 'function') {
+                        const renderResult = col.render(row);
+                        // Ensure we're rendering valid React elements
+                        if (React.isValidElement(renderResult) || 
+                            typeof renderResult === 'string' || 
+                            typeof renderResult === 'number' ||
+                            renderResult === null ||
+                            renderResult === undefined) {
+                          return (
+                            <td
+                              key={col.key || colIndex}
+                              className={`px-6 py-4 whitespace-nowrap ${
+                                colIndex === 0
+                                  ? "sticky left-0 bg-white dark:bg-gray-800 z-30"
+                                  : ""
+                              }`}
+                            >
+                              {renderResult}
+                            </td>
+                          );
+                        }
+                        // Fallback if render returns something invalid
+                        return (
+                          <td
+                            key={col.key || colIndex}
+                            className={`px-6 py-4 whitespace-nowrap ${
+                              colIndex === 0
+                                ? "sticky left-0 bg-white dark:bg-gray-800 z-30"
+                                : ""
+                            }`}
+                          >
+                            {String(renderResult)}
+                          </td>
+                        );
+                      }
+
+                      // Otherwise use key to access data
+                      if (col.key) {
+                        const cellValue = row[col.key];
+                        return (
+                          <td
+                            key={col.key || colIndex}
+                            className={`px-6 py-4 whitespace-nowrap ${
+                              colIndex === 0
+                                ? "sticky left-0 bg-white dark:bg-gray-800 z-30"
+                                : ""
+                            }`}
+                          >
+                            {cellValue !== undefined && cellValue !== null
+                              ? String(cellValue)
+                              : "-"}
+                          </td>
+                        );
+                      }
+
+                      // Fallback for columns without key or render
+                      return (
+                        <td
+                          key={colIndex}
+                          className={`px-6 py-4 whitespace-nowrap ${
+                            colIndex === 0
+                              ? "sticky left-0 bg-white dark:bg-gray-800 z-30"
+                              : ""
+                          }`}
+                        >
+                          -
+                        </td>
+                      );
+                    })}
+                  </tr>
+                );
+              })
+            )}
           </tbody>
         </table>
       </div>
 
       {/* Footer */}
-      {users.length > 0 && (
+      {data.length > 0 && (
         <div className="px-6 py-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-sm text-gray-500 dark:text-gray-400">
-          Showing <span className="font-medium text-gray-900 dark:text-white">{users.length}</span> customers
+          Showing{" "}
+          <span className="font-medium text-gray-900 dark:text-white">
+            {data.length}
+          </span>{" "}
+          {title.toLowerCase() || "items"}
         </div>
       )}
     </div>
   );
 };
 
-export default UserTable;
+export default Table;

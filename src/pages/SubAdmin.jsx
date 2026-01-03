@@ -22,13 +22,15 @@ import Button from '../components/ui/Button';
 import StatCard from '../components/ui/StatCard';
 import Card from '../components/ui/GlassCard';
 import Input from '../components/ui/InputField';
+// import PageHeader from '../components/ui/PageHeader';
+import ActionButtons from '../components/ui/UserAction';
+import Select from '../components/ui/Select';
 import Table from '../components/ui/Table';
 
 const SubAdmin = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
-  const [showDropdown, setShowDropdown] = useState(null);
 
   // Sample sub-admin data
   const [subAdmins, setSubAdmins] = useState([
@@ -39,7 +41,7 @@ const SubAdmin = () => {
       phone: '+91 98765 43210',
       role: 'Senior Admin',
       status: 'active',
-      permissions: ['View Orders', 'Manage Users', 'Manage Restaurants'],
+      permissions: ['View Orders', 'Manage Users', 'Manage Restaurants', 'View Reports'],
       createdAt: '15 Jan 2024',
       lastActive: '2 hours ago'
     },
@@ -50,7 +52,7 @@ const SubAdmin = () => {
       phone: '+91 98765 43211',
       role: 'Support Admin',
       status: 'active',
-      permissions: ['View Orders', 'Handle Refunds'],
+      permissions: ['View Orders', 'Handle Refunds', 'View Users'],
       createdAt: '20 Jan 2024',
       lastActive: '1 day ago'
     },
@@ -61,9 +63,42 @@ const SubAdmin = () => {
       phone: '+91 98765 43212',
       role: 'Order Manager',
       status: 'inactive',
-      permissions: ['View Orders', 'Manage Users'],
+      permissions: ['View Orders', 'Assign Delivery', 'Mark Delivered'],
       createdAt: '10 Feb 2024',
       lastActive: '5 days ago'
+    },
+    {
+      id: 4,
+      name: 'Sunita Singh',
+      email: 'sunita@swaad.com',
+      phone: '+91 98765 43213',
+      role: 'Financial Admin',
+      status: 'active',
+      permissions: ['View Payments', 'Handle Refunds', 'View Reports'],
+      createdAt: '01 Mar 2024',
+      lastActive: '8 hours ago'
+    },
+    {
+      id: 5,
+      name: 'Vikram Rathore',
+      email: 'vikram@swaad.com',
+      phone: '+91 98765 43214',
+      role: 'Restaurant Manager',
+      status: 'inactive',
+      permissions: ['View Restaurants', 'Manage Restaurants', 'Edit Commission'],
+      createdAt: '15 Mar 2024',
+      lastActive: '1 week ago'
+    },
+    {
+      id: 6,
+      name: 'Anjali Desai',
+      email: 'anjali@swaad.com',
+      phone: '+91 98765 43215',
+      role: 'Support Admin',
+      status: 'active',
+      permissions: ['View Orders', 'Handle Refunds'],
+      createdAt: '22 Mar 2024',
+      lastActive: '30 minutes ago'
     }
   ]);
 
@@ -72,22 +107,22 @@ const SubAdmin = () => {
       title: 'Total Sub-Admins',
       value: subAdmins.length,
       icon: Users,
-      color: 'blue',
-      change: '+2 this month'
+      trendValue: '+2 this month',
+      color: 'blue'
     },
     {
       title: 'Active Admins',
       value: subAdmins.filter(a => a.status === 'active').length,
       icon: CheckCircle,
-      color: 'green',
-      change: 'All online'
+      trendValue: 'All online',
+      color: 'green'
     },
     {
       title: 'Inactive Admins',
       value: subAdmins.filter(a => a.status === 'inactive').length,
       icon: XCircle,
-      color: 'red',
-      change: 'Needs attention'
+      trendValue: 'Needs attention',
+      color: 'red'
     }
   ];
 
@@ -104,15 +139,119 @@ const SubAdmin = () => {
         ? { ...admin, status: admin.status === 'active' ? 'inactive' : 'active' }
         : admin
     ));
-    setShowDropdown(null);
   };
 
   const handleDelete = (id) => {
     if (window.confirm('Are you sure you want to delete this sub-admin?')) {
       setSubAdmins(subAdmins.filter(admin => admin.id !== id));
-      setShowDropdown(null);
     }
   };
+
+  const tableActions = [
+    {
+      key: 'view',
+      label: 'View Details',
+      icon: Eye,
+      color: 'blue',
+      onClick: (item) => console.log('View', item), // Placeholder
+    },
+    {
+      key: 'edit',
+      label: 'Edit Permissions',
+      icon: Edit,
+      color: 'purple',
+      onClick: () => navigate('/sub-admin/assign'),
+    },
+    {
+      key: 'toggle',
+      label: (item) => (item.status === 'active' ? 'Deactivate' : 'Activate'),
+      icon: (item) => (item.status === 'active' ? Lock : Unlock),
+      color: (item) => (item.status === 'active' ? 'amber' : 'emerald'),
+      onClick: (item) => handleStatusToggle(item.id),
+    },
+    {
+      key: 'delete',
+      label: 'Delete Admin',
+      icon: Trash2,
+      color: 'rose',
+      onClick: (item) => handleDelete(item.id),
+    },
+  ];
+const columns = [
+  {
+    header: "Customer",
+    render: (admin) => (
+      <div className="flex items-center gap-3">
+        <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
+          {admin.name.charAt(0)}
+        </div>
+        <div>
+          <p className="font-bold text-gray-800 dark:text-gray-100">
+            {admin.name}
+          </p>
+          <p className="text-sm text-muted">{admin.email}</p>
+        </div>
+      </div>
+    ),
+  },
+  {
+    header: "Contact",
+    key: "phone",
+  },
+  {
+    header: "Membership",
+    render: (admin) => (
+      <span className="px-3 py-1.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-lg text-sm font-semibold inline-flex items-center gap-1.5">
+        <Shield size={14} />
+        {admin.role}
+      </span>
+    ),
+  },
+  {
+    header: "Stats",
+    render: (admin) => (
+      <div>
+        <div className="flex items-center gap-2 text-sm">
+          <Clock size={14} className="text-gray-400" />
+          <span className="text-gray-600 dark:text-gray-400">
+            {admin.lastActive}
+          </span>
+        </div>
+        <p className="text-xs text-muted mt-1">
+          Joined {admin.createdAt}
+        </p>
+      </div>
+    ),
+  },
+  {
+    header: "Status",
+    render: (admin) => (
+      <div className="flex items-center gap-2">
+        <div
+          className={`w-2.5 h-2.5 rounded-full ${
+            admin.status === "active"
+              ? "bg-green-500 animate-pulse"
+              : "bg-red-500"
+          }`}
+        />
+        <span
+          className={`text-sm font-bold ${
+            admin.status === "active"
+              ? "text-green-600 dark:text-green-400"
+              : "text-red-600 dark:text-red-400"
+          }`}
+        >
+          {admin.status === "active" ? "Active" : "Inactive"}
+        </span>
+      </div>
+    ),
+  },
+  {
+    header: "Actions",
+    key: "actions",
+  },
+];
+
 
   return (
     <div className="page">
@@ -155,7 +294,7 @@ const SubAdmin = () => {
               title={stat.title}
               value={stat.value}
               icon={stat.icon}
-              trend={stat.change}
+              trendValue={stat.trendValue}
               color={stat.color}
             />
           ))}
@@ -174,15 +313,16 @@ const SubAdmin = () => {
             </div>
             <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
               <div className="w-full sm:w-auto">
-                <select
+                <Select
                   value={filterStatus}
                   onChange={(e) => setFilterStatus(e.target.value)}
-                  className="input w-full px-4 py-2 rounded-lg"
-                >
-                  <option value="all">All Status</option>
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
-                </select>
+                  options={[
+                    { value: 'all', label: 'All Status' },
+                    { value: 'active', label: 'Active' },
+                    { value: 'inactive', label: 'Inactive' },
+                  ]}
+                  className="w-full sm:w-48"
+                />
               </div>
               <Button
                 variant="secondary"
@@ -223,137 +363,15 @@ const SubAdmin = () => {
           <>
             {/* Desktop Table View */}
             <div className="hidden lg:block">
-              <Table
-                data={filteredAdmins}
-                columns={[
-                  {
-                    header: "Admin Details",
-                    render: (admin) => (
-                      <div className="flex items-center gap-3">
-                        <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
-                          {admin.name.charAt(0)}
-                        </div>
-                        <div>
-                          <p className="font-bold text-gray-800 dark:text-gray-100">{admin.name}</p>
-                          <p className="text-sm text-muted">{admin.email}</p>
-                          <p className="text-xs text-muted">{admin.phone}</p>
-                        </div>
-                      </div>
-                    )
-                  },
-                  {
-                    header: "Role",
-                    render: (admin) => (
-                      <span className="px-3 py-1.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-lg text-sm font-semibold inline-flex items-center gap-1.5">
-                        <Shield size={14} />
-                        {admin.role}
-                      </span>
-                    )
-                  },
-                  {
-                    header: "Permissions",
-                    render: (admin) => (
-                      <div className="flex flex-wrap gap-1.5 max-w-xs">
-                        {admin.permissions.slice(0, 2).map((perm, idx) => (
-                          <span key={idx} className="px-2.5 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-md text-xs font-semibold">
-                            {perm}
-                          </span>
-                        ))}
-                        {admin.permissions.length > 2 && (
-                          <span className="px-2.5 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md text-xs font-semibold">
-                            +{admin.permissions.length - 2} more
-                          </span>
-                        )}
-                      </div>
-                    )
-                  },
-                  {
-                    header: "Status",
-                    render: (admin) => (
-                      <div className="flex items-center gap-2">
-                        <div className={`w-2.5 h-2.5 rounded-full ${admin.status === 'active' ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></div>
-                        <span className={`text-sm font-bold ${admin.status === 'active' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-                          {admin.status === 'active' ? 'Active' : 'Inactive'}
-                        </span>
-                      </div>
-                    )
-                  },
-                  {
-                    header: "Activity",
-                    render: (admin) => (
-                      <div>
-                        <div className="flex items-center gap-2 text-sm">
-                          <Clock size={14} className="text-gray-400" />
-                          <span className="text-gray-600 dark:text-gray-400">{admin.lastActive}</span>
-                        </div>
-                        <p className="text-xs text-muted mt-1">Joined {admin.createdAt}</p>
-                      </div>
-                    )
-                  },
-                  {
-                    header: "Actions",
-                    tdClassName: "text-center",
-                    render: (admin) => (
-                      <div className="flex items-center justify-center gap-2 relative">
-                        <button
-                          className="p-2 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all text-blue-600 dark:text-blue-400"
-                          title="View Details"
-                        >
-                          <Eye size={18} />
-                        </button>
-                        <button
-                          className="p-2 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-all text-purple-600 dark:text-purple-400"
-                          onClick={() => navigate('/sub-admin/assign')}
-                          title="Edit Permissions"
-                        >
-                          <Edit size={18} />
-                        </button>
-                        <button
-                          onClick={() => setShowDropdown(showDropdown === admin.id ? null : admin.id)}
-                          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all text-gray-600 dark:text-gray-400"
-                        >
-                          <MoreVertical size={18} />
-                        </button>
 
-                        {showDropdown === admin.id && (
-                          <>
-                            <div
-                              className="fixed inset-0 z-10 cursor-default"
-                              onClick={() => setShowDropdown(null)}
-                            ></div>
-                            <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-20 overflow-hidden text-left">
-                              <button
-                                onClick={() => handleStatusToggle(admin.id)}
-                                className="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-3 text-sm font-medium transition-colors"
-                              >
-                                {admin.status === 'active' ? (
-                                  <>
-                                    <Lock size={16} className="text-red-600" />
-                                    <span>Deactivate</span>
-                                  </>
-                                ) : (
-                                  <>
-                                    <Unlock size={16} className="text-green-600" />
-                                    <span>Activate</span>
-                                  </>
-                                )}
-                              </button>
-                              <div className="h-px bg-gray-200 dark:bg-gray-700"></div>
-                              <button
-                                onClick={() => handleDelete(admin.id)}
-                                className="w-full px-4 py-3 text-left hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-3 text-sm font-medium text-red-600 dark:text-red-400 transition-colors"
-                              >
-                                <Trash2 size={16} />
-                                <span>Delete Admin</span>
-                              </button>
-                            </div>
-                          </>
-                        )}
-                      </div>
-                    )
-                  }
-                ]}
-              />
+              <Card className="overflow-hidden">
+                <Table
+                  columns={columns}
+                  data={filteredAdmins}
+                  actions={tableActions}
+                  title='Sub Admin'
+                />
+              </Card>
             </div>
 
             {/* Mobile/Tablet Card View */}
@@ -363,7 +381,7 @@ const SubAdmin = () => {
                   <div className="space-y-4">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-md flex-shrink-0">
+                        <div className="w-12 h-12 rounded-xl bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-md shrink-0">
                           {admin.name.charAt(0)}
                         </div>
                         <div className="min-w-0">
@@ -371,58 +389,13 @@ const SubAdmin = () => {
                           <p className="text-sm text-muted truncate">{admin.email}</p>
                         </div>
                       </div>
-                      <div className="relative flex-shrink-0">
-                        <button
-                          onClick={() => setShowDropdown(showDropdown === admin.id ? null : admin.id)}
-                          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all text-gray-600 dark:text-gray-400"
-                        >
-                          <MoreVertical size={18} />
-                        </button>
-
-                        {showDropdown === admin.id && (
-                          <>
-                            <div
-                              className="fixed inset-0 z-10"
-                              onClick={() => setShowDropdown(null)}
-                            ></div>
-                            <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-20 overflow-hidden">
-                              <button
-                                onClick={() => {
-                                  navigate('/sub-admin/assign');
-                                  setShowDropdown(null);
-                                }}
-                                className="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-3 text-sm font-medium transition-colors"
-                              >
-                                <Edit size={16} className="text-blue-600" />
-                                <span>Edit Permissions</span>
-                              </button>
-                              <button
-                                onClick={() => handleStatusToggle(admin.id)}
-                                className="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-3 text-sm font-medium transition-colors"
-                              >
-                                {admin.status === 'active' ? (
-                                  <>
-                                    <Lock size={16} className="text-red-600" />
-                                    <span>Deactivate</span>
-                                  </>
-                                ) : (
-                                  <>
-                                    <Unlock size={16} className="text-green-600" />
-                                    <span>Activate</span>
-                                  </>
-                                )}
-                              </button>
-                              <div className="h-px bg-gray-200 dark:bg-gray-700"></div>
-                              <button
-                                onClick={() => handleDelete(admin.id)}
-                                className="w-full px-4 py-3 text-left hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-3 text-sm font-medium text-red-600 dark:text-red-400 transition-colors"
-                              >
-                                <Trash2 size={16} />
-                                <span>Delete Admin</span>
-                              </button>
-                            </div>
-                          </>
-                        )}
+                      <div className="relative shrink-0">
+                        <ActionButtons 
+                          item={admin}
+                          actions={tableActions}
+                          maxVisible={0}
+                          size="md"
+                        />
                       </div>
                     </div>
 

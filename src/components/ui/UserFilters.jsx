@@ -2,6 +2,7 @@ import React from "react";
 import InputField from "./InputField";
 import Select from "./Select";
 import Button from "./Button";
+import { FaFilterCircleXmark } from "react-icons/fa6";
 
 const FiltersBar = ({
   // Search config
@@ -20,10 +21,10 @@ const FiltersBar = ({
 }) => {
   return (
     <div className="mb-8 card p-4 rounded-xl shadow-sm border border-gray-200">
-      <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
+      <div className="flex flex-col lg:flex-row gap-8 items-center justify-between flex-nowrap">
 
         {/* SEARCH */}
-        <div className="w-full lg:w-1/3">
+        <div className="w-full ">
           {search ? (
             <InputField
               name="search"
@@ -40,7 +41,7 @@ const FiltersBar = ({
         </div>
 
         {/* FILTERS + ACTIONS */}
-        <div className="flex flex-wrap gap-3 items-center justify-end w-full lg:w-auto">
+        <div className="flex flex-nowrap gap-3 items-center justify-end w-full lg:w-auto">
 
           {/* FILTER DROPDOWNS */}
           {filters.map((filter) => (
@@ -60,20 +61,22 @@ const FiltersBar = ({
               />
             </div>
           ))}
-
-          {/* CUSTOM ACTIONS */}
-          {children}
-
-          {/* CLEAR FILTERS */}
+           {/* CLEAR FILTERS */}
           {onClear && (
             <Button
               variant="ghost"
               onClick={onClear}
               className="px-4 py-2"
             >
-              Clear Filters
+              <FaFilterCircleXmark />
+
             </Button>
           )}
+
+          {/* CUSTOM ACTIONS */}
+          {children}
+
+         
         </div>
       </div>
     </div>

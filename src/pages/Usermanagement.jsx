@@ -1,11 +1,59 @@
 import React, { useState } from "react";
 import FiltersBar from "../components/ui/UserFilters";
-import UserTable from "../components/ui/Table";
 import UserModal from "../components/users/UserModal";
 import UserCard from "../components/users/UserCard";
-import { Grid, List, TrendingUp, TrendingDown } from "lucide-react";
+import { useMemo } from "react";
+import {
+  Eye,
+  Edit,
+  Trash2,
+  TrendingUp,
+  TrendingDown,
+  Grid,
+  List
+} from 'lucide-react';
 import GradientButton from "../components/ui/GradientButton";
 import StatCard from "../components/ui/StatCard";
+import Table from "../components/ui/Table";
+import Badge from "../components/ui/Badge";
+import { User, Mail, Phone, ShoppingBag, CheckCircle, Clock, AlertCircle } from "lucide-react";
+
+
+  const invoiceActions = [
+    {
+      key: 'view',
+      label: 'View Invoice',
+      icon: Eye,
+      onClick: (invoice) => {
+        handleViewInvoice(invoice);
+      },
+      color: 'blue',
+      show: true
+    },
+
+    {
+      key: 'edit',
+      label: 'Edit',
+      icon: Edit,
+      onClick: (invoice) => {
+        setSelectedInvoice(invoice);
+        setModalMode('edit');
+        setModalOpen(true);
+      },
+      color: 'yellow',
+      show: true
+    },
+    {
+      key: 'delete',
+      label: 'Delete',
+      icon: Trash2,
+      onClick: (invoice) => {
+        handleDeleteInvoice(invoice.id);
+      },
+      color: 'rose',
+      show: true
+    }
+  ];
 
 const initialUsers = [
   {
@@ -210,7 +258,87 @@ const UserManagement = () => {
             ))}
           </div>
         ) : (
-          <StatCard users={filteredUsers} />
+          <Table
+            data={filteredUsers}
+            columns={[
+              {
+                header: "Customer",
+                key: "customer",
+                render: (user) => (
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg highlight-bg flex items-center justify-center">
+                      <User className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900 dark:text-white">{user.name}</p>
+                      {user.invoice && (
+                        <p className="text-xs text-gray-500">#{user.invoice}</p>
+                      )}
+                    </div>
+                  </div>
+                ),
+              },
+              {
+                header: "Contact",
+                key: "contact",
+                render: (user) => (
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                      <Mail className="w-4 h-4 text-blue-500" />
+                      {user.email}
+                    </div>
+                    {user.phone && (
+                      <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                        <Phone className="w-4 h-4 text-green-500" />
+                        {user.phone}
+                      </div>
+                    )}
+                  </div>
+                ),
+              },
+              {
+                header: "Membership",
+                key: "membership",
+                render: (user) => <Badge>{user.membership}</Badge>,
+              },
+              {
+                header: "Stats",
+                key: "stats",
+                render: (user) => (
+                  <div className="flex items-center gap-2">
+                    <ShoppingBag className="w-4 h-4 text-pink-600" />
+                    <span className="font-medium">{user.totalOrders || 0} orders</span>
+                  </div>
+                ),
+              },
+              {
+                header: "Status",
+                key: "status",
+                render: (user) => {
+                  const getStatusIcon = (status) => {
+                    switch (status?.toLowerCase()) {
+                      case "active":
+                        return <CheckCircle className="w-4 h-4 text-green-500" />;
+                      case "inactive":
+                        return <AlertCircle className="w-4 h-4 text-red-500" />;
+                      case "pending":
+                        return <Clock className="w-4 h-4 text-yellow-500" />;
+                      default:
+                        return <User className="w-4 h-4 text-gray-400" />;
+                    }
+                  };
+                  return (
+                    <div className="flex items-center gap-2">
+                      {getStatusIcon(user.status)}
+                      <Badge>{user.status}</Badge>
+                    </div>
+                  );
+                },
+              },
+            ]}
+            actions={invoiceActions}
+            title="Customers"
+          />
         )}
 
         {/* Empty State */}

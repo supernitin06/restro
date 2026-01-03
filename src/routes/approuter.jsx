@@ -8,7 +8,7 @@ import DeliverySettings from "../pages/DeliverySettings";
 import DeliveryPartnerManagement from "../pages/DeliveryPartnerManagement";
 import Orders from "../pages/Orders";
 import SubAdmin from "../pages/SubAdmin";
-import CreateAdmin from "../components/Sub-Admin/createAdmin";
+import CreateAdmin from "../components/Sub-Admin/CreateAdmin";
 import AssignAdmin from "../components/Sub-Admin/AssignAdmin";
 import AuthContainer from "../components/Auth/AuthContainer";
 import PaymentDashboard from "../pages/payments/PaymentDashboard";
@@ -18,8 +18,11 @@ import Refunds from "../pages/payments/Refunds";
 import Invoice from "../pages/payments/Invoice";
 import Settings from "../components/settings/Settings"
 
+import CustomerReviewsPage from "../components/PageDashboard/ReviewCustomer/CustomerReviewsPage";
 import OffersManagement from "../pages/OffersManagement";
 import SupportManagement from "../pages/SupportManagement";
+import MenuManagement from "../pages/menu/MenuManagement";
+import AddMenu from "../components/menu/AddMenu";
 const AppRouter = createBrowserRouter(
   [
     /* 🔐 AUTH ROUTES */
@@ -58,6 +61,19 @@ const AppRouter = createBrowserRouter(
           element: <Orders />,
         },
         {
+          path: "menu-management",
+          children: [
+            {
+              index: true,
+              element: <MenuManagement />
+            },
+            {
+              path: "add",
+              element: <AddMenu />
+            }
+          ]
+        },
+        {
           path: "settings",
           element: <Settings />,
         },
@@ -66,6 +82,11 @@ const AppRouter = createBrowserRouter(
           path: "support-tickets",
           element: <SupportManagement />,
         },
+        {
+          path: "reviews",
+          element: <CustomerReviewsPage />,
+        },
+        /* 💳 PAYMENTS (nested inside Layout) */
         {
           path: "payments",
           children: [
@@ -95,22 +116,35 @@ const AppRouter = createBrowserRouter(
             }
           ],
         },
-        {
-          path: "sub-admin",
-          element: <SubAdmin />,
-        },
+
         {
           path: "offers",
           element: <OffersManagement />,
+
+        },
+
+
+        {
+          path: "sub-admin",
+          children: [
+            {
+              index: true, // /sub-admin
+              element: <SubAdmin />,
+            },
+            {
+              path: "create", // /sub-admin/create
+              element: <CreateAdmin />,
+            },
+            {
+              path: "assign", // /sub-admin/assign
+              element: <AssignAdmin />,
+            },
+          ],
         },
         {
-          path: "sub-admin/create",
-          element: <CreateAdmin />,
-        },
-        {
-          path: "sub-admin/assign",
-          element: <AssignAdmin />,
-        },
+          path: "menu-management/add",
+          element: <AddMenu />,
+        }
       ],
     },
   ],

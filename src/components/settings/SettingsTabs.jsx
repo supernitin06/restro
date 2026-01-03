@@ -22,14 +22,14 @@ const SettingsTabs = ({ activeTab, setActiveTab }) => {
   );
 
   return (
-    <div className="card space-y-4">
+    <div className="card ">
       {/* Search Input */}
       <input
         type="text"
         placeholder="Search settings..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        className="input w-full"
+        className="input w-full mb-4"
       />
 
       {/* Tabs */}

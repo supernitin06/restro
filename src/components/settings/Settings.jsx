@@ -24,16 +24,16 @@ const Settings = () => {
     <>
 
       <div className="bg-primary text-primary px-4 py-4 rounded-lg shadow-sm mb-4">
-  <h1 className="text-lg font-bold">Settings</h1>
-  <p className="text-xs text-primary">
-    Manage restaurant and website settings here.
-  </p>
-</div>
+        <h1 className="text-lg font-bold">Settings</h1>
+        <p className="text-xs text-primary">
+          Manage restaurant and website settings here.
+        </p>
+      </div>
 
 
       <SettingsTabs activeTab={tab} setActiveTab={changeTab} />
 
-      <div className="space-y-8">
+      <div className="space-y-8 page">
         {tab === "general" && <General />}
         {tab === "profile" && <Profile />}
         {tab === "menu" && <Menu />}

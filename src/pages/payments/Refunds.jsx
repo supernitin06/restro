@@ -10,8 +10,9 @@ import {
   Mail
 } from 'lucide-react';
 import Button from '../../components/ui/Button';
-import UserTable from '../../components/ui/Table';
-import FilterBar from '../../components/ui/UserFilters';
+import Table from '../../components/ui/Table';
+import Badge from '../../components/ui/Badge';
+import { User, Phone, ShoppingBag } from 'lucide-react';
 import PaymentModal from '../../components/Payment/PaymentModal';
 import refundsData from '../../assets/json/PaymentData/refunds.json';
 import { useNavigate } from 'react-router-dom';
@@ -267,11 +268,90 @@ const Refunds = () => {
             <div className="text-gray-600 dark:text-gray-400 text-sm mb-4">
               Showing {filteredRefunds.length} of {refunds.length} refunds
             </div>
-            <UserTable
-              users={filteredRefunds}
+            <Table
+              data={filteredRefunds}
+              columns={[
+                {
+                  header: "Customer",
+                  key: "customer",
+                  render: (refund) => (
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg highlight-bg flex items-center justify-center">
+                        <User className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900 dark:text-white">{refund.name || refund.customerName}</p>
+                        {refund.invoice && (
+                          <p className="text-xs text-gray-500">#{refund.invoice}</p>
+                        )}
+                      </div>
+                    </div>
+                  ),
+                },
+                {
+                  header: "Amount",
+                  key: "amount",
+                  render: (refund) => (
+                    <span className="font-semibold text-gray-900 dark:text-white">
+                      {refund.amount}
+                    </span>
+                  ),
+                },
+                {
+                  header: "Date",
+                  key: "date",
+                  render: (refund) => (
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                      {new Date(refund.date || refund.refundDate).toLocaleDateString()}
+                    </span>
+                  ),
+                },
+                {
+                  header: "Method",
+                  key: "method",
+                  render: (refund) => <Badge>{refund.method || refund.refundMethod}</Badge>,
+                },
+                {
+                  header: "Contact",
+                  key: "contact",
+                  render: (refund) => (
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                        <Mail className="w-4 h-4 text-blue-500" />
+                        {refund.email}
+                      </div>
+                      {refund.phone && (
+                        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                          <Phone className="w-4 h-4 text-green-500" />
+                          {refund.phone}
+                        </div>
+                      )}
+                    </div>
+                  ),
+                },
+                {
+                  header: "Membership",
+                  key: "membership",
+                  render: (refund) => <Badge>{refund.membership}</Badge>,
+                },
+                {
+                  header: "Stats",
+                  key: "stats",
+                  render: (refund) => (
+                    <div className="flex items-center gap-2">
+                      <ShoppingBag className="w-4 h-4 text-pink-600" />
+                      <span className="font-medium">{refund.totalOrders || 0} orders</span>
+                    </div>
+                  ),
+                },
+                {
+                  header: "Status",
+                  key: "status",
+                  render: (refund) => <Badge>{refund.status}</Badge>,
+                },
+              ]}
               actions={refundActions}
-              onToggleStatus={handleToggleStatus}
-              showPaymentInfo={true}
+              title="Refunds"
             />
           </>
         )}

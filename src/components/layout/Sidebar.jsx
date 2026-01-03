@@ -74,6 +74,27 @@ const Sidebar = ({ theme = "dark" }) => {
       path: "/orders",
     },
     {
+      id:"menu_items",
+      label:"Menu",
+      icon:UtensilsCrossed,
+      hasDropdown:true,
+      subItems:[
+        {
+          id:"menu_items",
+          label:"Menu Management",
+          icon:UtensilsCrossed,
+          path:"/menu-management" 
+        },
+        {
+          id:"menu_items",
+          label:"Add Menu",
+          icon:UtensilsCrossed,
+          path:"/menu-management/add" 
+        }
+      ]
+
+    },
+    {
       id: "offers",
       label: "Offers",
       icon: FaCog,
@@ -119,14 +140,14 @@ const Sidebar = ({ theme = "dark" }) => {
       hasDropdown: true,
       subItems: [
         {
-          id: "create-sub",
+          id: "create-sub-admin",
           label: "Create SubAdmin",
           path: "/sub-admin/create",
           icon: UserPlus,
         },
         {
-          id: "assign-admin",
-          label: "Assign Admin",
+          id: "assign-sub-admin",
+          label: "Assign SubAdmin",
           path: "/sub-admin/assign",
           icon: Shield,
         },
@@ -137,6 +158,7 @@ const Sidebar = ({ theme = "dark" }) => {
       label: "Support & Tickets",
       icon: Shield,
       path: "/support-tickets",
+
     },
     {
       id: "settings",
@@ -295,7 +317,7 @@ const Sidebar = ({ theme = "dark" }) => {
                   {item.hasDropdown && !isCollapsed && (
                     <div
                       className={`
-                      overflow-hidden transition-all duration-300 ml-4
+                      overflow-hidden transition-all duration-400 ml-4
                       ${isExpanded ? "max-h-96 mt-2" : "max-h-0"}
                     `}
                     >
