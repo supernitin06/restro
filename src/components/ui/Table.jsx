@@ -29,7 +29,10 @@ const UserTable = ({
   actions = [],
   showPaymentInfo = false,
   columns = DEFAULT_COLUMNS,
+
   className = "",
+  title = "",
+  subtitle = "",
 }) => {
   const formatCurrency = (amount) => {
     if (!amount) return "$0.00";
@@ -80,7 +83,6 @@ const UserTable = ({
         </p>
       </div>
 
-      {/* Table */}
       <div className="overflow-x-auto">
         <table className="min-w-full">
           {/* Reusable Table Head */}
@@ -174,11 +176,7 @@ const UserTable = ({
                     variant="ghost"
                   />
                 </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+
 
       {/* Footer */}
       {users.length > 0 && (
@@ -190,4 +188,4 @@ const UserTable = ({
   );
 };
 
-export default UserTable;
+export default Table;

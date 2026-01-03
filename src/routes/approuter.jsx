@@ -21,6 +21,8 @@ import Settings from "../components/settings/Settings"
 import CustomerReviewsPage from "../components/PageDashboard/ReviewCustomer/CustomerReviewsPage";
 import OffersManagement from "../pages/OffersManagement";
 import SupportManagement from "../pages/SupportManagement";
+import MenuManagement from "../pages/menu/MenuManagement";
+import AddMenu from "../components/menu/AddMenu";
 const AppRouter = createBrowserRouter(
   [
     /* 🔐 AUTH ROUTES */
@@ -117,6 +119,14 @@ const AppRouter = createBrowserRouter(
           path: "sub-admin/assign",
           element: <AssignAdmin />,
         },
+        {
+          path: "menu-management/:restaurantId",
+          element: <MenuManagement />,
+        },
+        {
+          path: "menu-management/add",
+          element: <AddMenu />,
+        }
       ],
     },
   ],

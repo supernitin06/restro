@@ -8,9 +8,10 @@ import {
   FiEye,
   FiCheckCircle,
   FiXCircle,
+  FiMenu,
 } from "react-icons/fi";
 import { AiFillStar } from "react-icons/ai";
-import Button from '../ui/Button';
+import Button from "../ui/Button";
 
 const RestaurantCard = ({
   restaurant,
@@ -19,6 +20,7 @@ const RestaurantCard = ({
   onView,
   onEdit,
   onDelete,
+  onViewMenu, // <- prop ka naam yahi rakho
   getStatusColor,
 }) => {
   const { restaurantDetail, status, restaurantId } = restaurant;
@@ -27,22 +29,14 @@ const RestaurantCard = ({
   const address = restaurantDetail?.address || {};
 
   return (
-    <div
-      className="
-      card
-      "
-    >
+    <div className="card group border rounded-lg overflow-hidden shadow hover:shadow-md transition">
       {/* IMAGE */}
       <div className="relative h-44 overflow-hidden">
         <img
           src={restaurantDetail?.imageUrl || "/placeholder.jpg"}
           alt={restaurantDetail?.name}
           loading="lazy"
-          className="
-            w-full h-full object-cover
-            transition-transform duration-500
-            group-hover:scale-110
-          "
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
         />
 
         {/* Overlay */}
@@ -57,28 +51,42 @@ const RestaurantCard = ({
           {status}
         </span>
 
-        {/* Edit / Delete */}
-        <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-all">
-          <Button
+        {/* Tiny Menu Button */}
+        <Button
+          onClick={() => (window.location.href = "/menu-management/:restaurantId")} // <-- yaha change
+          disabled={status === "Suspended"}
+          className="
+            absolute top-3 right-12
+            px-2 py-[2px]
+            text-[10px]
+            rounded-full
+            bg-black/50 text-white
+            hover:scale-105
+            shadow
+            flex items-center gap-1
+          "
+        >
+          <FiMenu size={10} />
+          Menu
+        </Button>
+
+        {/* EDIT / DELETE ICONS */}
+        <div className="absolute top-3 right-3 flex gap-3 opacity-0 group-hover:opacity-100 transition-all">
+          <button
             onClick={() => onEdit(restaurant)}
-            className="
-              p-2 rounded-full bg-white/90 dark:bg-black/60
-              hover:text-blue-600 hover:scale-110
-              shadow transition items-center justify-center
-            "
+            className="text-white hover:text-blue-400 transition"
+            title="Edit"
           >
-            <FiEdit3 size={13} />
-          </Button>
-          <Button
+            <FiEdit3 size={14} />
+          </button>
+
+          <button
             onClick={() => onDelete(restaurantId)}
-            className="
-              p-2 rounded-full bg-white/90 dark:bg-black/60
-              hover:text-red-500 hover:scale-110
-              shadow transition items-center justify-center
-            "
+            className="text-white hover:text-red-400 transition"
+            title="Delete"
           >
-            <FiTrash2 size={13} />
-          </Button>
+            <FiTrash2 size={14} />
+          </button>
         </div>
       </div>
 
@@ -144,10 +152,7 @@ const RestaurantCard = ({
             disabled={status === "Approved"}
             variant="active"
             size="sm"
-            className={`
-              w-full
-              ${status === "Approved" ? "opacity-50 cursor-not-allowed" : "hover:scale-105"}
-            `}
+            className="w-full"
           >
             Approve
           </Button>
@@ -157,10 +162,7 @@ const RestaurantCard = ({
             disabled={status === "Suspended"}
             variant="inactive"
             size="sm"
-            className={`
-              w-full
-              ${status === "Suspended" ? "opacity-50 cursor-not-allowed" : "hover:scale-105"}
-            `}
+            className="w-full"
           >
             Suspend
           </Button>
@@ -169,7 +171,7 @@ const RestaurantCard = ({
             onClick={() => onView(restaurant)}
             variant="primary"
             size="sm"
-            className="w-full hover:scale-105"
+            className="w-full"
           >
             <FiEye size={12} />
             View
