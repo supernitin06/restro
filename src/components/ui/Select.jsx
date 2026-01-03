@@ -45,12 +45,23 @@ const Select = ({
             Note: Standard select doesn't support "placeholder" attribute like input, 
             so we often use a disabled first option. 
         */}
-                {placeholder && <option value="" disabled>{placeholder}</option>}
+                {placeholder && typeof placeholder === 'string' && (
+                    <option value="" disabled>{placeholder}</option>
+                )}
 
                 {options.map((option, index) => {
                     // Handle both object {value, label} and simple string/number array
                     const optionValue = typeof option === 'object' ? option.value : option;
-                    const optionLabel = typeof option === 'object' ? option.label : option;
+                    let optionLabel = typeof option === 'object' ? option.label : option;
+                    
+                    // Ensure optionLabel is a valid React child (string, number, or null)
+                    if (React.isValidElement(optionLabel)) {
+                        // If it's a React element, convert to string
+                        optionLabel = String(optionLabel);
+                    } else if (typeof optionLabel !== 'string' && typeof optionLabel !== 'number' && optionLabel !== null && optionLabel !== undefined) {
+                        // If it's not a valid primitive, convert to string
+                        optionLabel = String(optionLabel);
+                    }
 
                     return (
                         <option key={index} value={optionValue}>

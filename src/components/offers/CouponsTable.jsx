@@ -1,5 +1,5 @@
 import React from 'react';
-import { Tag, Percent, DollarSign } from 'lucide-react';
+import { Tag, Percent, DollarSign, Eye, Edit, Trash2 } from 'lucide-react';
 import Badge from '../ui/Badge';
 import Table from '../ui/Table';
 import { FiEdit, FiEye, FiTrash2 } from 'react-icons/fi';
@@ -25,6 +25,30 @@ const CouponTable = ({
         return `$${parseFloat(amount).toFixed(2)}`;
     };
 
+     const tableActions = [
+    {
+      key: 'view',
+      label: 'View Details',
+      icon: Eye,
+      color: 'blue',
+      onClick: (item) => console.log('View', item), // Placeholder
+    },
+    {
+      key: 'edit',
+      label: 'Edit Permissions',
+      icon: Edit,
+      color: 'purple',
+      onClick: () => navigate('/sub-admin/assign'),
+    },
+    {
+      key: 'delete',
+      label: 'Delete Admin',
+      icon: Trash2,
+      color: 'rose',
+      onClick: (item) => handleDelete(item.id),
+    },
+  ];
+
     return (
         <div className={`bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 cursor-pointer ${className}`}>
             {coupons.length === 0 ? (
@@ -34,7 +58,7 @@ const CouponTable = ({
                         Total coupons in system: {coupons.length}
                     </p>
                 </div>
-            ) : (
+            ):(
                 <>
                     <div className="text-gray-600 dark:text-gray-400 text-sm mb-4">
                         Showing {coupons.length} of {coupons.length} coupons
@@ -98,11 +122,7 @@ const CouponTable = ({
                     </button>
                 ) },
             ]}
-            actions={[
-                { key: 'view', icon: FiEye, color: 'blue', onClick: (coupon) => onView?.(coupon) },
-                { key: 'edit', icon: FiEdit, color: 'cyan', onClick: (coupon) => onEdit?.(coupon) },
-                { key: 'delete', icon: FiTrash2, color: 'rose', onClick: (coupon) => onDelete?.(coupon.id) }
-            ]}
+            actions={tableActions}
             title="Coupons"
                     />
                 </>

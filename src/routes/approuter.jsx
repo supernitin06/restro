@@ -61,6 +61,19 @@ const AppRouter = createBrowserRouter(
           element: <Orders />,
         },
         {
+          path: "menu-management",
+          children:[
+            {
+              index:true,
+              element:<MenuManagement/>
+            },
+            {
+              path:"add",
+              element:<AddMenu/>
+            }
+          ]
+        },
+        {
           path: "settings",
           element: <Settings />,
         },
@@ -103,25 +116,31 @@ const AppRouter = createBrowserRouter(
             }
           ],
         },
-        {
-          path: "sub-admin",
-          element: <SubAdmin />,
-        },
+
         {
           path: "offers",
           element: <OffersManagement />,
+
         },
+
+
         {
-          path: "sub-admin/create",
-          element: <CreateAdmin />,
-        },
-        {
-          path: "sub-admin/assign",
-          element: <AssignAdmin />,
-        },
-        {
-          path: "menu-management/:restaurantId",
-          element: <MenuManagement />,
+          path: "sub-admin",
+          element: <SubAdmin />,
+          children: [
+            {
+              index: true, // /sub-admin
+              element: <SubAdmin />,
+            },
+            {
+              path: "create", // /sub-admin/create
+              element: <CreateAdmin />,
+            },
+            {
+              path: "assign", // /sub-admin/assign
+              element: <AssignAdmin />,
+            },
+          ],
         },
         {
           path: "menu-management/add",

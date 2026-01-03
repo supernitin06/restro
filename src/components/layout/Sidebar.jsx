@@ -74,6 +74,27 @@ const Sidebar = ({ theme = "dark" }) => {
       path: "/orders",
     },
     {
+      id:"menu_items",
+      label:"Menu",
+      icon:UtensilsCrossed,
+      hasDropdown:true,
+      subItems:[
+        {
+          id:"menu_items",
+          label:"Menu Management",
+          icon:UtensilsCrossed,
+          path:"/menu-management" 
+        },
+        {
+          id:"menu_items",
+          label:"Add Menu",
+          icon:UtensilsCrossed,
+          path:"/menu-management/add" 
+        }
+      ]
+
+    },
+    {
       id: "offers",
       label: "Offers",
       icon: FaCog,

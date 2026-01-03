@@ -25,7 +25,7 @@ import Input from '../components/ui/InputField';
 // import PageHeader from '../components/ui/PageHeader';
 import ActionButtons from '../components/ui/UserAction';
 import Select from '../components/ui/Select';
-import UserTable from '../components/ui/Table';
+import Table from '../components/ui/Table';
 
 const SubAdmin = () => {
   const navigate = useNavigate();
@@ -139,13 +139,11 @@ const SubAdmin = () => {
         ? { ...admin, status: admin.status === 'active' ? 'inactive' : 'active' }
         : admin
     ));
-    setShowDropdown(null);
   };
 
   const handleDelete = (id) => {
     if (window.confirm('Are you sure you want to delete this sub-admin?')) {
       setSubAdmins(subAdmins.filter(admin => admin.id !== id));
-      setShowDropdown(null);
     }
   };
 
@@ -179,73 +177,81 @@ const SubAdmin = () => {
       onClick: (item) => handleDelete(item.id),
     },
   ];
-
-  const columns = [
-    {
-      header: 'Customer',
-      cell: ({ row: { original: admin } }) => (
-        <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
-            {admin.name.charAt(0)}
-          </div>
-          <div>
-            <p className="font-bold text-gray-800 dark:text-gray-100">{admin.name}</p>
-            <p className="text-sm text-muted">{admin.email}</p>
-          </div>
+const columns = [
+  {
+    header: "Customer",
+    render: (admin) => (
+      <div className="flex items-center gap-3">
+        <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
+          {admin.name.charAt(0)}
         </div>
-      ),
-    },
-    {
-      header: 'Contact',
-      cell: ({ row: { original: admin } }) => (
-        <p className="text-sm text-muted">{admin.phone}</p>
-      ),
-    },
-    {
-      header: 'Membership',
-      cell: ({ row: { original: admin } }) => (
-        <span className="px-3 py-1.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-lg text-sm font-semibold inline-flex items-center gap-1.5">
-          <Shield size={14} />
-          {admin.role}
-        </span>
-      ),
-    },
-    {
-      header: 'Stats',
-      cell: ({ row: { original: admin } }) => (
         <div>
-          <div className="flex items-center gap-2 text-sm">
-            <Clock size={14} className="text-gray-400" />
-            <span className="text-gray-600 dark:text-gray-400">{admin.lastActive}</span>
-          </div>
-          <p className="text-xs text-muted mt-1">Joined {admin.createdAt}</p>
+          <p className="font-bold text-gray-800 dark:text-gray-100">
+            {admin.name}
+          </p>
+          <p className="text-sm text-muted">{admin.email}</p>
         </div>
-      ),
-    },
-    {
-      header: 'Status',
-      cell: ({ row: { original: admin } }) => (
-        <div className="flex items-center gap-2">
-          <div className={`w-2.5 h-2.5 rounded-full ${admin.status === 'active' ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></div>
-          <span className={`text-sm font-bold ${admin.status === 'active' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-            {admin.status === 'active' ? 'Active' : 'Inactive'}
+      </div>
+    ),
+  },
+  {
+    header: "Contact",
+    key: "phone",
+  },
+  {
+    header: "Membership",
+    render: (admin) => (
+      <span className="px-3 py-1.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-lg text-sm font-semibold inline-flex items-center gap-1.5">
+        <Shield size={14} />
+        {admin.role}
+      </span>
+    ),
+  },
+  {
+    header: "Stats",
+    render: (admin) => (
+      <div>
+        <div className="flex items-center gap-2 text-sm">
+          <Clock size={14} className="text-gray-400" />
+          <span className="text-gray-600 dark:text-gray-400">
+            {admin.lastActive}
           </span>
         </div>
-      ),
-    },
-    {
-      header: 'Actions',
-      cell: ({ row: { original: admin } }) => (
-        <ActionButtons 
-          item={admin}
-          actions={tableActions}
-          maxVisible={3}
-          size="md"
-          className="justify-center"
+        <p className="text-xs text-muted mt-1">
+          Joined {admin.createdAt}
+        </p>
+      </div>
+    ),
+  },
+  {
+    header: "Status",
+    render: (admin) => (
+      <div className="flex items-center gap-2">
+        <div
+          className={`w-2.5 h-2.5 rounded-full ${
+            admin.status === "active"
+              ? "bg-green-500 animate-pulse"
+              : "bg-red-500"
+          }`}
         />
-      ),
-    },
-  ];
+        <span
+          className={`text-sm font-bold ${
+            admin.status === "active"
+              ? "text-green-600 dark:text-green-400"
+              : "text-red-600 dark:text-red-400"
+          }`}
+        >
+          {admin.status === "active" ? "Active" : "Inactive"}
+        </span>
+      </div>
+    ),
+  },
+  {
+    header: "Actions",
+    key: "actions",
+  },
+];
+
 
   return (
     <div className="page">
@@ -288,7 +294,7 @@ const SubAdmin = () => {
               title={stat.title}
               value={stat.value}
               icon={stat.icon}
-              trendValue={stat.change}
+              trendValue={stat.trendValue}
               color={stat.color}
             />
           ))}
@@ -359,34 +365,12 @@ const SubAdmin = () => {
             <div className="hidden lg:block">
 
               <Card className="overflow-hidden">
-                <UserTable
+                <Table
                   columns={columns}
                   data={filteredAdmins}
+                  actions={tableActions}
+                  title='Sub Admin'
                 />
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    {/* <thead className="bg-gray-50 dark:bg-gray-800 border-b-2 border-gray-200 dark:border-gray-700">
-                      <tr>
-                        {columns.map((col) => (
-                          <th key={col.header} className="px-6 py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
-                            {col.header}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead> */}
-                    <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                      {filteredAdmins.map((admin) => (
-                        <tr key={admin.id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                          {columns.map((col) => (
-                            <td key={col.header} className="px-6 py-4 align-middle">
-                              {col.cell({ row: { original: admin } })}
-                            </td>
-                          ))}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
               </Card>
             </div>
 

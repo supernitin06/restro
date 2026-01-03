@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { FiEdit, FiTrash2, FiStar, FiCheck, FiX, FiChevronDown, FiChevronUp } from "react-icons/fi";
-import { GiChickenLeg, GiFruitBowl } from "react-icons/gi";
 import { List } from "lucide-react";
 import StatCard from "../ui/StatCard";
 import EditMenuModal from "./EditMenuModal";
@@ -186,9 +185,9 @@ const MenuList = () => {
   const filteredMenus = getFilteredMenus();
 
   return (
-    <div className="space-y-6 p-4">
+    <div className="space-y-6">
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+      <div className="grid mt-6 grid-cols-1 md:grid-cols-3 gap-5">
         <StatCard
           title="Total Items"
           value={stats.totalItems}

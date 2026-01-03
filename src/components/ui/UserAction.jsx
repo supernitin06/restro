@@ -37,8 +37,8 @@ const ActionButtons = ({
   const extra = visible.slice(maxVisible);
 
   const renderBtn = (action) => {
-    // Icon should be a React component, not a function that returns an element
-    const Icon = action.icon;
+    // Icon can be a React component or a function that returns a component
+    const Icon = typeof action.icon === 'function' ? action.icon(item) : action.icon;
     const label = typeof action.label === 'function' ? action.label(item) : action.label;
     const color = typeof action.color === 'function' ? action.color(item) : action.color;
     const isDisabled = typeof action.disabled === 'function' ? action.disabled(item) : action.disabled;
@@ -88,8 +88,8 @@ const ActionButtons = ({
             transition p-2 z-50
           ">
             {extra.map(action => {
-              // Icon should be a React component, not a function that returns an element
-              const Icon = action.icon;
+              // Icon can be a React component or a function that returns a component
+              const Icon = typeof action.icon === 'function' ? action.icon(item) : action.icon;
               const label = typeof action.label === 'function' ? action.label(item) : action.label;
               const isDisabled = typeof action.disabled === 'function' ? action.disabled(item) : action.disabled;
               
