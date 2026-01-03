@@ -1,5 +1,5 @@
 import React from "react";
-import InputField from "../ui/InputField"; // adjust path as needed
+import InputField from "../ui/InputField"; 
 
 const SearchFilter = ({
   searchText,
@@ -9,12 +9,12 @@ const SearchFilter = ({
 }) => {
   return (
     <div className="flex flex-col sm:flex-row gap-4">
-      {/* Replaced input with InputField */}
+      
        <InputField
     placeholder="Search by coupon code..."
     value={searchText}
     onChange={(e) => setSearchText(e.target.value)}
-    className="w-[220px] h-11" // custom width and height
+    className="w-[220px] h-11" 
   />
 
      <select

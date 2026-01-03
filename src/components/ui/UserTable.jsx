@@ -13,10 +13,10 @@ import {
   Clock,
   AlertCircle,
 } from "lucide-react";
-import Badge from "../ui/Badge";
-import ActionButtons from "../ui/UserAction";
+import Badge from "./Badge";
+import ActionButton from "./ActionButton";
 
-const Table = ({
+const UserTable = ({
   data = [],
   columns = [],
   actions = [],
@@ -98,7 +98,7 @@ const Table = ({
                 ))}
                 {actions.length > 0 && (
                   <td className="px-6 py-4">
-                    <ActionButtons
+                    <ActionButton
                       item={item}
                       actions={actions}
                       size="sm"
@@ -122,4 +122,4 @@ const Table = ({
   );
 };
 
-export default Table;
+export default UserTable;

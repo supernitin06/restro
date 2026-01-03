@@ -1,7 +1,7 @@
 import React from "react";
 import { Tag, Percent, DollarSign, Calendar } from "lucide-react";
 import Badge from "../ui/Badge";
-import Table from "../ui/Table";
+import Table from "../ui/UserTable";
 import { FiEye, FiEdit, FiTrash2 } from "react-icons/fi";
 
 const OffersTable = ({ offers = [], onView, onEdit, onDelete }) => {

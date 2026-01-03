@@ -11,8 +11,7 @@ const FiltersBar = ({
     onChange: () => {}
   },
   filters = [], // [{ key, value, options }]
-  onFilterChange = () => {},
-  onClear = () => {}
+  onFilterChange = () => {}
 }) => {
   return (
     <GlassCard className="p-6 mb-6">
@@ -30,11 +29,11 @@ const FiltersBar = ({
               className="mb-0"
               inputClassName="
                 w-full px-4 py-3
-                bg-white/10 backdrop-blur-sm
-                border border-white/20
+                bg-white
+                border border-gray-300
                 rounded-xl
-                text-white
-                placeholder-gray-400
+                text-gray-900
+                placeholder-gray-500
                 focus:outline-none
                 focus:ring-2
                 focus:ring-cyan-500/50
@@ -49,7 +48,7 @@ const FiltersBar = ({
           {filters.map((filter) => (
             <div
               key={filter.key}
-              className="flex items-center gap-2 px-4 py-2 bg-white/10 rounded-xl border border-white/20"
+              className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl border border-gray-300"
             >
               <Filter className="w-4 h-4 text-gray-300" />
               <select
@@ -57,7 +56,7 @@ const FiltersBar = ({
                 onChange={(e) =>
                   onFilterChange(filter.key, e.target.value)
                 }
-                className="bg-transparent text-white outline-none"
+                className="bg-transparent text-gray-900 outline-none"
               >
                 {filter.options.map((opt) => (
                   <option key={opt.value} value={opt.value}>
@@ -68,12 +67,7 @@ const FiltersBar = ({
             </div>
           ))}
 
-          {/* Clear */}
-          {onClear && (
-            <GradientButton variant="ghost" onClick={onClear}>
-              Clear Filters
-            </GradientButton>
-          )}
+
         </div>
       </div>
     </GlassCard>

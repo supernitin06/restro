@@ -2,7 +2,7 @@ import React from 'react';
 import { Calendar, User, MessageSquare } from 'lucide-react';
 import TicketStatusBadge from './TicketStatusBadge';
 import TicketPriorityBadge from './TicketPriorityBadge';
-import Table from '../ui/Table';
+import Table from '../ui/UserTable';
 import { FiEye, FiMessageSquare, FiX } from 'react-icons/fi';
 
 const TicketsTable = ({ tickets = [], onView, onReply, onClose }) => {

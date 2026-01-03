@@ -10,7 +10,7 @@ import {
   Share2,
   FileText
 } from 'lucide-react';
-import UserTable from "../../components/ui/Table";
+import UserTable from "../../components/ui/UserTable";
 import FilterBar from "../../components/ui/UserFilters";
 import PaymentModal from "../../components/Payment/PaymentModal";
 import transactionsData from "../../assets/json/PaymentData/transactions.json";

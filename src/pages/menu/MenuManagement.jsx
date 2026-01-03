@@ -26,7 +26,7 @@ const MenuManagement = () => {
   return (
     <div className="p-6">
       {/* ✅ Header */}
-      <div className="flex flex-col mb-6 md:flex-row justify-between items-start md:items-center bg-white dark:bg-gray-800 p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
+      <div className="card-elevated flex flex-col mb-6 md:flex-row justify-between items-start md:items-center p-6 md:p-8 rounded-3xl transition-all duration-300">
         <div>
           <h1 className="text-heading">Menu Management</h1>
           <p className="text-gray-500 dark:text-gray-400 mt-2 text-lg font-medium">

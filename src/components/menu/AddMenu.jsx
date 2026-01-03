@@ -112,7 +112,7 @@ const AddMenuItem = () => {
         </div>
 
         {/* Form */}
-        <form className="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+        <form className="p-8 mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Left Column */}
           <div className="space-y-6">
             {/* Language Selector */}
