@@ -16,7 +16,7 @@ import {
 import Badge from "../ui/Badge";
 import ActionButtons from "../ui/UserAction";
 
-const UserTable = ({
+const Table = ({
   users = [],
   actions = [],
   onToggleStatus,
@@ -203,4 +203,4 @@ const UserTable = ({
   );
 };
 
-export default UserTable;
+export default Table;
