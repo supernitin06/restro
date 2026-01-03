@@ -1,31 +1,29 @@
-import React, { useMemo } from 'react';
-import { Search, X } from 'lucide-react';
-import InputField from './InputField';
-import Select from './Select';
-import Button from './Button';
+import React from "react";
+import InputField from "./InputField";
+import Select from "./Select";
+import Button from "./Button";
 
 const FiltersBar = ({
-  // Option 1: Direct Props
+  // Search config
   search,
-  filters: propFilters = [],
+
+  // Filters
+  filters = [],
   onFilterChange,
+
+  // Actions
   onClear,
   children,
 
-  // Option 2: Config Helper (kept for backward compatibility logic if any)
-  filterConfig
+  // Backward compatibility (optional)
+  filterConfig,
 }) => {
-
-  // Normalize props logic (simplified for readability)
-  // Assuming propFilters is the primary source of truth as refactored previously.
-  const filters = propFilters;
-
   return (
     <div className="mb-8 card p-4 rounded-xl shadow-sm border border-gray-200">
-      <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+      <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
 
-        {/* Search Input */}
-        <div className="relative w-full md:w-2/3">
+        {/* SEARCH */}
+        <div className="w-full lg:w-1/3">
           {search ? (
             <InputField
               name="search"
@@ -33,54 +31,51 @@ const FiltersBar = ({
               placeholder={search.placeholder || "Search..."}
               value={search.value}
               onChange={(e) => search.onChange(e.target.value)}
-              className="w-full"
             />
           ) : filterConfig?.showSearch ? (
-            // Fallback for config usage if needed (though we prefer search prop)
-            <div className="text-red-500 text-sm">Search prop missing in parent component</div>
+            <div className="text-red-500 text-sm">
+              Search prop missing in parent
+            </div>
           ) : null}
         </div>
 
-        {/* Filters & Actions */}
-        <div className="flex flex-wrap gap-4 w-full md:w-auto items-center justify-end">
+        {/* FILTERS + ACTIONS */}
+        <div className="flex flex-wrap gap-3 items-center justify-end w-full lg:w-auto">
 
+          {/* FILTER DROPDOWNS */}
           {filters.map((filter) => (
-            <div key={filter.key} className="flex-1 md:w-40 min-w-[140px]">
-        {/* Filters */}
-        <div className="flex flex-wrap gap-3 items-center">
-          {filters.map((filter) => (
-            <div key={filter.key} className="min-w-[180px] w-full lg:w-auto">
+            <div
+              key={filter.key}
+              className="min-w-[160px] w-full sm:w-auto"
+            >
               <Select
                 value={filter.value}
-                onChange={(e) => onFilterChange(filter.key, e.target.value)}
+                onChange={(e) =>
+                  onFilterChange(filter.key, e.target.value)
+                }
                 options={filter.options}
                 icon={filter.icon}
-                placeholder={filter.label || filter.placeholder}
+                placeholder={filter.placeholder || filter.label}
                 className="w-full"
-
-                selectClassName={commonInputClass}
-                placeholder={filter.placeholder || 'Select option'}
               />
             </div>
           ))}
 
-          {/* Custom Actions/Buttons */}
+          {/* CUSTOM ACTIONS */}
           {children}
 
-
-          {/* Clear Filters Button */}
+          {/* CLEAR FILTERS */}
           {onClear && (
-            <GradientButton
+            <Button
               variant="ghost"
               onClick={onClear}
-              className="px-6 py-3 h-full mt-2 lg:mt-0"
+              className="px-4 py-2"
             >
               Clear Filters
-            </GradientButton>
+            </Button>
           )}
-          {children && (
-    <div className="ml-auto w-full lg:w-auto">
-      {children}
+        </div>
+      </div>
     </div>
   );
 };
