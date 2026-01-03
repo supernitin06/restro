@@ -119,7 +119,7 @@ const ActionButtons = ({
             absolute right-0 top-full mt-1 
             bg-gray-900/95 backdrop-blur-md
             border border-white/20 rounded-xl
-            p-2 min-w-[120px]
+            p-2 min-w-30
             shadow-xl
             opacity-0 invisible group-hover:opacity-100 group-hover:visible
             transition-all duration-200

@@ -72,7 +72,7 @@ const CityBasedCharges = () => {
                             <Button
                                 type="submit"
                                 disabled={!newCity || !newFee}
-                                className="mt-1 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white p-3.5 rounded-xl transition-all shadow-md hover:shadow-lg transform active:scale-95 flex items-center justify-center min-w-[50px]"
+                                className="mt-1 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white p-3.5 rounded-xl transition-all shadow-sm hover:shadow-md transform active:scale-95 flex items-center justify-center min-w-[50px]"
                             >
                                 <FaPlus />
                             </Button>

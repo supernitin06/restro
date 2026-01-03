@@ -1,4 +1,5 @@
 import React from "react";
+<<<<<<< HEAD:src/components/ui/UserTable.jsx
 import {
   Mail,
   Phone,
@@ -15,79 +16,81 @@ import {
 } from "lucide-react";
 import Badge from "./Badge";
 import ActionButton from "./ActionButton";
+=======
+import ActionButtons from "./UserAction";
+>>>>>>> 17f62e744ade93713c6b9f8ef38cad78b23ecab8:src/components/ui/Table.jsx
 
 const UserTable = ({
   data = [],
   columns = [],
+
   actions = [],
   className = "",
   title = "",
   subtitle = "",
 }) => {
-  const formatCurrency = (amount) => {
-    if (!amount) return "$0.00";
-    const num = parseFloat(amount);
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(num);
-  };
-
-  const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
-    return new Date(dateString).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
-  };
-
-  const getStatusIcon = (status) => {
-    switch (status?.toLowerCase()) {
-      case "active":
-        return <CheckCircle className="w-4 h-4 text-green-500" />;
-      case "inactive":
-        return <AlertCircle className="w-4 h-4 text-red-500" />;
-      case "pending":
-        return <Clock className="w-4 h-4 text-yellow-500" />;
-      default:
-        return <User className="w-4 h-4 text-gray-400" />;
-    }
-  };
+  // Check if actions column should be added
+  const hasActionsColumn = columns.some(
+    (col) => col.header === "Actions" || col.key === "actions"
+  );
+  const displayColumns = hasActionsColumn
+    ? columns
+    : actions.length > 0
+    ? [...columns, { header: "Actions", key: "actions" }]
+    : columns;
 
   return (
     <div
-      className={`rounded-xl border border-gray-200 bg-white shadow-sm ${className}`}
+      className={`rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm ${className}`}
     >
       {/* Header */}
-      {title && (
-        <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
-          <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
-          {subtitle && <p className="text-sm text-gray-500 mt-1">{subtitle}</p>}
+      {(title || subtitle) && (
+        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
+          {title && (
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+              {title}
+            </h2>
+          )}
+          {subtitle && (
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              {subtitle}
+            </p>
+          )}
         </div>
       )}
 
-      {/* Table */}
       <div className="overflow-x-auto">
         <table className="min-w-full">
-          <thead className="bg-gray-50 sticky top-0">
+          <thead className="bg-primary z-50 sticky top-0">
             <tr>
-              {columns.map((col, index) => (
+              {displayColumns.map((col, index) => (
                 <th
-                  key={index}
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase"
+                  key={col.key || index}
+                  className={`px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider ${
+                    index === 0
+                      ? "sticky z-50 left-0 bg-primary "
+                      : ""
+                  }`}
                 >
-                  {col.header}
+                  {(() => {
+                    const header = col.header || col.label;
+                    if (typeof header === 'string') {
+                      return header;
+                    }
+                    if (typeof header === 'function') {
+                      return header();
+                    }
+                    if (React.isValidElement(header)) {
+                      return header;
+                    }
+                    return String(header || '');
+                  })()}
                 </th>
               ))}
-              {actions.length > 0 && (
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">
-                  Actions
-                </th>
-              )}
             </tr>
           </thead>
 
+<<<<<<< HEAD:src/components/ui/UserTable.jsx
           <tbody className="divide-y divide-gray-100">
             {data.map((item, index) => (
               <tr key={item.id || index} className="hover:bg-gray-50">
@@ -106,16 +109,130 @@ const UserTable = ({
                     />
                   </td>
                 )}
+=======
+          <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+            {data.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={displayColumns.length}
+                  className="px-6 py-12 text-center text-gray-500 dark:text-gray-400"
+                >
+                  No data available
+                </td>
+>>>>>>> 17f62e744ade93713c6b9f8ef38cad78b23ecab8:src/components/ui/Table.jsx
               </tr>
-            ))}
+            ) : (
+              data.map((row, rowIndex) => {
+                const rowKey = row.id || row._id || `row-${rowIndex}`;
+
+                return (
+                  <tr
+                    key={rowKey}
+                    className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                  >
+                    {displayColumns.map((col, colIndex) => {
+                      if (col.key === "actions") {
+                        return (
+                          <td
+                            key="actions"
+                            className="px-6 py-4 whitespace-nowrap"
+                          >
+                            <ActionButtons
+                              item={row}
+                              actions={actions}
+                              size="sm"
+                              variant="ghost"
+                            />
+                          </td>
+                        );
+                      }
+
+                      // Use render function if provided
+                      if (col.render && typeof col.render === 'function') {
+                        const renderResult = col.render(row);
+                        // Ensure we're rendering valid React elements
+                        if (React.isValidElement(renderResult) || 
+                            typeof renderResult === 'string' || 
+                            typeof renderResult === 'number' ||
+                            renderResult === null ||
+                            renderResult === undefined) {
+                          return (
+                            <td
+                              key={col.key || colIndex}
+                              className={`px-6 py-4 whitespace-nowrap ${
+                                colIndex === 0
+                                  ? "sticky left-0 bg-white dark:bg-gray-800 z-30"
+                                  : ""
+                              }`}
+                            >
+                              {renderResult}
+                            </td>
+                          );
+                        }
+                        // Fallback if render returns something invalid
+                        return (
+                          <td
+                            key={col.key || colIndex}
+                            className={`px-6 py-4 whitespace-nowrap ${
+                              colIndex === 0
+                                ? "sticky left-0 bg-white dark:bg-gray-800 z-30"
+                                : ""
+                            }`}
+                          >
+                            {String(renderResult)}
+                          </td>
+                        );
+                      }
+
+                      // Otherwise use key to access data
+                      if (col.key) {
+                        const cellValue = row[col.key];
+                        return (
+                          <td
+                            key={col.key || colIndex}
+                            className={`px-6 py-4 whitespace-nowrap ${
+                              colIndex === 0
+                                ? "sticky left-0 bg-white dark:bg-gray-800 z-30"
+                                : ""
+                            }`}
+                          >
+                            {cellValue !== undefined && cellValue !== null
+                              ? String(cellValue)
+                              : "-"}
+                          </td>
+                        );
+                      }
+
+                      // Fallback for columns without key or render
+                      return (
+                        <td
+                          key={colIndex}
+                          className={`px-6 py-4 whitespace-nowrap ${
+                            colIndex === 0
+                              ? "sticky left-0 bg-white dark:bg-gray-800 z-30"
+                              : ""
+                          }`}
+                        >
+                          -
+                        </td>
+                      );
+                    })}
+                  </tr>
+                );
+              })
+            )}
           </tbody>
         </table>
       </div>
 
       {/* Footer */}
       {data.length > 0 && (
-        <div className="px-6 py-3 border-t bg-gray-50 text-sm text-gray-600">
-          Showing <span className="font-medium">{data.length}</span> items
+        <div className="px-6 py-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-sm text-gray-500 dark:text-gray-400">
+          Showing{" "}
+          <span className="font-medium text-gray-900 dark:text-white">
+            {data.length}
+          </span>{" "}
+          {title.toLowerCase() || "items"}
         </div>
       )}
     </div>

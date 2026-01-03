@@ -1,41 +1,16 @@
-import React, { useState } from 'react';
-import LoginForm from '../auth/Login';
-import SignupForm from '../auth/Signup';
-import ForgotPasswordPage from '../auth/ForgotPassword';
-import ToggleSwitch from '../ui/ToggleSwitch';
-import AuthLayout from '../auth/AuthLayout';
+import React, { useState } from "react";
+import LoginForm from "../../components/Auth/Login";
 
 const AuthContainer = () => {
-  const [isLogin, setIsLogin] = useState(true);
-  const [showForgotPassword, setShowForgotPassword] = useState(false);
-
-  if (showForgotPassword) {
-    return (
-      <ForgotPasswordPage 
-        onBackToLogin={() => setShowForgotPassword(false)}
-      />
-    );
-  }
+  const [role, setRole] = useState("admin"); // admin | sub_admin
 
   return (
-    <AuthLayout 
-      showTabs={true}
-      activeTab={isLogin ? 'login' : 'signup'}
-      onTabChange={(tab) => setIsLogin(tab === 'login')}
-    >
-      <ToggleSwitch isLogin={isLogin} onToggle={setIsLogin} />
-      
-      {isLogin ? (
-        <LoginForm 
-          onSwitchToSignup={() => setIsLogin(false)}
-          onSwitchToForgotPassword={() => setShowForgotPassword(true)}
-        />
-      ) : (
-        <SignupForm 
-          onSwitchToLogin={() => setIsLogin(true)}
-        />
-      )}
-    </AuthLayout>
+    <div className="app page flex items-center justify-center">
+      <LoginForm
+        role={role}
+        onRoleChange={setRole}
+      />
+    </div>
   );
 };
 

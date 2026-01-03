@@ -72,7 +72,7 @@ const ActionButton = ({
           </button>
  
           <div className="
-            absolute right-0 mt-1 min-w-[120px]
+            absolute right-0 mt-1 min-w-30
             bg-gray-900/95 border border-white/20 rounded-xl
             opacity-0 invisible group-hover:opacity-100 group-hover:visible
             transition p-2 z-50

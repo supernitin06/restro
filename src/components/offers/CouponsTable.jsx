@@ -1,5 +1,5 @@
 import React from 'react';
-import { Tag, Percent, DollarSign } from 'lucide-react';
+import { Tag, Percent, DollarSign, Eye, Edit, Trash2 } from 'lucide-react';
 import Badge from '../ui/Badge';
 import Table from '../ui/UserTable';
 import { FiEdit, FiEye, FiTrash2 } from 'react-icons/fi';
@@ -25,18 +25,47 @@ const CouponTable = ({
         return `$${parseFloat(amount).toFixed(2)}`;
     };
 
-    if (coupons.length === 0) {
-        return (
-            <div className={`rounded-2xl border border-white/20 p-12 text-center ${className}`}>
-                <p className="text-gray-400 text-lg">No coupons found</p>
-            </div>
-        );
-    }
+     const tableActions = [
+    {
+      key: 'view',
+      label: 'View Details',
+      icon: Eye,
+      color: 'blue',
+      onClick: (item) => console.log('View', item), // Placeholder
+    },
+    {
+      key: 'edit',
+      label: 'Edit Permissions',
+      icon: Edit,
+      color: 'purple',
+      onClick: () => navigate('/sub-admin/assign'),
+    },
+    {
+      key: 'delete',
+      label: 'Delete Admin',
+      icon: Trash2,
+      color: 'rose',
+      onClick: (item) => handleDelete(item.id),
+    },
+  ];
 
     return (
-        <Table
-            data={coupons}
-            columns={[
+        <div className={`bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 cursor-pointer ${className}`}>
+            {coupons.length === 0 ? (
+                <div className="text-center py-8">
+                    <p className="text-gray-500 dark:text-gray-400">No coupons found.</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-sm mt-2">
+                        Total coupons in system: {coupons.length}
+                    </p>
+                </div>
+            ):(
+                <>
+                    <div className="text-gray-600 dark:text-gray-400 text-sm mb-4">
+                        Showing {coupons.length} of {coupons.length} coupons
+                    </div>
+                    <Table
+                        data={coupons}
+                        columns={[
                 { header: "Coupon Code", key: "code", render: (coupon) => (
                     <div className="flex items-center gap-3">
                         <Tag className="w-5 h-5 text-gray-500" />
@@ -93,14 +122,15 @@ const CouponTable = ({
                     </button>
                 ) },
             ]}
-            actions={[
-                { key: 'view', icon: FiEye, color: 'blue', onClick: (coupon) => onView?.(coupon) },
-                { key: 'edit', icon: FiEdit, color: 'cyan', onClick: (coupon) => onEdit?.(coupon) },
-                { key: 'delete', icon: FiTrash2, color: 'rose', onClick: (coupon) => onDelete?.(coupon.id) }
-            ]}
-            className={className}
-        />
+            actions={tableActions}
+            title="Coupons"
+                    />
+                </>
+            )}
+        </div>
     );
 };
 
-export default CouponTable;
+const CouponsTable = CouponTable;
+export default CouponsTable;
+export { CouponTable };

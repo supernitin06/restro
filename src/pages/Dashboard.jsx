@@ -19,9 +19,9 @@ const Dashboard = () => {
       <div className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8 pt-6 pb-10 space-y-8">
 
         {/* ================= HEADER ================= */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-primary p-6 md:p-8 rounded-3xl shadow-lg border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
+        <div className="flex bg-primary flex-col md:flex-row justify-between items-start md:items-center bg-white dark:bg-gray-800 p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
           <div>
-            <h1 className="text-heading">
+            <h1 className="highlight text-4xl font-extrabold tracking-tight">
               Dashboard
             </h1>
             <p className="text-primary opacity-70 mt-2 text-lg font-medium">

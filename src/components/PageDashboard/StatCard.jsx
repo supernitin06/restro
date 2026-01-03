@@ -15,7 +15,7 @@ const StatCard = ({
   return (
     <div className="border-1 card-elevated rounded-2xl p-6 hover:scale-[1.02] group">
       <div className="flex items-center justify-between mb-4">
-        <div className="p-3 rounded-xl shadow-md group-hover:scale-110 transition-transform duration-300 ">
+        <div className="p-3 rounded-xl shadow-sm group-hover:scale-110 transition-transform duration-300 ">
           <Icon className="w-6 h-6 text-black" />
         </div>
         {trend && (

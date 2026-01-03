@@ -1,10 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { FiEdit, FiTrash2, FiStar, FiCheck, FiX, FiChevronDown, FiChevronUp } from "react-icons/fi";
+<<<<<<< HEAD
 import { GiChickenLeg, GiFruitBowl } from "react-icons/gi";
+=======
+>>>>>>> 17f62e744ade93713c6b9f8ef38cad78b23ecab8
 import { List } from "lucide-react";
 import StatCard from "../ui/StatCard";
 import EditMenuModal from "./EditMenuModal";
 import UserFilters from "../ui/UserFilters";
+<<<<<<< HEAD
+=======
+import menuData from "../../pages/menu/menuData";
+>>>>>>> 17f62e744ade93713c6b9f8ef38cad78b23ecab8
 
 const transformMenuData = (data) => {
   const categoriesMap = {};
@@ -31,12 +38,40 @@ const transformMenuData = (data) => {
       discountPrice: null,
       available: item.isAvailable,
       veg: item.isVeg,
-      bestseller: item.tags.includes('BEST_SELLER')
+      bestseller: item.tags?.includes('BEST_SELLER') || false
     });
   });
   return {
     menus: [{
       categories: Object.values(categoriesMap)
+    }]
+  };
+};
+
+const transformCategoryData = (categoryData) => {
+  const categories = categoryData.map(category => ({
+    categoryId: category.id,
+    name: category.name,
+    status: category.isActive ? 'active' : 'inactive',
+    subCategories: [{
+      subCategoryId: category.id + '_sub',
+      name: category.name,
+      status: category.isActive ? 'active' : 'inactive',
+      items: (category.products || []).map(product => ({
+        itemId: product._id,
+        name: product.name,
+        price: product.basePrice,
+        discountPrice: null,
+        available: product.isAvailable,
+        veg: product.isVeg,
+        bestseller: false
+      }))
+    }]
+  }));
+  
+  return {
+    menus: [{
+      categories
     }]
   };
 };
@@ -53,12 +88,18 @@ const MenuList = () => {
     if (saved) {
       const parsed = JSON.parse(saved);
       if (Array.isArray(parsed)) {
-        setMenus(transformMenuData(parsed).menus);
+        // Check if it's the category structure (from menuData.js) or item structure
+        if (parsed.length > 0 && parsed[0].products) {
+          setMenus(transformCategoryData(parsed).menus);
+        } else {
+          setMenus(transformMenuData(parsed).menus);
+        }
       } else {
         setMenus(parsed.menus);
       }
     } else {
-      setMenus(transformMenuData(menuData.data).menus);
+      // Use default menuData from menuData.js
+      setMenus(transformCategoryData(menuData).menus);
     }
   }, []);
 
@@ -151,9 +192,15 @@ const MenuList = () => {
   const filteredMenus = getFilteredMenus();
 
   return (
+<<<<<<< HEAD
     <div className="space-y-6 p-4">
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+=======
+    <div className="space-y-6">
+      {/* Stats Cards */}
+      <div className="grid mt-6 grid-cols-1 md:grid-cols-3 gap-5">
+>>>>>>> 17f62e744ade93713c6b9f8ef38cad78b23ecab8
         <StatCard
           title="Total Items"
           value={stats.totalItems}

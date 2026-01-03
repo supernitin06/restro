@@ -6,6 +6,7 @@ import { useTheme } from '../../context/ThemeContext';
 
 const OrdersOverview = () => {
   const [selectedView, setSelectedView] = useState('This Week');
+  const [activeTab, setActiveTab] = useState('Weekly');
   const { theme } = useTheme();
 
   const axisColor = theme === 'dark' ? '#9ca3af' : '#6b7280';
@@ -25,9 +26,9 @@ const OrdersOverview = () => {
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-primary p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 h-96">
-          <p className="text-sm font-semibold text-primary">{payload[0].payload.day}</p>
-          <p className="text-sm text-primary opacity-70">Orders: <span className="font-bold text-[#eb2528] dark:text-red-400">{payload[0].value}</span></p>
+        <div className="bg-white dark:bg-gray-800 p-3 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
+          <p className="text-sm font-bold text-gray-800 dark:text-gray-100">{payload[0].payload.day}</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">Orders: <span className="font-bold text-[#eb2528] dark:text-red-400">{payload[0].value}</span></p>
         </div>
       );
     }
@@ -36,20 +37,32 @@ const OrdersOverview = () => {
 
   return (
     <div className="bg-primary rounded-2xl p-6 shadow-lg border border-white/20 dark:border-gray-700">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
         <h3 className="text-xl font-bold text-primary">Orders Overview</h3>
-        <div className="flex gap-2">
-          <Button className="px-3 py-1.5 rounded-lg text-sm font-medium bg-gray-800 text-white dark:bg-gray-600">
+        <div className="flex items-center gap-2 flex-wrap">
+          <Button
+            variant={activeTab === 'Weekly' ? 'primary' : 'secondary'}
+            onClick={() => setActiveTab('Weekly')}
+            className="text-sm"
+          >
             Weekly
           </Button>
-          <Button className="px-3 py-1.5 rounded-lg text-sm font-medium text-primary opacity-70 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+          <Button
+            variant={activeTab === 'Monthly' ? 'primary' : 'secondary'}
+            onClick={() => setActiveTab('Monthly')}
+            className="text-sm"
+          >
             Monthly
           </Button>
           <Select
             value={selectedView}
             onChange={(e) => setSelectedView(e.target.value)}
-            options={["This Week", "Last Week", "This Month"]}
-            className="w-36 ml-2"
+            options={[
+              { value: 'This Week', label: 'This Week' },
+              { value: 'Last Week', label: 'Last Week' },
+              { value: 'This Month', label: 'This Month' },
+            ]}
+            className="w-full sm:w-auto"
           />
         </div>
       </div>

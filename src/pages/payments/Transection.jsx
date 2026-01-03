@@ -10,11 +10,16 @@ import {
   Share2,
   FileText
 } from 'lucide-react';
+<<<<<<< HEAD
 import UserTable from "../../components/ui/UserTable";
 import FilterBar from "../../components/ui/UserFilters";
+=======
+import Table from "../../components/ui/Table";
+import Badge from "../../components/ui/Badge";
+import { User,  Phone, ShoppingBag } from "lucide-react";
+>>>>>>> 17f62e744ade93713c6b9f8ef38cad78b23ecab8
 import PaymentModal from "../../components/Payment/PaymentModal";
 import transactionsData from "../../assets/json/PaymentData/transactions.json";
-import UserStats from "../../components/ui/UserStats";
 
 const Transactions = () => {
   const [transactions, setTransactions] = useState([]);
@@ -78,28 +83,28 @@ const Transactions = () => {
         value: `$${totalRevenue.toFixed(2)}`,
         change: totalRevenue > 45000 ? '+20.1%' : '-5.2%',
         changeType: totalRevenue > 45000 ? 'increase' : 'decrease',
-        icon: 'dollar'
+        icon: 'dollar-sign'
       },
       {
         title: 'Total Transactions',
         value: totalTransactions.toString(),
         change: totalTransactions > 2300 ? '+180' : '-50',
         changeType: totalTransactions > 2300 ? 'increase' : 'decrease',
-        icon: 'transaction'
+        icon: 'credit-card'
       },
       {
         title: 'Success Rate',
         value: `${successRate.toFixed(1)}%`,
         change: successRate > 95 ? '+1.2%' : '-0.5%',
         changeType: successRate > 95 ? 'increase' : 'decrease',
-        icon: 'success'
+        icon: 'check-circle'
       },
       {
         title: 'Avg. Transaction',
         value: `$${avgTransaction.toFixed(2)}`,
         change: avgTransaction > 80 ? '+5.3%' : '-2.3%',
         changeType: avgTransaction > 80 ? 'increase' : 'decrease',
-        icon: 'average'
+        icon: 'percent'
       }
     ];
 
@@ -292,9 +297,9 @@ const Transactions = () => {
   return (
     <div className="min-h-screen page  space-y-8">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-primary p-6 md:p-8 rounded-3xl shadow-lg border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
+      <div className="flex flex-col bg-primary md:flex-row justify-between items-start md:items-center p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
         <div>
-          <h1 className="text-heading">
+          <h1 className="highlight text-4xl font-extrabold tracking-tight">
             Payment Management
           </h1>
           <p className="text-primary opacity-70 mt-2 text-lg font-medium">
@@ -303,71 +308,112 @@ const Transactions = () => {
         </div>
       </div>
 
-      {/* Debug info */}
-      {renderDebugStats()}
-
-      {/* Stats Section - Try different prop names */}
+      {/* Stats Section
       {paymentStats.length > 0 && (
         <div className="mb-6">
-          {/* Try one of these: */}
-          {/* Option 1: stats={paymentStats} */}
-          <UserStats stats={paymentStats} />
-
-          {/* Option 2: paymentStats={paymentStats} */}
-          {/* <UserStats paymentStats={paymentStats} /> */}
-
-          {/* Option 3: data={paymentStats} */}
-          {/* <UserStats data={paymentStats} /> */}
-
-          {/* Option 4: Try a simple fallback */}
-          {/* <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {paymentStats.map((stat, index) => (
-              <div key={index} className="bg-gray-800/50 p-4 rounded-xl">
-                <p className="text-gray-400 text-sm">{stat.title}</p>
-                <p className="text-white text-2xl font-bold">{stat.value}</p>
-                <p className={`text-sm ${stat.changeType === 'increase' ? 'text-green-400' : 'text-red-400'}`}>
-                  {stat.change}
-                </p>
-              </div>
-            ))}
-          </div> */}
+          <StatCard paymentStats={paymentStats} />
         </div>
-      )}
+      )} */}
 
-      {/* Filter Bar */}
-      <div className="mb-6">
-        <FilterBar
-          onFilterChange={handleFilterChange}
-          filterConfig={{
-            status: ['all', 'completed', 'pending', 'failed'],
-            membership: ['all', 'premium', 'basic'],
-            method: ['all', 'Credit Card', 'PayPal', 'Bank Transfer'],
-            showSearch: true,
-            searchPlaceholder: "Search by name, email or invoice..."
-          }}
-        />
-      </div>
 
-      {/* UserTable */}
-      <div className="bg-gray-900/50 backdrop-blur-sm border border-white/20 rounded-2xl p-4">
-        {/* Debug table info */}
+      {/* Transactions Table */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4">
         {filteredTransactions.length === 0 ? (
           <div className="text-center py-8">
-            <p className="text-gray-400">No transactions found.</p>
-            <p className="text-gray-500 text-sm mt-2">
+            <p className="text-gray-500 dark:text-gray-400">No transactions found.</p>
+            <p className="text-gray-500 dark:text-gray-400 text-sm mt-2">
               Total transactions in system: {transactions.length}
             </p>
           </div>
         ) : (
           <>
-            <div className="text-gray-400 text-sm mb-4">
+            <div className="text-gray-600 dark:text-gray-400 text-sm mb-4">
               Showing {filteredTransactions.length} of {transactions.length} transactions
             </div>
-            <UserTable
-              users={filteredTransactions}
+            <Table
+              data={filteredTransactions}
+              columns={[
+                {
+                  header: "Customer",
+                  key: "customer",
+                  render: (transaction) => (
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg highlight-bg flex items-center justify-center">
+                        <User className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900 dark:text-white">{transaction.name}</p>
+                        {transaction.invoice && (
+                          <p className="text-xs text-gray-500">#{transaction.invoice}</p>
+                        )}
+                      </div>
+                    </div>
+                  ),
+                },
+                {
+                  header: "Amount",
+                  key: "amount",
+                  render: (transaction) => (
+                    <span className="font-semibold text-gray-900 dark:text-white">
+                      {transaction.amount}
+                    </span>
+                  ),
+                },
+                {
+                  header: "Date",
+                  key: "date",
+                  render: (transaction) => (
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                      {new Date(transaction.date).toLocaleDateString()}
+                    </span>
+                  ),
+                },
+                {
+                  header: "Method",
+                  key: "method",
+                  render: (transaction) => <Badge>{transaction.method}</Badge>,
+                },
+                {
+                  header: "Contact",
+                  key: "contact",
+                  render: (transaction) => (
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                        <Mail className="w-4 h-4 text-blue-500" />
+                        {transaction.email}
+                      </div>
+                      {transaction.phone && (
+                        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                          <Phone className="w-4 h-4 text-green-500" />
+                          {transaction.phone}
+                        </div>
+                      )}
+                    </div>
+                  ),
+                },
+                {
+                  header: "Membership",
+                  key: "membership",
+                  render: (transaction) => <Badge>{transaction.membership}</Badge>,
+                },
+                {
+                  header: "Stats",
+                  key: "stats",
+                  render: (transaction) => (
+                    <div className="flex items-center gap-2">
+                      <ShoppingBag className="w-4 h-4 text-pink-600" />
+                      <span className="font-medium">{transaction.totalOrders || 0} orders</span>
+                    </div>
+                  ),
+                },
+                {
+                  header: "Status",
+                  key: "status",
+                  render: (transaction) => <Badge>{transaction.status}</Badge>,
+                },
+              ]}
               actions={paymentActions}
-              onToggleStatus={handleToggleStatus}
-              showPaymentInfo={true}
+              title="Transactions"
             />
           </>
         )}

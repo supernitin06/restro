@@ -41,7 +41,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
             className={`
               w-10 h-10 rounded-xl font-medium transition-all p-0
               ${currentPage === page
-                ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/25'
+                ? 'highlight-bg shadow-sm'
                 : 'bg-white/10 text-gray-300 hover:bg-white/20 border border-white/20'
               }
             `}

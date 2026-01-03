@@ -1,12 +1,12 @@
 // src/admin/payments/components/PaymentModal.jsx
 import React, { useState, useEffect } from 'react';
 import InputField from '../ui/InputField';
-import { 
-  FaUser, 
-  FaEnvelope, 
-  FaDollarSign, 
-  FaCreditCard, 
-  FaCalendarAlt, 
+import {
+  FaUser,
+  FaEnvelope,
+  FaDollarSign,
+  FaCreditCard,
+  FaCalendarAlt,
   FaIdBadge,
   FaInfoCircle,
   FaGlobe,
@@ -70,7 +70,7 @@ const PaymentModal = ({ isOpen, onClose, onSubmit, paymentData, mode = 'view' })
       ...prev,
       [name]: value
     }));
-    
+
     // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
@@ -79,38 +79,38 @@ const PaymentModal = ({ isOpen, onClose, onSubmit, paymentData, mode = 'view' })
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!formData.customerName.trim()) {
       newErrors.customerName = 'Customer name is required';
     }
-    
+
     if (!formData.customerEmail.trim()) {
       newErrors.customerEmail = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.customerEmail)) {
       newErrors.customerEmail = 'Please enter a valid email';
     }
-    
+
     if (!formData.amount || Number(formData.amount) <= 0) {
       newErrors.amount = 'Amount must be greater than 0';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
-    
+
     onSubmit(formData);
     onClose();
   };
 
   const getStatusColor = (status) => {
-    switch(status) {
+    switch (status) {
       case 'completed': return 'bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-800';
       case 'pending': return 'bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800';
       case 'failed': return 'bg-rose-100 text-rose-800 border-rose-200 dark:bg-rose-900/30 dark:text-rose-300 dark:border-rose-800';
@@ -121,7 +121,7 @@ const PaymentModal = ({ isOpen, onClose, onSubmit, paymentData, mode = 'view' })
   };
 
   const getStatusIcon = (status) => {
-    switch(status) {
+    switch (status) {
       case 'completed': return <FaCheckCircle className="inline mr-2" />;
       case 'pending': return <FaClock className="inline mr-2" />;
       case 'failed': return <FaTimesCircle className="inline mr-2" />;
@@ -132,7 +132,7 @@ const PaymentModal = ({ isOpen, onClose, onSubmit, paymentData, mode = 'view' })
   };
 
   const getPaymentMethodIcon = (method) => {
-    switch(method) {
+    switch (method) {
       case 'credit_card': return <FaCreditCard className="text-lg" />;
       case 'paypal': return <SiPaypal className="text-lg text-blue-600" />;
       case 'bank_transfer': return <BsBank className="text-lg" />;
@@ -143,7 +143,7 @@ const PaymentModal = ({ isOpen, onClose, onSubmit, paymentData, mode = 'view' })
   };
 
   const getCurrencySymbol = (currency) => {
-    switch(currency) {
+    switch (currency) {
       case 'USD': return '$';
       case 'EUR': return '€';
       case 'GBP': return '£';
@@ -158,19 +158,19 @@ const PaymentModal = ({ isOpen, onClose, onSubmit, paymentData, mode = 'view' })
     <>
       {/* Backdrop */}
       <div className="fixed inset-0 z-50 overflow-hidden">
-        <div 
+        <div
           className="absolute inset-0 bg-black/30 backdrop-blur-xs transition-opacity duration-300"
           onClick={onClose}
         />
-        
+
         {/* Modal Container */}
         <div className="fixed inset-0 overflow-y-auto">
           <div className="flex min-h-full items-center justify-center p-4">
             {/* Modal Content */}
-            <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden border border-gray-200 dark:border-gray-800">
-              
+            <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-sm w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden border border-gray-200 dark:border-gray-800 cursor-pointer">
+
               {/* Header */}
-              <div className="relative p-6 border-b border-gray-200 dark:border-gray-800 bg-gradient-to-r from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+              <div className="relative p-6 border-b border-gray-200 dark:border-gray-800 bg-primary">
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
                 <div className="flex justify-between items-center">
                   <div>
@@ -191,7 +191,7 @@ const PaymentModal = ({ isOpen, onClose, onSubmit, paymentData, mode = 'view' })
                     </svg>
                   </button>
                 </div>
-                
+
                 {mode === 'view' && (
                   <div className="flex items-center gap-4 mt-4">
                     <div className={`px-4 py-1.5 rounded-full text-sm font-medium border ${getStatusColor(formData.status)}`}>
@@ -387,7 +387,7 @@ const PaymentModal = ({ isOpen, onClose, onSubmit, paymentData, mode = 'view' })
                   <button
                     type="button"
                     onClick={onClose}
-                    className="px-6 py-3 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:border-gray-400 dark:hover:border-gray-600 transition-all duration-200 font-medium transform hover:-translate-y-0.5 active:translate-y-0"
+                    className="btn btn-secondary"
                   >
                     {mode === 'view' ? 'Close' : 'Cancel'}
                   </button>
@@ -395,7 +395,7 @@ const PaymentModal = ({ isOpen, onClose, onSubmit, paymentData, mode = 'view' })
                     <button
                       type="button"
                       onClick={handleSubmit}
-                      className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 font-medium transform hover:-translate-y-0.5 active:translate-y-0 shadow-lg hover:shadow-xl active:shadow-md"
+                      className="btn btn-primary shadow-sm hover:shadow-md active:shadow-sm"
                     >
                       {mode === 'edit' ? 'Update Payment' : 'Create Payment'}
                       <span className="ml-2">→</span>

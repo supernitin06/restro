@@ -1,7 +1,5 @@
 import React from "react";
 import { createBrowserRouter } from "react-router-dom";
-
-// Layout & Pages
 import Layout from "../pages/Layout";
 import Dashboard from "../pages/Dashboard";
 import RestaurantManagement from "../pages/RestaurantManagement";
@@ -10,19 +8,17 @@ import DeliverySettings from "../pages/DeliverySettings";
 import DeliveryPartnerManagement from "../pages/DeliveryPartnerManagement";
 import Orders from "../pages/Orders";
 import SubAdmin from "../pages/SubAdmin";
-import CreateAdmin from "../components/Sub-Admin/createAdmin";
+import CreateAdmin from "../components/Sub-Admin/CreateAdmin";
 import AssignAdmin from "../components/Sub-Admin/AssignAdmin";
-
-// Auth
 import AuthContainer from "../components/Auth/AuthContainer";
-
-// Payments Pages
 import PaymentDashboard from "../pages/payments/PaymentDashboard";
 import Transactions from "../pages/payments/Transection";
 import TransactionDetails from "../pages/payments/TransactionDetails";
 import Refunds from "../pages/payments/Refunds";
 import Invoice from "../pages/payments/Invoice";
+import Settings from "../components/settings/Settings"
 
+import CustomerReviewsPage from "../components/PageDashboard/ReviewCustomer/CustomerReviewsPage";
 import OffersManagement from "../pages/OffersManagement";
 import SupportManagement from "../pages/SupportManagement";
 import MenuManagement from "../pages/menu/MenuManagement";
@@ -65,14 +61,32 @@ const AppRouter = createBrowserRouter(
           element: <Orders />,
         },
         {
-          path: "offers",
-          element: <OffersManagement />,
+          path: "menu-management",
+          children: [
+            {
+              index: true,
+              element: <MenuManagement />
+            },
+            {
+              path: "add",
+              element: <AddMenu />
+            }
+          ]
+        },
+        {
+          path: "settings",
+          element: <Settings />,
         },
 
         {
           path: "support-tickets",
           element: <SupportManagement />,
         },
+        {
+          path: "reviews",
+          element: <CustomerReviewsPage />,
+        },
+        /* 💳 PAYMENTS (nested inside Layout) */
         {
           path: "payments",
           children: [
@@ -102,21 +116,30 @@ const AppRouter = createBrowserRouter(
             }
           ],
         },
+
+        {
+          path: "offers",
+          element: <OffersManagement />,
+
+        },
+
+
         {
           path: "sub-admin",
-          element: <SubAdmin />,
-        },
-        {
-          path: "sub-admin/create",
-          element: <CreateAdmin />,
-        },
-        {
-          path: "sub-admin/assign",
-          element: <AssignAdmin />,
-        },
-        {
-          path: "menu-management/:restaurantId",
-          element: <MenuManagement />,
+          children: [
+            {
+              index: true, // /sub-admin
+              element: <SubAdmin />,
+            },
+            {
+              path: "create", // /sub-admin/create
+              element: <CreateAdmin />,
+            },
+            {
+              path: "assign", // /sub-admin/assign
+              element: <AssignAdmin />,
+            },
+          ],
         },
         {
           path: "menu-management/add",

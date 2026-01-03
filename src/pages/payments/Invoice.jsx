@@ -8,13 +8,19 @@ import {
   Printer,
   FileText,
   CheckCircle,
-  AlertCircle
 } from 'lucide-react';
+<<<<<<< HEAD
 import UserTable from '../../components/ui/UserTable';
+=======
+import Button from '../../components/ui/Button';
+import Table from '../../components/ui/Table';
+import Badge from '../../components/ui/Badge';
+import { User, Phone, ShoppingBag } from 'lucide-react';
+>>>>>>> 17f62e744ade93713c6b9f8ef38cad78b23ecab8
 import FilterBar from '../../components/ui/UserFilters';
 import PaymentModal from '../../components/Payment/PaymentModal';
 
-const Invoice = () => {
+const Invoice = () => { 
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState('view');
   const [selectedInvoice, setSelectedInvoice] = useState(null);
@@ -315,22 +321,23 @@ const Invoice = () => {
   return (
     <div className="min-h-screen page space-y-8">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-primary p-6 md:p-8 rounded-3xl shadow-lg border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
+      <div className="flex bg-primary flex-col md:flex-row justify-between items-start md:items-center p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
         <div>
-          <h1 className="text-heading">
+          <h1 className="highlight text-4xl font-extrabold tracking-tight">
             Payment Management
           </h1>
           <p className="text-primary opacity-70 mt-2 text-lg font-medium">
             Track and manage all restaurant payments
           </p>
         </div>
-        <button
+        <Button
           onClick={handleCreateInvoice}
-          className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center gap-2"
+          variant="secondary"
+          className="flex items-center gap-2"
         >
           <FileText className="w-5 h-5" />
           Create New Invoice
-        </button>
+        </Button>
       </div>
 
       {/* Filter Bar */}
@@ -380,19 +387,98 @@ const Invoice = () => {
       </div>
 
       {/* Invoices Table */}
-      <div className="bg-white rounded-lg shadow border">
-        <div className="p-4 border-b">
-          <h2 className="text-xl font-bold text-gray-800">All Invoices</h2>
-          <p className="text-gray-600 text-sm">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 cursor-pointer">
+        <div className="p-4 border-b border-gray-100 dark:border-gray-700">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">All Invoices</h2>
+          <p className="text-gray-600 dark:text-gray-400 text-sm">
             Showing {filteredInvoices.length} invoices • Total: ${totalAmount.toFixed(2)}
           </p>
         </div>
         <div className="p-4">
-          <UserTable
-            users={filteredInvoices}
+          <Table
+            data={filteredInvoices}
+            columns={[
+              {
+                header: "Customer",
+                key: "customer",
+                render: (invoice) => (
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg highlight-bg flex items-center justify-center">
+                      <User className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900 dark:text-white">{invoice.name}</p>
+                      {invoice.invoice && (
+                        <p className="text-xs text-gray-500">#{invoice.invoice}</p>
+                      )}
+                    </div>
+                  </div>
+                ),
+              },
+              {
+                header: "Amount",
+                key: "amount",
+                render: (invoice) => (
+                  <span className="font-semibold text-gray-900 dark:text-white">
+                    {invoice.amount}
+                  </span>
+                ),
+              },
+              {
+                header: "Date",
+                key: "date",
+                render: (invoice) => (
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                    {new Date(invoice.date).toLocaleDateString()}
+                  </span>
+                ),
+              },
+              {
+                header: "Method",
+                key: "method",
+                render: (invoice) => <Badge>{invoice.method}</Badge>,
+              },
+              {
+                header: "Contact",
+                key: "contact",
+                render: (invoice) => (
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                      <Mail className="w-4 h-4 text-blue-500" />
+                      {invoice.email}
+                    </div>
+                    {invoice.phone && (
+                      <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                        <Phone className="w-4 h-4 text-green-500" />
+                        {invoice.phone}
+                      </div>
+                    )}
+                  </div>
+                ),
+              },
+              {
+                header: "Membership",
+                key: "membership",
+                render: (invoice) => <Badge>{invoice.membership}</Badge>,
+              },
+              {
+                header: "Stats",
+                key: "stats",
+                render: (invoice) => (
+                  <div className="flex items-center gap-2">
+                    <ShoppingBag className="w-4 h-4 text-pink-600" />
+                    <span className="font-medium">{invoice.totalOrders || 0} orders</span>
+                  </div>
+                ),
+              },
+              {
+                header: "Status",
+                key: "status",
+                render: (invoice) => <Badge>{invoice.status}</Badge>,
+              },
+            ]}
             actions={invoiceActions}
-            onToggleStatus={handleToggleStatus}
-            showPaymentInfo={true}
+            title="Invoices"
           />
         </div>
       </div>

@@ -36,7 +36,7 @@ const RevenueChart = () => {
   };
 
   return (
-    <div className="bg-primary rounded-2xl p-6 shadow-lg border border-white/20 dark:border-gray-700">
+    <div className="bg-primary rounded-2xl p-6 shadow-sm border border-white/20 dark:border-gray-700">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h3 className="text-xl font-bold text-primary mb-1">Total Revenue</h3>

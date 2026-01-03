@@ -1,78 +1,133 @@
 import React from 'react';
-import { Mail, Phone, MapPin, CreditCard } from 'lucide-react';
+import { Mail, Phone, MapPin } from 'lucide-react';
 import GlassCard from '../ui/GlassCard';
-import Badge from '../ui/Badge';
-import GradientButton from '../ui/GradientButton';
+// import Badge from '../ui/Badge';
+import Button from '../ui/Button';
 
 const UserCard = ({ user, onView, onEdit, onDelete }) => {
   return (
-    <GlassCard hover className="card card-elevated p-6">
-      <div className="flex items-start justify-between mb-4">
+    <GlassCard
+      hover
+      className="p-4 rounded-xl transition-all duration-200 
+                  dark:from-gray-800 dark:to-gray-900 
+                 border border-gray-200 dark:border-gray-700 
+                 hover:shadow-lg hover:-translate-y-0.5"
+    >
+      {/* Header with Avatar and Status */}
+      <div className=" flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className="relative">
-            <div className="w-14 h-14 rounded-full flex items-center justify-center font-bold text-xl"
-              style={{ background: 'var(--primary)', color: '#000' }}>
+          {/* Avatar with Status Ring */}
+          <div className="relative bg-gray-200 rounded-4xl">
+            <div className="absolute -inset-0.5 rounded-full  opacity-10"></div>
+            <div
+              className="relative w-12 h-12 rounded-full flex items-center justify-center text-lg font-semibold 
+                       "
+            >
               {user.name.charAt(0)}
             </div>
-            <div className="absolute -bottom-1 -right-1">
-              <Badge type={user.status} size="sm">
+            {/* <div className="absolute -bottom-1 -right-1">
+              <Badge 
+                type={user.status} 
+                size="sm" 
+                className="text-[8px] px-1 py-0.5 border border-white dark:border-gray-800"
+              >
                 {user.status}
               </Badge>
-            </div>
+            </div> */}
           </div>
-          <div>
-            <h3 className="text-lg font-semibold">{user.name}</h3>
-            <p className="text-muted text-sm">{user.email}</p>
+
+          {/* Name & Email */}
+          <div className="">
+            <h3 className="">
+              {user.name}
+            </h3>
+            <p className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1 mt-0.5">
+              <Mail className="w-3 h-3" />
+              <span className="truncate">{user.email}</span>
+            </p>
           </div>
         </div>
-        <Badge type={user.membership.toLowerCase()}>
+
+        {/* Membership Badge */}
+        {/* <Badge 
+          type={user.membership.toLowerCase()} 
+          className="text-xs px-2 py-1 border border-white dark:border-gray-800"
+        >
           {user.membership}
-        </Badge>
+        </Badge> */}
       </div>
-      
-      <div className="space-y-3 mb-6">
-        <div className="flex items-center gap-2 text-muted">
-          <Phone className="w-4 h-4" />
-          <span className="text-sm">{user.phone}</span>
+
+      {/* Contact Info */}
+      <div className="space-y-2 mb-4">
+        <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800/50 p-2 rounded-lg text-xs">
+          <div className="p-1.5 bg-blue-100 dark:bg-blue-900/30 rounded-md">
+            <Phone className="w-3 h-3 text-blue-600 dark:text-blue-400" />
+          </div>
+          <span className="font-medium truncate">{user.phone}</span>
         </div>
-        <div className="flex items-center gap-2 text-muted">
-          <MapPin className="w-4 h-4" />
-          <span className="text-sm">{user.address}</span>
-        </div>
-      </div>
-      
-      <div className="grid grid-cols-2 gap-4 mb-6">
-        <div className="text-center p-3 rounded-xl card">
-          <div className="text-2xl font-bold">{user.totalOrders}</div>
-          <div className="text-muted text-xs">Orders</div>
-        </div>
-        <div className="text-center p-3 rounded-xl card">
-          <div className="text-2xl font-bold">{user.totalSpent}</div>
-          <div className="text-muted text-xs">Spent</div>
+        <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800/50 p-2 rounded-lg text-xs">
+          <div className="p-1.5 bg-green-100 dark:bg-green-900/30 rounded-md">
+            <MapPin className="w-3 h-3 text-green-600 dark:text-green-400" />
+          </div>
+          <span className="font-medium truncate">{user.address}</span>
         </div>
       </div>
-      
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-2 gap-2 mb-4">
+        <div className="flex flex-col items-center justify-center text-center p-2 rounded-lg
+                bg-gradient-to-br from-blue-50 to-white dark:from-blue-900/20 dark:to-gray-800
+                border border-blue-100 dark:border-blue-800/30
+                shadow-sm">
+          <div className="text-lg font-bold text-blue-600 dark:text-blue-400">
+            {user.totalOrders}
+          </div>
+          <div className="text-[10px] font-semibold text-blue-500 dark:text-blue-300 uppercase tracking-wider mt-0.5">
+            Orders
+          </div>
+        </div>
+
+        <div className="flex flex-col items-center justify-center text-center p-2 rounded-lg
+                bg-gradient-to-br from-purple-50 to-white dark:from-purple-900/20 dark:to-gray-800
+                border border-purple-100 dark:border-purple-800/30
+                shadow-sm">
+          <div className="text-lg font-bold text-purple-600 dark:text-purple-400">
+            ₹{user.totalSpent}
+          </div>
+          <div className="text-[10px] font-semibold text-purple-500 dark:text-purple-300 uppercase tracking-wider mt-0.5">
+            Spent
+          </div>
+        </div>
+      </div>
+
+      {/* Action Buttons */}
       <div className="flex gap-2">
-        <GradientButton 
+        <Button
           onClick={() => onView(user)}
           variant="primary"
-          className="flex-1"
+          size="sm"
+          fullWidth
+          className="text-primary"
         >
           View
-        </GradientButton>
-        <GradientButton 
+        </Button>
+        <Button
           onClick={() => onEdit(user)}
           variant="secondary"
-          className="flex-1"
+          size="sm"
+          fullWidth
+          className="btn rounded-lg text-xs py-2"
         >
           Edit
-        </GradientButton>
-        <GradientButton 
+        </Button>
+        <Button
           onClick={() => onDelete(user.id)}
           variant="danger"
+          size="sm"
+          className="rounded-lg text-xs py-2 px-3"
         >
           Delete
-        </GradientButton>
+        </Button>
       </div>
     </GlassCard>
   );

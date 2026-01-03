@@ -24,36 +24,38 @@ const MenuManagement = () => {
   };
 
   return (
-    <div className="p-6">
+    <div className="page">
       {/* ✅ Header */}
+<<<<<<< HEAD
       <div className="card-elevated flex flex-col mb-6 md:flex-row justify-between items-start md:items-center p-6 md:p-8 rounded-3xl transition-all duration-300">
+=======
+      <div className="flex bg-primary flex-col md:flex-row justify-between items-start md:items-center bg-white dark:bg-gray-800 p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
+>>>>>>> 17f62e744ade93713c6b9f8ef38cad78b23ecab8
         <div>
-          <h1 className="text-heading">Menu Management</h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-2 text-lg font-medium">
-            Manage your restaurant menu items.
+          <h1 className="highlight text-4xl font-extrabold tracking-tight">
+            Menu Management
+          </h1>
+          <p className="text-primary opacity-70 mt-2 text-lg font-medium">
+            Manage Menu, SubCategory, and Product across your platform.
           </p>
         </div>
-        <Button onClick={handleAddMenu} variant="primary" className="flex items-center gap-2 mt-4 md:mt-0">
-          <FiPlus className="w-4 h-4" />
-          Add Menu
-        </Button>
       </div>
 
-      {/* ✅ Glow Effects */}
-      <div className="fixed inset-0 pointer-events-none">
+        {/* ✅ Glow Effects */}
+        {/* <div className="fixed inset-0 pointer-events-none">
         <div className="absolute top-0 left-1/4 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl" />
         <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl" />
-      </div>
+      </div> */}
 
-      <div className="relative z-10">
-        {/* Menu List */}
-        <MenuList
-          menus={menuList}
-          onEdit={handleEdit}
-        />
+        <div className="relative z-10">
+          {/* Menu List */}
+          <MenuList
+            menus={menuList}
+            onEdit={handleEdit}
+          />
+        </div>
       </div>
-    </div>
-  );
+      );
 };
 
-export default MenuManagement;
+      export default MenuManagement;
