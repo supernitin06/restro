@@ -47,7 +47,7 @@ const initialUsers = [
     phone: "+91 98765 43210",
     joinDate: "2023-01-15",
     totalOrders: 45,
-    totalSpent: "₹45,200",
+    totalSpent: "₹45,200", 
     loyaltyPoints: 1200,
     address: "MG Road, Bangalore",
     dietaryPreferences: ["Vegetarian"],
