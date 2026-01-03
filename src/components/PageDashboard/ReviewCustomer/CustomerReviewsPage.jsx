@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Star, Filter, Grid3x3, List, Search, Clock, CheckCircle, XCircle, AlertCircle, MessageSquare } from 'lucide-react';
+import { Star, Grid3x3, List, Search, Clock, CheckCircle, XCircle, AlertCircle, MessageSquare, Settings, X } from 'lucide-react';
 import Button from '../../ui/Button';
 import Card from '../../ui/GlassCard';
 import ReviewCard from './ReviewCard';
@@ -7,9 +7,10 @@ import InputField from '../../ui/InputField';
 import StatCard from '../../ui/StatCard';
 import Select from '../../ui/Select';
 
+
 const CustomerReviewsPage = () => {
   const [viewMode, setViewMode] = useState('grid');
-  const [showFilters, setShowFilters] = useState(false);
+  const [showViewMenu, setShowViewMenu] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState({
     status: 'all',
@@ -211,6 +212,16 @@ const CustomerReviewsPage = () => {
     },
   ];
 
+  const handleClearFilters = () => {
+    setSearchTerm('');
+    setFilters({
+      status: 'all',
+      rating: 'all',
+      category: 'all',
+      dateRange: 'all',
+    });
+  };
+
   const filteredReviews = useMemo(() => {
     return allReviews.filter(review => {
       const matchesSearch = review.dishName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -229,6 +240,12 @@ const CustomerReviewsPage = () => {
     });
   }, [searchTerm, filters, allReviews]);
 
+  const isFiltered = searchTerm !== '' || 
+    filters.status !== 'all' || 
+    filters.rating !== 'all' || 
+    filters.category !== 'all' || 
+    filters.dateRange !== 'all';
+
   const stats = {
     total: allReviews.length,
     approved: allReviews.filter(r => r.status === 'approved').length,
@@ -246,33 +263,17 @@ const CustomerReviewsPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-4 md:p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-6">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
             <div className="flex items-center gap-4">
              
               <div>
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Review Management</h1>
-                <p className="text-gray-600 dark:text-gray-400 mt-1">Monitor and manage customer feedback</p>
+                <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Review Management</h1>
+                <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 mt-1">Monitor and manage customer feedback</p>
               </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <Button 
-                variant={viewMode === 'grid' ? 'primary' : 'outline'}
-                onClick={() => setViewMode('grid')}
-                className="p-2"
-              >
-                <Grid3x3 className="w-5 h-5" />
-              </Button>
-              <Button 
-                variant={viewMode === 'list' ? 'primary' : 'outline'}
-                onClick={() => setViewMode('list')}
-                className="p-2"
-              >
-                <List className="w-5 h-5" />
-              </Button>
             </div>
           </div>
 
@@ -291,8 +292,8 @@ const CustomerReviewsPage = () => {
           </div>
 
           {/* Search and Filters */}
-          <Card className="p-4">
-            <div className="flex flex-col md:flex-row gap-4">
+          <Card className="p-4 overflow-visible relative z-20">
+            <div className="flex flex-col xl:flex-row gap-4">
               <div className="flex-1">
                 <InputField
                   type="text"
@@ -302,20 +303,9 @@ const CustomerReviewsPage = () => {
                   startIcon={<Search className="w-5 h-5" />}
                 />
               </div>
-              <Button 
-                variant={showFilters ? 'primary' : 'outline'}
-                onClick={() => setShowFilters(!showFilters)}
-              >
-                <Filter className="w-5 h-5" />
-                Filters
-              </Button>
-            </div>
-
-            {/* Filter Options */}
-            {showFilters && (
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status</label>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:flex lg:flex-wrap gap-3 items-center">
+                <div className="w-full lg:w-40">
                   <Select
                     value={filters.status}
                     onChange={(e) => setFilters({...filters, status: e.target.value})}
@@ -327,8 +317,7 @@ const CustomerReviewsPage = () => {
                     ]}
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Rating</label>
+                <div className="w-full lg:w-40">
                   <Select
                     value={filters.rating}
                     onChange={(e) => setFilters({...filters, rating: e.target.value})}
@@ -341,8 +330,7 @@ const CustomerReviewsPage = () => {
                     ]}
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Category</label>
+                <div className="w-full lg:w-40">
                   <Select
                     value={filters.category}
                     onChange={(e) => setFilters({...filters, category: e.target.value})}
@@ -357,8 +345,7 @@ const CustomerReviewsPage = () => {
                     ]}
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Date Range</label>
+                <div className="w-full lg:w-40">
                   <Select
                     value={filters.dateRange}
                     onChange={(e) => setFilters({...filters, dateRange: e.target.value})}
@@ -370,8 +357,63 @@ const CustomerReviewsPage = () => {
                     ]}
                   />
                 </div>
+
+                {/* Clear Filters Button */}
+                {isFiltered && (
+                  <Button 
+                    variant="outline" 
+                    onClick={handleClearFilters}
+                    className="flex items-center justify-center gap-2 text-red-500 hover:text-red-600 border-red-200 hover:bg-red-50 px-3 w-full sm:w-auto"
+                  >
+                    <X className="w-4 h-4" />
+                    Clear
+                  </Button>
+                )}
+
+                {/* View Settings Dropdown */}
+                <div className="relative flex justify-end sm:block col-span-1 sm:col-span-2 lg:col-span-1">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setShowViewMenu(!showViewMenu)}
+                    className="p-2"
+                  >
+                    <Settings className="w-5 h-5" />
+                  </Button>
+                  
+                  {showViewMenu && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-3 z-[999]">
+                      <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-2">View Layout</h4>
+                      <div className="space-y-2">
+                        <label className="flex items-center gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg cursor-pointer transition-colors">
+                          <input 
+                            type="checkbox" 
+                            checked={viewMode === 'grid'} 
+                            onChange={() => {
+                              setViewMode('grid');
+                              setShowViewMenu(false);
+                            }}
+                            className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                          />
+                          <span className="text-sm text-gray-700 dark:text-gray-300">Grid View</span>
+                        </label>
+                        <label className="flex items-center gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg cursor-pointer transition-colors">
+                          <input 
+                            type="checkbox" 
+                            checked={viewMode === 'list'} 
+                            onChange={() => {
+                              setViewMode('list');
+                              setShowViewMenu(false);
+                            }}
+                            className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                          />
+                          <span className="text-sm text-gray-700 dark:text-gray-300">List View</span>
+                        </label>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
-            )}
+            </div>
           </Card>
 
         {/* Results Count */}
@@ -379,14 +421,6 @@ const CustomerReviewsPage = () => {
           <p className="text-sm text-gray-600 dark:text-gray-400">
             Showing <span className="font-semibold text-gray-900 dark:text-white">{filteredReviews.length}</span> of <span className="font-semibold text-gray-900 dark:text-white">{allReviews.length}</span> reviews
           </p>
-          {filteredReviews.length === 0 && (
-            <Button variant="outline" onClick={() => {
-              setSearchTerm('');
-              setFilters({ status: 'all', rating: 'all', category: 'all', dateRange: 'all' });
-            }}>
-              Clear All Filters
-            </Button>
-          )}
         </div>
 
         {/* Reviews Grid/List */}
@@ -401,10 +435,7 @@ const CustomerReviewsPage = () => {
             <AlertCircle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
             <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">No Reviews Found</h3>
             <p className="text-gray-600 dark:text-gray-400 mb-4">Try adjusting your filters or search terms</p>
-            <Button variant="primary" onClick={() => {
-              setSearchTerm('');
-              setFilters({ status: 'all', rating: 'all', category: 'all', dateRange: 'all' });
-            }}>
+            <Button variant="primary" onClick={handleClearFilters}>
               Clear All Filters
             </Button>
           </Card>
