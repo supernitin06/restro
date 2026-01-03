@@ -84,12 +84,12 @@ const UserTable = ({
       <div className="overflow-x-auto">
         <table className="min-w-full">
           {/* Reusable Table Head */}
-          <thead className="bg-gray-50 sticky top-0">
+          <thead className="bg-gray-50 z-50 sticky top-0">
             <tr>
-              {visibleColumns.map((col) => (
+              {visibleColumns.map((col , index) => (
                 <th
                   key={col.key}
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase"
+                  className={` px-6 py-3 text-left text-xs font-medium text-gray ${index==0? "sticky z-50 left-0 bg-gray-50 ":" "} `}
                 >
                   {col.label}
                 </th>
@@ -98,10 +98,10 @@ const UserTable = ({
           </thead>
 
           <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-            {users.map((user) => (
-              <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+            {users.map((user , index) => (
+              <tr key={user.id} className={`hover:bg-gray-40 border-r-1 border-gray-400 dark:hover:bg-gray-700/50 transition-colors`}>
                 {/* Customer */}
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="sticky left-0 bg-primary z-30  px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-lg highlight-bg flex items-center justify-center">
                       <User className="w-5 h-5 text-white" />

@@ -120,8 +120,8 @@ const OffersManagement = () => {
             setFilterStatus("");
           }}
           className={`pb-3 px-1 font-medium text-lg border-b-4 transition-colors ${activeTab === "offers"
-            ? "border-blue-500 text-blue-500"
-            : "border-transparent text-gray-500 hover:text-gray-700"
+                ? "border-highlight rounded-sm highlight text-blue-500"
+            : "border-none text-gray-500"
             }`}
         >
           Offers
@@ -133,8 +133,8 @@ const OffersManagement = () => {
             setFilterStatus("");
           }}
           className={`pb-3 px-1 font-medium text-lg border-b-4 transition-colors ${activeTab === "coupons"
-            ? "border-blue-500 text-blue-500"
-            : "border-transparent text-gray-500 hover:text-gray-700"
+            ? "border-highlight rounded-sm highlight text-blue-500"
+            : "border-none text-gray-500"
             }`}
         >
           Coupons

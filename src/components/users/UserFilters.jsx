@@ -20,6 +20,7 @@ const UserFilters = ({
         onChange: onSearch,
         placeholder: "Search users by name, email, or phone..."
       }}
+      onClear={onClearFilters}
       filters={[
         {
           key: 'status',
@@ -42,7 +43,6 @@ const UserFilters = ({
         }
       ]}
       onFilterChange={handleFilterChange}
-      onClear={onClearFilters}
     />
   );
 };

@@ -1,11 +1,57 @@
 import React, { useState } from "react";
 import FiltersBar from "../components/ui/UserFilters";
-import UserTable from "../components/ui/Table";
 import UserModal from "../components/users/UserModal";
 import UserCard from "../components/users/UserCard";
-import { Grid, List, TrendingUp, TrendingDown } from "lucide-react";
+import { useMemo } from "react";
+import {
+  Eye,
+  Edit,
+  Trash2,
+  TrendingUp,
+  TrendingDown,
+  Grid,
+  List
+} from 'lucide-react';
 import GradientButton from "../components/ui/GradientButton";
 import StatCard from "../components/ui/StatCard";
+import UserTable from "../components/ui/Table";
+
+
+  const invoiceActions = [
+    {
+      key: 'view',
+      label: 'View Invoice',
+      icon: Eye,
+      onClick: (invoice) => {
+        handleViewInvoice(invoice);
+      },
+      color: 'blue',
+      show: true
+    },
+
+    {
+      key: 'edit',
+      label: 'Edit',
+      icon: Edit,
+      onClick: (invoice) => {
+        setSelectedInvoice(invoice);
+        setModalMode('edit');
+        setModalOpen(true);
+      },
+      color: 'yellow',
+      show: true
+    },
+    {
+      key: 'delete',
+      label: 'Delete',
+      icon: Trash2,
+      onClick: (invoice) => {
+        handleDeleteInvoice(invoice.id);
+      },
+      color: 'rose',
+      show: true
+    }
+  ];
 
 const initialUsers = [
   {
@@ -210,7 +256,9 @@ const UserManagement = () => {
             ))}
           </div>
         ) : (
-          <StatCard users={filteredUsers} />
+          <UserTable users={filteredUsers} 
+          actions={invoiceActions}
+          />
         )}
 
         {/* Empty State */}

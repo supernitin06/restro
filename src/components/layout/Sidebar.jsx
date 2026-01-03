@@ -295,7 +295,7 @@ const Sidebar = ({ theme = "dark" }) => {
                   {item.hasDropdown && !isCollapsed && (
                     <div
                       className={`
-                      overflow-hidden transition-all duration-300 ml-4
+                      overflow-hidden transition-all duration-400 ml-4
                       ${isExpanded ? "max-h-96 mt-2" : "max-h-0"}
                     `}
                     >
