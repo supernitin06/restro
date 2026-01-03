@@ -23,8 +23,9 @@ import StatCard from '../components/ui/StatCard';
 import Card from '../components/ui/GlassCard';
 import Input from '../components/ui/InputField';
 // import PageHeader from '../components/ui/PageHeader';
-import Select from '../components/ui/Select';
 import ActionButtons from '../components/ui/UserAction';
+import Select from '../components/ui/Select';
+import UserTable from '../components/ui/Table';
 
 const SubAdmin = () => {
   const navigate = useNavigate();
@@ -40,7 +41,7 @@ const SubAdmin = () => {
       phone: '+91 98765 43210',
       role: 'Senior Admin',
       status: 'active',
-      permissions: ['View Orders', 'Manage Users', 'Manage Restaurants'],
+      permissions: ['View Orders', 'Manage Users', 'Manage Restaurants', 'View Reports'],
       createdAt: '15 Jan 2024',
       lastActive: '2 hours ago'
     },
@@ -51,7 +52,7 @@ const SubAdmin = () => {
       phone: '+91 98765 43211',
       role: 'Support Admin',
       status: 'active',
-      permissions: ['View Orders', 'Handle Refunds'],
+      permissions: ['View Orders', 'Handle Refunds', 'View Users'],
       createdAt: '20 Jan 2024',
       lastActive: '1 day ago'
     },
@@ -62,9 +63,42 @@ const SubAdmin = () => {
       phone: '+91 98765 43212',
       role: 'Order Manager',
       status: 'inactive',
-      permissions: ['View Orders', 'Manage Users'],
+      permissions: ['View Orders', 'Assign Delivery', 'Mark Delivered'],
       createdAt: '10 Feb 2024',
       lastActive: '5 days ago'
+    },
+    {
+      id: 4,
+      name: 'Sunita Singh',
+      email: 'sunita@swaad.com',
+      phone: '+91 98765 43213',
+      role: 'Financial Admin',
+      status: 'active',
+      permissions: ['View Payments', 'Handle Refunds', 'View Reports'],
+      createdAt: '01 Mar 2024',
+      lastActive: '8 hours ago'
+    },
+    {
+      id: 5,
+      name: 'Vikram Rathore',
+      email: 'vikram@swaad.com',
+      phone: '+91 98765 43214',
+      role: 'Restaurant Manager',
+      status: 'inactive',
+      permissions: ['View Restaurants', 'Manage Restaurants', 'Edit Commission'],
+      createdAt: '15 Mar 2024',
+      lastActive: '1 week ago'
+    },
+    {
+      id: 6,
+      name: 'Anjali Desai',
+      email: 'anjali@swaad.com',
+      phone: '+91 98765 43215',
+      role: 'Support Admin',
+      status: 'active',
+      permissions: ['View Orders', 'Handle Refunds'],
+      createdAt: '22 Mar 2024',
+      lastActive: '30 minutes ago'
     }
   ]);
 
@@ -143,6 +177,73 @@ const SubAdmin = () => {
       icon: Trash2,
       color: 'rose',
       onClick: (item) => handleDelete(item.id),
+    },
+  ];
+
+  const columns = [
+    {
+      header: 'Customer',
+      cell: ({ row: { original: admin } }) => (
+        <div className="flex items-center gap-3">
+          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
+            {admin.name.charAt(0)}
+          </div>
+          <div>
+            <p className="font-bold text-gray-800 dark:text-gray-100">{admin.name}</p>
+            <p className="text-sm text-muted">{admin.email}</p>
+          </div>
+        </div>
+      ),
+    },
+    {
+      header: 'Contact',
+      cell: ({ row: { original: admin } }) => (
+        <p className="text-sm text-muted">{admin.phone}</p>
+      ),
+    },
+    {
+      header: 'Membership',
+      cell: ({ row: { original: admin } }) => (
+        <span className="px-3 py-1.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-lg text-sm font-semibold inline-flex items-center gap-1.5">
+          <Shield size={14} />
+          {admin.role}
+        </span>
+      ),
+    },
+    {
+      header: 'Stats',
+      cell: ({ row: { original: admin } }) => (
+        <div>
+          <div className="flex items-center gap-2 text-sm">
+            <Clock size={14} className="text-gray-400" />
+            <span className="text-gray-600 dark:text-gray-400">{admin.lastActive}</span>
+          </div>
+          <p className="text-xs text-muted mt-1">Joined {admin.createdAt}</p>
+        </div>
+      ),
+    },
+    {
+      header: 'Status',
+      cell: ({ row: { original: admin } }) => (
+        <div className="flex items-center gap-2">
+          <div className={`w-2.5 h-2.5 rounded-full ${admin.status === 'active' ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></div>
+          <span className={`text-sm font-bold ${admin.status === 'active' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+            {admin.status === 'active' ? 'Active' : 'Inactive'}
+          </span>
+        </div>
+      ),
+    },
+    {
+      header: 'Actions',
+      cell: ({ row: { original: admin } }) => (
+        <ActionButtons 
+          item={admin}
+          actions={tableActions}
+          maxVisible={3}
+          size="md"
+          className="justify-center"
+        />
+      ),
     },
   ];
 
@@ -258,89 +359,29 @@ const SubAdmin = () => {
             <div className="hidden lg:block">
 
               <Card className="overflow-hidden">
+                <UserTable
+                  columns={columns}
+                  data={filteredAdmins}
+                />
                 <div className="overflow-x-auto">
                   <table className="w-full">
-                    <thead className="bg-gray-50 dark:bg-gray-800 border-b-2 border-gray-200 dark:border-gray-700">
+                    {/* <thead className="bg-gray-50 dark:bg-gray-800 border-b-2 border-gray-200 dark:border-gray-700">
                       <tr>
-                        <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
-                          Admin Details
-                        </th>
-                        <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
-                          Role
-                        </th>
-                        <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
-                          Permissions
-                        </th>
-                        <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
-                          Status
-                        </th>
-                        <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
-                          Activity
-                        </th>
-                        <th className="px-6 py-4 text-center text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
-                          Actions
-                        </th>
+                        {columns.map((col) => (
+                          <th key={col.header} className="px-6 py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                            {col.header}
+                          </th>
+                        ))}
                       </tr>
-                    </thead>
+                    </thead> */}
                     <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                       {filteredAdmins.map((admin) => (
                         <tr key={admin.id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                          <td className="px-6 py-4">
-                            <div className="flex items-center gap-3">
-                              <div className="w-11 h-11 rounded-xl bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
-                                {admin.name.charAt(0)}
-                              </div>
-                              <div>
-                                <p className="font-bold text-gray-800 dark:text-gray-100">{admin.name}</p>
-                                <p className="text-sm text-muted">{admin.email}</p>
-                                <p className="text-xs text-muted">{admin.phone}</p>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4">
-                            <span className="px-3 py-1.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-lg text-sm font-semibold inline-flex items-center gap-1.5">
-                              <Shield size={14} />
-                              {admin.role}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4">
-                            <div className="flex flex-wrap gap-1.5 max-w-xs">
-                              {admin.permissions.slice(0, 2).map((perm, idx) => (
-                                <span key={idx} className="px-2.5 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-md text-xs font-semibold">
-                                  {perm}
-                                </span>
-                              ))}
-                              {admin.permissions.length > 2 && (
-                                <span className="px-2.5 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md text-xs font-semibold">
-                                  +{admin.permissions.length - 2} more
-                                </span>
-                              )}
-                            </div>
-                          </td>
-                          <td className="px-6 py-4">
-                            <div className="flex items-center gap-2">
-                              <div className={`w-2.5 h-2.5 rounded-full ${admin.status === 'active' ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></div>
-                              <span className={`text-sm font-bold ${admin.status === 'active' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-                                {admin.status === 'active' ? 'Active' : 'Inactive'}
-                              </span>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4">
-                            <div className="flex items-center gap-2 text-sm">
-                              <Clock size={14} className="text-gray-400" />
-                              <span className="text-gray-600 dark:text-gray-400">{admin.lastActive}</span>
-                            </div>
-                            <p className="text-xs text-muted mt-1">Joined {admin.createdAt}</p>
-                          </td>
-                          <td className="px-6 py-4">
-                            <ActionButtons 
-                              item={admin}
-                              actions={tableActions}
-                              maxVisible={3}
-                              size="md"
-                              className="justify-center"
-                            />
-                          </td>
+                          {columns.map((col) => (
+                            <td key={col.header} className="px-6 py-4 align-middle">
+                              {col.cell({ row: { original: admin } })}
+                            </td>
+                          ))}
                         </tr>
                       ))}
                     </tbody>

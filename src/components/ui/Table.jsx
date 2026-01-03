@@ -4,6 +4,7 @@ import ActionButtons from "./UserAction";
 const Table = ({
   data = [],
   columns = [],
+
   actions = [],
   className = "",
   title = "",
