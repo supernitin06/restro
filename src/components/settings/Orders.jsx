@@ -4,7 +4,7 @@ import Button from "../../components/ui/Button";
 const Orders = () => {
   return (
     <div className="card space-y-6">
-      <h2 className="text-heading">Order Settings</h2>
+      <h2 className="highlight text-3xl font-bold">Order Settings</h2>
 
       <div className="flex justify-between items-center">
         <p>Accept Online Orders</p>

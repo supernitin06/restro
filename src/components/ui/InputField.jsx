@@ -62,7 +62,7 @@ const InputField = ({
             focus:border-white/30 dark:focus:border-gray-500
             shadow-sm
             transition-all duration-200
-            ${startIcon ? "pl-12" : "pl-4"}
+            ${startIcon ? "pl-14" : "pl-4"}
             ${endIcon ? "pr-12" : "pr-4"}
             ${disabled ? "opacity-60 cursor-not-allowed" : ""}
           `}

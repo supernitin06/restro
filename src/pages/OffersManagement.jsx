@@ -93,9 +93,9 @@ const OffersManagement = () => {
   return (
     <div className="page">
       {/* Header */}
-      <div className="flex flex-col mb-6 md:flex-row justify-between items-start md:items-center bg-white dark:bg-gray-800 p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
+      <div className="flex bg-primary flex-col mb-6 md:flex-row justify-between items-start md:items-center bg-white dark:bg-gray-800 p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
         <div>
-          <h1 className="text-heading">Offers & Coupons Management</h1>
+          <h1 className="highlight text-4xl font-extrabold tracking-tight">Offers & Coupons Management</h1>
           <p className="text-gray-500 dark:text-gray-400 mt-2 text-lg font-medium">
             Manage offers, coupons, and promotions across your platform.
           </p>
@@ -119,11 +119,10 @@ const OffersManagement = () => {
             setSearchText("");
             setFilterStatus("");
           }}
-          className={`pb-3 px-1 font-medium text-lg border-b-4 transition-colors ${
-            activeTab === "offers"
-              ? "border-blue-500 text-blue-500"
-              : "border-transparent text-gray-500 hover:text-gray-700"
-          }`}
+          className={`pb-3 px-1 font-medium text-lg border-b-4 transition-colors ${activeTab === "offers"
+            ? "border-blue-500 text-blue-500"
+            : "border-transparent text-gray-500 hover:text-gray-700"
+            }`}
         >
           Offers
         </button>
@@ -133,11 +132,10 @@ const OffersManagement = () => {
             setSearchText("");
             setFilterStatus("");
           }}
-          className={`pb-3 px-1 font-medium text-lg border-b-4 transition-colors ${
-            activeTab === "coupons"
-              ? "border-blue-500 text-blue-500"
-              : "border-transparent text-gray-500 hover:text-gray-700"
-          }`}
+          className={`pb-3 px-1 font-medium text-lg border-b-4 transition-colors ${activeTab === "coupons"
+            ? "border-blue-500 text-blue-500"
+            : "border-transparent text-gray-500 hover:text-gray-700"
+            }`}
         >
           Coupons
         </button>

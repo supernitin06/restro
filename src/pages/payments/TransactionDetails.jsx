@@ -1,6 +1,7 @@
-// src/admin/payments/pages/TransactionDetails.jsx
 import React from 'react';
 import Badge from '../../components/ui/Badge';
+import Button from '../../components/ui/Button';
+import { ChevronLeft, Download, Mail, RefreshCw } from 'lucide-react';
 
 const TransactionDetails = ({ transaction, onBack }) => {
   if (!transaction) {
@@ -21,88 +22,91 @@ const TransactionDetails = ({ transaction, onBack }) => {
 
   return (
     <div className="p-6">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex bg-primary flex-col md:flex-row justify-between items-start md:items-center p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90 mb-6">
         <div>
           <button
             onClick={onBack}
-            className="flex items-center text-blue-600 hover:text-blue-800 mb-2"
+            className="flex items-center text-white/80 hover:text-white mb-2 transition-colors"
           >
-            <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
-            </svg>
+            <ChevronLeft className="w-5 h-5 mr-1" />
             Back to Transactions
           </button>
-          <h1 className="text-2xl font-bold text-gray-800">Transaction Details</h1>
-          <p className="text-gray-600">ID: {transaction.id}</p>
+          <h1 className="highlight text-2xl font-bold text-white">Transaction Details</h1>
+          <p className="text-white/70">ID: {transaction.id}</p>
         </div>
-        <Badge status={transaction.status} />
+        <div className="bg-white/20 backdrop-blur-md rounded-full">
+          <Badge type="default" size="lg">{transaction.status}</Badge>
+        </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <div className="p-6 border-b">
-          <h2 className="text-lg font-semibold text-gray-800">Transaction Information</h2>
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden cursor-pointer">
+        <div className="p-6 border-b border-gray-100 dark:border-gray-700">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Transaction Information</h2>
         </div>
-        
+
         <div className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-600">Transaction ID</label>
-                <p className="mt-1 text-gray-900 font-medium">{transaction.id}</p>
+                <label className="block text-sm font-medium text-gray-500 dark:text-gray-400">Transaction ID</label>
+                <p className="mt-1 text-gray-900 dark:text-white font-medium">{transaction.id}</p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-600">Customer Name</label>
-                <p className="mt-1 text-gray-900">{transaction.customerName}</p>
+                <label className="block text-sm font-medium text-gray-500 dark:text-gray-400">Customer Name</label>
+                <p className="mt-1 text-gray-900 dark:text-white">{transaction.customerName}</p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-600">Customer Email</label>
-                <p className="mt-1 text-gray-900">{transaction.customerEmail}</p>
+                <label className="block text-sm font-medium text-gray-500 dark:text-gray-400">Customer Email</label>
+                <p className="mt-1 text-gray-900 dark:text-white">{transaction.customerEmail}</p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-600">Amount</label>
-                <p className="mt-1 text-gray-900 text-xl font-bold">${transaction.amount.toFixed(2)}</p>
+                <label className="block text-sm font-medium text-gray-500 dark:text-gray-400">Amount</label>
+                <p className="mt-1 text-gray-900 dark:text-white text-xl font-bold">${transaction.amount.toFixed(2)}</p>
               </div>
             </div>
-            
+
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-600">Payment Method</label>
-                <p className="mt-1 text-gray-900 capitalize">{transaction.paymentMethod.replace('_', ' ')}</p>
+                <label className="block text-sm font-medium text-gray-500 dark:text-gray-400">Payment Method</label>
+                <p className="mt-1 text-gray-900 dark:text-white capitalize">{transaction.paymentMethod.replace('_', ' ')}</p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-600">Status</label>
+                <label className="block text-sm font-medium text-gray-500 dark:text-gray-400">Status</label>
                 <div className="mt-1">
-                  <PaymentStatusBadge status={transaction.status} />
+                  <Badge type="default">{transaction.status}</Badge>
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-600">Date</label>
-                <p className="mt-1 text-gray-900">{transaction.date}</p>
+                <label className="block text-sm font-medium text-gray-500 dark:text-gray-400">Date</label>
+                <p className="mt-1 text-gray-900 dark:text-white">{transaction.date}</p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-600">Currency</label>
-                <p className="mt-1 text-gray-900">{transaction.currency}</p>
+                <label className="block text-sm font-medium text-gray-500 dark:text-gray-400">Currency</label>
+                <p className="mt-1 text-gray-900 dark:text-white">{transaction.currency}</p>
               </div>
             </div>
           </div>
-          
-          <div className="mt-6 pt-6 border-t">
-            <label className="block text-sm font-medium text-gray-600 mb-2">Description</label>
-            <p className="text-gray-900 bg-gray-50 p-4 rounded-md">{transaction.description}</p>
+
+          <div className="mt-6 pt-6 border-t border-gray-100 dark:border-gray-700">
+            <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Description</label>
+            <p className="text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-900/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700">{transaction.description}</p>
           </div>
-          
-          <div className="mt-6 pt-6 border-t">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Actions</h3>
-            <div className="flex space-x-3">
-              <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+
+          <div className="mt-6 pt-6 border-t border-gray-100 dark:border-gray-700">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Actions</h3>
+            <div className="flex gap-3">
+              <Button variant="primary" className="flex items-center gap-2">
+                <Download className="w-4 h-4" />
                 Download Receipt
-              </button>
-              <button className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors">
+              </Button>
+              <Button variant="secondary" className="flex items-center gap-2">
+                <Mail className="w-4 h-4" />
                 Send Email
-              </button>
-              <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors">
+              </Button>
+              <Button variant="ghost" className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white border border-gray-200 dark:border-gray-700">
+                <RefreshCw className="w-4 h-4" />
                 Refund
-              </button>
+              </Button>
             </div>
           </div>
         </div>

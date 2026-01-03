@@ -7,7 +7,7 @@ const General = () => {
     <div className="card space-y-6">
       {/* Header */}
       <div>
-        <h2 className="text-heading">General Settings</h2>
+        <h2 className="highlight text-3xl font-bold">General Settings</h2>
         <p className="text-muted mt-1">
           Basic restaurant and website configuration
         </p>

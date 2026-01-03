@@ -14,7 +14,7 @@ import UserTable from "../../components/ui/Table";
 import FilterBar from "../../components/ui/UserFilters";
 import PaymentModal from "../../components/Payment/PaymentModal";
 import transactionsData from "../../assets/json/PaymentData/transactions.json";
-import UserStats from "../../components/ui/UserStats";
+import StatCard from "../../components/ui/StatCard";
 
 const Transactions = () => {
   const [transactions, setTransactions] = useState([]);
@@ -78,28 +78,28 @@ const Transactions = () => {
         value: `$${totalRevenue.toFixed(2)}`,
         change: totalRevenue > 45000 ? '+20.1%' : '-5.2%',
         changeType: totalRevenue > 45000 ? 'increase' : 'decrease',
-        icon: 'dollar'
+        icon: 'dollar-sign'
       },
       {
         title: 'Total Transactions',
         value: totalTransactions.toString(),
         change: totalTransactions > 2300 ? '+180' : '-50',
         changeType: totalTransactions > 2300 ? 'increase' : 'decrease',
-        icon: 'transaction'
+        icon: 'credit-card'
       },
       {
         title: 'Success Rate',
         value: `${successRate.toFixed(1)}%`,
         change: successRate > 95 ? '+1.2%' : '-0.5%',
         changeType: successRate > 95 ? 'increase' : 'decrease',
-        icon: 'success'
+        icon: 'check-circle'
       },
       {
         title: 'Avg. Transaction',
         value: `$${avgTransaction.toFixed(2)}`,
         change: avgTransaction > 80 ? '+5.3%' : '-2.3%',
         changeType: avgTransaction > 80 ? 'increase' : 'decrease',
-        icon: 'average'
+        icon: 'percent'
       }
     ];
 
@@ -292,9 +292,9 @@ const Transactions = () => {
   return (
     <div className="min-h-screen page  space-y-8">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-primary p-6 md:p-8 rounded-3xl shadow-lg border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
+      <div className="flex flex-col bg-primary md:flex-row justify-between items-start md:items-center p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
         <div>
-          <h1 className="text-heading">
+          <h1 className="highlight text-4xl font-extrabold tracking-tight">
             Payment Management
           </h1>
           <p className="text-primary opacity-70 mt-2 text-lg font-medium">
@@ -303,64 +303,27 @@ const Transactions = () => {
         </div>
       </div>
 
-      {/* Debug info */}
-      {renderDebugStats()}
-
-      {/* Stats Section - Try different prop names */}
+      {/* Stats Section
       {paymentStats.length > 0 && (
         <div className="mb-6">
-          {/* Try one of these: */}
-          {/* Option 1: stats={paymentStats} */}
-          <UserStats stats={paymentStats} />
-
-          {/* Option 2: paymentStats={paymentStats} */}
-          {/* <UserStats paymentStats={paymentStats} /> */}
-
-          {/* Option 3: data={paymentStats} */}
-          {/* <UserStats data={paymentStats} /> */}
-
-          {/* Option 4: Try a simple fallback */}
-          {/* <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {paymentStats.map((stat, index) => (
-              <div key={index} className="bg-gray-800/50 p-4 rounded-xl">
-                <p className="text-gray-400 text-sm">{stat.title}</p>
-                <p className="text-white text-2xl font-bold">{stat.value}</p>
-                <p className={`text-sm ${stat.changeType === 'increase' ? 'text-green-400' : 'text-red-400'}`}>
-                  {stat.change}
-                </p>
-              </div>
-            ))}
-          </div> */}
+          <StatCard paymentStats={paymentStats} />
         </div>
-      )}
+      )} */}
 
-      {/* Filter Bar */}
-      <div className="mb-6">
-        <FilterBar
-          onFilterChange={handleFilterChange}
-          filterConfig={{
-            status: ['all', 'completed', 'pending', 'failed'],
-            membership: ['all', 'premium', 'basic'],
-            method: ['all', 'Credit Card', 'PayPal', 'Bank Transfer'],
-            showSearch: true,
-            searchPlaceholder: "Search by name, email or invoice..."
-          }}
-        />
-      </div>
 
       {/* UserTable */}
-      <div className="bg-gray-900/50 backdrop-blur-sm border border-white/20 rounded-2xl p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4">
         {/* Debug table info */}
         {filteredTransactions.length === 0 ? (
           <div className="text-center py-8">
-            <p className="text-gray-400">No transactions found.</p>
-            <p className="text-gray-500 text-sm mt-2">
+            <p className="text-gray-500 dark:text-gray-400">No transactions found.</p>
+            <p className="text-gray-500 dark:text-gray-400 text-sm mt-2">
               Total transactions in system: {transactions.length}
             </p>
           </div>
         ) : (
           <>
-            <div className="text-gray-400 text-sm mb-4">
+            <div className="text-gray-600 dark:text-gray-400 text-sm mb-4">
               Showing {filteredTransactions.length} of {transactions.length} transactions
             </div>
             <UserTable

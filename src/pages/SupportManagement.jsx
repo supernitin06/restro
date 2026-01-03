@@ -53,9 +53,9 @@ const SupportManagement = () => {
 
   return (
     <div className="page">
-      <div className="flex flex-col mb-6 md:flex-row justify-between items-start md:items-center bg-white dark:bg-gray-800 p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 backdrop-blur-sm bg-opacity-90">
+      <div className="flex bg-primary  flex-col mb-6 md:flex-row justify-between items-start md:items-center bg-white dark:bg-gray-800 p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 backdrop-blur-sm bg-opacity-90">
         <div>
-          <h1 className="text-heading flex items-center gap-3">
+          <h1 className="highlight text-4xl font-extrabold tracking-tight flex items-center gap-3">
             <MessageSquare className="w-8 h-8 text-primary" />
             Support & Tickets
           </h1>

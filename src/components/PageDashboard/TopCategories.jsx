@@ -15,7 +15,7 @@ const TopCategories = () => {
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-primary p-3 rounded-xl shadow-xl border border-gray-200">
+        <div className="bg-primary p-3 rounded-xl shadow-sm border border-gray-200">
           <p className="text-sm font-semibold text-primary">{payload[0].name}</p>
           <p className="text-sm text-primary opacity-70">{payload[0].value}%</p>
         </div>
@@ -43,7 +43,7 @@ const TopCategories = () => {
   };
 
   return (
-    <div className="bg-primary rounded-2xl p-6 shadow-lg border border-white/20 dark:border-gray-700 hover:shadow-xl transition-all duration-300">
+    <div className="bg-primary rounded-2xl p-6 shadow-sm border border-white/20 dark:border-gray-700 hover:shadow-md transition-all duration-300">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-xl font-bold text-primary">Top Categories</h3>
         <Button className="text-sm font-medium text-[#2563eb] hover:text-[#1d4ed8] transition-colors bg-transparent shadow-none p-0 w-auto hover:bg-transparent">

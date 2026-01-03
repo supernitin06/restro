@@ -81,7 +81,7 @@ const CustomerReviews = () => {
   }, []);
 
   return (
-    <div className="bg-primary rounded-2xl p-6 shadow-lg border border-white/20 dark:border-gray-700">
+    <div className="bg-primary rounded-2xl p-6 shadow-sm border border-white/20 dark:border-gray-700">
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-xl font-bold text-primary">Customer Reviews</h3>
         <Button className="text-sm font-medium text-[#2563eb] hover:text-[#1d4ed8] transition-colors bg-transparent shadow-none p-0 w-auto hover:bg-transparent">
@@ -94,7 +94,7 @@ const CustomerReviews = () => {
         {canScrollLeft && (
           <Button
             onClick={() => scroll('left')}
-            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white dark:bg-gray-700 rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-600 transition-all hover:scale-110 p-0"
+            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white dark:bg-gray-700 rounded-full shadow-sm flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-600 transition-all hover:scale-110 p-0"
           >
             <ChevronLeft className="w-5 h-5 text-gray-700 dark:text-gray-200" />
           </Button>
@@ -110,10 +110,10 @@ const CustomerReviews = () => {
             {reviews.map((review) => (
               <div
                 key={review.id}
-                className="w-[45%] flex-shrink-0 card rounded-2xl p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 group"
+                className="w-[45%] flex-shrink-0 card rounded-2xl p-6 border border-gray-100 dark:border-gray-700 hover:shadow-md transition-all duration-300 group"
               >
                 <div className="flex items-start gap-4 mb-4">
-                  <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${review.gradient} dark:from-gray-600 dark:via-gray-700 dark:to-gray-800 flex items-center justify-center text-4xl shadow-md group-hover:scale-110 transition-transform`}>
+                  <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${review.gradient} dark:from-gray-600 dark:via-gray-700 dark:to-gray-800 flex items-center justify-center text-4xl shadow-sm group-hover:scale-110 transition-transform`}>
                     {review.image}
                   </div>
                   <div className="flex-1">
@@ -158,7 +158,7 @@ const CustomerReviews = () => {
           {canScrollRight && (
             <Button
               onClick={() => scroll('right')}
-              className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white dark:bg-gray-700 rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-600 transition-all hover:scale-110 p-0"
+              className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white dark:bg-gray-700 rounded-full shadow-sm flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-600 transition-all hover:scale-110 p-0"
             >
               <ChevronRight className="w-5 h-5 text-gray-700 dark:text-gray-200" />
             </Button>

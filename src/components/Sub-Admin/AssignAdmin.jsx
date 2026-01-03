@@ -1,8 +1,8 @@
 // components/Sub-Admin/AssignAdmin.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  ArrowLeft, 
+import {
+  ArrowLeft,
   Search,
   Shield,
   CheckCircle,
@@ -96,7 +96,7 @@ const AssignAdmin = () => {
     }
   ];
 
-  const filteredAdmins = subAdmins.filter(admin => 
+  const filteredAdmins = subAdmins.filter(admin =>
     admin.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     admin.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -107,7 +107,7 @@ const AssignAdmin = () => {
   };
 
   const togglePermission = (permissionId) => {
-    setModifiedPermissions(prev => 
+    setModifiedPermissions(prev =>
       prev.includes(permissionId)
         ? prev.filter(id => id !== permissionId)
         : [...prev, permissionId]
@@ -118,9 +118,9 @@ const AssignAdmin = () => {
     const categoryPerms = permissionGroups
       .find(g => g.category === category)
       ?.permissions.map(p => p.id) || [];
-    
+
     const allSelected = categoryPerms.every(id => modifiedPermissions.includes(id));
-    
+
     if (allSelected) {
       setModifiedPermissions(prev => prev.filter(id => !categoryPerms.includes(id)));
     } else {
@@ -137,7 +137,7 @@ const AssignAdmin = () => {
 
   const handleSave = () => {
     if (!selectedAdmin || !hasChanges()) return;
-    
+
     console.log('Updating permissions for:', selectedAdmin.name);
     console.log('New permissions:', modifiedPermissions);
     alert('Permissions updated successfully!');
@@ -159,16 +159,10 @@ const AssignAdmin = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-6">
-          <button
-            onClick={() => navigate('/sub-admin')}
-            className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 mb-4 transition-all group"
-          >
-            <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
-            <span className="font-medium">Back to Sub-Admins</span>
-          </button>
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-primary p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
+
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
             <div>
-              <h1 className="text-heading">
+              <h1 className="highlight text-4xl font-extrabold tracking-tight">
                 Assign Permissions
               </h1>
               <p className="text-primary opacity-70 mt-2 text-lg font-medium">
@@ -185,7 +179,7 @@ const AssignAdmin = () => {
               <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4">
                 Select Sub-Admin
               </h3>
-              
+
               <Input
                 placeholder="Search admins..."
                 value={searchTerm}
@@ -199,11 +193,10 @@ const AssignAdmin = () => {
                   <div
                     key={admin.id}
                     onClick={() => handleSelectAdmin(admin)}
-                    className={`p-4 rounded-lg cursor-pointer transition-all border-2 ${
-                      selectedAdmin?.id === admin.id
-                        ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-500'
-                        : 'bg-gray-50 dark:bg-gray-800 border-transparent hover:border-gray-300 dark:hover:border-gray-600'
-                    }`}
+                    className={`p-4 rounded-lg cursor-pointer transition-all border-2 ${selectedAdmin?.id === admin.id
+                      ? 'bg-orange-50 dark:bg-orange-900/20 border-orange-500'
+                      : 'bg-gray-50 dark:bg-gray-800 border-transparent hover:border-gray-300 dark:hover:border-gray-600'
+                      }`}
                   >
                     <div className="flex items-center gap-3 mb-2">
                       <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold flex-shrink-0">
@@ -217,7 +210,7 @@ const AssignAdmin = () => {
                       </div>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded text-xs font-semibold">
+                      <span className="px-2 py-1 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 rounded text-xs font-semibold">
                         {admin.role}
                       </span>
                       <div className="flex items-center gap-1">
@@ -265,7 +258,7 @@ const AssignAdmin = () => {
                         </h2>
                         <p className="text-muted">{selectedAdmin.email}</p>
                         <div className="flex items-center gap-2 mt-1">
-                          <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-full text-sm font-semibold">
+                          <span className="px-3 py-1 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 rounded-full text-sm font-semibold">
                             {selectedAdmin.role}
                           </span>
                           <div className="flex items-center gap-1">
@@ -275,7 +268,7 @@ const AssignAdmin = () => {
                         </div>
                       </div>
                     </div>
-                    
+
                     {hasChanges() && (
                       <div className="flex items-center gap-2 px-4 py-2 bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 rounded-lg">
                         <RefreshCw size={16} />
@@ -326,13 +319,12 @@ const AssignAdmin = () => {
                             <button
                               type="button"
                               onClick={() => toggleCategoryPermissions(group.category)}
-                              className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
-                                allSelected
-                                  ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
-                                  : someSelected
+                              className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${allSelected
+                                ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
+                                : someSelected
                                   ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'
                                   : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                              }`}
+                                }`}
                             >
                               {allSelected ? 'Deselect All' : 'Select All'}
                             </button>
@@ -347,17 +339,16 @@ const AssignAdmin = () => {
                               return (
                                 <label
                                   key={permission.id}
-                                  className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all border-2 ${
-                                    isSelected
-                                      ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-500'
-                                      : 'bg-gray-50 dark:bg-gray-800 border-transparent hover:border-gray-300 dark:hover:border-gray-600'
-                                  } ${isChanged ? 'ring-2 ring-yellow-500' : ''}`}
+                                  className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all border-2 ${isSelected
+                                    ? 'bg-orange-50 dark:bg-orange-900/20 border-orange-500'
+                                    : 'bg-gray-50 dark:bg-gray-800 border-transparent hover:border-gray-300 dark:hover:border-gray-600'
+                                    } ${isChanged ? 'ring-2 ring-yellow-500' : ''}`}
                                 >
                                   <input
                                     type="checkbox"
                                     checked={isSelected}
                                     onChange={() => togglePermission(permission.id)}
-                                    className="mt-1 w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                    className="mt-1 w-5 h-5 rounded border-gray-300 text-orange-600 focus:ring-orange-500 accent-orange-600 file:text-orange-600"
                                   />
                                   <div className="flex-1">
                                     <div className="flex items-center gap-2">
@@ -373,7 +364,7 @@ const AssignAdmin = () => {
                                     <p className="text-sm text-muted">{permission.description}</p>
                                   </div>
                                   {isSelected ? (
-                                    <CheckCircle size={20} className="text-blue-600 dark:text-blue-400 flex-shrink-0" />
+                                    <CheckCircle size={20} className="text-orange-600 dark:text-orange-400 flex-shrink-0" />
                                   ) : (
                                     <XCircle size={20} className="text-gray-300 dark:text-gray-600 flex-shrink-0" />
                                   )}

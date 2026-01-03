@@ -35,7 +35,7 @@ const OrdersOverview = () => {
   };
 
   return (
-    <div className="bg-primary rounded-2xl p-6 shadow-lg border border-white/20 dark:border-gray-700">
+    <div className="bg-primary rounded-2xl p-6 shadow-sm border border-white/20 dark:border-gray-700">
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-xl font-bold text-primary">Orders Overview</h3>
         <div className="flex gap-2">
