@@ -17,12 +17,13 @@ import TransactionDetails from "../pages/payments/TransactionDetails";
 import Refunds from "../pages/payments/Refunds";
 import Invoice from "../pages/payments/Invoice";
 import Settings from "../components/settings/Settings"
-
 import CustomerReviewsPage from "../components/PageDashboard/ReviewCustomer/CustomerReviewsPage";
 import OffersManagement from "../pages/OffersManagement";
 import SupportManagement from "../pages/SupportManagement";
 import MenuManagement from "../pages/menu/MenuManagement";
 import AddMenu from "../components/menu/AddMenu";
+import ProtectedRoute from "../routes/ProtectedRoute";
+
 const AppRouter = createBrowserRouter(
   [
     /* 🔐 AUTH ROUTES */
@@ -32,6 +33,10 @@ const AppRouter = createBrowserRouter(
     },
 
     /* 🏠 MAIN APP */
+
+    {
+      element: <ProtectedRoute />,
+      children : [
     {
       path: "/",
       element: <Layout />,
@@ -147,6 +152,9 @@ const AppRouter = createBrowserRouter(
         }
       ],
     },
+   ],
+  },
+
   ],
   {
     future: {
@@ -154,6 +162,7 @@ const AppRouter = createBrowserRouter(
       v7_relativeSplatPath: true,
     },
   }
+  
 );
 
 export default AppRouter;
