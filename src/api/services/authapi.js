@@ -7,7 +7,7 @@ export const authApi = baseApi.injectEndpoints({
     // 🔹 LOGIN
     login: builder.mutation({
       query: (payload) => ({
-        url: "admin/login",
+        url: "auth/login",
         method: "POST",
         data: payload,
       }),
@@ -17,7 +17,7 @@ export const authApi = baseApi.injectEndpoints({
           const { data } = await queryFulfilled;
           // Dispatch setCredentials to update auth state in Redux and localStorage
           dispatch(setCredentials({ token: data.token, user: data.user }));
-        } catch (err) {}
+        } catch (err) { }
       },
     }),
   }),

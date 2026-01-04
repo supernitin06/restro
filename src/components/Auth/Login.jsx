@@ -17,6 +17,16 @@ const LoginForm = ({ role = "admin", onRoleChange }) => {
 
   const navigate = useNavigate();
 
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 900);
+
+  React.useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 900);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   // handle input changes
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -51,24 +61,46 @@ const LoginForm = ({ role = "admin", onRoleChange }) => {
   };
 
   return (
-    <div style={styles.container}>
+    <div style={styles.container} >
       {/* Background Elements */}
       <div style={styles.backgroundAnimation}></div>
-      
-      <div style={styles.card}>
+
+      <div style={{
+        ...styles.card,
+        flexDirection: isMobile ? "column" : "row",
+        maxWidth: "1000px",
+        height: isMobile ? "auto" : "600px"
+      }}>
         {/* LEFT IMAGE */}
-        <div style={styles.imageSection}>
+        <div style={{
+          ...styles.imageSection,
+          flex: isMobile ? "none" : 1,
+          height: isMobile ? "200px" : "100%"
+        }}>
           <div style={styles.imageOverlay}></div>
           <img src={restaurantImage} alt="Restaurant" style={styles.image} />
           <div style={styles.imageContent}>
-            <div style={styles.restaurantLogo}>🍽️</div>
-            <h2 style={styles.restaurantTitle}>Fine Dining Pro</h2>
-            <p style={styles.restaurantTagline}>Elevating Restaurant Management</p>
+            {isMobile ? (
+              // Simplified header for mobile image section
+              <>
+                <div style={{ ...styles.restaurantLogo, fontSize: "40px", marginBottom: "5px" }}>🍽️</div>
+                <h2 style={{ ...styles.restaurantTitle, fontSize: "24px" }}>Fine Dining Pro</h2>
+              </>
+            ) : (
+              <>
+                <div style={styles.restaurantLogo}>🍽️</div>
+                <h2 style={styles.restaurantTitle}>Fine Dining Pro</h2>
+                <p style={styles.restaurantTagline}>Elevating Restaurant Management</p>
+              </>
+            )}
           </div>
         </div>
 
         {/* RIGHT FORM */}
-        <div style={styles.formSection}>
+        <div style={{
+          ...styles.formSection,
+          padding: isMobile ? "30px 20px" : "40px"
+        }}>
           <div style={styles.formContent}>
             <div style={styles.header}>
               <div style={styles.welcomeBack}>
@@ -84,26 +116,30 @@ const LoginForm = ({ role = "admin", onRoleChange }) => {
                 onClick={() => onRoleChange && onRoleChange("admin")}
                 style={{
                   ...styles.roleButton,
-                  ...(role === "admin" ? styles.roleButtonActive : {})
+                  ...(role === "admin" ? styles.roleButtonActive : {}),
+                  padding: isMobile ? "10px" : "15px",
+                  gap: isMobile ? "8px" : "12px"
                 }}
               >
-                <span style={styles.roleIcon}>👑</span>
+                <span style={{ ...styles.roleIcon, fontSize: isMobile ? "20px" : "24px" }}>👑</span>
                 <div>
-                  <div style={styles.roleName}>Admin</div>
-                  <div style={styles.roleDesc}>Full Access</div>
+                  <div style={{ ...styles.roleName, fontSize: isMobile ? "13px" : "14px" }}>Admin</div>
+                  <div style={{ ...styles.roleDesc, fontSize: isMobile ? "11px" : "12px" }}>Full Access</div>
                 </div>
               </button>
               <button
                 onClick={() => onRoleChange && onRoleChange("subadmin")}
                 style={{
                   ...styles.roleButton,
-                  ...(role === "subadmin" ? styles.roleButtonActive : {})
+                  ...(role === "subadmin" ? styles.roleButtonActive : {}),
+                  padding: isMobile ? "10px" : "15px",
+                  gap: isMobile ? "8px" : "12px"
                 }}
               >
-                <span style={styles.roleIcon}>👥</span>
+                <span style={{ ...styles.roleIcon, fontSize: isMobile ? "20px" : "24px" }}>👥</span>
                 <div>
-                  <div style={styles.roleName}>Sub-Admin</div>
-                  <div style={styles.roleDesc}>Limited Access</div>
+                  <div style={{ ...styles.roleName, fontSize: isMobile ? "13px" : "14px" }}>Sub-Admin</div>
+                  <div style={{ ...styles.roleDesc, fontSize: isMobile ? "11px" : "12px" }}>Limited Access</div>
                 </div>
               </button>
             </div>
@@ -145,7 +181,7 @@ const LoginForm = ({ role = "admin", onRoleChange }) => {
                     required
                     style={styles.input}
                   />
-                  <button 
+                  <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     style={styles.eyeButton}
@@ -200,7 +236,7 @@ const LoginForm = ({ role = "admin", onRoleChange }) => {
               <div style={styles.footer}>
                 <p style={styles.footerText}>
                   Need help?{" "}
-                  <button 
+                  <button
                     type="button"
                     style={styles.supportLink}
                     onClick={() => navigate("/support")}
