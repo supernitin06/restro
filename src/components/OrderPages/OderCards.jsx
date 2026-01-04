@@ -9,27 +9,69 @@ const OrderCard = ({ order, onDelete, onEdit, onUpdateStatus, viewMode }) => {
   const [showDetails, setShowDetails] = useState(false);
 
   const statusConfig = {
-    'completed': {
+    completed: {
       bg: 'bg-green-100 dark:bg-green-900/30',
       text: 'text-green-700 dark:text-green-400',
       icon: CheckCircle,
       label: 'Completed'
     },
-    'cancelled': {
+    delivered: {
+      bg: 'bg-green-100 dark:bg-green-900/30',
+      text: 'text-green-700 dark:text-green-400',
+      icon: CheckCircle,
+      label: 'Delivered'
+    },
+    cancelled: {
       bg: 'bg-red-100 dark:bg-red-900/30',
       text: 'text-red-700 dark:text-red-400',
       icon: XCircle,
       label: 'Cancelled'
     },
-    'on-process': {
+    'on-process': { // Fallback/default
       bg: 'bg-blue-100 dark:bg-blue-900/30',
       text: 'text-blue-700 dark:text-blue-400',
       icon: Clock,
       label: 'Processing'
+    },
+    preparing: {
+      bg: 'bg-blue-100 dark:bg-blue-900/30',
+      text: 'text-blue-700 dark:text-blue-400',
+      icon: Clock,
+      label: 'Preparing'
+    },
+    confirmed: {
+      bg: 'bg-cyan-100 dark:bg-cyan-900/30',
+      text: 'text-cyan-700 dark:text-cyan-400',
+      icon: CheckCircle,
+      label: 'Confirmed'
+    },
+    placed: {
+      bg: 'bg-orange-100 dark:bg-orange-900/30',
+      text: 'text-orange-700 dark:text-orange-400',
+      icon: Clock,
+      label: 'Placed'
+    },
+    accepted: {
+      bg: 'bg-indigo-100 dark:bg-indigo-900/30',
+      text: 'text-indigo-700 dark:text-indigo-400',
+      icon: CheckCircle,
+      label: 'Accepted'
+    },
+    assigned: {
+      bg: 'bg-purple-100 dark:bg-purple-900/30',
+      text: 'text-purple-700 dark:text-purple-400',
+      icon: Bike,
+      label: 'Assigned'
+    },
+    picked: {
+      bg: 'bg-purple-100 dark:bg-purple-900/30',
+      text: 'text-purple-700 dark:text-purple-400',
+      icon: Bike,
+      label: 'Picked Up'
     }
   };
 
-  const config = statusConfig[order.status];
+  const config = statusConfig[order.status] || statusConfig['on-process'];
   const StatusIcon = config.icon;
 
   // ============= LIST VIEW =============

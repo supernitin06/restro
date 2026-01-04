@@ -7,8 +7,6 @@ const AuthContainer = () => {
   return (
     <div className="app page flex items-center justify-center">
       <LoginForm
-        role={role}
-        onRoleChange={setRole}
       />
     </div>
   );
