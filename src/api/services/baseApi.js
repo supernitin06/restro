@@ -12,14 +12,13 @@ const axiosInstance = axios.create({
 
 
 const axiosBaseQuery =
-  ({ baseUrl } = { baseUrl: "" }) =>
+  () =>
   async ({ url, method, data, params, headers }, api) => {
     try {
-      const state = api.getState();
-      const token = state?.auth?.authToken;
+      const token = localStorage.getItem("token");
 
       const result = await axiosInstance({
-        url: baseUrl + url,
+        url,
         method,
         data,
         params,
@@ -33,7 +32,6 @@ const axiosBaseQuery =
     } catch (axiosError) {
       const err = axiosError;
 
-      // 🔐 Unauthorized
       if (err.response?.status === 401) {
         api.dispatch(logout());
       }
@@ -47,21 +45,14 @@ const axiosBaseQuery =
     }
   };
 
+
 /**
  * RTK Query base API
  */
 export const baseApi = createApi({
   reducerPath: "baseApi",
-  baseQuery: axiosBaseQuery({
-    baseUrl: "",
-  }),
-  tagTypes: [
-    "Auth",
-    "User",
-    "Order",
-    "Menu",
-    "Category",
-    "Dashboard",
-  ],
+  baseQuery: axiosBaseQuery(),
+  tagTypes: ["Auth", "User", "Order", "Menu", "Category", "Dashboard"],
   endpoints: () => ({}),
 });
+

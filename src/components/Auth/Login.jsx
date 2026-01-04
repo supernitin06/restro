@@ -39,6 +39,7 @@ const LoginForm = ({ role = "admin", onRoleChange }) => {
       const response = await login(payload).unwrap();
       // ✅ store only token
       localStorage.setItem("token", response.token);
+      console.log("Token stored:", localStorage.getItem("token"));
       // optional: rememberMe logic
       if (formData.rememberMe) {
         localStorage.setItem("rememberMeEmail", formData.email);
