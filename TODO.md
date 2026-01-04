@@ -1,7 +1,6 @@
-# TODO: Convert AddMenu Modal to Standalone Page
+# TODO List for Fixing Console Errors
 
-## Steps to Complete:
-1. Add a new route in approuter.jsx for /menu-management/add that renders the AddMenu component.
-2. Modify MenuManagement.jsx to navigate to the new page instead of opening a modal, and remove modal-related code.
-3. Update AddMenu.jsx to handle navigation (back button and save functionality) using React Router.
-4. Test the changes to ensure the Add Menu functionality opens as a full page.
+- [x] Import i18n in main.jsx to fix react-i18next warning
+- [x] Add all React Router future flags in approuter.jsx to suppress v7_startTransition warning
+- [x] Add minWidth and minHeight to ResponsiveContainer in RevenueChart.jsx to fix recharts warning
+- [x] Test the app to verify warnings are resolved
