@@ -37,9 +37,7 @@ const LoginForm = ({ role = "admin", onRoleChange }) => {
 
     try {
       const response = await login(payload).unwrap();
-      // ✅ store only token
-      localStorage.setItem("token", response.token);
-      console.log("Token stored:", localStorage.getItem("token"));
+      // Token is now handled in authapi onQueryStarted
       // optional: rememberMe logic
       if (formData.rememberMe) {
         localStorage.setItem("rememberMeEmail", formData.email);

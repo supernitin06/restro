@@ -21,13 +21,6 @@ import Table from "../components/ui/Table";
 import Badge from "../components/ui/Badge";
 
 const UserManagement = () => {
-
-    const { data, isLoading, isError } = useGetUsersQuery({
-    page: currentPage,
-    limit: itemsPerPage,
-  });
-  console.log("khusboo ka data",data);
-  const [updateUser] = useUpdateUserMutation(); 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
 
@@ -38,12 +31,15 @@ const UserManagement = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
-
-
+  const { data, isLoading, isError } = useGetUsersQuery({
+    page: currentPage,
+    limit: itemsPerPage,
+  });
+  console.log(data);
   const users = data?.data || [];
   const totalUsers = data?.meta?.total || 0;
 
-  
+  const [updateUser] = useUpdateUserMutation(); 
 
   if (isLoading) return <div>Loading users...</div>;
   if (isError) return <div>Error fetching users</div>;
@@ -55,7 +51,7 @@ const UserManagement = () => {
       body: { isBlocked: !user.isBlocked },
     });
   };
-
+ 
   const handleFilterChange = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
     setCurrentPage(1);

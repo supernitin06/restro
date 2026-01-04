@@ -1,4 +1,5 @@
 import { baseApi } from "../services/baseApi";
+import { setCredentials } from "../services/authSlice";
 
 export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -24,8 +25,8 @@ export const authApi = baseApi.injectEndpoints({
             )
           );
 
-          // optional: token localStorage me
-          localStorage.setItem("token", data.token);
+          // Set credentials in state
+          dispatch(setCredentials({ token: data.token, user: data.user }));
         } catch (err) {}
       },
     }),
