@@ -10,7 +10,7 @@ import Pagination from '../components/ui/Pagination';
 import { useGetOrdersQuery } from '../api/services/orderApi';
 
 const Orders = () => {
-  const { token } = useSelector((state) => state.auth);
+  const { authToken } = useSelector((state) => state.auth);
   const [filters, setFilters] = useState({
     status: 'all',
   });
@@ -22,16 +22,20 @@ const Orders = () => {
   const itemsPerPage = 6;
 
   // Fetch data from API
-  const { data, isLoading, isError } = useGetOrdersQuery({
-  page: currentPage,
-  limit: itemsPerPage,
-  search: searchQuery,
-  status: filters.status === "all" ? undefined : filters.status,
-});
+  const { data, isLoading, isError, error } = useGetOrdersQuery(
+    {
+      page: currentPage,
+      limit: itemsPerPage,
+      search: searchQuery,
+      status: filters.status === "all" ? undefined : filters.status,
+    },
+    {
+      skip: !authToken, // Do not run query if user is not logged in
+    }
+  );
   const apiResponse = data;
 
-  console.log('API Response:', apiResponse);
-  // Local state to hold orders (allows for optimistic UI updates if needed, though direct API data is better)
+  console.log("API Response:", apiResponse, "Error:", error);
   const [orders, setOrders] = useState([]);
 
   // Normalize API data to match UI structure
@@ -185,7 +189,7 @@ const Orders = () => {
         />
 
         {/* Orders Grid/List */}
-        {/* {!token ? (
+        {!authToken ? (
           <div className="text-center py-20">
             <p className="text-2xl text-gray-400 font-semibold">Access Denied</p>
             <p className="text-gray-500 mt-2">Please log in to view orders.</p>
@@ -198,10 +202,10 @@ const Orders = () => {
           <div className="text-center py-20">
             <p className="text-2xl text-red-500 font-semibold">Unable to load orders</p>
             <p className="text-gray-500 mt-2">
-              {error?.status === 401 ? "Unauthorized: Please log in." : (error?.data?.message || "An error occurred.")}
+              {error?.status === 401 ? "Unauthorized: Please log in again." : (error?.data?.message || "An error occurred.")}
             </p>
           </div>
-        ) : ( */}
+        ) : (
           <div className={
             viewMode === 'grid'
               ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8'
@@ -218,9 +222,9 @@ const Orders = () => {
               />
             ))}
           </div>
-      
+        )}
 
-        {token && !isLoading && !isError && filteredOrders.length === 0 && (
+        {authToken && !isLoading && !isError && currentOrders.length === 0 && (
           <div className="text-center py-20">
             <p className="text-2xl text-gray-400 font-semibold">No orders found</p>
             <p className="text-gray-500 mt-2">Try adjusting your filters or add a new order</p>
