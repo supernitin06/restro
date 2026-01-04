@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import restaurantImage from "../../assets/loginimage1.jpg";
+import { useLoginMutation } from "../../api/services/authapi";
+import { useNavigate } from "react-router-dom";
 
 const LoginForm = ({ role = "admin", onRoleChange }) => {
   const [formData, setFormData] = useState({
@@ -7,9 +9,13 @@ const LoginForm = ({ role = "admin", onRoleChange }) => {
     password: "",
     rememberMe: false,
   });
-  const [loading, setLoading] = useState(false);
+
+  const [login, { isLoading }] = useLoginMutation();
   const [error, setError] = useState("");
 
+  const navigate = useNavigate();
+
+  // handle input changes
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
@@ -18,15 +24,29 @@ const LoginForm = ({ role = "admin", onRoleChange }) => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  // handle form submit
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    setLoading(true);
 
-    setTimeout(() => {
-      console.log("LOGIN DATA 👉", { role, ...formData });
-      setLoading(false);
-    }, 1500);
+    const payload = {
+      email: formData.email.trim(),
+      password: formData.password.trim(),
+      role: role === "admin" ? "RESTAURANT_ADMIN" : "SUB_ADMIN",
+    };
+
+    try {
+      const response = await login(payload).unwrap();
+      // ✅ store only token
+      localStorage.setItem("token", response.token);
+      // optional: rememberMe logic
+      if (formData.rememberMe) {
+        localStorage.setItem("rememberMeEmail", formData.email);
+      }
+      navigate("/"); // redirect to dashboard
+    } catch (err) {
+      setError(err?.data?.message || err?.error || "Login failed");
+    }
   };
 
   return (
@@ -41,34 +61,10 @@ const LoginForm = ({ role = "admin", onRoleChange }) => {
         <div style={styles.formSection}>
           <div style={styles.header}>
             <h1 style={styles.title}>Welcome Back</h1>
-            <p style={styles.subtitle}>
-              Login as {role === "admin" ? "Admin" : "Sub Admin"}
-            </p>
+           
           </div>
 
-          {/* ROLE SWITCH */}
-          <div style={styles.roleSwitcher}>
-            <button
-              type="button"
-              style={{
-                ...styles.roleButton,
-                ...(role === "admin" ? styles.roleButtonActive : {}),
-              }}
-              onClick={() => onRoleChange("admin")}
-            >
-              Admin
-            </button>
-            <button
-              type="button"
-              style={{
-                ...styles.roleButton,
-                ...(role === "sub_admin" ? styles.roleButtonActive : {}),
-              }}
-              onClick={() => onRoleChange("sub_admin")}
-            >
-              Sub Admin
-            </button>
-          </div>
+          
 
           {/* FORM */}
           <form onSubmit={handleSubmit} style={styles.form}>
@@ -103,7 +99,14 @@ const LoginForm = ({ role = "admin", onRoleChange }) => {
             </div>
 
             {/* REMEMBER */}
-            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                marginBottom: "12px",
+              }}
+            >
               <input
                 type="checkbox"
                 name="rememberMe"
@@ -115,10 +118,16 @@ const LoginForm = ({ role = "admin", onRoleChange }) => {
               </span>
             </div>
 
+            {/* ERROR */}
             {error && <div style={styles.errorMessage}>{error}</div>}
 
-            <button type="submit" style={styles.loginButton} disabled={loading}>
-              {loading ? "Logging in..." : "Login"}
+            {/* SUBMIT */}
+            <button
+              type="submit"
+              style={styles.loginButton}
+              disabled={isLoading}
+            >
+              {isLoading ? "Logging in..." : "Login"}
             </button>
           </form>
 
@@ -130,6 +139,7 @@ const LoginForm = ({ role = "admin", onRoleChange }) => {
     </div>
   );
 };
+
 
 const styles = {
   container: {
