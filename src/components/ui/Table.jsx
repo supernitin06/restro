@@ -19,6 +19,9 @@ const Table = ({
     : actions.length > 0
     ? [...columns, { header: "Actions", key: "actions" }]
     : columns;
+ console.log("Table Rendered with column:", columns);
+ console.log("Table Rendered with data:", data);
+ console.log("Table Rendered with displayColumns:", displayColumns);
 
   return (
     <div
