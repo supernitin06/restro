@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigation } from "react-router-dom";
 import Navbar from "../components/layout/Navbar";
 import Sidebar from "../components/layout/Sidebar";
+import CookingLoader from "./Loader";
 
- 
 const Layout = () => {
+  const navigation = useNavigation();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const toggleSidebar = () => {
@@ -25,7 +26,7 @@ const Layout = () => {
 
         {/* MAIN CONTENT */}
         <main className="flex-1 p-4 overflow-auto">
-          <Outlet />
+          {navigation.state === "loading" ? <CookingLoader /> : <Outlet />}
         </main>
       </div>
     </div>
