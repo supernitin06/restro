@@ -1,15 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
-import axios from "axios";
-import { logout } from "../auth/authtoken";
-
-
-const axiosInstance = axios.create({
-  baseURL: "https://sog.bitmaxtest.com/api/v1/",
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
-
+import { axiosInstance } from "../../utils/axiosInstance";
+import { logout } from "../services/authSlice";
 
 const axiosBaseQuery =
   ({ baseUrl } = { baseUrl: "" }) =>
@@ -47,21 +38,11 @@ const axiosBaseQuery =
       }
     };
 
-/**
- * RTK Query base API
- */
+
+
 export const baseApi = createApi({
   reducerPath: "baseApi",
-  baseQuery: axiosBaseQuery({
-    baseUrl: "",
-  }),
-  tagTypes: [
-    "Auth",
-    "User",
-    "Order",
-    "Menu",
-    "Category",
-    "Dashboard",
-  ],
+  baseQuery: axiosBaseQuery(),
+  tagTypes: ["Auth", "User", "Order", "Menu", "Category", "Dashboard"],
   endpoints: () => ({}),
 });
