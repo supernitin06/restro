@@ -23,23 +23,28 @@ import SupportManagement from "../pages/SupportManagement";
 import MenuManagement from "../pages/menu/MenuManagement";
 import AddMenu from "../components/menu/AddMenu";
 import ProtectedRoute from "../routes/ProtectedRoute";
+import ErrorPage from "../pages/ErrorPage";
+
 
 const AppRouter = createBrowserRouter(
   [
     /* 🔐 AUTH ROUTES */
     {
-      path: "/auth",
+      path: "/login",
       element: <AuthContainer />,
+      errorElement: <ErrorPage />,
     },
 
     /* 🏠 MAIN APP */
 
     {
       element: <ProtectedRoute />,
+      errorElement: <ErrorPage />,
       children : [
     {
       path: "/",
       element: <Layout />,
+      errorElement: <ErrorPage />,
       children: [
         {
           index: true,

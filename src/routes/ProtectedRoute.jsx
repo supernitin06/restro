@@ -1,10 +1,12 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useGetAuthDataQuery } from "../api/services/authapi";
 
 const ProtectedRoute = () => {
-  const token = useSelector((state) => state.auth.authToken);
+  const { data } = useGetAuthDataQuery();
 
-  
+  const token =
+    data?.token || localStorage.getItem("token");
+
   if (!token) {
     return <Navigate to="/login" replace />;
   }
