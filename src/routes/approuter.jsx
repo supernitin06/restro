@@ -27,7 +27,7 @@ import CookingLoader from "../pages/Loader";
 // loaders/generalLoader.js
 export const generalLoader = async () => {
   // simulate API delay or global data fetching
-  await new Promise((resolve) => setTimeout(resolve, 800)); // Reduced slightly for better UX on frequent clicks
+  await new Promise((resolve) => setTimeout(resolve, 300)); // Reduced slightly for better UX on frequent clicks
 
   return null;
 };

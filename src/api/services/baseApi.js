@@ -17,7 +17,7 @@ const axiosBaseQuery =
     try {
       const state = api.getState();
       const token = state?.auth?.authToken;
-
+      console.log(token);
       const result = await axiosInstance({
         url: baseUrl + url,
         method,
