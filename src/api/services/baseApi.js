@@ -1,67 +1,46 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
-import axios from "axios";
-import { logout } from "../auth/authtoken";
-
-
-const axiosInstance = axios.create({
-  baseURL: "https://sog.bitmaxtest.com/api/v1/",
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
-
+import { axiosInstance } from "../../utils/axiosInstance";
+import { logout } from "../services/authSlice";
 
 const axiosBaseQuery =
-  ({ baseUrl } = { baseUrl: "" }) =>
-  async ({ url, method, data, params, headers }, api) => {
+  () =>
+  async ({ url, method, data, params }, api) => {
     try {
       const state = api.getState();
-      const token = state?.auth?.authToken;
+      const token = state.auth?.authToken;
+
+      console.log("TOKEN SENT:", token); // 👈 DEBUG
 
       const result = await axiosInstance({
-        url: baseUrl + url,
+        url,
         method,
         data,
         params,
         headers: {
-          ...headers,
-          Authorization: token ? `Bearer ${token}` : undefined,
+          Authorization: token ? `Bearer ${token}` : "",
         },
       });
 
       return { data: result.data };
-    } catch (axiosError) {
-      const err = axiosError;
-
-      // 🔐 Unauthorized
-      if (err.response?.status === 401) {
+    } catch (error) {
+      if (error.response?.status === 401) {
         api.dispatch(logout());
       }
 
       return {
         error: {
-          status: err.response?.status,
-          data: err.response?.data || err.message,
+          status: error.response?.status,
+          data: error.response?.data,
         },
       };
     }
   };
 
-/**
- * RTK Query base API
- */
+
+
 export const baseApi = createApi({
   reducerPath: "baseApi",
-  baseQuery: axiosBaseQuery({
-    baseUrl: "",
-  }),
-  tagTypes: [
-    "Auth",
-    "User",
-    "Order",
-    "Menu",
-    "Category",
-    "Dashboard",
-  ],
+  baseQuery: axiosBaseQuery(),
+  tagTypes: ["Auth", "User", "Order", "Menu", "Category", "Dashboard"],
   endpoints: () => ({}),
 });
