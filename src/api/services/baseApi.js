@@ -1,6 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import axios from "axios";
-import { logout } from "../auth/authtoken";
+import { logout } from "./authSlice";
 
 
 const axiosInstance = axios.create({
@@ -15,8 +15,9 @@ const axiosBaseQuery =
   () =>
   async ({ url, method, data, params, headers }, api) => {
     try {
-      const token = localStorage.getItem("token");
-
+      const state = api.getState();
+      const token = state?.auth?.authToken;
+ 
       const result = await axiosInstance({
         url,
         method,
@@ -27,15 +28,16 @@ const axiosBaseQuery =
           Authorization: token ? `Bearer ${token}` : undefined,
         },
       });
-
+ 
       return { data: result.data };
     } catch (axiosError) {
       const err = axiosError;
-
+ 
+      // 🔐 Unauthorized
       if (err.response?.status === 401) {
         api.dispatch(logout());
       }
-
+ 
       return {
         error: {
           status: err.response?.status,
@@ -44,8 +46,7 @@ const axiosBaseQuery =
       };
     }
   };
-
-
+ 
 /**
  * RTK Query base API
  */
@@ -55,4 +56,3 @@ export const baseApi = createApi({
   tagTypes: ["Auth", "User", "Order", "Menu", "Category", "Dashboard"],
   endpoints: () => ({}),
 });
-

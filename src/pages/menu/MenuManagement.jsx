@@ -4,10 +4,6 @@ import MenuList from "../../components/menu/MenuList";
 import Button from "../../components/ui/Button";
 import { FiPlus } from "react-icons/fi";
 
-/**
- * Unified Add Menu Page
- * Combines Add Category, SubCategory, and Product in a single form
- */
 const MenuManagement = () => {
   const navigate = useNavigate();
   const [menuList, setMenuList] = useState([]); // Local menu list state
