@@ -13,39 +13,39 @@ const axiosInstance = axios.create({
 
 const axiosBaseQuery =
   ({ baseUrl } = { baseUrl: "" }) =>
-  async ({ url, method, data, params, headers }, api) => {
-    try {
-      const state = api.getState();
-      const token = state?.auth?.authToken;
+    async ({ url, method, data, params, headers }, api) => {
+      try {
+        const state = api.getState();
+        const token = state?.auth?.token;
 
-      const result = await axiosInstance({
-        url: baseUrl + url,
-        method,
-        data,
-        params,
-        headers: {
-          ...headers,
-          Authorization: token ? `Bearer ${token}` : undefined,
-        },
-      });
+        const result = await axiosInstance({
+          url: baseUrl + url,
+          method,
+          data,
+          params,
+          headers: {
+            ...headers,
+            Authorization: token ? `Bearer ${token}` : undefined,
+          },
+        });
 
-      return { data: result.data };
-    } catch (axiosError) {
-      const err = axiosError;
+        return { data: result.data };
+      } catch (axiosError) {
+        const err = axiosError;
 
-      // 🔐 Unauthorized
-      if (err.response?.status === 401) {
-        api.dispatch(logout());
+        // 🔐 Unauthorized
+        if (err.response?.status === 401) {
+          api.dispatch(logout());
+        }
+
+        return {
+          error: {
+            status: err.response?.status,
+            data: err.response?.data || err.message,
+          },
+        };
       }
-
-      return {
-        error: {
-          status: err.response?.status,
-          data: err.response?.data || err.message,
-        },
-      };
-    }
-  };
+    };
 
 /**
  * RTK Query base API
