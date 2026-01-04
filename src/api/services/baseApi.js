@@ -1,6 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import axios from "axios";
-import { logout } from "../auth/authtoken";
+import { logout } from "./authSlice";
 
 
 const axiosInstance = axios.create({
@@ -17,7 +17,7 @@ const axiosBaseQuery =
     try {
       const state = api.getState();
       const token = state?.auth?.authToken;
-
+ 
       const result = await axiosInstance({
         url: baseUrl + url,
         method,
@@ -28,16 +28,16 @@ const axiosBaseQuery =
           Authorization: token ? `Bearer ${token}` : undefined,
         },
       });
-
+ 
       return { data: result.data };
     } catch (axiosError) {
       const err = axiosError;
-
+ 
       // 🔐 Unauthorized
       if (err.response?.status === 401) {
         api.dispatch(logout());
       }
-
+ 
       return {
         error: {
           status: err.response?.status,
@@ -46,7 +46,7 @@ const axiosBaseQuery =
       };
     }
   };
-
+ 
 /**
  * RTK Query base API
  */
