@@ -26,10 +26,8 @@ const RestaurantGrid = ({
       {filteredRestaurants.map((restaurant) => (
         <RestaurantCard
           key={restaurant._id}
-
           restaurant={restaurant}
           onApprove={onApprove}
-          onSuspend={onSuspend}
           onView={onView}
           onEdit={onEdit}
           onDelete={onDelete}

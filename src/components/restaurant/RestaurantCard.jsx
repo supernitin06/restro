@@ -5,7 +5,6 @@ import Button from "../ui/Button";
 const RestaurantCard = ({
   restaurant,
   onApprove,
-  onSuspend,
   onView,
   onEdit,
   onDelete,
@@ -37,7 +36,7 @@ const RestaurantCard = ({
               isActive
             )}`}
           >
-            {isActive ? "Approved" : "Suspended"}
+            {isActive ? "Active" : "Inactive"}
           </span>
 
           {/* EDIT / DELETE */}
@@ -59,42 +58,22 @@ const RestaurantCard = ({
           </h2>
 
           {/* ACTIVE / DEACTIVE STATUS */}
-          <div className="flex items-center gap-2">
-            <span
-              className={`w-2.5 h-2.5 rounded-full ${
-                isActive ? "bg-green-500" : "bg-red-500"
-              }`}
-            />
-            <span
-              className={`text-xs font-semibold ${
-                isActive ? "text-green-600" : "text-red-600"
-              }`}
-            >
-              {isActive ? "Active" : "Inactive"}
-            </span>
-          </div>
+
 
           <div className="h-px bg-gray-200" />
 
           {/* ACTION BUTTONS */}
-          <div className="grid grid-cols-3 gap-2">
-            <Button
-              onClick={() => onApprove(restaurantId)}
-              disabled={isActive}
-              variant="active"
-              size="sm"
-            >
-              Approve
-            </Button>
+          <div className="grid grid-cols-2 gap-2">
 
             <Button
-              onClick={() => onSuspend(restaurantId)}
-              disabled={!isActive}
-              variant="inactive"
-              size="sm"
-            >
-              Suspend
-            </Button>
+  onClick={() => onApprove(restaurantId)} // or any handler
+  size="sm"
+  className={`py-2 px-4 rounded-lg text-white transition-colors duration-300 ease-in-out
+    ${isActive ? "bg-green-600 hover:bg-green-700" : "bg-red-600 hover:bg-red-700"}`}
+>
+  {isActive ? "Active" : "Inactive"}
+</Button>
+
 
             <Button
               onClick={() => onView(restaurant)}
