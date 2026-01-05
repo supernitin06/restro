@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from "react";
 import FiltersBar from "../components/ui/UserFilters";
 import UserModal from "../components/users/UserModal";
-// import UserCard from "../components/users/UserCard";
+import UserCard from "../components/users/UserCard";
 import { useGetUsersQuery, useUpdateUserMutation } from "../api/services/userapi";
 import { TrendingUp, TrendingDown, Grid, List } from "lucide-react";
 import GradientButton from "../components/ui/GradientButton";
@@ -11,7 +11,7 @@ import Badge from "../components/ui/Badge";
 import Pagination from "../components/ui/Pagination";
 
 
-const UserManagement = () => { 
+const UserManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
   const [viewMode, setViewMode] = useState("table");
@@ -148,16 +148,16 @@ const columns = useMemo(() => {
               onClear={handleClearFilters}
             >
               <div className="flex gap-1">
-                {/* <GradientButton onClick={() => setViewMode("grid")}>
+                <GradientButton onClick={() => setViewMode("grid")}>
                   <Grid size={16} />
-                </GradientButton> */}
+                </GradientButton>
                 <GradientButton onClick={() => setViewMode("table")}>
                   <List size={16} />
                 </GradientButton>
               </div>
             </FiltersBar>
 
-            {/* {viewMode === "grid" && (
+            {viewMode === "grid" && (
   <>
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
       {filteredUsers.map((user) => (
@@ -171,7 +171,7 @@ const columns = useMemo(() => {
       onPageChange={handlePageChange}
     />
   </>
-)} */}
+)}
 
 {viewMode === "table" && (
   <>

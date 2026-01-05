@@ -10,6 +10,7 @@ const SearchFilterBar = ({
   onAddNew
 }) => {
 
+  // called when filter select changes
   const handleFilterChange = (key, value) => {
     if (key === 'status') {
       setStatusFilter(value);
@@ -18,25 +19,24 @@ const SearchFilterBar = ({
 
   return (
     <FilterBar
-      search={{
-        value: searchTerm,
-        onChange: setSearchTerm,
-        placeholder: "Search restaurants..."
-      }}
+       search={{
+    value: searchTerm,
+    onChange: setSearchTerm, // ✅ just pass setter
+    placeholder: "Search restaurants..."
+  }}
       filters={[
         {
           key: 'status',
           value: statusFilter,
           options: [
             { value: "All", label: "All Status" },
-            { value: "Active", label: "Active" },
-            { value: "Deactive", label: "Deactive" }
+            { value: "Approved", label: "Approved" },
+            { value: "Suspended", label: "Suspended" }
           ]
         }
       ]}
       onFilterChange={handleFilterChange}
     >
-      {/* Add New Button passed as child */}
       <Button onClick={onAddNew} className="px-6 whitespace-nowrap">
         + Add New
       </Button>

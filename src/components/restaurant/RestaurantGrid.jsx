@@ -25,7 +25,8 @@ const RestaurantGrid = ({
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       {filteredRestaurants.map((restaurant) => (
         <RestaurantCard
-          key={restaurant.restaurantId}
+          key={restaurant._id}
+
           restaurant={restaurant}
           onApprove={onApprove}
           onSuspend={onSuspend}
