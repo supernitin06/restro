@@ -80,16 +80,16 @@ const Sidebar = ({ theme = "dark" }) => {
       hasDropdown:true,
       subItems:[
         {
-          id:"menu_items",
+          id:"menu-management",
           label:"Menu Management",
           icon:UtensilsCrossed,
-          path:"/menu-management" 
+          path:"/menu-management"
         },
         {
-          id:"menu_items",
+          id:"add-menu",
           label:"Add Menu",
           icon:UtensilsCrossed,
-          path:"/menu-management/add" 
+          path:"/menu-management/add"
         }
       ]
 

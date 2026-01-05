@@ -47,7 +47,7 @@ const DeliveryPartner = ({ partners, onViewDetails, updatePartner }) => {
             <div className={`h-0.5 ${isActive ? "bg-green-500" : "bg-gray-400 dark:bg-gray-500"}`} />
 
             <div className="p-2.5 flex flex-col h-full justify-between">
-              {/* HEADER - Name aur ID niche, badge chhota aur right mein */}
+             
               <div className="flex items-start justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <img
@@ -71,7 +71,7 @@ const DeliveryPartner = ({ partners, onViewDetails, updatePartner }) => {
                   </div>
                 </div>
 
-                {/* Badge ko aur chhota aur clean banaya */}
+                
                 <DeliveryPartnerStatusBadge
                   status={listView.status}
                   className="text-[7px] font-semibold px-1.5 py-0.5 rounded-md"

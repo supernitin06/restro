@@ -33,8 +33,7 @@ const SearchFilterBar = ({
           ]
         }
       ]}
-      onFilterChange={handleFilterChange}
-    >
+      >
       {/* Add New Button passed as child */}
       <Button onClick={() => navigate('/restaurant-management/add')} className="px-6 whitespace-nowrap">
         + Add New

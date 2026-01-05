@@ -1,7 +1,22 @@
-# TODO: Convert AddMenu Modal to Standalone Page
+# TODO: Fix Add New Category Save Issue
 
-## Steps to Complete:
-1. Add a new route in approuter.jsx for /menu-management/add that renders the AddMenu component.
-2. Modify MenuManagement.jsx to navigate to the new page instead of opening a modal, and remove modal-related code.
-3. Update AddMenu.jsx to handle navigation (back button and save functionality) using React Router.
-4. Test the changes to ensure the Add Menu functionality opens as a full page.
+- [x] Analyze the AddMenu.jsx component to understand the handleAddCategory function
+- [x] Identify issues: No user feedback on success/failure, no auto-selection of new category, no refresh of categories list
+- [x] Add success alert when category is added successfully
+- [x] Add error alert when category addition fails
+- [x] Auto-select the newly added category in the dropdown
+- [x] Reset the form fields after successful addition
+- [x] Refresh the categories list after adding a new category
+- [x] Test the functionality to ensure save works properly
+
+# TODO: Fix 404 Errors for Categories and Schemes Endpoints
+
+- [x] Change category endpoints from "admin/category" to "admin/categories" in menuApi.js
+- [x] Remove schemes endpoint and related UI from AddMenu.jsx since it's not available on the server
+- [x] Remove useGetSchemesQuery import and usage
+- [x] Remove schemes state variables and JSX section
+- [x] Update exports in menuApi.js to exclude useGetSchemesQuery
+
+# TODO: Update API Base URL
+
+- [x] Update baseURL in src/api/services/baseApi.js from "https://sog.bitmaxtest.com/api/v1/" to "https://resto-grandma.onrender.com/api/v1/"

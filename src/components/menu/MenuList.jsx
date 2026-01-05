@@ -1,10 +1,17 @@
 import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { FiEdit, FiTrash2, FiStar, FiCheck, FiX, FiChevronDown, FiChevronUp } from "react-icons/fi";
+import { GiChickenLeg, GiFruitBowl } from "react-icons/gi";
 import { List } from "lucide-react";
 import StatCard from "../ui/StatCard";
 import EditMenuModal from "./EditMenuModal";
 import UserFilters from "../ui/UserFilters";
-import menuData from "../../pages/menu/menuData";
+import {
+  useGetMenusQuery,
+  useDeleteMenuMutation,
+  useUpdateMenuMutation,
+} from "../../api/services/menuApi";
+import transformMenuData from "./transformMenuData";
 
 const transformMenuData = (data) => {
   const categoriesMap = {};
@@ -70,31 +77,35 @@ const transformCategoryData = (categoryData) => {
 };
 
 const MenuList = () => {
-  const [menus, setMenus] = useState([]);
+  const user = useSelector((state) => state.auth.user);
+  console.log("jfnvjinfov nionfkov ", user);
+  const [restaurant , setRestaurant] = useState(null);
+  useEffect(() => {
+
+    if(user){
+      setRestaurant(user.restaurantId);
+    }
+
+  }, [user]);
+  console.log("restaurant", restaurant);
+
   const [editItem, setEditItem] = useState(null);
   const [expandedCategories, setExpandedCategories] = useState({});
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
 
-  useEffect(() => {
-    const saved = localStorage.getItem("menuData");
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      if (Array.isArray(parsed)) {
-        // Check if it's the category structure (from menuData.js) or item structure
-        if (parsed.length > 0 && parsed[0].products) {
-          setMenus(transformCategoryData(parsed).menus);
-        } else {
-          setMenus(transformMenuData(parsed).menus);
-        }
-      } else {
-        setMenus(parsed.menus);
-      }
-    } else {
-      // Use default menuData from menuData.js
-      setMenus(transformCategoryData(menuData).menus);
-    }
-  }, []);
+  /* 🔥 API CALL WITH FILTERS */
+  const { data, isLoading, isError, error } = useGetMenusQuery({
+    restaurantId: restaurant || RESTAURANT_ID,
+    categoryId: CATEGORY_ID,
+    search: searchTerm,
+    status: statusFilter,
+  });
+  const [deleteMenu] = useDeleteMenuMutation();
+  const [updateMenu] = useUpdateMenuMutation();
+
+  /* 🧠 API → UI */
+  const menus = data?.data ? transformMenuData(data.data).menus : [];
 
   const toggleCategory = (categoryId) => {
     setExpandedCategories(prev => ({
@@ -103,7 +114,7 @@ const MenuList = () => {
     }));
   };
 
-  const handleDelete = (itemId) => {
+  const handleDelete = async (itemId) => {
     if (!window.confirm("Are you sure you want to delete this item?")) return;
 
     const updated = { menus: [...menus] };
@@ -116,21 +127,19 @@ const MenuList = () => {
     });
     setMenus(updated.menus);
     localStorage.setItem("menuData", JSON.stringify(updated));
+    await deleteMenu(itemId);
   };
 
-  const handleEditSave = (updatedItem) => {
-    const updated = { menus: [...menus] };
-    updated.menus.forEach(menu => {
-      menu.categories.forEach(cat => {
-        cat.subCategories.forEach(sub => {
-          sub.items = sub.items.map(item =>
-            item.itemId === updatedItem.itemId ? updatedItem : item
-          );
-        });
-      });
+  const handleEditSave = async (updatedItem) => {
+    await updateMenu({
+      id: updatedItem.itemId,
+      payload: {
+        name: updatedItem.name,
+        basePrice: updatedItem.price,
+        isAvailable: updatedItem.available,
+      },
     });
-    setMenus(updated.menus);
-    localStorage.setItem("menuData", JSON.stringify(updated));
+    setEditItem(null);
   };
 
   // Calculate stats
@@ -184,10 +193,18 @@ const MenuList = () => {
 
   const filteredMenus = getFilteredMenus();
 
+  if (isLoading) return <div>Loading menus...</div>;
+  if (isError) {
+    if (error?.status === 401) {
+      return <div>Please log in to view the menu.</div>;
+    }
+    return <div>Error loading menu: {error?.data?.message || error?.status || 'Unknown error'}</div>;
+  }
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-4">
       {/* Stats Cards */}
-      <div className="grid mt-6 grid-cols-1 md:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         <StatCard
           title="Total Items"
           value={stats.totalItems}
