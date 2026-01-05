@@ -93,6 +93,7 @@ const LoginForm = ({ role = "admin", onRoleChange }) => {
                 <p style={styles.restaurantTagline}>Elevating Restaurant Management</p>
               </>
             )}
+
           </div>
         </div>
 
@@ -101,6 +102,7 @@ const LoginForm = ({ role = "admin", onRoleChange }) => {
           ...styles.formSection,
           padding: isMobile ? "30px 20px" : "40px"
         }}>
+
           <div style={styles.formContent}>
             <div style={styles.header}>
               <div style={styles.welcomeBack}>
@@ -125,6 +127,7 @@ const LoginForm = ({ role = "admin", onRoleChange }) => {
                 <div>
                   <div style={{ ...styles.roleName, fontSize: isMobile ? "13px" : "14px" }}>Admin</div>
                   <div style={{ ...styles.roleDesc, fontSize: isMobile ? "11px" : "12px" }}>Full Access</div>
+
                 </div>
               </button>
               <button
@@ -236,7 +239,7 @@ const LoginForm = ({ role = "admin", onRoleChange }) => {
               <div style={styles.footer}>
                 <p style={styles.footerText}>
                   Need help?{" "}
-                  <button
+                       <button
                     type="button"
                     style={styles.supportLink}
                     onClick={() => navigate("/support")}
