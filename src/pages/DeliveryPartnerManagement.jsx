@@ -1,6 +1,7 @@
 // DeliveryPartnerManagement.jsx
 import React, { useState, useEffect } from "react";
-import deliveryData from "../assets/json/delivery-partner-management.json";
+import { Loader2 } from "lucide-react";
+import { useGetDeliveryPartnersQuery } from "../api/services/deliveryPartnerApi";
 
 import DeliveryPartner from "../components/delivery-partner-management/DeliveryPartner";
 import DeliveryPartnerDetailsModal from "../components/delivery-partner-management/DeliveryPartnerDetailsModal";
@@ -9,9 +10,8 @@ import DeliveryPartnerSearchFilter from "../components/delivery-partner-manageme
 import Button from "../components/ui/Button";
 
 const DeliveryPartnerManagement = () => {
-  const [partners, setPartners] = useState(
-    deliveryData.deliveryPartnerManagement.deliveryPartnerList
-  );
+  const { data: apiResponse, isLoading, error } = useGetDeliveryPartnersQuery();
+  const [partners, setPartners] = useState([]);
 
   const [filteredPartners, setFilteredPartners] = useState(partners);
   const [selectedPartner, setSelectedPartner] = useState(null);
@@ -19,6 +19,45 @@ const DeliveryPartnerManagement = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
+  const [viewMode, setViewMode] = useState(() => localStorage.getItem('partnerViewMode') || 'grid');
+
+  // Debugging logs
+  console.log("Delivery Partners API Response:", apiResponse);
+  console.log("Delivery Partners API Error:", error);
+
+  // Sync API data to local state
+  useEffect(() => {
+    if (apiResponse?.success && apiResponse?.data) {
+      const normalizedData = apiResponse.data.map((p) => ({
+        partnerId: p._id,
+        listView: {
+          name: p.name,
+          phone: p.phone,
+          city: "N/A", // API does not provide city currently
+          status: p.isActive ? "Active" : "Inactive",
+          assignedOrdersCount: p.totalOrders || 0,
+          vehicleType: p.vehicleType,
+          kycStatus: p.kyc?.status || "PENDING",
+          isOnline: p.isOnline
+        },
+        registrationData: {
+          name: p.name,
+          mobileNumber: p.phone,
+          email: "",
+          cityArea: "N/A",
+          vehicleType: p.vehicleType,
+          image: null,
+        },
+        orderHistory: [],
+      }));
+      setPartners(normalizedData);
+    }
+  }, [apiResponse]);
+
+  // Persist view mode
+  useEffect(() => {
+    localStorage.setItem('partnerViewMode', viewMode);
+  }, [viewMode]);
 
   useEffect(() => {
     let filtered = partners.filter((p) =>
@@ -117,14 +156,23 @@ const DeliveryPartnerManagement = () => {
         setSearchTerm={setSearchTerm}
         statusFilter={statusFilter}
         setStatusFilter={setStatusFilter}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
       />
 
       {/* List */}
-      <DeliveryPartner
-        partners={filteredPartners}
-        onViewDetails={handleViewDetails}
-        updatePartner={updatePartner}
-      />
+      {isLoading ? (
+        <div className="flex justify-center items-center py-20">
+          <Loader2 className="animate-spin text-primary w-10 h-10" />
+        </div>
+      ) : (
+        <DeliveryPartner
+          partners={filteredPartners}
+          onViewDetails={handleViewDetails}
+          updatePartner={updatePartner}
+          viewMode={viewMode}
+        />
+      )}
 
       {/* Details Modal */}
       {isModalOpen && selectedPartner && (

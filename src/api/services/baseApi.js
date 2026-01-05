@@ -4,7 +4,7 @@ import { logout } from "./authSlice";
 
 
 const axiosInstance = axios.create({
-  baseURL: "https://sog.bitmaxtest.com/api/v1/",
+  baseURL: "https://resto-grandma.onrender.com/api/v1/",
   headers: {
     "Content-Type": "application/json",
   },
