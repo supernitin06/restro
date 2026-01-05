@@ -37,9 +37,9 @@ const SearchFilterBar = ({
       ]}
       onFilterChange={handleFilterChange}
     >
-      <Button onClick={onAddNew} className="px-6 whitespace-nowrap">
+      {/* <Button onClick={onAddNew} className="px-6 whitespace-nowrap">
         + Add New
-      </Button>
+      </Button> */}
     </FilterBar>
   );
 };
