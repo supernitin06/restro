@@ -1,28 +1,24 @@
+// src/api/services/menuApi.js
 import { baseApi } from "./baseApi";
 
 export const menuApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
 
-        // 🔹 GET MENU LIST
+        // ================= MENU =================
         getMenus: builder.query({
-            query: () => ({
-                url: "admin/item?restaurantId=69576acfd4e05e92cee77736",
+            query: ({ restaurantId, categoryId, search, status }) => ({
+                url: "admin/item",
                 method: "GET",
+                params: {
+                    restaurantId,
+                    categoryId,
+                    search: search || undefined,
+                    status: status !== "all" ? status : undefined,
+                },
             }),
             providesTags: ["Menu"],
         }),
 
-        // 🔹 ADD MENU
-        addMenu: builder.mutation({
-            query: (payload) => ({
-                url: "admin/menu",
-                method: "POST",
-                data: payload,
-            }),
-            invalidatesTags: ["Menu"],
-        }),
-
-        // 🔹 UPDATE MENU
         updateMenu: builder.mutation({
             query: ({ id, payload }) => ({
                 url: `admin/menu/${id}`,
@@ -32,7 +28,6 @@ export const menuApi = baseApi.injectEndpoints({
             invalidatesTags: ["Menu"],
         }),
 
-        // 🔹 DELETE MENU
         deleteMenu: builder.mutation({
             query: (id) => ({
                 url: `admin/menu/${id}`,
@@ -40,12 +35,65 @@ export const menuApi = baseApi.injectEndpoints({
             }),
             invalidatesTags: ["Menu"],
         }),
+
+        // ================= CATEGORY (FINAL FIX) =================
+        getCategories: builder.query({
+            query: (restaurantId) => ({
+                url: "admin/category",
+                method: "GET",
+                params: { restaurantId },
+            }),
+            providesTags: ["Categories"],
+        }),
+
+        addCategory: builder.mutation({
+            query: (payload) => ({
+                url: "admin/category",
+                method: "POST",
+                data: payload,
+            }),
+            invalidatesTags: ["Categories"],
+        }),
+
+        updateCategory: builder.mutation({
+            query: ({ id, payload }) => ({
+                url: `admin/category/${id}`,
+                method: "PUT",
+                data: payload,
+            }),
+            invalidatesTags: ["Categories"],
+        }),
+
+        toggleCategory: builder.mutation({
+            query: (id) => ({
+                url: `admin/category/${id}`,
+                method: "PUT",
+                data: { isActive: false },
+            }),
+            invalidatesTags: ["Categories"],
+        }),
+
+
+        // ================= ADD MENU =================
+        addMenu: builder.mutation({
+            query: (payload) => ({
+                url: "admin/menu",
+                method: "POST",
+                data: payload,
+            }),
+            invalidatesTags: ["Menu"],
+        }),
+
     }),
 });
 
 export const {
     useGetMenusQuery,
-    useAddMenuMutation,
     useUpdateMenuMutation,
     useDeleteMenuMutation,
+    useGetCategoriesQuery,
+    useAddCategoryMutation,
+    useUpdateCategoryMutation,
+    useToggleCategoryMutation,
+    useAddMenuMutation,
 } = menuApi;

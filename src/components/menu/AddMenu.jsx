@@ -1,11 +1,18 @@
-// src/components/menu/AddMenu.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { useSelector } from "react-redux";
+
 import Button from "../ui/Button";
 import InputField from "../ui/InputField";
 import Textarea from "../ui/Textarea";
 import Select from "../ui/Select";
+
+import {
+  useGetCategoriesQuery,
+  useAddCategoryMutation,
+  useAddMenuMutation,
+} from "../../api/services/menuApi";
 
 const languages = [
   { code: "en", label: "English", flag: "🇬🇧" },
@@ -16,36 +23,58 @@ const languages = [
   { code: "it", label: "Italian", flag: "🇮🇹" },
 ];
 
-const categories = [
-  { _id: "695779ff6fc3958cd3972df2", name: "Starters" },
-  { _id: "695779ff6fc3958cd3972df5", name: "Main Course" },
-  { _id: "695779ff6fc3958cd3972df9", name: "Breads" },
-  { _id: "695779ff6fc3958cd3972dfd", name: "Desserts" },
-  { _id: "695779ff6fc3958cd3972e00", name: "Beverages" },
-];
-
 const tagsList = ["BEST_SELLER", "CHEF_SPECIAL", "SPICY"];
 
 const AddMenuItem = () => {
   const navigate = useNavigate();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
+
+  /* 🔑 restaurantId FROM REDUX */
+  const restaurantId = useSelector(
+    (state) => state.auth?.user?.restaurantId
+  );
+
+  const { data: categoriesData, refetch: refetchCategories } = useGetCategoriesQuery(restaurantId, {
+    skip: !restaurantId,
+  });
+
+  const [addCategory] = useAddCategoryMutation();
+  const [addMenu] = useAddMenuMutation();
+
+  const categories = categoriesData?.data || [];
 
   const [language, setLanguage] = useState("en");
-  const [category, setCategory] = useState(categories[0]._id);
+  const [category, setCategory] = useState("");
+  const [newCategoryName, setNewCategoryName] = useState("");
+  const [newCategoryOrder, setNewCategoryOrder] = useState(1);
+  const [showAddCategory, setShowAddCategory] = useState(false);
+
+
+
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
+
   const [foodType, setFoodType] = useState("VEG");
   const [isVeg, setIsVeg] = useState(true);
   const [tags, setTags] = useState([]);
   const [available, setAvailable] = useState(true);
+
   const [photo, setPhoto] = useState(null);
   const [altText, setAltText] = useState("");
+
   const [pricingOptions, setPricingOptions] = useState({
     priceLabel: false,
     priceUnit: false,
     priceRange: false,
   });
+
+  /* ✅ FIX: auto select first category */
+  useEffect(() => {
+    if (categories.length && !category) {
+      setCategory(categories[0]._id);
+    }
+  }, [categories, category]);
 
   const toggleTag = (tag) => {
     setTags((prev) =>
@@ -58,47 +87,66 @@ const AddMenuItem = () => {
     if (file) setPhoto(URL.createObjectURL(file));
   };
 
-  const handleSave = (e) => {
+  /* ✅ ADD CATEGORY API */
+  const handleAddCategory = async () => {
+    if (!newCategoryName.trim()) return;
+
+    try {
+      const result = await addCategory({
+        restaurantId,
+        name: newCategoryName,
+        order: newCategoryOrder,
+      }).unwrap();
+
+      alert("Category added successfully!");
+      await refetchCategories(); // Refresh categories list
+      setCategory(result._id); // Auto-select the new category
+      setNewCategoryName("");
+      setNewCategoryOrder(1);
+      setShowAddCategory(false);
+    } catch (err) {
+      console.error("Add category failed", err);
+      alert("Failed to add category. Please try again.");
+    }
+  };
+
+  /* ✅ REAL SAVE MENU API */
+  const handleSave = async (e) => {
     e.preventDefault();
-    const categoryObj = categories.find((cat) => cat._id === category);
 
-    const newItem = {
-      _id: Date.now().toString(),
-      restaurantId: "69576acfd4e05e92cee77736",
-      categoryId: { _id: categoryObj._id, name: categoryObj.name },
-      name,
-      basePrice: parseFloat(price),
-      foodType,
-      isVeg,
-      tags,
-      isAvailable: available,
-      variants: [],
-      addons: [],
-      image: photo || null,
-      description,
-      pricingOptions,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
+    try {
+      await addMenu({
+        restaurantId,
+        categoryId: category,
+        name,
+        description,
+        basePrice: Number(price),
+        foodType,
+        isVeg,
+        tags,
+        isAvailable: available,
+        pricingOptions,
+        image: photo,
+        altText,
+      }).unwrap();
 
-    const existing = localStorage.getItem("menuData");
-    const menuData = existing ? JSON.parse(existing) : [];
-    menuData.push(newItem);
-    localStorage.setItem("menuData", JSON.stringify(menuData));
-
-    alert(t('menuItemSaved'));
-    navigate("/menu-management");
+      alert(t("menuItemSaved"));
+      navigate("/menu-management");
+    } catch (err) {
+      console.error("Add menu failed", err);
+      alert("Failed to save menu item");
+    }
   };
 
   return (
     <div className="page">
-      {/* Header */}
-      <div className="flex bg-primary flex-col md:flex-row justify-between items-start md:items-center bg-white dark:bg-gray-800 p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
+      {/* ===== HEADER (UNCHANGED) ===== */}
+      <div className="flex bg-primary flex-col md:flex-row justify-between items-start md:items-center bg-white p-6 md:p-8 rounded-3xl shadow-sm border">
         <div>
-          <h1 className="highlight text-4xl font-extrabold tracking-tight">
+          <h1 className="highlight text-4xl font-extrabold">
             Add Menu Item
           </h1>
-          <p className="text-primary opacity-70 mt-2 text-lg font-medium">
+          <p className="text-primary opacity-70 mt-2 text-lg">
             Add a new menu item to your restaurant.
           </p>
         </div>
@@ -112,7 +160,6 @@ const AddMenuItem = () => {
         </div>
       </div>
 
-      {/* Form */}
       <form className="p-8 mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Left Column */}
         <div className="space-y-6">
@@ -132,12 +179,46 @@ const AddMenuItem = () => {
           {/* Category */}
           <div>
             <label className="block mb-2 font-medium text-gray-700 dark:text-gray-300">{t('category')}</label>
-            <Select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              options={categories.map((cat) => ({ value: cat._id, label: cat.name }))}
-            />
+            <div className="flex gap-2">
+              <Select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                options={categories.map((cat) => ({ value: cat._id, label: cat.name }))}
+                className="flex-1"
+              />
+              <Button onClick={() => setShowAddCategory(!showAddCategory)} variant="outline" size="sm">
+                + Add
+              </Button>
+            </div>
+            {showAddCategory && (
+              <div className="mt-4 p-4 border rounded-lg bg-gray-50 dark:bg-gray-700">
+                <h3 className="font-medium mb-3">Add New Category</h3>
+                <div className="space-y-3">
+                  <InputField
+                    value={newCategoryName}
+                    onChange={(e) => setNewCategoryName(e.target.value)}
+                    placeholder="Category name"
+                  />
+                  <InputField
+                    type="number"
+                    value={newCategoryOrder}
+                    onChange={(e) => setNewCategoryOrder(parseInt(e.target.value))}
+                    placeholder="Order"
+                  />
+                  <div className="flex gap-2">
+                    <Button onClick={handleAddCategory} variant="primary" size="sm">
+                      Add Category
+                    </Button>
+                    <Button onClick={() => setShowAddCategory(false)} variant="outline" size="sm">
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
+
+
 
           {/* Name */}
           <div>

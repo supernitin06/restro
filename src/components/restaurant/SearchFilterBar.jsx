@@ -34,8 +34,7 @@ const SearchFilterBar = ({
           ]
         }
       ]}
-      onFilterChange={handleFilterChange}
-    >
+      >
       {/* Add New Button passed as child */}
       <Button onClick={onAddNew} className="px-6 whitespace-nowrap">
         + Add New

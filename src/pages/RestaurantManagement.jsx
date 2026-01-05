@@ -1,17 +1,19 @@
 import React, { useState } from "react";
-import restaurantData from "../assets/json/resturant.json";
+import { useGetRestaurantsQuery, useCreateRestaurantMutation } from "../api/services/restaurantApi";
 import SearchFilterBar from "../components/restaurant/SearchFilterBar";
 import RestaurantStats from "../components/restaurant/RestaurantStats";
 import RestaurantGrid from "../components/restaurant/RestaurantGrid";
 import ViewDetailsModal from "../components/restaurant/ViewDetailsModal";
 import EditRestaurantModal from "../components/restaurant/EditRestaurantModal";
+import AddRestaurantModal from "../components/restaurant/AddRestaurantModal";
 
 function RestaurantManagement() {
-  const [restaurants, setRestaurants] = useState(
-    restaurantData.restaurantManagement.restaurantList
-  );
+  const { data: restaurantsData, isLoading, error } = useGetRestaurantsQuery();
+  const [createRestaurant] = useCreateRestaurantMutation();
+  const restaurants = restaurantsData?.data || [];
   const [selectedRestaurant, setSelectedRestaurant] = useState(null);
   const [editRestaurant, setEditRestaurant] = useState(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
 
@@ -41,6 +43,17 @@ function RestaurantManagement() {
   };
 
   const handleEdit = (r) => setEditRestaurant({ ...r });
+
+  const handleAddNew = () => setIsAddModalOpen(true);
+
+  const handleAddSave = async (restaurantData) => {
+    try {
+      await createRestaurant(restaurantData).unwrap();
+      setIsAddModalOpen(false);
+    } catch (error) {
+      console.error('Failed to create restaurant:', error);
+    }
+  };
 
   // ===== Filtered Restaurants =====
   const filteredRestaurants = restaurants.filter((r) => {
@@ -93,6 +106,7 @@ function RestaurantManagement() {
         setSearchTerm={setSearchTerm}
         statusFilter={statusFilter}
         setStatusFilter={setStatusFilter}
+        onAddNew={handleAddNew}
       />
 
       {/* ===== STATS ===== */}
@@ -122,6 +136,13 @@ function RestaurantManagement() {
         editRestaurant={editRestaurant}
         setEditRestaurant={setEditRestaurant}
         onCancel={() => setEditRestaurant(null)}
+      />
+
+      {/* ===== ADD RESTAURANT MODAL ===== */}
+      <AddRestaurantModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onSave={handleAddSave}
       />
     </div>
   );
