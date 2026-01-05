@@ -9,8 +9,19 @@ export const deliveryPartnerApi = baseApi.injectEndpoints({
       }),
       providesTags: ["DeliveryPartner"],
     }),
+    createDeliveryPartner: builder.mutation({
+      query: (payload) => ({
+        url: "admin/delivery-partners/create",
+        method: "POST",
+        data: payload,
+      }),
+      invalidatesTags: ["DeliveryPartner"],
+    }),
   }),
   overrideExisting: false,
 });
 
-export const { useGetDeliveryPartnersQuery } = deliveryPartnerApi;
+export const {
+  useGetDeliveryPartnersQuery,
+  useCreateDeliveryPartnerMutation,
+} = deliveryPartnerApi;

@@ -1,10 +1,10 @@
 import React from "react";
-import { Phone, MapPin, Truck, Bike, Eye } from "lucide-react";
+import { Phone, MapPin, Truck, Bike, Eye, Info, Edit } from "lucide-react";
 import DeliveryPartnerStatusBadge from "./DeliveryPartnerStatusBadge";
 import Button from "../ui/Button";
 import Card from "../ui/GlassCard";
 
-const DeliveryPartner = ({ partners, onViewDetails, updatePartner, viewMode = 'grid' }) => {
+const DeliveryPartner = ({ partners, onViewDetails, onEdit, updatePartner, viewMode = 'grid' }) => {
   const toggleStatus = (partner) => {
     const newStatus =
       partner.listView.status === "Active" ? "Inactive" : "Active";
@@ -69,8 +69,11 @@ const DeliveryPartner = ({ partners, onViewDetails, updatePartner, viewMode = 'g
 
                 {/* Actions */}
                 <div className="md:col-span-2 flex justify-end gap-2 transition-opacity">
-                  <Button variant="ghost" size="sm" className="h-8 px-2 py-0 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20" onClick={() => onViewDetails(partner)} title="View Details">
-                    <Eye size={14}/>
+                  <Button variant="ghost" size="sm" className="h-8 px-2 py-0 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20" onClick={(e) => { e.stopPropagation(); onViewDetails(partner); }} title="View Details">
+                    <Info size={14}/>
+                  </Button>
+                  <Button variant="ghost" size="sm" className="h-8 px-2 py-0 text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20" onClick={(e) => { e.stopPropagation(); onEdit(partner); }} title="Edit Partner">
+                    <Edit size={14}/>
                   </Button>
                   <Button variant="primary" size="sm" className="h-8 px-2 py-0" onClick={() => alert('Assign Order')}>Assign</Button>
                   <Button variant={isActive ? "danger" : "success"} size="sm" className="h-8 px-2 py-0" onClick={() => toggleStatus(partner)}>
@@ -99,14 +102,23 @@ const DeliveryPartner = ({ partners, onViewDetails, updatePartner, viewMode = 'g
           >
             {/* ID Card Header / Background */}
             <div className="h-10 w-full bg-gray-100 dark:bg-gray-700/50 relative">
-              {/* View Button (Top Left) */}
-              <button 
-                onClick={(e) => { e.stopPropagation(); onViewDetails(partner); }}
-                className="absolute top-2 left-2 bg-white/80 dark:bg-gray-800/80 rounded-full text-gray-600 dark:text-gray-300 hover:text-primary hover:bg-white dark:hover:bg-gray-800 shadow-sm backdrop-blur-sm transition-all z-10"
-                title="View Details"
-              >
-                <Eye size={14} />
-              </button>
+              {/* Action Buttons (Top Left) */}
+              <div className="absolute top-2 left-2 z-10 flex flex-col gap-1.5">
+                <button 
+                  onClick={(e) => { e.stopPropagation(); onViewDetails(partner); }}
+                  className="p-1.5 bg-white/80 dark:bg-gray-800/80 rounded-full text-gray-600 dark:text-gray-300 hover:text-primary hover:bg-white dark:hover:bg-gray-800 shadow-sm backdrop-blur-sm transition-all"
+                  title="View Details"
+                >
+                  <Info size={12} />
+                </button>
+                <button 
+                  onClick={(e) => { e.stopPropagation(); onEdit(partner); }}
+                  className="p-1.5 bg-white/80 dark:bg-gray-800/80 rounded-full text-gray-600 dark:text-gray-300 hover:text-primary hover:bg-white dark:hover:bg-gray-800 shadow-sm backdrop-blur-sm transition-all"
+                  title="Edit Partner"
+                >
+                  <Edit size={12} />
+                </button>
+              </div>
 
               <div className="absolute top-1 right-1 bg-white/90 dark:bg-gray-900/90 rounded-full shadow-sm backdrop-blur-sm scale-90">
                 <DeliveryPartnerStatusBadge status={listView.status} />

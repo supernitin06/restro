@@ -1,12 +1,13 @@
 // DeliveryPartnerManagement.jsx
-import React, { useState, useEffect } from "react";
-import { Loader2 } from "lucide-react";
+import React, { useState, useEffect, useMemo } from "react";
+import { Loader2, UserPlus } from "lucide-react";
 import { useGetDeliveryPartnersQuery } from "../api/services/deliveryPartnerApi";
 
 import DeliveryPartner from "../components/delivery-partner-management/DeliveryPartner";
 import DeliveryPartnerDetailsModal from "../components/delivery-partner-management/DeliveryPartnerDetailsModal";
 import DeliveryPartnerForm from "../components/delivery-partner-management/DeliveryPartnerForm";
 import DeliveryPartnerSearchFilter from "../components/delivery-partner-management/DeliveryPartnerSearchFilter";
+import Pagination from "../components/ui/Pagination";
 import Button from "../components/ui/Button";
 
 const DeliveryPartnerManagement = () => {
@@ -20,6 +21,8 @@ const DeliveryPartnerManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [viewMode, setViewMode] = useState(() => localStorage.getItem('partnerViewMode') || 'grid');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   // Debugging logs
   console.log("Delivery Partners API Response:", apiResponse);
@@ -67,8 +70,22 @@ const DeliveryPartnerManagement = () => {
       filtered = filtered.filter((p) => p.listView.status === statusFilter);
     }
     setFilteredPartners(filtered);
+    setCurrentPage(1); // Reset to first page on filter change
   }, [partners, searchTerm, statusFilter]);
 
+  const partnerCounts = useMemo(() => {
+    return {
+      all: partners.length,
+      active: partners.filter(p => p.listView.status === 'Active').length,
+      inactive: partners.filter(p => p.listView.status === 'Inactive').length,
+    }
+  }, [partners]);
+
+  const totalPages = Math.ceil(filteredPartners.length / itemsPerPage);
+  const currentPartners = useMemo(() => {
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      return filteredPartners.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredPartners, currentPage, itemsPerPage]);
   const handleViewDetails = (partner) => {
     setSelectedPartner(partner);
     setIsModalOpen(true);
@@ -82,24 +99,6 @@ const DeliveryPartnerManagement = () => {
   const openForm = () => setIsFormOpen(true);
   const closeForm = () => setIsFormOpen(false);
 
-  const handleAddPartner = (newPartner) => {
-    const nextId = partners.length + 1;
-    const partnerToAdd = {
-      ...newPartner,
-      partnerId: newPartner.partnerId || `DP${String(nextId).padStart(3, "0")}`,
-      actions: {
-        canActivate: false,
-        canDeactivate: true,
-        canViewOrderHistory: true,
-        canManualAssign: true,
-      },
-    };
-    const updated = [...partners, partnerToAdd];
-    setPartners(updated);
-    setFilteredPartners(updated);
-    setIsFormOpen(false);
-  };
-
   const updatePartner = (updatedPartner) => {
     const updatedList = partners.map((p) =>
       p.partnerId === updatedPartner.partnerId ? updatedPartner : p
@@ -111,30 +110,8 @@ const DeliveryPartnerManagement = () => {
     }
   };
 
-  const handleFilter = (value) => {
-    let filtered = partners.filter((p) =>
-      p.listView.name.toLowerCase().includes(value.toLowerCase())
-    );
-    if (statusFilter !== "All") {
-      filtered = filtered.filter((p) => p.listView.status === statusFilter);
-    }
-    setFilteredPartners(filtered);
-  };
-
-  const handleStatusFilter = (status) => {
-    setStatusFilter(status);
-    let filtered = partners.filter((p) =>
-      p.listView.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    if (status !== "All") {
-      filtered = filtered.filter((p) => p.listView.status === status);
-    }
-    setFilteredPartners(filtered);
-  };
-
   return (
     <div className="page page-background ">
-
       {/* Header */}
       <div className="flex bg-primary flex-col mb-6 md:flex-row justify-between items-start md:items-center bg-white dark:bg-gray-800 p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
         <div >
@@ -145,19 +122,20 @@ const DeliveryPartnerManagement = () => {
             Manage delivery partners, assignments, and performance across your platform.
           </p>
         </div>
-        <Button onClick={openForm} className="btn-primary w-auto px-4 py-2 mt-4 md:mt-0" fullWidth={false}>
-          + Add Delivery Partner
+        <Button onClick={openForm} variant="primary" className="mt-4 md:mt-0">
+          <UserPlus size={18} />
+          Add Partner
         </Button>
       </div>
 
       {/* Search */}
       <DeliveryPartnerSearchFilter
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
+        onSearchChange={(e) => setSearchTerm(e.target.value)}
         statusFilter={statusFilter}
-        setStatusFilter={setStatusFilter}
+        onStatusChange={setStatusFilter}
         viewMode={viewMode}
         onViewModeChange={setViewMode}
+        counts={partnerCounts}
       />
 
       {/* List */}
@@ -167,14 +145,24 @@ const DeliveryPartnerManagement = () => {
         </div>
       ) : (
         <DeliveryPartner
-          partners={filteredPartners}
+          partners={currentPartners}
           onViewDetails={handleViewDetails}
+          onEdit={openForm}
           updatePartner={updatePartner}
           viewMode={viewMode}
         />
       )}
 
       {/* Details Modal */}
+      {totalPages > 1 && (
+        <div className="mt-8 flex justify-center">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+        </div>
+      )}
       {isModalOpen && selectedPartner && (
         <DeliveryPartnerDetailsModal
           partner={selectedPartner}
@@ -186,8 +174,7 @@ const DeliveryPartnerManagement = () => {
       {/* Add Form */}
       {isFormOpen && (
         <DeliveryPartnerForm
-          onClose={closeForm}
-          onSubmit={handleAddPartner}
+          onClose={closeForm} 
         />
       )}
     </div>
