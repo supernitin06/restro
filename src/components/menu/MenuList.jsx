@@ -61,7 +61,7 @@ const transformCategoryData = (categoryData) => {
       }))
     }]
   }));
-  
+
   return {
     menus: [{
       categories
@@ -105,7 +105,7 @@ const MenuList = () => {
 
   const handleDelete = (itemId) => {
     if (!window.confirm("Are you sure you want to delete this item?")) return;
-    
+
     const updated = { menus: [...menus] };
     updated.menus.forEach(menu => {
       menu.categories.forEach(cat => {
@@ -401,7 +401,7 @@ const MenuList = () => {
                             ))}
                           </tbody>
                         </table>
-                        
+
                         {/* Empty State */}
                         {subCat.items.length === 0 && (
                           <div className="text-center py-12 border-2 border-dashed border-[var(--border)] rounded-lg">
@@ -418,7 +418,7 @@ const MenuList = () => {
           </div>
         ))
       )}
-     
+
 
       <EditMenuModal
         open={!!editItem}

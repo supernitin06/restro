@@ -7,7 +7,6 @@ const SearchFilterBar = ({
   setSearchTerm,
   statusFilter,
   setStatusFilter,
-  onAddNew
 }) => {
 
   const handleFilterChange = (key, value) => {
@@ -37,7 +36,7 @@ const SearchFilterBar = ({
       onFilterChange={handleFilterChange}
     >
       {/* Add New Button passed as child */}
-      <Button onClick={onAddNew} className="px-6 whitespace-nowrap">
+      <Button onClick={() => navigate('/restaurant-management/add')} className="px-6 whitespace-nowrap">
         + Add New
       </Button>
     </FilterBar>

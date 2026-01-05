@@ -1,17 +1,20 @@
 import React, { useState, useMemo } from "react";
 import FiltersBar from "../components/ui/UserFilters";
 import UserModal from "../components/users/UserModal";
+import UserOrdersModal from "../components/users/UserOrdersModal";
 import UserCard from "../components/users/UserCard";
-import { useGetUsersQuery, useUpdateUserMutation } from "../api/services/userapi";
-import { TrendingUp, TrendingDown, Grid, List } from "lucide-react";
+import { useGetUserDetailsQuery, useGetUsersQuery, useUpdateUserBlockMutation, } from "../api/services/userapi";
+import { TrendingUp, TrendingDown, Grid, List, Eye, Edit, Trash2, ShoppingBag } from "lucide-react";
 import GradientButton from "../components/ui/GradientButton";
 import StatCard from "../components/ui/StatCard";
 import Table from "../components/ui/Table";
 import Badge from "../components/ui/Badge";
 import Pagination from "../components/ui/Pagination";
+import { useNavigate } from "react-router-dom";
 
 
 const UserManagement = () => {
+  const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
   const [viewMode, setViewMode] = useState("table");
@@ -19,21 +22,68 @@ const UserManagement = () => {
   const [filters, setFilters] = useState({ status: "all" });
   const [selectedUser, setSelectedUser] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const hiddenKeys = ["_id", "password", "createdAt", "updatedAt", "__v"];
 
+  // State for Orders Modal
+  const [showOrdersModal, setShowOrdersModal] = useState(false);
+  const [activeOrdersUserId, setActiveOrdersUserId] = useState(null);
 
+  const hiddenKeys = ["_id", "password", "createdAt", "updatedAt", "__v", "otp", "lastLogin", "role", "permissions"];
+  const { data: userDetail, isLoading: userDetailLoading, isError: userDetailError } = useGetUserDetailsQuery(selectedUser, { skip: !selectedUser });
+
+  console.log("data of user", userDetail);
   // -------------------- Hooks (always called) --------------------
   const { data, isLoading, isError } = useGetUsersQuery({
     page: currentPage,
     limit: itemsPerPage,
   });
-  const [updateUser] = useUpdateUserMutation();
+  const [updateUserBlock] = useUpdateUserBlockMutation();
+
+
+
+  //  Action
+
+  const tableActions = [
+    {
+      key: 'view',
+      label: 'View Details',
+      icon: Eye,
+      color: 'blue',
+      onClick: (item) => {
+        setSelectedUser(item._id);
+        setShowModal(true);
+      },
+    },
+    {
+      key: 'orders',
+      label: 'View Orders',
+      icon: ShoppingBag,
+      color: 'amber',
+      onClick: (item) => {
+        setActiveOrdersUserId(item._id);
+        setShowOrdersModal(true);
+      },
+    },
+    {
+      key: 'edit',
+      label: 'Edit Permissions',
+      icon: Edit,
+      color: 'purple',
+      onClick: () => navigate('/sub-admin/assign'),
+    },
+    {
+      key: 'delete',
+      label: 'Delete Admin',
+      icon: Trash2,
+      color: 'rose',
+      onClick: (item) => handleDelete(item.id),
+    },
+  ];
 
   // -------------------- Data processing --------------------
   const users = data?.data || [];
   const totalUsers = data?.meta?.total || 0;
   const totalPages = Math.ceil(totalUsers / itemsPerPage);
-  
+
 
   const filteredUsers = useMemo(() => {
     let filtered = users;
@@ -54,38 +104,52 @@ const UserManagement = () => {
 
   // -------------------- Handlers --------------------
   const handleBlockToggle = (user) => {
-    updateUser({
+    console.log("user", user);
+    updateUserBlock({
       id: user._id,
       body: { isBlocked: !user.isBlocked },
     });
   };
-  
- // -------------------- Columns for Table --------------------
-const columns = useMemo(() => {
-  if (!filteredUsers || filteredUsers.length === 0) return [];
 
-  return Object.keys(filteredUsers[0])
+  const handleActiveToggle = (user) => {
+    updateUserBlock({
+      id: user._id,
+      body: { isActive: !user.isActive },
+    });
+  };
+
+  // -------------------- Columns for Table --------------------
+  const columns = useMemo(() => {
+    if (!filteredUsers || filteredUsers.length === 0) return [];
+
+    return Object.keys(filteredUsers[0])
 
 
-    .filter((key) => !hiddenKeys.includes(key)) // ❌ Hide unwanted keys
-    .map((key) => ({
-      header: key
-        .replace(/([A-Z])/g, " $1")
-        .replace(/^./, (str) => str.toUpperCase()),
-      key,
-      render: (user) => {
-        if (key === "isBlocked")
-          return (
-            <Badge onClick={() => handleBlockToggle(user)}>
-              {user.isBlocked ? "Blocked" : "Active"}
-            </Badge>
-          );
-        if (key === "lastLogin")
-          return user.lastLogin ? new Date(user.lastLogin).toLocaleString() : "-";
-        return user[key];
-      },
-    }));
-}, [filteredUsers]);
+      .filter((key) => !hiddenKeys.includes(key)) // ❌ Hide unwanted keys
+      .map((key) => ({
+        header: key
+          .replace(/([A-Z])/g, " $1")
+          .replace(/^./, (str) => str.toUpperCase()),
+        key,
+        render: (user) => {
+          if (key === "isBlocked")
+            return (
+              <Badge onClick={() => handleBlockToggle(user)}>
+                {user.isBlocked ? "Blocked" : "Active"}
+              </Badge>
+            );
+          if (key === "isActive")
+            return (
+              <Badge onClick={() => handleActiveToggle(user)} type={user.isActive ? "active" : "inactive"}>
+                {user.isActive ? "Active" : "Inactive"}
+              </Badge>
+            );
+          if (key === "lastLogin")
+            return user.lastLogin ? new Date(user.lastLogin).toLocaleString() : "-";
+          return user[key];
+        },
+      }));
+  }, [filteredUsers]);
 
 
 
@@ -100,9 +164,9 @@ const columns = useMemo(() => {
     setCurrentPage(1);
   };
   const handlePageChange = (page) => {
-  if (page < 1 || page > totalPages) return;
-  setCurrentPage(page);
-};
+    if (page < 1 || page > totalPages) return;
+    setCurrentPage(page);
+  };
 
 
   // -------------------- Render --------------------
@@ -116,6 +180,28 @@ const columns = useMemo(() => {
           </p>
         </div>
       </div>
+
+      {showModal && (
+        <UserModal
+          user={userDetail?.data}
+          isLoading={userDetailLoading}
+          onClose={() => {
+            setShowModal(false);
+            setSelectedUser(null);
+          }}
+        />
+      )}
+
+      {/* Orders Modal */}
+      {showOrdersModal && activeOrdersUserId && (
+        <UserOrdersModal
+          userId={activeOrdersUserId}
+          onClose={() => {
+            setShowOrdersModal(false);
+            setActiveOrdersUserId(null);
+          }}
+        />
+      )}
 
       <div className="relative z-10">
         {isLoading && <div>Loading users...</div>}
@@ -158,45 +244,43 @@ const columns = useMemo(() => {
             </FiltersBar>
 
             {viewMode === "grid" && (
-  <>
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-      {filteredUsers.map((user) => (
-        <UserCard key={user._id} user={user} />
-      ))}
-    </div>
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                  {filteredUsers.map((user) => (
+                    <UserCard key={user._id} user={user} />
+                  ))}
+                </div>
 
-    <Pagination
-      currentPage={currentPage}
-      totalPages={totalPages}
-      onPageChange={handlePageChange}
-    />
-  </>
-)}
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                />
+              </>
+            )}
 
-{viewMode === "table" && (
-  <>
-    <Table
-      data={filteredUsers}
-      columns={columns}
-      title="Users"
-    />
+            {viewMode === "table" && (
+              <>
+                <Table
+                  data={filteredUsers}
+                  columns={columns}
+                  title="Users"
+                  actions={tableActions}
+                />
 
-   <Pagination
-  currentPage={currentPage}
-  totalPages={totalPages}
-  onPageChange={handlePageChange}
-/>
-  </>
-)}
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                />
+              </>
+            )}
 
 
           </>
         )}
       </div>
 
-      {showModal && selectedUser && (
-        <UserModal user={selectedUser} onClose={() => setShowModal(false)} />
-      )}
     </div>
   );
 };

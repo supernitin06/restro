@@ -86,6 +86,7 @@ function RestaurantManagement() {
           </p>
         </div>
       </div>
+      <RestaurantStats restaurants={restaurants} />
 
       {/* ===== SEARCH & FILTER ===== */}
       <SearchFilterBar
@@ -96,7 +97,6 @@ function RestaurantManagement() {
       />
 
       {/* ===== STATS ===== */}
-      <RestaurantStats restaurants={restaurants} />
 
       {/* ===== RESTAURANT GRID ===== */}
       <RestaurantGrid

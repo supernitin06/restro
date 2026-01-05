@@ -1,10 +1,19 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import MenuList from "../../components/menu/MenuList";
-import Button from "../../components/ui/Button";
-import { FiPlus } from "react-icons/fi";
+import { useSelector } from "react-redux";
 
 const MenuManagement = () => {
+  const user = useSelector((state) => state.auth.user);
+  const [restaurant, setRestaurant] = useState(null);
+
+  useEffect(() => {
+    if (user?.restaurantId) {
+      setRestaurant(user.restaurantId);
+    }
+  }, [user]);
+  console.log("restaurant", restaurant);
+
   const navigate = useNavigate();
   const [menuList, setMenuList] = useState([]); // Local menu list state
 
@@ -34,15 +43,15 @@ const MenuManagement = () => {
       </div>
 
 
-        <div className="relative z-10">
-          {/* Menu List */}
-          <MenuList
-            menus={menuList}
-            onEdit={handleEdit}
-          />
-        </div>
+      <div className="relative z-10">
+        {/* Menu List */}
+        <MenuList
+          menus={menuList}
+          onEdit={handleEdit}
+        />
       </div>
-      );
+    </div>
+  );
 };
 
-      export default MenuManagement;
+export default MenuManagement;
