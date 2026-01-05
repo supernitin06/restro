@@ -1,5 +1,4 @@
 import { baseApi } from "../services/baseApi";
-import { setCredentials } from "../auth/authtoken";
 
 export const authApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({

@@ -3,18 +3,7 @@ import MenuList from "../../components/menu/MenuList";
 import Button from "../../components/ui/Button";
 import { FiPlus } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-
 const MenuManagement = () => {
-  const user = useSelector((state) => state.auth.user);
-  const [restaurant, setRestaurant] = useState(null);
-
-  useEffect(() => {
-    if (user?.restaurantId) {
-      setRestaurant(user.restaurantId);
-    }
-  }, [user]);
-  console.log("restaurant", restaurant);
-
   const navigate = useNavigate();
 
   return (
@@ -30,8 +19,6 @@ const MenuManagement = () => {
       <div className="relative z-10">
         {/* Menu List */}
         <MenuList
-          menus={menuList}
-          onEdit={handleEdit}
         />
       </div>
 

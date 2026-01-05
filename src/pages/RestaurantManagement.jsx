@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useGetRestaurantsQuery, useCreateRestaurantMutation } from "../api/services/restaurantApi";
 import SearchFilterBar from "../components/restaurant/SearchFilterBar";
 import RestaurantStats from "../components/restaurant/RestaurantStats";
 import RestaurantGrid from "../components/restaurant/RestaurantGrid";

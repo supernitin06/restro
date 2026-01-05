@@ -19,6 +19,15 @@ export const menuApi = baseApi.injectEndpoints({
             providesTags: ["Menu"],
         }),
 
+        addMenu: builder.mutation({
+            query: (payload) => ({
+                url: "admin/menu",
+                method: "POST",
+                data: payload,
+            }),
+            invalidatesTags: ["Menu"],
+        }),
+
         updateMenu: builder.mutation({
             query: ({ id, payload }) => ({
                 url: `admin/menu/${id}`,
@@ -74,15 +83,7 @@ export const menuApi = baseApi.injectEndpoints({
         }),
 
 
-        // ================= ADD MENU =================
-        addMenu: builder.mutation({
-            query: (payload) => ({
-                url: "admin/menu",
-                method: "POST",
-                data: payload,
-            }),
-            invalidatesTags: ["Menu"],
-        }),
+
 
     }),
 });

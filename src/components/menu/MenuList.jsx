@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { FiEdit, FiTrash2, FiStar, FiCheck, FiX, FiChevronDown, FiChevronUp } from "react-icons/fi";
-import { GiChickenLeg, GiFruitBowl } from "react-icons/gi";
 import { List } from "lucide-react";
 import StatCard from "../ui/StatCard";
 import EditMenuModal from "./EditMenuModal";
@@ -11,36 +10,45 @@ import {
   useDeleteMenuMutation,
   useUpdateMenuMutation,
 } from "../../api/services/menuApi";
-import transformMenuData from "./transformMenuData";
 
-const transformMenuData = (data) => {
+
+
+const transformItemsData = (items) => {
+  if (!Array.isArray(items)) return { menus: [] };
+
   const categoriesMap = {};
-  data.forEach(item => {
-    const catId = item.categoryId._id;
-    const catName = item.categoryId.name;
+
+  items.forEach(item => {
+    // Safe access to category
+    const cat = item.categoryId || { _id: 'uncategorized', name: 'Uncategorized' };
+    const catId = cat._id || 'uncategorized';
+
     if (!categoriesMap[catId]) {
       categoriesMap[catId] = {
         categoryId: catId,
-        name: catName,
+        name: cat.name || 'Uncategorized',
         status: 'active',
         subCategories: [{
-          subCategoryId: catId + '_sub',
-          name: catName,
-          status: 'active',
+          subCategoryId: `${catId}_sub`,
+          name: cat.name || 'Uncategorized',
           items: []
         }]
       };
     }
+
     categoriesMap[catId].subCategories[0].items.push({
       itemId: item._id,
       name: item.name,
+      image: item.image,
       price: item.basePrice,
       discountPrice: null,
       available: item.isAvailable,
       veg: item.isVeg,
-      bestseller: item.tags?.includes('BEST_SELLER') || false
+      bestseller: item.tags?.includes('BEST_SELLER') || false,
+      ...item
     });
   });
+
   return {
     menus: [{
       categories: Object.values(categoriesMap)
@@ -48,46 +56,14 @@ const transformMenuData = (data) => {
   };
 };
 
-const transformCategoryData = (categoryData) => {
-  const categories = categoryData.map(category => ({
-    categoryId: category.id,
-    name: category.name,
-    status: category.isActive ? 'active' : 'inactive',
-    subCategories: [{
-      subCategoryId: category.id + '_sub',
-      name: category.name,
-      status: category.isActive ? 'active' : 'inactive',
-      items: (category.products || []).map(product => ({
-        itemId: product._id,
-        name: product.name,
-        price: product.basePrice,
-        discountPrice: null,
-        available: product.isAvailable,
-        veg: product.isVeg,
-        bestseller: false
-      }))
-    }]
-  }));
-
-  return {
-    menus: [{
-      categories
-    }]
-  };
-};
-
 const MenuList = () => {
   const user = useSelector((state) => state.auth.user);
-  console.log("jfnvjinfov nionfkov ", user);
-  const [restaurant , setRestaurant] = useState(null);
+  const [restaurant, setRestaurant] = useState(null);
   useEffect(() => {
-
-    if(user){
+    if (user) {
       setRestaurant(user.restaurantId);
     }
-
   }, [user]);
-  console.log("restaurant", restaurant);
 
   const [editItem, setEditItem] = useState(null);
   const [expandedCategories, setExpandedCategories] = useState({});
@@ -96,16 +72,16 @@ const MenuList = () => {
 
   /* 🔥 API CALL WITH FILTERS */
   const { data, isLoading, isError, error } = useGetMenusQuery({
-    restaurantId: restaurant || RESTAURANT_ID,
-    categoryId: CATEGORY_ID,
+    restaurantId: restaurant,
+    // categoryId: CATEGORY_ID, 
     search: searchTerm,
     status: statusFilter,
-  });
+  }, { skip: !restaurant });
   const [deleteMenu] = useDeleteMenuMutation();
   const [updateMenu] = useUpdateMenuMutation();
 
   /* 🧠 API → UI */
-  const menus = data?.data ? transformMenuData(data.data).menus : [];
+  const menus = data?.data ? transformItemsData(data.data).menus : [];
 
   const toggleCategory = (categoryId) => {
     setExpandedCategories(prev => ({
@@ -193,16 +169,25 @@ const MenuList = () => {
 
   const filteredMenus = getFilteredMenus();
 
-  if (isLoading) return <div>Loading menus...</div>;
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
   if (isError) {
-    if (error?.status === 401) {
-      return <div>Please log in to view the menu.</div>;
-    }
-    return <div>Error loading menu: {error?.data?.message || error?.status || 'Unknown error'}</div>;
+    return (
+      <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl text-red-600 dark:text-red-400">
+        <h3 className="font-semibold mb-1">Error Loading Menu</h3>
+        <p>{error?.data?.message || error?.status === 401 ? "Please log in to view menu" : (error?.status || 'Unknown error occurred')}</p>
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-6 p-4">
+    <div className="space-y-6">
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         <StatCard
@@ -254,23 +239,23 @@ const MenuList = () => {
       {/* Menu Categories */}
       {filteredMenus.map((menu) =>
         menu.categories.map((category) => (
-          <div key={category.categoryId} className="bg-[var(--bg-card)] rounded-xl shadow-sm overflow-hidden border border-[var(--border)]">
+          <div key={category.categoryId} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden border border-gray-100 dark:border-gray-700">
             {/* Category Header */}
             <div
-              className="flex justify-between items-center p-5 cursor-pointer hover:bg-[var(--bg-hover)] transition-all"
+              className="flex justify-between items-center p-5 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all"
               onClick={() => toggleCategory(category.categoryId)}
             >
               <div className="flex items-center gap-4">
-                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${category.status === 'active' ? 'bg-green-50 border border-green-200' : 'bg-gray-100 border border-gray-300'}`}>
+                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${category.status === 'active' ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800' : 'bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600'}`}>
                   <div className={`w-2.5 h-2.5 rounded-full ${category.status === 'active' ? 'bg-green-500' : 'bg-gray-400'}`} />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-[var(--text-main)]">{category.name}</h2>
+                  <h2 className="text-xl font-bold text-gray-900 dark:text-white">{category.name}</h2>
                   <div className="flex items-center gap-3 mt-1">
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${category.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'}`}>
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${category.status === 'active' ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'}`}>
                       {category.status === 'active' ? 'Active' : 'Inactive'}
                     </span>
-                    <span className="text-sm text-[var(--text-muted)]">
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
                       {category.subCategories.reduce((total, sub) => total + sub.items.length, 0)} items
                     </span>
                   </div>
@@ -279,21 +264,21 @@ const MenuList = () => {
 
               <div className="flex items-center gap-2">
                 {expandedCategories[category.categoryId] ? (
-                  <FiChevronUp className="w-5 h-5 text-[var(--text-muted)]" />
+                  <FiChevronUp className="w-5 h-5 text-gray-400" />
                 ) : (
-                  <FiChevronDown className="w-5 h-5 text-[var(--text-muted)]" />
+                  <FiChevronDown className="w-5 h-5 text-gray-400" />
                 )}
               </div>
             </div>
 
             {/* Category Items - Collapsible */}
             {expandedCategories[category.categoryId] && (
-              <div className="border-t border-[var(--border)]">
+              <div className="border-t border-gray-100 dark:border-gray-700">
                 {category.subCategories.map((subCat) => (
                   <div key={subCat.subCategoryId}>
                     {category.subCategories.length > 1 && (
                       <div className="px-5 pt-4">
-                        <h3 className="text-lg font-semibold text-[var(--text-main)] mb-3">{subCat.name}</h3>
+                        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">{subCat.name}</h3>
                       </div>
                     )}
 
@@ -302,29 +287,29 @@ const MenuList = () => {
                       <div className="overflow-x-auto">
                         <table className="w-full">
                           <thead>
-                            <tr className="border-b border-[var(--border)]">
-                              <th className="text-left py-3 px-2 text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider">Item</th>
-                              <th className="text-left py-3 px-2 text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider">Type</th>
-                              <th className="text-left py-3 px-2 text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider">Price</th>
-                              <th className="text-left py-3 px-2 text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider">Status</th>
-                              <th className="text-left py-3 px-2 text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider">Bestseller</th>
-                              <th className="text-left py-3 px-2 text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider">Actions</th>
+                            <tr className="border-b border-gray-100 dark:border-gray-700">
+                              <th className="text-left py-3 px-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Item</th>
+                              <th className="text-left py-3 px-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Type</th>
+                              <th className="text-left py-3 px-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Price</th>
+                              <th className="text-left py-3 px-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                              <th className="text-left py-3 px-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Bestseller</th>
+                              <th className="text-left py-3 px-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
                             </tr>
                           </thead>
-                          <tbody className="divide-y divide-[var(--border)]">
+                          <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                             {subCat.items.map((item) => (
                               <tr
                                 key={item.itemId}
-                                className={`hover:bg-[var(--bg-hover)] transition-colors ${!item.available ? 'opacity-60' : ''}`}
+                                className={`hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors ${!item.available ? 'opacity-60' : ''}`}
                               >
                                 {/* Item Name with Bestseller */}
                                 <td className="py-4 px-2">
                                   <div className="flex items-center gap-3">
                                     {getVegIcon(item.veg)}
                                     <div>
-                                      <div className="font-medium text-[var(--text-main)]">{item.name}</div>
+                                      <div className="font-medium text-gray-900 dark:text-white">{item.name}</div>
                                       {item.bestseller && (
-                                        <div className="flex items-center gap-1 text-amber-600 text-xs mt-1">
+                                        <div className="flex items-center gap-1 text-amber-600 dark:text-amber-400 text-xs mt-1">
                                           <FiStar className="w-3 h-3" />
                                           <span>Bestseller</span>
                                         </div>
@@ -335,7 +320,7 @@ const MenuList = () => {
 
                                 {/* Veg/Non-Veg Type */}
                                 <td className="py-4 px-2">
-                                  <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium ${item.veg ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}>
+                                  <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium ${item.veg ? 'bg-green-50 dark:bg-green-900/30 text-green-800 dark:text-green-300' : 'bg-red-50 dark:bg-red-900/30 text-red-800 dark:text-red-300'}`}>
                                     <span>{item.veg ? 'Veg' : 'Non-Veg'}</span>
                                   </div>
                                 </td>
@@ -346,15 +331,15 @@ const MenuList = () => {
                                     <div className="flex items-baseline gap-2">
                                       {item.discountPrice ? (
                                         <>
-                                          <span className="text-lg font-semibold text-red-600">₹{item.discountPrice}</span>
+                                          <span className="text-lg font-semibold text-red-600 dark:text-red-400">₹{item.discountPrice}</span>
                                           <span className="text-sm text-gray-400 line-through">₹{item.price}</span>
                                         </>
                                       ) : (
-                                        <span className="text-lg font-semibold text-[var(--text-main)]">₹{item.price}</span>
+                                        <span className="text-lg font-semibold text-gray-900 dark:text-white">₹{item.price}</span>
                                       )}
                                     </div>
                                     {item.discountPrice && (
-                                      <div className="text-xs text-green-600 font-medium">
+                                      <div className="text-xs text-green-600 dark:text-green-400 font-medium">
                                         Save ₹{item.price - item.discountPrice}
                                       </div>
                                     )}
@@ -363,7 +348,7 @@ const MenuList = () => {
 
                                 {/* Availability Status */}
                                 <td className="py-4 px-2">
-                                  <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${item.available ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}>
+                                  <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${item.available ? 'bg-green-50 dark:bg-green-900/30 text-green-800 dark:text-green-300' : 'bg-red-50 dark:bg-red-900/30 text-red-800 dark:text-red-300'}`}>
                                     {item.available ? (
                                       <>
                                         <FiCheck className="w-4 h-4" />
@@ -380,7 +365,7 @@ const MenuList = () => {
 
                                 {/* Bestseller */}
                                 <td className="py-4 px-2">
-                                  <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${item.bestseller ? 'bg-amber-50 text-amber-800' : 'bg-gray-50 text-gray-800'}`}>
+                                  <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${item.bestseller ? 'bg-amber-50 dark:bg-amber-900/30 text-amber-800 dark:text-amber-300' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300'}`}>
                                     {item.bestseller ? (
                                       <>
                                         <FiStar className="w-4 h-4" />
@@ -400,17 +385,17 @@ const MenuList = () => {
                                   <div className="flex items-center gap-2">
                                     <button
                                       onClick={() => setEditItem(item)}
-                                      className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg font-medium text-sm transition-colors"
+                                      className="inline-flex items-center gap-2 px-3 py-2 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 text-blue-600 dark:text-blue-300 rounded-lg font-medium text-sm transition-colors"
+                                      title="Edit Item"
                                     >
                                       <FiEdit className="w-4 h-4" />
-
                                     </button>
                                     <button
                                       onClick={() => handleDelete(item.itemId)}
-                                      className="inline-flex items-center gap-2 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg font-medium text-sm transition-colors"
+                                      className="inline-flex items-center gap-2 px-3 py-2 bg-red-50 dark:bg-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/50 text-red-600 dark:text-red-300 rounded-lg font-medium text-sm transition-colors"
+                                      title="Delete Item"
                                     >
                                       <FiTrash2 className="w-4 h-4" />
-
                                     </button>
                                   </div>
                                 </td>
@@ -421,9 +406,9 @@ const MenuList = () => {
 
                         {/* Empty State */}
                         {subCat.items.length === 0 && (
-                          <div className="text-center py-12 border-2 border-dashed border-[var(--border)] rounded-lg">
-                            <div className="text-[var(--text-muted)] text-lg mb-2">No items in this category</div>
-                            <div className="text-[var(--text-muted)]">Add items to get started</div>
+                          <div className="text-center py-12 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg">
+                            <div className="text-gray-400 dark:text-gray-500 text-lg mb-2">No items in this category</div>
+                            <div className="text-gray-400 dark:text-gray-600 text-sm">Add items to get started</div>
                           </div>
                         )}
                       </div>
