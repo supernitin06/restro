@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from "react";
 import FiltersBar from "../components/ui/UserFilters";
 import UserModal from "../components/users/UserModal";
-import UserCard from "../components/users/UserCard";
+// import UserCard from "../components/users/UserCard";
 import { useGetUsersQuery, useUpdateUserMutation } from "../api/services/userapi";
 import { TrendingUp, TrendingDown, Grid, List } from "lucide-react";
 import GradientButton from "../components/ui/GradientButton";
@@ -11,7 +11,7 @@ import Badge from "../components/ui/Badge";
 import Pagination from "../components/ui/Pagination";
 
 
-const UserManagement = () => {
+const UserManagement = () => { 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
   const [viewMode, setViewMode] = useState("table");
