@@ -7,39 +7,13 @@ import EditRestaurantModal from "../components/restaurant/EditRestaurantModal";
 import AddRestaurantModal from "../components/restaurant/AddRestaurantModal";
 
 function RestaurantManagement() {
-  const { data: restaurantsData, isLoading, error } = useGetRestaurantsQuery();
-  const [createRestaurant] = useCreateRestaurantMutation();
-  const restaurants = restaurantsData?.data || [];
   const [selectedRestaurant, setSelectedRestaurant] = useState(null);
   const [editRestaurant, setEditRestaurant] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
 
-  // ===== Handlers =====
-  const handleApprove = (id) => {
-    setRestaurants((prev) =>
-      prev.map((r) =>
-        r.restaurantId === id ? { ...r, status: "Approved" } : r
-      )
-    );
-  };
-
-  const handleSuspend = (id) => {
-    setRestaurants((prev) =>
-      prev.map((r) =>
-        r.restaurantId === id ? { ...r, status: "Suspended" } : r
-      )
-    );
-  };
-
-  const handleDelete = (id) => {
-    if (window.confirm("Are you sure you want to delete this restaurant?")) {
-      setRestaurants((prev) =>
-        prev.filter((r) => r.restaurantId !== id)
-      );
-    }
-  };
+  
 
   const handleEdit = (r) => setEditRestaurant({ ...r });
 
