@@ -148,16 +148,16 @@ const columns = useMemo(() => {
               onClear={handleClearFilters}
             >
               <div className="flex gap-1">
-                <GradientButton onClick={() => setViewMode("grid")}>
+                {/* <GradientButton onClick={() => setViewMode("grid")}>
                   <Grid size={16} />
-                </GradientButton>
+                </GradientButton> */}
                 <GradientButton onClick={() => setViewMode("table")}>
                   <List size={16} />
                 </GradientButton>
               </div>
             </FiltersBar>
 
-            {viewMode === "grid" && (
+            {/* {viewMode === "grid" && (
   <>
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
       {filteredUsers.map((user) => (
@@ -171,7 +171,7 @@ const columns = useMemo(() => {
       onPageChange={handlePageChange}
     />
   </>
-)}
+)} */}
 
 {viewMode === "table" && (
   <>
