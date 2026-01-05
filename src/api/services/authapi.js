@@ -1,5 +1,6 @@
 import { baseApi } from "../services/baseApi";
-import { setCredentials } from "../services/authSlice";
+import { setCredentials } from "./authSlice";
+
 
 export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -16,29 +17,15 @@ export const authApi = baseApi.injectEndpoints({
         try {
           const { data } = await queryFulfilled;
 
-          // ✅ login response ko auth cache me daal diya
-          dispatch(
-            authApi.util.updateQueryData(
-              "getAuthData",
-              undefined,
-              () => data
-            )
-          );
-
-          // Set credentials in state
+          // Dispatch setCredentials to update auth state in Redux and localStorage
           dispatch(setCredentials({ token: data.token, user: data.user }));
-        } catch (err) {}
-      },
-    }),
+        } catch (err) { }
 
-    // 🔹 AUTH DATA HOLDER (CACHE ONLY)
-    getAuthData: builder.query({
-      queryFn: () => ({ data: null }),
+      },
     }),
   }),
 });
 
 export const {
   useLoginMutation,
-  useGetAuthDataQuery,
 } = authApi;

@@ -17,8 +17,7 @@ const axiosBaseQuery =
     try {
       const state = api.getState();
       const token = state?.auth?.authToken;
-      
- 
+
       const result = await axiosInstance({
         url,
         method,
@@ -33,7 +32,7 @@ const axiosBaseQuery =
       return { data: result.data };
     } catch (axiosError) {
       const err = axiosError;
- 
+
       // 🔐 Unauthorized
       if (err.response?.status === 401) {
         api.dispatch(logout());
@@ -47,7 +46,7 @@ const axiosBaseQuery =
       };
     }
   };
- 
+
 /**
  * RTK Query base API
  */

@@ -87,7 +87,7 @@ const AddMenuItem = () => {
     localStorage.setItem("menuData", JSON.stringify(menuData));
 
     alert(t('menuItemSaved'));
-    navigate("/menu-management/1");
+    navigate("/menu-management");
   };
 
   return (
@@ -103,7 +103,7 @@ const AddMenuItem = () => {
           </p>
         </div>
         <div className="flex gap-3 mt-4 md:mt-0">
-          <Button onClick={() => navigate("/menu-management/1")} variant="outline">
+          <Button onClick={() => navigate("/menu-management")} variant="outline">
             ← Back
           </Button>
           <Button onClick={handleSave} variant="primary">

@@ -5,7 +5,7 @@ const AuthContainer = () => {
   const [role, setRole] = useState("admin"); // admin | sub_admin
 
   return (
-    <div className=" flex items-center justify-center">
+    <div className="app flex items-center justify-center">
       <LoginForm
       />
     </div>
