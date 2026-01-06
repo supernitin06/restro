@@ -1,16 +1,26 @@
 import React, { useState, useEffect } from "react";
+import { FiX } from "react-icons/fi";
 import Button from "../ui/Button";
 import InputField from "../ui/InputField";
  
 const EditMenuModal = ({ open, item, onClose, onSave }) => {
   const [form, setForm] = useState({});
- 
+  const [isVisible, setIsVisible] = useState(false);
+
   useEffect(() => {
     if (item) {
       setForm(item);
     }
   }, [item]);
- 
+
+  useEffect(() => {
+    if (open) {
+      setIsVisible(true);
+    } else {
+      setIsVisible(false);
+    }
+  }, [open]);
+
   if (!open || !item) return null;
  
   const handleChange = (key, value) => {
@@ -23,9 +33,18 @@ const EditMenuModal = ({ open, item, onClose, onSave }) => {
   };
  
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl w-[420px] p-6 space-y-4">
-        <h2 className="text-lg font-semibold">Edit Menu Item</h2>
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 transition-opacity duration-300">
+      <div className="bg-white rounded-xl w-[420px] p-6 space-y-4 transition-all duration-300">
+        <div className="flex justify-between items-center">
+          <h2 className="text-lg font-semibold">Edit Menu Item</h2>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600 transition-colors"
+            title="Close"
+          >
+            <FiX className="w-5 h-5" />
+          </button>
+        </div>
  
         <InputField
           label="Item Name"

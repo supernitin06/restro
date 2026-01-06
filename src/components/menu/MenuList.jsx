@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { FiEdit, FiTrash2, FiStar, FiCheck, FiX, FiChevronDown, FiChevronUp } from "react-icons/fi";
 import { List } from "lucide-react";
@@ -82,16 +82,20 @@ const MenuList = ({ searchTerm = '', statusFilter = 'all', viewType = 'list' }) 
   /* 🧠 API → UI */
   const menus = data?.data ? transformItemsData(data.data).menus : [];
 
-  // Expand all categories by default when menus are loaded
+  // Expand all categories by default when menus are loaded, preserving manual toggles
   useEffect(() => {
     if (menus.length > 0) {
-      const allCategoryIds = {};
-      menus.forEach(menu => {
-        menu.categories.forEach(cat => {
-          allCategoryIds[cat.categoryId] = true;
+      setExpandedCategories(prev => {
+        const updated = { ...prev };
+        menus.forEach(menu => {
+          menu.categories.forEach(cat => {
+            if (!(cat.categoryId in updated)) {
+              updated[cat.categoryId] = true;
+            }
+          });
         });
+        return updated;
       });
-      setExpandedCategories(allCategoryIds);
     }
   }, [menus]);
 
@@ -102,24 +106,16 @@ const MenuList = ({ searchTerm = '', statusFilter = 'all', viewType = 'list' }) 
     }));
   };
 
-  const handleDelete = async (itemId) => {
+  const handleDelete = useCallback(async (itemId) => {
     const result = await showConfirmAlert("Are you sure you want to delete this item?", "Delete", "Cancel");
     if (!result.isConfirmed) return;
 
-    const updated = { menus: [...menus] };
-    updated.menus.forEach(menu => {
-      menu.categories.forEach(cat => {
-        cat.subCategories.forEach(sub => {
-          sub.items = sub.items.filter(i => i.itemId !== itemId);
-        });
-      });
-    });
-    setMenus(updated.menus);
-    localStorage.setItem("menuData", JSON.stringify(updated));
     await deleteMenu(itemId);
-  };
+    // Refetch the menus after deletion
+    // The useGetMenusQuery will automatically refetch when the mutation is successful
+  }, [deleteMenu]);
 
-  const handleEditSave = async (updatedItem) => {
+  const handleEditSave = useCallback(async (updatedItem) => {
     await updateMenu({
       id: updatedItem.itemId,
       payload: {
@@ -129,7 +125,7 @@ const MenuList = ({ searchTerm = '', statusFilter = 'all', viewType = 'list' }) 
       },
     });
     setEditItem(null);
-  };
+  }, [updateMenu]);
 
   // Calculate stats
   const calculateStats = () => {
@@ -230,10 +226,7 @@ const MenuList = ({ searchTerm = '', statusFilter = 'all', viewType = 'list' }) 
         menu.categories.map((category) => (
           <div key={category.categoryId} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden border border-gray-100 dark:border-gray-700">
             {/* Category Header */}
-            <div
-              className="flex justify-between items-center p-5 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all"
-              onClick={() => toggleCategory(category.categoryId)}
-            >
+            <div className="flex justify-between items-center p-5 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all">
               <div className="flex items-center gap-4">
                 <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${category.status === 'active' ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800' : 'bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600'}`}>
                   <div className={`w-2.5 h-2.5 rounded-full ${category.status === 'active' ? 'bg-green-500' : 'bg-gray-400'}`} />
@@ -251,7 +244,10 @@ const MenuList = ({ searchTerm = '', statusFilter = 'all', viewType = 'list' }) 
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div
+                className="flex items-center gap-2 cursor-pointer"
+                onClick={() => toggleCategory(category.categoryId)}
+              >
                 {expandedCategories[category.categoryId] ? (
                   <FiChevronUp className="w-5 h-5 text-gray-400" />
                 ) : (

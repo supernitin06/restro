@@ -387,8 +387,8 @@ const AddMenuItem = () => {
         {/* Right Column */}
         <div className="space-y-6">
           {/* Pricing Options */}
-          <div className="border rounded-xl p-4 bg-gray-50">
-            <h2 className="font-semibold mb-3">{t('pricingOptions')}</h2>
+          <div className="border rounded-xl p-4 bg-gray-50 dark:bg-gray-800">
+            <h2 className="font-semibold mb-3 text-gray-700 dark:text-gray-300">{t('pricingOptions')}</h2>
             <label className="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -431,8 +431,8 @@ const AddMenuItem = () => {
           </div>
 
           {/* Featured Photo */}
-          <div className="border rounded-xl p-4 bg-gray-50">
-            <h2 className="font-semibold mb-3">{t('featuredPhoto')}</h2>
+          <div className="border rounded-xl p-4 bg-gray-50 dark:bg-gray-800">
+            <h2 className="font-semibold mb-3 text-gray-700 dark:text-gray-300">{t('featuredPhoto')}</h2>
             <div className="flex flex-col items-center">
               {photo ? (
                 <img
