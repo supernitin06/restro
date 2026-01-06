@@ -17,6 +17,14 @@ export const deliveryPartnerApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["DeliveryPartner"],
     }),
+    updateDeliveryPartner: builder.mutation({
+      query: ({ id, ...payload }) => ({
+        url: `admin/delivery-partners/${id}`,
+        method: "PUT",
+        data: payload,
+      }),
+      invalidatesTags: ["DeliveryPartner"],
+    }),
   }),
   overrideExisting: false,
 });
@@ -24,4 +32,5 @@ export const deliveryPartnerApi = baseApi.injectEndpoints({
 export const {
   useGetDeliveryPartnersQuery,
   useCreateDeliveryPartnerMutation,
+  useUpdateDeliveryPartnerMutation,
 } = deliveryPartnerApi;

@@ -3,19 +3,24 @@ import { Phone, MapPin, Truck, Bike, Eye, Info, Edit } from "lucide-react";
 import DeliveryPartnerStatusBadge from "./DeliveryPartnerStatusBadge";
 import Button from "../ui/Button";
 import Card from "../ui/GlassCard";
+import { useUpdateDeliveryPartnerMutation } from "../../api/services/deliveryPartnerApi";
 
 const DeliveryPartner = ({ partners, onViewDetails, onEdit, updatePartner, viewMode = 'grid' }) => {
-  const toggleStatus = (partner) => {
-    const newStatus =
-      partner.listView.status === "Active" ? "Inactive" : "Active";
+  const [updateDeliveryPartner] = useUpdateDeliveryPartnerMutation();
 
-    updatePartner({
-      ...partner,
-      listView: {
-        ...partner.listView,
-        status: newStatus,
-      },
-    });
+  const toggleStatus = async (partner) => {
+    const currentStatus = partner.listView.status;
+    const newIsActive = currentStatus !== "Active"; // If Active, switch to false (Inactive)
+
+    try {
+      await updateDeliveryPartner({
+        id: partner.partnerId,
+        isActive: newIsActive,
+      }).unwrap();
+      // The parent component's query will invalidate and refresh the list automatically
+    } catch (error) {
+      console.error("Failed to update status:", error);
+    }
   };
 
   if (viewMode === 'list') {

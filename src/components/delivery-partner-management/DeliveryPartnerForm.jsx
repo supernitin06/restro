@@ -4,10 +4,15 @@ import { createPortal } from "react-dom";
 import InputField from "../ui/InputField";
 import Button from "../ui/Button";
 import { X } from "lucide-react";
-import { useCreateDeliveryPartnerMutation } from "../../api/services/deliveryPartnerApi";
+import { useCreateDeliveryPartnerMutation, useUpdateDeliveryPartnerMutation } from "../../api/services/deliveryPartnerApi";
 
-const DeliveryPartnerForm = ({ onClose, onSubmit }) => {
-  const [createPartner, { isLoading, isSuccess, isError, error }] = useCreateDeliveryPartnerMutation();
+const DeliveryPartnerForm = ({ onClose, partner }) => {
+  const [createPartner, { isLoading: isCreating, isSuccess: isCreateSuccess, isError: isCreateError, error: createError }] = useCreateDeliveryPartnerMutation();
+  const [updatePartner, { isLoading: isUpdating, isSuccess: isUpdateSuccess, isError: isUpdateError, error: updateError }] = useUpdateDeliveryPartnerMutation();
+  
+  const isLoading = isCreating || isUpdating;
+  const error = createError || updateError;
+  
   const [serverError, setServerError] = useState(null);
 
   const [formData, setFormData] = useState({
@@ -21,16 +26,30 @@ const DeliveryPartnerForm = ({ onClose, onSubmit }) => {
   });
 
   useEffect(() => {
-    if (isSuccess) {
+    if (partner) {
+      setFormData({
+        name: partner.registrationData.name || "",
+        phone: partner.registrationData.mobileNumber || "",
+        email: partner.registrationData.email || "",
+        password: "",
+        restaurantId: "695b5ae21b755e7a004ca320",
+        vehicleType: partner.registrationData.vehicleType || "BIKE",
+        image: null,
+      });
+    }
+  }, [partner]);
+
+  useEffect(() => {
+    if (isCreateSuccess || isUpdateSuccess) {
       onClose();
     }
-    if (isError) {
+    if (isCreateError || isUpdateError) {
       // Extract and display the server's error message
       const errorMessage = error?.data?.message || "An unexpected error occurred. Please try again.";
       setServerError(errorMessage);
-      console.error("Failed to create partner:", error);
+      console.error("Failed to save partner:", error);
     }
-  }, [isSuccess, isError, onClose, error]);
+  }, [isCreateSuccess, isUpdateSuccess, isCreateError, isUpdateError, onClose, error]);
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -47,7 +66,14 @@ const DeliveryPartnerForm = ({ onClose, onSubmit }) => {
     e.preventDefault();
     setServerError(null); // Reset error on new submission
     const { image, ...payload } = formData;
-    await createPartner(payload);
+    
+    if (partner) {
+      const updatePayload = { id: partner.partnerId, ...payload };
+      if (!updatePayload.password) delete updatePayload.password;
+      await updatePartner(updatePayload);
+    } else {
+      await createPartner(payload);
+    }
   };
 
   return createPortal(
@@ -56,7 +82,7 @@ const DeliveryPartnerForm = ({ onClose, onSubmit }) => {
 
         {/* Header */}
         <div className="p-4 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
-          <h3 className="font-semibold text-lg text-gray-800 dark:text-white">Add Delivery Partner</h3>
+          <h3 className="font-semibold text-lg text-gray-800 dark:text-white">{partner ? "Edit Delivery Partner" : "Add Delivery Partner"}</h3>
           <button onClick={onClose} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors">
             <X className="w-5 h-5 text-gray-500" />
           </button>
@@ -90,7 +116,7 @@ const DeliveryPartnerForm = ({ onClose, onSubmit }) => {
             <InputField name="name" placeholder="Full Name" value={formData.name} onChange={handleChange} required />
             <InputField name="phone" placeholder="Mobile Number" value={formData.phone} onChange={handleChange} required />
             <InputField name="email" placeholder="Email" value={formData.email} onChange={handleChange} required type="email" />
-            <InputField name="password" placeholder="Password" value={formData.password} onChange={handleChange} required type="password" />
+            <InputField name="password" placeholder={partner ? "Password (leave blank to keep)" : "Password"} value={formData.password} onChange={handleChange} required={!partner} type="password" />
             <select name="vehicleType" value={formData.vehicleType} onChange={handleChange} className="input w-full bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 focus:border-primary">
               <option value="BIKE">Bike</option>
               <option value="SCOOTER">Scooter</option>
@@ -102,7 +128,7 @@ const DeliveryPartnerForm = ({ onClose, onSubmit }) => {
           <div className="pt-4 border-t border-gray-100 dark:border-gray-700 flex justify-end gap-3">
             <Button type="button" variant="ghost" onClick={onClose}>Cancel</Button>
             <Button type="submit" variant="primary" loading={isLoading} disabled={isLoading}>
-              {isLoading ? "Creating..." : "Create Partner"}
+              {isLoading ? "Saving..." : (partner ? "Update Partner" : "Create Partner")}
             </Button>
           </div>
         </form>
