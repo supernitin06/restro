@@ -1,16 +1,13 @@
 import React, { useState, useEffect } from "react";
+import { Edit, Eye, Trash2 } from "lucide-react";
+
 import SearchFilterBar from "../components/restaurant/SearchFilterBar";
 import RestaurantStats from "../components/restaurant/RestaurantStats";
 import RestaurantGrid from "../components/restaurant/RestaurantGrid";
 import ViewDetailsModal from "../components/restaurant/ViewDetailsModal";
 import EditRestaurantModal from "../components/restaurant/EditRestaurantModal";
-
-import Table from "../components/ui/Table"; 
-import Pagination from "../components/ui/Pagination";
-
 import Table from "../components/ui/Table";
-import Pagination from "../components/ui/Pagination"; // ✅ your pagination component
-
+import Pagination from "../components/ui/Pagination";
 
 import {
   useGetRestaurantsQuery,
@@ -19,57 +16,53 @@ import {
   useUpdateRestaurantMutation,
   useDeleteRestaurantMutation,
 } from "../api/services/resturentsapi";
-import { Edit, Eye, Trash2 } from "lucide-react";
 
 function RestaurantManagement() {
+  // ===== RTK Query Hooks =====
   const { data, isLoading, isError, refetch } = useGetRestaurantsQuery();
-  const [toggleStatus] = useToggleRestaurantStatusMutation();
-  const [deleteRestaurant] = useDeleteRestaurantMutation();
-  const [updateRestaurant] = useUpdateRestaurantMutation();
-
-  const [viewMode, setViewMode] = useState("grid"); // default card view
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
-
-  const restaurants = Array.isArray(data?.data)
-    ? data.data
-    : data
-    ? [data]
-    : [];
-
-  const [selectedRestaurantId, setSelectedRestaurantId] = useState(null);
   const { data: restaurantDetails } = useGetRestaurantByIdQuery(
-    selectedRestaurantId,
-    { skip: !selectedRestaurantId }
+    null,
+    { skip: true } // skip initially
   );
 
+  const [toggleStatus] = useToggleRestaurantStatusMutation();
+  const [updateRestaurant] = useUpdateRestaurantMutation();
+  const [deleteRestaurant] = useDeleteRestaurantMutation();
+
+  // ===== State =====
+  const [viewMode, setViewMode] = useState("grid");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
+
+  const [selectedRestaurantId, setSelectedRestaurantId] = useState(null);
   const [editRestaurant, setEditRestaurant] = useState(null);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
 
+  // ===== Prepare restaurants =====
+  const restaurants = Array.isArray(data?.data) ? data.data : [];
+
   // ===== Filtered Restaurants =====
   const filteredRestaurants = restaurants.filter((r) => {
-    const matchesSearch = r.name
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
-
+    const matchesSearch = r.name?.toLowerCase().includes(searchTerm.toLowerCase());
     let matchesStatus = true;
+
     if (statusFilter === "Approved") {
-      matchesStatus = r.isActive === "active" || r.isActive === true;
+      matchesStatus = r.isActive === true || r.isActive === "active";
     } else if (statusFilter === "Suspended") {
-      matchesStatus = r.isActive === "suspended" || r.isActive === false;
+      matchesStatus = r.isActive === false || r.isActive === "suspended";
     }
 
     return matchesSearch && matchesStatus;
   });
 
-  // ===== Reset page when filter/search changes =====
+  // ===== Reset page when search/status changes =====
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, statusFilter]);
 
-  // ===== Pagination logic =====
+  // ===== Pagination =====
   const totalPages = Math.ceil(filteredRestaurants.length / itemsPerPage);
   const paginatedRestaurants = filteredRestaurants.slice(
     (currentPage - 1) * itemsPerPage,
@@ -116,7 +109,6 @@ function RestaurantManagement() {
           logo: editRestaurant.logo,
         },
       }).unwrap();
-
       setEditRestaurant(null);
       refetch();
     } catch (err) {
@@ -141,37 +133,38 @@ function RestaurantManagement() {
     },
   ];
 
-    const tableActions = [
+  const tableActions = [
     {
-      key: 'view',
-      label: 'View Details',
+      key: "view",
+      label: "View",
       icon: Eye,
-      color: 'blue',
-      onClick: (item) => console.log('View', item), // Placeholder
+      color: "blue",
+      onClick: handleView,
     },
     {
-      key: 'edit',
-      label: 'Edit Permissions',
+      key: "edit",
+      label: "Edit",
       icon: Edit,
-      color: 'purple',
-      onClick: () => navigate('/sub-admin/assign'),
+      color: "purple",
+      onClick: handleEdit,
     },
     {
-      key: 'delete',
-      label: 'Delete Admin',
+      key: "delete",
+      label: "Delete",
       icon: Trash2,
-      color: 'rose',
-      onClick: (item) => handleDelete(item.id),
+      color: "rose",
+      onClick: (item) => handleDelete(item._id || item.id),
     },
   ];
+
   const getStatusColor = (isActive) =>
     isActive
       ? "bg-green-100 text-green-800 border border-green-300"
       : "bg-red-100 text-red-800 border border-red-300";
 
+  // ===== Render =====
   if (isLoading) return <div className="p-8">Loading restaurants...</div>;
-  if (isError)
-    return <div className="p-8 text-red-500">Error loading restaurants</div>;
+  if (isError) return <div className="p-8 text-red-500">Error loading restaurants</div>;
 
   return (
     <div className="page page-background">
@@ -182,12 +175,13 @@ function RestaurantManagement() {
             Restaurant Management
           </h1>
           <p className="text-primary opacity-70 mt-2 text-lg font-medium">
-            Manage restaurant pricing, rules, and priorities across your
-            platform.
+            Manage restaurant pricing, rules, and priorities across your platform.
           </p>
         </div>
       </div>
-      <RestaurantStats restaurants={restaurants} />
+
+      {/* Stats */}
+      <RestaurantStats restaurants={filteredRestaurants} />
 
       {/* Search & Filter */}
       <SearchFilterBar
@@ -200,19 +194,11 @@ function RestaurantManagement() {
         setViewMode={setViewMode}
       />
 
-
-      {isLoading && <p className="text-center mt-6">Loading restaurants...</p>}
-      {isError && (
-        <p className="text-center mt-6 text-red-500">
-          Failed to load restaurants
-        </p>
-      )}
-
       {/* Grid view */}
       {viewMode === "grid" && (
         <>
           <RestaurantGrid
-            filteredRestaurants={paginatedRestaurants} // ✅ paginated
+            filteredRestaurants={paginatedRestaurants}
             onApprove={handleApprove}
             onSuspend={handleSuspend}
             onView={handleView}
@@ -223,7 +209,7 @@ function RestaurantManagement() {
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
-            onPageChange={(page) => setCurrentPage(page)}
+            onPageChange={setCurrentPage}
           />
         </>
       )}
@@ -233,19 +219,19 @@ function RestaurantManagement() {
         <>
           <Table
             title="Restaurants"
-            data={paginatedRestaurants} // ✅ paginated
+            data={paginatedRestaurants}
             columns={restaurantColumns}
             actions={tableActions}
           />
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
-            onPageChange={(page) => setCurrentPage(page)}
+            onPageChange={setCurrentPage}
           />
         </>
       )}
 
-      {/* View Details Modal */}
+      {/* Modals */}
       {selectedRestaurantId && (
         <ViewDetailsModal
           restaurant={restaurantDetails?.data}
@@ -255,7 +241,6 @@ function RestaurantManagement() {
         />
       )}
 
-      {/* Edit Modal */}
       {editRestaurant && (
         <EditRestaurantModal
           editRestaurant={editRestaurant}
