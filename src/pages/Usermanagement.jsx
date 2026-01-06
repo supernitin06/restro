@@ -27,7 +27,6 @@ const UserManagement = () => {
   const [showOrdersModal, setShowOrdersModal] = useState(false);
   const [activeOrdersUserId, setActiveOrdersUserId] = useState(null);
 
-  const hiddenKeys = ["_id", "password", "createdAt", "updatedAt", "__v", "otp", "lastLogin", "role", "permissions"];
   const { data: userDetail, isLoading: userDetailLoading, isError: userDetailError } = useGetUserDetailsQuery(selectedUser, { skip: !selectedUser });
 
   console.log("data of user", userDetail);
@@ -37,11 +36,7 @@ const UserManagement = () => {
     limit: itemsPerPage,
   });
   const [updateUserBlock] = useUpdateUserBlockMutation();
-
-
-
   //  Action
-
   const tableActions = [
     {
       key: 'view',
@@ -119,37 +114,76 @@ const UserManagement = () => {
   };
 
   // -------------------- Columns for Table --------------------
-  const columns = useMemo(() => {
-    if (!filteredUsers || filteredUsers.length === 0) return [];
-
-    return Object.keys(filteredUsers[0])
-
-
-      .filter((key) => !hiddenKeys.includes(key)) // ❌ Hide unwanted keys
-      .map((key) => ({
-        header: key
-          .replace(/([A-Z])/g, " $1")
-          .replace(/^./, (str) => str.toUpperCase()),
-        key,
-        render: (user) => {
-          if (key === "isBlocked")
-            return (
-              <Badge onClick={() => handleBlockToggle(user)}>
-                {user.isBlocked ? "Blocked" : "Active"}
-              </Badge>
-            );
-          if (key === "isActive")
-            return (
-              <Badge onClick={() => handleActiveToggle(user)} type={user.isActive ? "active" : "inactive"}>
-                {user.isActive ? "Active" : "Inactive"}
-              </Badge>
-            );
-          if (key === "lastLogin")
-            return user.lastLogin ? new Date(user.lastLogin).toLocaleString() : "-";
-          return user[key];
-        },
-      }));
-  }, [filteredUsers]);
+  // -------------------- Columns for Table --------------------
+  const columns = [
+    {
+      header: "Profile",
+      key: "profile",
+      render: (user) => {
+        const userName = user.displayName || user.name || "U";
+        return (
+          <div className="w-10 h-10 rounded-full overflow-hidden border border-gray-200">
+            {user.profile && user.profile !== "not available" ? (
+              <img src={user.profile} alt={userName} className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-500 text-xs font-bold">
+                {userName.charAt(0).toUpperCase()}
+              </div>
+            )}
+          </div>
+        );
+      },
+    },
+    {
+      header: "Name",
+      key: "name",
+      render: (user) => (
+        <div className="font-medium text-gray-900 dark:text-gray-100">
+          {user.displayName || user.name}
+        </div>
+      ),
+    },
+    {
+      header: "Contact Info",
+      key: "email",
+      render: (user) => (
+        <div className="flex flex-col">
+          <span className="text-sm text-gray-700 dark:text-gray-200">{user.email}</span>
+          <span className="text-xs text-gray-500">{user.mobile}</span>
+        </div>
+      ),
+    },
+    {
+      header: "DOB",
+      key: "dob",
+      render: (user) => {
+        if (!user.dob) return <span className="text-gray-400">-</span>;
+        return new Date(user.dob).toLocaleDateString(undefined, {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        });
+      },
+    },
+    {
+      header: "Joined Date", // Renamed from createdAt for better UX
+      key: "createdAt",
+      render: (user) => new Date(user.createdAt).toLocaleDateString(),
+    },
+    {
+      header: "Block Status",
+      key: "isBlocked",
+      render: (user) => (
+        <Badge
+          type={user.isBlocked ? "inactive" : "active"}
+          onClick={() => handleBlockToggle(user)}
+          className="cursor-pointer"
+        >
+          {user.isBlocked ? "Blocked" : "Active"}
+        </Badge>
+      ),
+    },
+  ];
 
 
 

@@ -28,6 +28,7 @@ const axiosBaseQuery =
           Authorization: token ? `Bearer ${token}` : undefined,
         },
       });
+      
  
       return { data: result.data };
     } catch (axiosError) {

@@ -5,6 +5,12 @@ import RestaurantGrid from "../components/restaurant/RestaurantGrid";
 import ViewDetailsModal from "../components/restaurant/ViewDetailsModal";
 import EditRestaurantModal from "../components/restaurant/EditRestaurantModal";
 import AddRestaurantModal from "../components/restaurant/AddRestaurantModal";
+import {
+  useGetAllRestaurantsQuery,
+  useCreateRestaurantMutation,
+  useUpdateRestaurantStatusMutation, // Assuming you added this
+  useDeleteRestaurantMutation
+} from "../api/services/restaurantApi";
 
 function RestaurantManagement() {
   const [selectedRestaurant, setSelectedRestaurant] = useState(null);
@@ -13,7 +19,13 @@ function RestaurantManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
 
-  
+  // API Hooks
+  const { data: restaurantData, isLoading, isError } = useGetAllRestaurantsQuery();
+  const [createRestaurant] = useCreateRestaurantMutation();
+  const [updateStatus] = useUpdateRestaurantStatusMutation();
+  const [deleteRestaurant] = useDeleteRestaurantMutation();
+
+  const restaurants = restaurantData?.data || [];
 
   const handleEdit = (r) => setEditRestaurant({ ...r });
 
@@ -28,14 +40,40 @@ function RestaurantManagement() {
     }
   };
 
+  const handleApprove = async (id) => {
+    try {
+      await updateStatus({ id, status: 'Approved' }).unwrap();
+    } catch (err) {
+      console.error("Failed to approve", err);
+    }
+  };
+
+  const handleSuspend = async (id) => {
+    try {
+      await updateStatus({ id, status: 'Suspended' }).unwrap();
+    } catch (err) {
+      console.error("Failed to suspend", err);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you sure you want to delete this restaurant?")) {
+      try {
+        await deleteRestaurant(id).unwrap();
+      } catch (err) {
+        console.error("Failed to delete", err);
+      }
+    }
+  }
+
   // ===== Filtered Restaurants =====
   const filteredRestaurants = restaurants.filter((r) => {
     const matchesSearch =
-      r.restaurantDetail.name
-        .toLowerCase()
+      r.restaurantDetail?.name
+        ?.toLowerCase()
         .includes(searchTerm.toLowerCase()) ||
-      r.address.fullAddress
-        .toLowerCase()
+      r.address?.fullAddress
+        ?.toLowerCase()
         .includes(searchTerm.toLowerCase());
 
     const matchesStatus =
@@ -57,6 +95,9 @@ function RestaurantManagement() {
         return "bg-gray-100 text-gray-800 border";
     }
   };
+
+  if (isLoading) return <div className="p-8">Loading restaurants...</div>;
+  if (isError) return <div className="p-8 text-red-500">Error loading restaurants</div>;
 
   return (
     <div className="page page-background ">
