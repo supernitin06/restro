@@ -4,17 +4,17 @@ import Button from "../../components/ui/Button";
 
 const General = () => {
   return (
-    <div className="bg-primary space-y-6">
+    <div className="bg-primary  space-y-6">
       {/* Header */}
-      <div>
-        <h2 className="highlight text-3xl mb-2 font-bold">General Settings</h2>
-        <p className="text-muted mt-1">
+      <div >
+        <h2 className="highlight ml-2 text-3xl mb-2  font-bold">General Settings</h2>
+        <p className="text-primary  m-3 mt-1">
           Basic restaurant and website configuration
         </p>
       </div>
 
       {/* Form */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 p-6 gap-6">
         <InputField
           label="Restaurant Name"
           name="restaurantName"
