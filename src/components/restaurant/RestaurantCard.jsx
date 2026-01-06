@@ -12,7 +12,7 @@ const RestaurantCard = ({
 }) => {
   if (!restaurant) return null;
 
-  const isActive = Boolean(restaurant.isActive); // ✅ SAFE
+  const isActive = Boolean(restaurant.isActive); 
   const restaurantId = restaurant._id;
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);

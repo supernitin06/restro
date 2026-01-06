@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import restaurantData from "../assets/json/resturant.json";
 import SearchFilterBar from "../components/restaurant/SearchFilterBar";
 import RestaurantStats from "../components/restaurant/RestaurantStats";
 import RestaurantGrid from "../components/restaurant/RestaurantGrid";
@@ -139,7 +138,8 @@ const filteredRestaurants = restaurants.filter((r) => {
 
 
       {/* Stats */}
-      <RestaurantStats restaurants={restaurants} />
+     <RestaurantStats restaurants={filteredRestaurants} />
+
 
       {isLoading && <p className="text-center mt-6">Loading restaurants...</p>}
       {isError && <p className="text-center mt-6 text-red-500">Failed to load restaurants</p>}
