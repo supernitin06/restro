@@ -4,8 +4,13 @@ import RestaurantStats from "../components/restaurant/RestaurantStats";
 import RestaurantGrid from "../components/restaurant/RestaurantGrid";
 import ViewDetailsModal from "../components/restaurant/ViewDetailsModal";
 import EditRestaurantModal from "../components/restaurant/EditRestaurantModal";
+
 import Table from "../components/ui/Table"; 
 import Pagination from "../components/ui/Pagination";
+
+import Table from "../components/ui/Table";
+import Pagination from "../components/ui/Pagination"; // ✅ your pagination component
+
 
 import {
   useGetRestaurantsQuery,
@@ -14,6 +19,7 @@ import {
   useUpdateRestaurantMutation,
   useDeleteRestaurantMutation,
 } from "../api/services/resturentsapi";
+import { Edit, Eye, Trash2 } from "lucide-react";
 
 function RestaurantManagement() {
   const { data, isLoading, isError, refetch } = useGetRestaurantsQuery();
@@ -25,7 +31,11 @@ function RestaurantManagement() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
-  const restaurants = Array.isArray(data?.data) ? data.data : data ? [data] : [];
+  const restaurants = Array.isArray(data?.data)
+    ? data.data
+    : data
+    ? [data]
+    : [];
 
   const [selectedRestaurantId, setSelectedRestaurantId] = useState(null);
   const { data: restaurantDetails } = useGetRestaurantByIdQuery(
@@ -34,12 +44,15 @@ function RestaurantManagement() {
   );
 
   const [editRestaurant, setEditRestaurant] = useState(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
 
   // ===== Filtered Restaurants =====
   const filteredRestaurants = restaurants.filter((r) => {
-    const matchesSearch = r.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = r.name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
 
     let matchesStatus = true;
     if (statusFilter === "Approved") {
@@ -122,20 +135,43 @@ function RestaurantManagement() {
       header: "Status",
       key: "isActive",
       render: (row) =>
-        row.isActive === true || row.isActive === "active" ? "Approved" : "Suspended",
+        row.isActive === true || row.isActive === "active"
+          ? "Approved"
+          : "Suspended",
     },
   ];
 
-  const restaurantActions = [
-    { label: "View", onClick: (row) => handleView(row) },
-    { label: "Edit", onClick: (row) => handleEdit(row) },
-    { label: "Delete", variant: "danger", onClick: (row) => handleDelete(row._id) },
+    const tableActions = [
+    {
+      key: 'view',
+      label: 'View Details',
+      icon: Eye,
+      color: 'blue',
+      onClick: (item) => console.log('View', item), // Placeholder
+    },
+    {
+      key: 'edit',
+      label: 'Edit Permissions',
+      icon: Edit,
+      color: 'purple',
+      onClick: () => navigate('/sub-admin/assign'),
+    },
+    {
+      key: 'delete',
+      label: 'Delete Admin',
+      icon: Trash2,
+      color: 'rose',
+      onClick: (item) => handleDelete(item.id),
+    },
   ];
-
   const getStatusColor = (isActive) =>
     isActive
       ? "bg-green-100 text-green-800 border border-green-300"
       : "bg-red-100 text-red-800 border border-red-300";
+
+  if (isLoading) return <div className="p-8">Loading restaurants...</div>;
+  if (isError)
+    return <div className="p-8 text-red-500">Error loading restaurants</div>;
 
   return (
     <div className="page page-background">
@@ -146,10 +182,12 @@ function RestaurantManagement() {
             Restaurant Management
           </h1>
           <p className="text-primary opacity-70 mt-2 text-lg font-medium">
-            Manage restaurant pricing, rules, and priorities across your platform.
+            Manage restaurant pricing, rules, and priorities across your
+            platform.
           </p>
         </div>
       </div>
+      <RestaurantStats restaurants={restaurants} />
 
       {/* Search & Filter */}
       <SearchFilterBar
@@ -162,11 +200,13 @@ function RestaurantManagement() {
         setViewMode={setViewMode}
       />
 
-      {/* Stats */}
-      <RestaurantStats restaurants={filteredRestaurants} />
 
       {isLoading && <p className="text-center mt-6">Loading restaurants...</p>}
-      {isError && <p className="text-center mt-6 text-red-500">Failed to load restaurants</p>}
+      {isError && (
+        <p className="text-center mt-6 text-red-500">
+          Failed to load restaurants
+        </p>
+      )}
 
       {/* Grid view */}
       {viewMode === "grid" && (
@@ -195,7 +235,7 @@ function RestaurantManagement() {
             title="Restaurants"
             data={paginatedRestaurants} // ✅ paginated
             columns={restaurantColumns}
-            actions={restaurantActions}
+            actions={tableActions}
           />
           <Pagination
             currentPage={currentPage}

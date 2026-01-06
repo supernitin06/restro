@@ -1,7 +1,16 @@
-# TODO: Convert AddMenu Modal to Standalone Page
+# TODO: Fix "Failed to add category" Error
 
-## Steps to Complete:
-1. Add a new route in approuter.jsx for /menu-management/add that renders the AddMenu component.
-2. Modify MenuManagement.jsx to navigate to the new page instead of opening a modal, and remove modal-related code.
-3. Update AddMenu.jsx to handle navigation (back button and save functionality) using React Router.
-4. Test the changes to ensure the Add Menu functionality opens as a full page.
+## Completed Tasks
+- [x] Identify the source of the error in AddMenu.jsx
+- [x] Add validation for restaurantId before making API call
+- [x] Improve error handling to display server-specific error messages
+- [x] Change API endpoints from "admin/category" to "admin/categories" to fix "Route not found" error
+
+## Pending Tasks
+- [ ] Test the fix by attempting to add a category
+- [ ] Verify that the error message is more informative if the issue persists
+
+## Notes
+- The error was occurring in the handleAddCategory function due to missing restaurantId or server-side issues.
+- Added checks for restaurantId and enhanced error messaging.
+- Changed API routes to plural form to match backend expectations.

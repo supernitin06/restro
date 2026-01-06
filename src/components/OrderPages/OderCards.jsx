@@ -78,125 +78,87 @@ const OrderCard = ({ order, onDelete, onEdit, onUpdateStatus, viewMode }) => {
   if (viewMode === 'list') {
     return (
       <>
-        <div className="card hover:border-primary/50 transition-all duration-300">
-          <div className="p-3.5">
-            <div className="flex items-center justify-between gap-3 flex-wrap">
+        <div className="card hover:border-primary/50 transition-all duration-300 group mb-3">
+          <div className="p-4">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
 
-              {/* Order Info */}
-              <div className="flex items-center gap-3 flex-1 min-w-[180px]">
-                <div className="flex-shrink-0">
-                  <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center">
-                    <span className="text-primary font-bold text-sm">
-                      {order.orderId.replace('#ORDER', '#')}
-                    </span>
-                  </div>
+              {/* 1. Order Info (Span 3) */}
+              <div className="md:col-span-3 flex items-center gap-3 min-w-0">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                  <span className="text-primary font-bold text-xs">
+                    {order.orderId.replace('#ORDER', '#')}
+                  </span>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-sm font-bold text-gray-800 dark:text-gray-100 truncate">
+                <div className="min-w-0">
+                  <h3 className="text-sm font-bold text-gray-800 dark:text-gray-100 truncate" title={order.customer}>
                     {order.customer}
                   </h3>
-                  <p className="text-xs text-muted flex items-center gap-1.5">
-                    <Clock size={11} />
-                    {order.time}
-                  </p>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <span className="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded text-[10px] font-medium uppercase tracking-wide">
+                      {order.type}
+                    </span>
+                    {order.table && (
+                      <span className="text-[10px] text-gray-500 dark:text-gray-400 border-l border-gray-300 dark:border-gray-600 pl-2">
+                        {order.table}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
 
-              {/* Restaurant Info Icon */}
-              <button
-                onClick={() => setShowDetails(true)}
-                className="p-2 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all text-blue-600 dark:text-blue-400 group"
-                title="View Full Details"
-              >
-                <Info size={16} className="group-hover:scale-110 transition-transform" />
-              </button>
-
-              {/* Delivery Partner */}
-              {order.deliveryPartner && (
-                <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-                  <Bike size={14} className="text-purple-600" />
-                  <span className="text-xs font-semibold text-purple-700 dark:text-purple-400">
-                    {order.deliveryPartner.name}
-                  </span>
+              {/* 2. Status (Span 2) */}
+              <div className="md:col-span-2">
+                <div className={`${config.bg} ${config.text} px-2.5 py-1.5 rounded-lg text-xs font-bold inline-flex items-center gap-1.5`}>
+                  <StatusIcon size={14} />
+                  {config.label}
                 </div>
-              )}
-
-              {/* Type & Table */}
-              <div className="flex items-center gap-1.5">
-                <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg text-xs font-semibold">
-                  {order.type}
-                </span>
-                {order.table && (
-                  <span className="px-2 py-1 bg-primary/10 text-primary rounded-lg text-xs font-semibold">
-                    {order.table}
-                  </span>
-                )}
               </div>
 
-              {/* Status */}
-              <div className={`${config.bg} ${config.text} px-2.5 py-1 rounded-full text-xs font-bold flex items-center gap-1`}>
-                <StatusIcon size={13} />
-                {config.label}
+              {/* 3. Details (Partner & Payment) (Span 3) */}
+              <div className="md:col-span-3 flex flex-col gap-1.5">
+                <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
+                  <Bike size={14} className="text-purple-500" />
+                  <span className="truncate">{order.deliveryPartner ? order.deliveryPartner.name : 'Unassigned'}</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
+                  <CreditCard size={14} className="text-green-500" />
+                  <span className="truncate">{order.paymentMethod}</span>
+                </div>
               </div>
 
-              {/* Payment */}
-              <div className="flex items-center gap-1.5 px-2 py-1 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                <CreditCard size={13} className="text-green-600" />
-                <span className="text-xs font-semibold text-green-700 dark:text-green-400">
-                  {order.paymentMethod}
-                </span>
-              </div>
-
-              {/* Total */}
-              <div className="text-right min-w-[70px]">
-                <span className="text-lg font-bold text-primary">
+              {/* 4. Time & Total (Span 2) */}
+              <div className="md:col-span-2 text-right">
+                <div className="text-base font-bold text-primary">
                   ${order.total.toFixed(2)}
-                </span>
+                </div>
+                <div className="flex items-center justify-end gap-1.5 text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                  <Clock size={12} />
+                  {order.time}
+                </div>
               </div>
 
-              {/* Actions */}
-              <div className="flex gap-1">
-                <button
-                  onClick={() => setShowDetails(true)}
-                  className="p-1.5 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all text-blue-600 dark:text-blue-400"
-                  title="View Details"
-                >
-                  <Eye size={15} />
+              {/* 5. Actions (Span 2) */}
+              <div className="md:col-span-2 flex justify-end gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                <button onClick={() => setShowDetails(true)} className="p-2 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg text-blue-600 dark:text-blue-400 transition-colors" title="View Details">
+                  <Eye size={16} />
                 </button>
-
+                
                 {order.status === 'on-process' && (
                   <>
-                    <button
-                      onClick={() => onUpdateStatus(order.id, 'completed')}
-                      className="p-1.5 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-all text-green-600 dark:text-green-400"
-                      title="Complete Order"
-                    >
-                      <CheckCircle size={15} />
+                    <button onClick={() => onUpdateStatus(order.id, 'completed')} className="p-2 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg text-green-600 dark:text-green-400 transition-colors" title="Complete">
+                      <CheckCircle size={16} />
                     </button>
-                    <button
-                      onClick={() => onUpdateStatus(order.id, 'cancelled')}
-                      className="p-1.5 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all text-red-600 dark:text-red-400"
-                      title="Cancel Order"
-                    >
-                      <XCircle size={15} />
+                    <button onClick={() => onUpdateStatus(order.id, 'cancelled')} className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg text-red-600 dark:text-red-400 transition-colors" title="Cancel">
+                      <XCircle size={16} />
                     </button>
                   </>
                 )}
 
-                <button
-                  onClick={() => onEdit(order)}
-                  className="p-1.5 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all text-primary"
-                  title="Edit Order"
-                >
-                  <Edit size={15} />
+                <button onClick={() => onEdit(order)} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-gray-600 dark:text-gray-300 transition-colors" title="Edit">
+                  <Edit size={16} />
                 </button>
-
-                <button
-                  onClick={() => onDelete(order.id)}
-                  className="p-1.5 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all text-red-600 dark:text-red-400"
-                  title="Delete Order"
-                >
-                  <Trash2 size={15} />
+                <button onClick={() => onDelete(order.id)} className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg text-red-600 dark:text-red-400 transition-colors" title="Delete">
+                  <Trash2 size={16} />
                 </button>
               </div>
             </div>

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { FiEdit3, FiTrash2, FiEye } from "react-icons/fi";
+import { Edit, Trash2, Eye, MapPin, MoreVertical, CheckCircle, XCircle } from "lucide-react";
 import Button from "../ui/Button";
+import GlassCard from "../ui/GlassCard";
 
 const RestaurantCard = ({
   restaurant,
@@ -12,115 +13,130 @@ const RestaurantCard = ({
 }) => {
   if (!restaurant) return null;
 
-  const isActive = Boolean(restaurant.isActive); 
+  const isActive = Boolean(restaurant.isActive);
   const restaurantId = restaurant._id;
-
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   return (
     <>
-      {/* CARD */}
-      <div className="card group border rounded-xl overflow-hidden shadow hover:shadow-lg transition">
+      <GlassCard className="group relative h-full flex flex-col overflow-hidden transition-all duration-500 hover:shadow-2xl hover:shadow-primary/5 hover:-translate-y-1 bg-white/60 dark:bg-gray-800/60">
 
-        {/* IMAGE */}
-        <div className="relative h-44 overflow-hidden">
+        {/* IMAGE SECTION */}
+        <div className="relative h-48 shrink-0 overflow-hidden bg-gray-200 dark:bg-gray-900">
+          {/* Image Overlay Gradient */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent z-10" />
+
           <img
             src={restaurant.logo || "/placeholder.jpg"}
             alt={restaurant.name}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+            onError={(e) => { e.target.src = "https://placehold.co/600x400?text=No+Image"; }}
           />
 
           {/* STATUS BADGE */}
-          <span
-            className={`absolute top-3 left-3 px-3 py-1 rounded-full text-[11px] font-semibold ${getStatusColor(
-              isActive
-            )}`}
-          >
-            {isActive ? "Active" : "Inactive"}
-          </span>
+          <div className="absolute top-3 left-3 z-20">
+            <div className={`
+                    flex items-center gap-1.5 px-3 py-1 rounded-full backdrop-blur-md border shadow-sm
+                    ${isActive
+                ? 'bg-green-500/20 border-green-400/30 text-green-100'
+                : 'bg-red-500/20 border-red-400/30 text-red-100'}
+                 `}>
+              <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-green-400 animate-pulse' : 'bg-red-400'}`} />
+              <span className="text-[10px] font-bold uppercase tracking-wider">
+                {isActive ? "Active" : "Inactive"}
+              </span>
+            </div>
+          </div>
 
-          {/* EDIT / DELETE */}
-          <div className="absolute top-3 right-3 flex gap-3 opacity-0 group-hover:opacity-100 transition">
-            <button onClick={() => onEdit(restaurant)}>
-              <FiEdit3 className="text-white hover:text-blue-400" />
+          {/* FLOATING ACTION BUTTONS (Top Right) */}
+          <div className="absolute top-3 right-3 z-20 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-4 group-hover:translate-x-0">
+            <button
+              onClick={(e) => { e.stopPropagation(); onEdit(restaurant); }}
+              className="p-2 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white shadow-lg transition-all hover:scale-110"
+              title="Edit"
+            >
+              <Edit size={14} />
             </button>
+            <button
+              onClick={(e) => { e.stopPropagation(); setShowDeleteModal(true); }}
+              className="p-2 rounded-full bg-red-500/20 hover:bg-red-500/40 backdrop-blur-md border border-red-500/30 text-red-200 hover:text-white shadow-lg transition-all hover:scale-110"
+              title="Delete"
+            >
+              <Trash2 size={14} />
+            </button>
+          </div>
 
-            <button onClick={() => setShowDeleteModal(true)}>
-              <FiTrash2 className="text-white hover:text-red-400" />
-            </button>
+          {/* BRAND INFO OVERLAY */}
+          <div className="absolute bottom-0 left-0 right-0 p-4 z-20 transform transition-transform duration-300">
+            <h2 className="text-xl font-bold text-white mb-0.5 drop-shadow-md truncate">
+              {restaurant.name || "Unnamed"}
+            </h2>
+            {restaurant.address && (
+              <div className="flex items-center gap-1 text-gray-300 text-xs">
+                <MapPin size={12} className="shrink-0" />
+                <span className="truncate">{restaurant.address.street || restaurant.address.city || "Location N/A"}</span>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* CONTENT */}
-        <div className="px-4 py-4 space-y-3">
-          <h2 className="text-sm font-semibold text-gray-800">
-            {restaurant.name || "Unnamed"}
-          </h2>
+        {/* CONTENT & ACTIONS */}
+        <div className="p-4 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm">
 
-          {/* ACTIVE / DEACTIVE STATUS */}
-
-
-          <div className="h-px bg-gray-200" />
-
-          {/* ACTION BUTTONS */}
-          <div className="grid grid-cols-2 gap-2">
-
-            <Button
-  onClick={() => onApprove(restaurantId)} // or any handler
-  size="sm"
-  className={`py-2 px-4 rounded-lg text-white transition-colors duration-300 ease-in-out
-    ${isActive ? "bg-green-600 hover:bg-green-700" : "bg-red-600 hover:bg-red-700"}`}
->
-  {isActive ? "Active" : "Inactive"}
-</Button>
-
-
+          <div className="grid grid-cols-2 gap-3">
             <Button
               onClick={() => onView(restaurant)}
-              variant="primary"
+              variant="ghost"
+              className="w-full border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700"
               size="sm"
             >
-              <FiEye size={12} /> View
+              <Eye size={14} className="mr-2" />
+              Details
+            </Button>
+
+            <Button
+              onClick={() => onApprove(restaurantId)}
+              size="sm"
+              className={`w-full border-none shadow-md text-white transition-all duration-300 ${isActive
+                ? "bg-gradient-to-r from-emerald-500 to-teal-500 hover:shadow-emerald-500/25"
+                : "bg-gradient-to-r from-red-500 to-rose-500 hover:shadow-red-500/25"}
+                `}
+            >
+              {isActive ? "Active" : "Inactive"}
             </Button>
           </div>
         </div>
-      </div>
+      </GlassCard>
 
-      {/* DELETE CONFIRM MODAL */}
+      {/* DELETE MODAL */}
       {showDeleteModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/70 backdrop-blur-md">
-          <div className="bg-white w-full max-w-sm rounded-2xl shadow-2xl p-6 border border-red-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowDeleteModal(false)} />
+          <div className="relative bg-white dark:bg-gray-900 w-full max-w-sm rounded-3xl shadow-2xl p-6 border border-gray-100 dark:border-gray-800 animate-in zoom-in-95 duration-200">
 
-            <div className="flex justify-center mb-4">
-              <div className="w-14 h-14 flex items-center justify-center rounded-full bg-red-100 text-red-600">
-                <FiTrash2 size={26} />
-              </div>
+            <div className="w-16 h-16 rounded-full bg-red-100 dark:bg-red-900/20 flex items-center justify-center mx-auto mb-4 text-red-500 ring-8 ring-red-50 dark:ring-red-900/10">
+              <Trash2 size={32} />
             </div>
 
-            <h2 className="text-lg font-bold text-center text-gray-800">
-              Delete Restaurant?
-            </h2>
-
-            <p className="text-sm text-center text-gray-500 mt-2">
-              This action cannot be undone.
+            <h3 className="text-xl font-bold text-center text-gray-900 dark:text-white mb-2">Delete Restaurant?</h3>
+            <p className="text-sm text-center text-gray-500 dark:text-gray-400 mb-6">
+              Are you sure you want to delete <span className="font-semibold text-gray-900 dark:text-white">{restaurant.name}</span>? This action cannot be undone.
             </p>
 
-            <div className="flex gap-3 mt-6">
+            <div className="grid grid-cols-2 gap-3">
               <Button
-                variant="secondary"
-                className="flex-1"
+                variant="ghost"
                 onClick={() => setShowDeleteModal(false)}
+                className="w-full"
               >
                 Cancel
               </Button>
-
               <Button
-                variant="danger"
-                className="flex-1"
                 onClick={() => {
                   onDelete(restaurantId);
                   setShowDeleteModal(false);
                 }}
+                className="w-full bg-red-500 hover:bg-red-600 text-white border-none"
               >
                 Delete
               </Button>

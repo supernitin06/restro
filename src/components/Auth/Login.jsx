@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import restaurantImage from "../../assets/loginimage1.jpg";
+import grandmaLogo from "../../assets/grandma.webp";
 import { useLoginMutation } from "../../api/services/authapi";
 import { useNavigate } from "react-router-dom";
 import { FiEye, FiEyeOff } from "react-icons/fi";
@@ -83,12 +84,16 @@ const LoginForm = ({ role = "admin", onRoleChange }) => {
             {isMobile ? (
               // Simplified header for mobile image section
               <>
-                <div style={{ ...styles.restaurantLogo, fontSize: "40px", marginBottom: "5px" }}>🍽️</div>
+                <div style={styles.mobileLogoContainer}>
+                  <img src={grandmaLogo} alt="Restaurant Logo" style={styles.mobileLogoImage} />
+                </div>
                 <h2 style={{ ...styles.restaurantTitle, fontSize: "24px" }}>Fine Dining Pro</h2>
               </>
             ) : (
               <>
-                <div style={styles.restaurantLogo}>🍽️</div>
+                <div style={styles.restaurantLogo}>
+                  <img src={grandmaLogo} alt="Restaurant Logo" style={styles.restaurantLogoImage} />
+                </div>
                 <h2 style={styles.restaurantTitle}>Fine Dining Pro</h2>
                 <p style={styles.restaurantTagline}>Elevating Restaurant Management</p>
               </>
@@ -239,7 +244,7 @@ const LoginForm = ({ role = "admin", onRoleChange }) => {
               <div style={styles.footer}>
                 <p style={styles.footerText}>
                   Need help?{" "}
-                       <button
+                  <button
                     type="button"
                     style={styles.supportLink}
                     onClick={() => navigate("/support")}
@@ -327,10 +332,32 @@ const styles = {
     textAlign: "center",
   },
   restaurantLogo: {
-    fontSize: "60px",
     marginBottom: "20px",
     animation: "bounce 2s ease-in-out infinite",
     filter: "drop-shadow(2px 2px 4px rgba(0,0,0,0.2))",
+    display: "flex",
+    justifyContent: "center",
+  },
+  restaurantLogoImage: {
+    width: "140px",
+    height: "140px",
+    borderRadius: "50%",
+    objectFit: "cover",
+    border: "4px solid rgba(255, 255, 255, 0.9)",
+    boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3)",
+  },
+  mobileLogoContainer: {
+    marginBottom: "10px",
+    display: "flex",
+    justifyContent: "center",
+  },
+  mobileLogoImage: {
+    width: "60px",
+    height: "60px",
+    borderRadius: "50%",
+    objectFit: "cover",
+    border: "2px solid rgba(255, 255, 255, 0.9)",
+    boxShadow: "0 4px 16px rgba(0, 0, 0, 0.2)",
   },
   restaurantTitle: {
     fontSize: "32px",

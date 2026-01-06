@@ -36,14 +36,16 @@ const SIZE_CLASSES = {
   lg: 'px-4 py-2 text-base',
 };
 
-const Badge = ({ type = 'default', size = 'md', children }) => {
+const Badge = ({ type = 'default', size = 'md', children, onClick }) => {
   const { icon: Icon, className } = BADGE_CONFIG[type] || BADGE_CONFIG.default;
 
   return (
     <span
+      onClick={onClick}
       className={`
         ${SIZE_CLASSES[size]}
         ${className}
+        ${onClick ? 'cursor-pointer hover:opacity-80 active:scale-95 transition-all' : ''}
         rounded-full
         border
         backdrop-blur-sm

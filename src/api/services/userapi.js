@@ -8,33 +8,40 @@ export const userApi = baseApi.injectEndpoints({
         url: `admin/users?page=${page}&limit=${limit}`,
         method: "get",
       }),
+      providesTags: ["User"],
     }),
     getUser: builder.query({
-      query: (id) => ({ url: `admin/users/${id}`, method: "get" }),
+      query: (id) =>
+        ({ url: `admin/users/${id}`, method: "get" }),
+      providesTags: ["User"],
     }),
+
+    getUserDetails: builder.query({
+      query: (id) => ({ url: `admin/users/${id}`, method: "get" }),
+      providesTags: ["User"],
+    }),
+
     getUserOrders: builder.query({
       query: (id) => ({ url: `admin/users/${id}/orders`, method: "get" }),
+      providesTags: ["Order"],
     }),
-    blockUser: builder.mutation({
-      query: ({ id, block }) => ({
-        url: `admin/users/${id}`,
-        method: "PATCH",
-        data: { isBlocked: block },
-      }),
-    }),
-    updateUser: builder.mutation({
+
+    updateUserBlock: builder.mutation({
       query: ({ id, body }) => ({
-        url: `admin/users/${id}`,
+        url: `admin/users/${id}/block`,
         method: "PATCH",
         data: body,
       }),
+      invalidatesTags: ["User"],
     }),
+
   }),
 });
 
 export const {
   useGetUsersQuery,
   useGetUserQuery,
+  useGetUserDetailsQuery,
   useGetUserOrdersQuery,
-  useUpdateUserMutation,
+  useUpdateUserBlockMutation,
 } = userApi;

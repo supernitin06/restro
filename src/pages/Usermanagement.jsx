@@ -1,17 +1,20 @@
 import React, { useState, useMemo } from "react";
 import FiltersBar from "../components/ui/UserFilters";
 import UserModal from "../components/users/UserModal";
+import UserOrdersModal from "../components/users/UserOrdersModal";
 import UserCard from "../components/users/UserCard";
-import { useGetUsersQuery, useUpdateUserMutation } from "../api/services/userapi";
-import { TrendingUp, TrendingDown, Grid, List } from "lucide-react";
+import { useGetUserDetailsQuery, useGetUsersQuery, useUpdateUserBlockMutation, } from "../api/services/userapi";
+import { TrendingUp, TrendingDown, Grid, List, Eye, Edit, Trash2, ShoppingBag } from "lucide-react";
 import GradientButton from "../components/ui/GradientButton";
 import StatCard from "../components/ui/StatCard";
 import Table from "../components/ui/Table";
 import Badge from "../components/ui/Badge";
 import Pagination from "../components/ui/Pagination";
+import { useNavigate } from "react-router-dom";
 
 
 const UserManagement = () => {
+  const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
   const [viewMode, setViewMode] = useState("table");
@@ -19,21 +22,63 @@ const UserManagement = () => {
   const [filters, setFilters] = useState({ status: "all" });
   const [selectedUser, setSelectedUser] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const hiddenKeys = ["_id", "password", "createdAt", "updatedAt", "__v"];
 
+  // State for Orders Modal
+  const [showOrdersModal, setShowOrdersModal] = useState(false);
+  const [activeOrdersUserId, setActiveOrdersUserId] = useState(null);
 
+  const { data: userDetail, isLoading: userDetailLoading, isError: userDetailError } = useGetUserDetailsQuery(selectedUser, { skip: !selectedUser });
+
+  console.log("data of user", userDetail);
   // -------------------- Hooks (always called) --------------------
   const { data, isLoading, isError } = useGetUsersQuery({
     page: currentPage,
     limit: itemsPerPage,
   });
-  const [updateUser] = useUpdateUserMutation();
+  const [updateUserBlock] = useUpdateUserBlockMutation();
+  //  Action
+  const tableActions = [
+    {
+      key: 'view',
+      label: 'View Details',
+      icon: Eye,
+      color: 'blue',
+      onClick: (item) => {
+        setSelectedUser(item._id);
+        setShowModal(true);
+      },
+    },
+    {
+      key: 'orders',
+      label: 'View Orders',
+      icon: ShoppingBag,
+      color: 'amber',
+      onClick: (item) => {
+        setActiveOrdersUserId(item._id);
+        setShowOrdersModal(true);
+      },
+    },
+    {
+      key: 'edit',
+      label: 'Edit Permissions',
+      icon: Edit,
+      color: 'purple',
+      onClick: () => navigate('/sub-admin/assign'),
+    },
+    {
+      key: 'delete',
+      label: 'Delete Admin',
+      icon: Trash2,
+      color: 'rose',
+      onClick: (item) => handleDelete(item.id),
+    },
+  ];
 
   // -------------------- Data processing --------------------
   const users = data?.data || [];
   const totalUsers = data?.meta?.total || 0;
   const totalPages = Math.ceil(totalUsers / itemsPerPage);
-  
+
 
   const filteredUsers = useMemo(() => {
     let filtered = users;
@@ -54,38 +99,91 @@ const UserManagement = () => {
 
   // -------------------- Handlers --------------------
   const handleBlockToggle = (user) => {
-    updateUser({
+    console.log("user", user);
+    updateUserBlock({
       id: user._id,
       body: { isBlocked: !user.isBlocked },
     });
   };
-  
- // -------------------- Columns for Table --------------------
-const columns = useMemo(() => {
-  if (!filteredUsers || filteredUsers.length === 0) return [];
 
-  return Object.keys(filteredUsers[0])
+  const handleActiveToggle = (user) => {
+    updateUserBlock({
+      id: user._id,
+      body: { isActive: !user.isActive },
+    });
+  };
 
-
-    .filter((key) => !hiddenKeys.includes(key)) // ❌ Hide unwanted keys
-    .map((key) => ({
-      header: key
-        .replace(/([A-Z])/g, " $1")
-        .replace(/^./, (str) => str.toUpperCase()),
-      key,
+  // -------------------- Columns for Table --------------------
+  // -------------------- Columns for Table --------------------
+  const columns = [
+    {
+      header: "Profile",
+      key: "profile",
       render: (user) => {
-        if (key === "isBlocked")
-          return (
-            <Badge onClick={() => handleBlockToggle(user)}>
-              {user.isBlocked ? "Blocked" : "Active"}
-            </Badge>
-          );
-        if (key === "lastLogin")
-          return user.lastLogin ? new Date(user.lastLogin).toLocaleString() : "-";
-        return user[key];
+        const userName = user.displayName || user.name || "U";
+        return (
+          <div className="w-10 h-10 rounded-full overflow-hidden border border-gray-200">
+            {user.profile && user.profile !== "not available" ? (
+              <img src={user.profile} alt={userName} className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-500 text-xs font-bold">
+                {userName.charAt(0).toUpperCase()}
+              </div>
+            )}
+          </div>
+        );
       },
-    }));
-}, [filteredUsers]);
+    },
+    {
+      header: "Name",
+      key: "name",
+      render: (user) => (
+        <div className="font-medium text-gray-900 dark:text-gray-100">
+          {user.displayName || user.name}
+        </div>
+      ),
+    },
+    {
+      header: "Contact Info",
+      key: "email",
+      render: (user) => (
+        <div className="flex flex-col">
+          <span className="text-sm text-gray-700 dark:text-gray-200">{user.email}</span>
+          <span className="text-xs text-gray-500">{user.mobile}</span>
+        </div>
+      ),
+    },
+    {
+      header: "DOB",
+      key: "dob",
+      render: (user) => {
+        if (!user.dob) return <span className="text-gray-400">-</span>;
+        return new Date(user.dob).toLocaleDateString(undefined, {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        });
+      },
+    },
+    {
+      header: "Joined Date", // Renamed from createdAt for better UX
+      key: "createdAt",
+      render: (user) => new Date(user.createdAt).toLocaleDateString(),
+    },
+    {
+      header: "Block Status",
+      key: "isBlocked",
+      render: (user) => (
+        <Badge
+          type={user.isBlocked ? "inactive" : "active"}
+          onClick={() => handleBlockToggle(user)}
+          className="cursor-pointer"
+        >
+          {user.isBlocked ? "Blocked" : "Active"}
+        </Badge>
+      ),
+    },
+  ];
 
 
 
@@ -100,9 +198,9 @@ const columns = useMemo(() => {
     setCurrentPage(1);
   };
   const handlePageChange = (page) => {
-  if (page < 1 || page > totalPages) return;
-  setCurrentPage(page);
-};
+    if (page < 1 || page > totalPages) return;
+    setCurrentPage(page);
+  };
 
 
   // -------------------- Render --------------------
@@ -116,6 +214,28 @@ const columns = useMemo(() => {
           </p>
         </div>
       </div>
+
+      {showModal && (
+        <UserModal
+          user={userDetail?.data}
+          isLoading={userDetailLoading}
+          onClose={() => {
+            setShowModal(false);
+            setSelectedUser(null);
+          }}
+        />
+      )}
+
+      {/* Orders Modal */}
+      {showOrdersModal && activeOrdersUserId && (
+        <UserOrdersModal
+          userId={activeOrdersUserId}
+          onClose={() => {
+            setShowOrdersModal(false);
+            setActiveOrdersUserId(null);
+          }}
+        />
+      )}
 
       <div className="relative z-10">
         {isLoading && <div>Loading users...</div>}
@@ -158,45 +278,43 @@ const columns = useMemo(() => {
             </FiltersBar>
 
             {viewMode === "grid" && (
-  <>
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-      {filteredUsers.map((user) => (
-        <UserCard key={user._id} user={user} />
-      ))}
-    </div>
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                  {filteredUsers.map((user) => (
+                    <UserCard key={user._id} user={user} />
+                  ))}
+                </div>
 
-    <Pagination
-      currentPage={currentPage}
-      totalPages={totalPages}
-      onPageChange={handlePageChange}
-    />
-  </>
-)}
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                />
+              </>
+            )}
 
-{viewMode === "table" && (
-  <>
-    <Table
-      data={filteredUsers}
-      columns={columns}
-      title="Users"
-    />
+            {viewMode === "table" && (
+              <>
+                <Table
+                  data={filteredUsers}
+                  columns={columns}
+                  title="Users"
+                  actions={tableActions}
+                />
 
-   <Pagination
-  currentPage={currentPage}
-  totalPages={totalPages}
-  onPageChange={handlePageChange}
-/>
-  </>
-)}
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                />
+              </>
+            )}
 
 
           </>
         )}
       </div>
 
-      {showModal && selectedUser && (
-        <UserModal user={selectedUser} onClose={() => setShowModal(false)} />
-      )}
     </div>
   );
 };
