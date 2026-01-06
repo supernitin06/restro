@@ -8,7 +8,7 @@ import AddRestaurantModal from "../components/restaurant/AddRestaurantModal";
 import {
   useGetAllRestaurantsQuery,
   useCreateRestaurantMutation,
-  useUpdateRestaurantStatusMutation, // Assuming you added this
+  useUpdateRestaurantStatusMutation, // Assuming you added thisg
   useDeleteRestaurantMutation
 } from "../api/services/restaurantApi";
 
