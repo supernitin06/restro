@@ -20,7 +20,7 @@ const GradientButton = ({
     <button
       onClick={onClick}
       className={`
-        px-6 py-3 
+        px-6 py-3
         rounded-xl
         font-semibold
         text-#2563eb
@@ -32,7 +32,6 @@ const GradientButton = ({
       `}
       {...props}
     >
-      {Icon && <Icon className="w-5 h-5" />}
       {children}
     </button>
   );

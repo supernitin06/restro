@@ -447,17 +447,17 @@ const AddMenuItem = () => {
                 </div>
               )}
               <div className="flex gap-2 mt-3">
-                <label className="cursor-pointer">
+                <div className="relative">
                   <input
                     type="file"
                     accept="image/*"
-                    className="hidden"
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                     onChange={handlePhotoUpload}
                   />
                   <Button variant="outline" size="sm">
                     {t('choose')}
                   </Button>
-                </label>
+                </div>
                 {photo && (
                   <Button variant="danger" size="sm" onClick={() => setPhoto(null)}>
                     {t('remove')}
