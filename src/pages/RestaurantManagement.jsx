@@ -143,7 +143,6 @@ const filteredRestaurants = restaurants.filter((r) => {
 
 
       {/* Stats */}
-     <RestaurantStats restaurants={filteredRestaurants} />
 
 
       {isLoading && <p className="text-center mt-6">Loading restaurants...</p>}
