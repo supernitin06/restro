@@ -5,7 +5,7 @@ import RestaurantGrid from "../components/restaurant/RestaurantGrid";
 import ViewDetailsModal from "../components/restaurant/ViewDetailsModal";
 import EditRestaurantModal from "../components/restaurant/EditRestaurantModal";
 import Table from "../components/ui/Table"; 
-import Pagination from "../components/ui/Pagination"; // ✅ your pagination component
+import Pagination from "../components/ui/Pagination";
 
 import {
   useGetRestaurantsQuery,
