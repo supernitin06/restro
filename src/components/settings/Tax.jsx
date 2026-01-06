@@ -8,8 +8,8 @@ const Tax = () => {
       <h2 className="highlight text-3xl font-bold">Tax & Charges</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <InputField label="GST (%)" />
-        <InputField label="Service Charge (%)" />
+        <InputField label="GST (%)" placeholder="Enter GST Amount"/>
+        <InputField label="Service Charge (%)" placeholder="Enter service charge"/>
       </div>
 
       <div className="flex justify-end">

@@ -12,9 +12,9 @@ const Profile = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <InputField label="Owner Name" placeholder="Enter owner name" />
-        <InputField label="Restaurant Email" type="email" />
-        <InputField label="Phone Number" />
-        <InputField label="Restaurant Address" />
+        <InputField label="Restaurant Email" type="email" placeholder="Enter your Email"/>
+        <InputField label="Phone Number" placeholder="Enter your Phone"/>
+        <InputField label="Restaurant Address" placeholder="Address"/>
       </div>
 
       <div className="flex justify-end">

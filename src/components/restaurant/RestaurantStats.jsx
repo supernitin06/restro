@@ -1,9 +1,10 @@
-import React from "react";
+
 import StatCard from "../ui/StatCard";
 import { Users, CheckCircle, Slash } from "lucide-react";
 
 const RestaurantStats = ({ restaurants }) => {
   const total = restaurants.length;
+
 
   const active = restaurants.filter(
     (r) => r.isActive === true || r.isActive === "active"
