@@ -2,15 +2,20 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
+import { Edit, Trash2 } from "lucide-react";
 
 import Button from "../ui/Button";
 import InputField from "../ui/InputField";
 import Textarea from "../ui/Textarea";
 import Select from "../ui/Select";
+import Modal from "../ui/Modal";
+import { showSuccessAlert, showErrorAlert } from "../../utils/sweetAlert";
 
 import {
   useGetCategoriesQuery,
   useAddCategoryMutation,
+  useUpdateCategoryMutation,
+  useToggleCategoryMutation,
   useAddMenuMutation,
 } from "../../api/services/menuApi";
 
@@ -39,6 +44,8 @@ const AddMenuItem = () => {
   });
 
   const [addCategory] = useAddCategoryMutation();
+  const [updateCategory] = useUpdateCategoryMutation();
+  const [toggleCategory] = useToggleCategoryMutation();
   const [addMenu] = useAddMenuMutation();
 
   const categories = categoriesData?.data || [];
@@ -48,6 +55,8 @@ const AddMenuItem = () => {
   const [newCategoryName, setNewCategoryName] = useState("");
   const [newCategoryOrder, setNewCategoryOrder] = useState(1);
   const [showAddCategory, setShowAddCategory] = useState(false);
+  const [editingCategory, setEditingCategory] = useState(null);
+  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
 
 
 
@@ -90,6 +99,10 @@ const AddMenuItem = () => {
   /* ✅ ADD CATEGORY API */
   const handleAddCategory = async () => {
     if (!newCategoryName.trim()) return;
+    if (!restaurantId) {
+      showErrorAlert("Restaurant ID is missing. Please log in again.");
+      return;
+    }
 
     try {
       const result = await addCategory({
@@ -98,7 +111,7 @@ const AddMenuItem = () => {
         order: newCategoryOrder,
       }).unwrap();
 
-      alert("Category added successfully!");
+      showSuccessAlert("Category added successfully!");
       await refetchCategories(); // Refresh categories list
       setCategory(result._id); // Auto-select the new category
       setNewCategoryName("");
@@ -106,7 +119,59 @@ const AddMenuItem = () => {
       setShowAddCategory(false);
     } catch (err) {
       console.error("Add category failed", err);
-      alert("Failed to add category. Please try again.");
+      const errorMessage = err?.data?.message || "Failed to add category. Please try again.";
+      showErrorAlert(errorMessage);
+    }
+  };
+
+  /* ✅ EDIT CATEGORY */
+  const handleEditCategory = (cat) => {
+    setEditingCategory(cat);
+    setNewCategoryName(cat.name);
+    setNewCategoryOrder(cat.order || 1);
+    setShowAddCategory(true);
+    setShowCategoryDropdown(false);
+  };
+
+  /* ✅ UPDATE CATEGORY API */
+  const handleUpdateCategory = async () => {
+    if (!newCategoryName.trim() || !editingCategory) return;
+
+    try {
+      await updateCategory({
+        id: editingCategory._id,
+        payload: {
+          name: newCategoryName,
+          order: newCategoryOrder,
+        },
+      }).unwrap();
+
+      showSuccessAlert("Category updated successfully!");
+      await refetchCategories();
+      setNewCategoryName("");
+      setNewCategoryOrder(1);
+      setEditingCategory(null);
+      setShowAddCategory(false);
+    } catch (err) {
+      console.error("Update category failed", err);
+      showErrorAlert("Failed to update category");
+    }
+  };
+
+  /* ✅ DELETE CATEGORY API */
+  const handleDeleteCategory = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this category?")) return;
+
+    try {
+      await toggleCategory(id).unwrap(); // Assuming toggleCategory is used for deletion
+      showSuccessAlert("Category deleted successfully!");
+      await refetchCategories();
+      if (category === id) {
+        setCategory(categories.length > 1 ? categories.find(cat => cat._id !== id)._id : "");
+      }
+    } catch (err) {
+      console.error("Delete category failed", err);
+      showErrorAlert("Failed to delete category");
     }
   };
 
@@ -130,11 +195,11 @@ const AddMenuItem = () => {
         altText,
       }).unwrap();
 
-      alert(t("menuItemSaved"));
+      showSuccessAlert(t("menuItemSaved"));
       navigate("/menu-management");
     } catch (err) {
       console.error("Add menu failed", err);
-      alert("Failed to save menu item");
+      showErrorAlert("Failed to save menu item");
     }
   };
 
@@ -177,45 +242,54 @@ const AddMenuItem = () => {
           </div>
 
           {/* Category */}
-          <div>
+          <div className="relative">
             <label className="block mb-2 font-medium text-gray-700 dark:text-gray-300">{t('category')}</label>
             <div className="flex gap-2">
-              <Select
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                options={categories.map((cat) => ({ value: cat._id, label: cat.name }))}
-                className="flex-1"
-              />
-              <Button onClick={() => setShowAddCategory(!showAddCategory)} variant="outline" size="sm">
+              <div className="relative flex-1">
+                <button
+                  type="button"
+                  onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
+                  className="w-full px-3 py-2 text-left bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  {categories.find(cat => cat._id === category)?.name || 'Select Category'}
+                  <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                    <svg className="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                  </span>
+                </button>
+                {showCategoryDropdown && (
+                  <div className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-800 shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
+                    {categories.map((cat) => (
+                      <div
+                        key={cat._id}
+                        className="flex items-center justify-between px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                        onClick={() => { setCategory(cat._id); setShowCategoryDropdown(false); }}
+                      >
+                        <span className="text-sm">{cat.name}</span>
+                        <div className="flex gap-1">
+                          <button
+                            onClick={(e) => { e.stopPropagation(); handleEditCategory(cat); }}
+                            className="text-gray-400 hover:text-blue-600 p-1"
+                          >
+                            <Edit size={12} />
+                          </button>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); handleDeleteCategory(cat._id); }}
+                            className="text-gray-400 hover:text-red-600 p-1"
+                          >
+                            <Trash2 size={12} />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <Button onClick={() => { setEditingCategory(null); setNewCategoryName(""); setNewCategoryOrder(1); setShowAddCategory(true); }} variant="outline" size="sm">
                 + Add
               </Button>
             </div>
-            {showAddCategory && (
-              <div className="mt-4 p-4 border rounded-lg bg-gray-50 dark:bg-gray-700">
-                <h3 className="font-medium mb-3">Add New Category</h3>
-                <div className="space-y-3">
-                  <InputField
-                    value={newCategoryName}
-                    onChange={(e) => setNewCategoryName(e.target.value)}
-                    placeholder="Category name"
-                  />
-                  <InputField
-                    type="number"
-                    value={newCategoryOrder}
-                    onChange={(e) => setNewCategoryOrder(parseInt(e.target.value))}
-                    placeholder="Order"
-                  />
-                  <div className="flex gap-2">
-                    <Button onClick={handleAddCategory} variant="primary" size="sm">
-                      Add Category
-                    </Button>
-                    <Button onClick={() => setShowAddCategory(false)} variant="outline" size="sm">
-                      Cancel
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
 
 
@@ -402,6 +476,36 @@ const AddMenuItem = () => {
           </div>
         </div>
       </form>
+
+      {/* Add/Edit Category Modal */}
+      {showAddCategory && (
+        <Modal
+          onClose={() => { setShowAddCategory(false); setEditingCategory(null); setNewCategoryName(""); setNewCategoryOrder(1); }}
+          title={editingCategory ? "Edit Category" : "Add New Category"}
+        >
+          <div className="space-y-4">
+            <InputField
+              value={newCategoryName}
+              onChange={(e) => setNewCategoryName(e.target.value)}
+              placeholder="Category name"
+            />
+            <InputField
+              type="number"
+              value={newCategoryOrder}
+              onChange={(e) => setNewCategoryOrder(parseInt(e.target.value))}
+              placeholder="Order"
+            />
+            <div className="flex gap-2 justify-end">
+              <Button onClick={() => { setShowAddCategory(false); setEditingCategory(null); setNewCategoryName(""); setNewCategoryOrder(1); }} variant="outline" size="sm">
+                Cancel
+              </Button>
+              <Button onClick={editingCategory ? handleUpdateCategory : handleAddCategory} variant="primary" size="sm">
+                {editingCategory ? "Update Category" : "Add Category"}
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 };

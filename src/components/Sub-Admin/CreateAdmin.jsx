@@ -213,7 +213,7 @@ const CreateAdmin = () => {
 
   const handleConfirmCreate = () => {
     console.log('Creating sub-admin:', { ...formData, permissions: selectedPermissions, sidebarAccess: selectedSidebarItems });
-    alert('Sub-Admin created successfully!');
+    showSuccessAlert('Sub-Admin created successfully!');
     setConfirmModalOpen(false);
     navigate('/sub-admin');
   };

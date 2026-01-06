@@ -91,7 +91,8 @@ const MenuList = () => {
   };
 
   const handleDelete = async (itemId) => {
-    if (!window.confirm("Are you sure you want to delete this item?")) return;
+    const result = await showConfirmAlert("Are you sure you want to delete this item?", "Delete", "Cancel");
+    if (!result.isConfirmed) return;
 
     const updated = { menus: [...menus] };
     updated.menus.forEach(menu => {

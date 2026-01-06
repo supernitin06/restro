@@ -1,22 +1,16 @@
-# TODO: Fix Add New Category Save Issue
+# TODO: Fix "Failed to add category" Error
 
-- [x] Analyze the AddMenu.jsx component to understand the handleAddCategory function
-- [x] Identify issues: No user feedback on success/failure, no auto-selection of new category, no refresh of categories list
-- [x] Add success alert when category is added successfully
-- [x] Add error alert when category addition fails
-- [x] Auto-select the newly added category in the dropdown
-- [x] Reset the form fields after successful addition
-- [x] Refresh the categories list after adding a new category
-- [x] Test the functionality to ensure save works properly
+## Completed Tasks
+- [x] Identify the source of the error in AddMenu.jsx
+- [x] Add validation for restaurantId before making API call
+- [x] Improve error handling to display server-specific error messages
+- [x] Change API endpoints from "admin/category" to "admin/categories" to fix "Route not found" error
 
-# TODO: Fix 404 Errors for Categories and Schemes Endpoints
+## Pending Tasks
+- [ ] Test the fix by attempting to add a category
+- [ ] Verify that the error message is more informative if the issue persists
 
-- [x] Change category endpoints from "admin/category" to "admin/categories" in menuApi.js
-- [x] Remove schemes endpoint and related UI from AddMenu.jsx since it's not available on the server
-- [x] Remove useGetSchemesQuery import and usage
-- [x] Remove schemes state variables and JSX section
-- [x] Update exports in menuApi.js to exclude useGetSchemesQuery
-
-# TODO: Update API Base URL
-
-- [x] Update baseURL in src/api/services/baseApi.js from "https://sog.bitmaxtest.com/api/v1/" to "https://resto-grandma.onrender.com/api/v1/"
+## Notes
+- The error was occurring in the handleAddCategory function due to missing restaurantId or server-side issues.
+- Added checks for restaurantId and enhanced error messaging.
+- Changed API routes to plural form to match backend expectations.
