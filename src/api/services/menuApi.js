@@ -21,7 +21,7 @@ export const menuApi = baseApi.injectEndpoints({
 
         addMenu: builder.mutation({
             query: (payload) => ({
-                url: "admin/menu",
+                url: "admin/item",
                 method: "POST",
                 data: payload,
             }),
@@ -48,7 +48,7 @@ export const menuApi = baseApi.injectEndpoints({
         // ================= CATEGORY (FINAL FIX) =================
         getCategories: builder.query({
             query: (restaurantId) => ({
-                url: "admin/category",
+                url: "admin/cat",
                 method: "GET",
                 params: { restaurantId },
             }),
@@ -57,7 +57,7 @@ export const menuApi = baseApi.injectEndpoints({
 
         addCategory: builder.mutation({
             query: (payload) => ({
-                url: "admin/category",
+                url: "admin/cat",
                 method: "POST",
                 data: payload,
             }),
@@ -66,7 +66,7 @@ export const menuApi = baseApi.injectEndpoints({
 
         updateCategory: builder.mutation({
             query: ({ id, payload }) => ({
-                url: `admin/category/${id}`,
+                url: `admin/cat/${id}`,
                 method: "PUT",
                 data: payload,
             }),
@@ -75,7 +75,7 @@ export const menuApi = baseApi.injectEndpoints({
 
         toggleCategory: builder.mutation({
             query: (id) => ({
-                url: `admin/category/${id}`,
+                url: `admin/cat/${id}`,
                 method: "PUT",
                 data: { isActive: false },
             }),

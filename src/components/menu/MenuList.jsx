@@ -4,7 +4,7 @@ import { FiEdit, FiTrash2, FiStar, FiCheck, FiX, FiChevronDown, FiChevronUp } fr
 import { List } from "lucide-react";
 import StatCard from "../ui/StatCard";
 import EditMenuModal from "./EditMenuModal";
-import UserFilters from "../ui/UserFilters";
+import { showConfirmAlert } from "../../utils/sweetAlert";
 import {
   useGetMenusQuery,
   useDeleteMenuMutation,
@@ -56,7 +56,8 @@ const transformItemsData = (items) => {
   };
 };
 
-const MenuList = () => {
+const MenuList = ({ searchTerm = '', statusFilter = 'all', viewType = 'list' }) => {
+  console.log('MenuList rendered with viewType:', viewType);
   const user = useSelector((state) => state.auth.user);
   const [restaurant, setRestaurant] = useState(null);
   useEffect(() => {
@@ -67,8 +68,6 @@ const MenuList = () => {
 
   const [editItem, setEditItem] = useState(null);
   const [expandedCategories, setExpandedCategories] = useState({});
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
 
   /* 🔥 API CALL WITH FILTERS */
   const { data, isLoading, isError, error } = useGetMenusQuery({
@@ -83,6 +82,19 @@ const MenuList = () => {
   /* 🧠 API → UI */
   const menus = data?.data ? transformItemsData(data.data).menus : [];
 
+  // Expand all categories by default when menus are loaded
+  useEffect(() => {
+    if (menus.length > 0) {
+      const allCategoryIds = {};
+      menus.forEach(menu => {
+        menu.categories.forEach(cat => {
+          allCategoryIds[cat.categoryId] = true;
+        });
+      });
+      setExpandedCategories(allCategoryIds);
+    }
+  }, [menus]);
+
   const toggleCategory = (categoryId) => {
     setExpandedCategories(prev => ({
       ...prev,
@@ -91,7 +103,8 @@ const MenuList = () => {
   };
 
   const handleDelete = async (itemId) => {
-    if (!window.confirm("Are you sure you want to delete this item?")) return;
+    const result = await showConfirmAlert("Are you sure you want to delete this item?", "Delete", "Cancel");
+    if (!result.isConfirmed) return;
 
     const updated = { menus: [...menus] };
     updated.menus.forEach(menu => {
@@ -210,31 +223,7 @@ const MenuList = () => {
         />
       </div>
 
-      {/* Menu Filters */}
-      <UserFilters
-        search={{
-          value: searchTerm,
-          placeholder: 'Search menu items...',
-          onChange: setSearchTerm
-        }}
-        filters={[
-          {
-            key: 'status',
-            value: statusFilter,
-            options: [
-              { value: 'all', label: 'All' },
-              { value: 'available', label: 'Available' },
-              { value: 'unavailable', label: 'Unavailable' },
-              { value: 'bestseller', label: 'Bestseller' }
-            ]
-          }
-        ]}
-        onFilterChange={(key, value) => {
-          if (key === 'status') {
-            setStatusFilter(value);
-          }
-        }}
-      />
+
 
       {/* Menu Categories */}
       {filteredMenus.map((menu) =>
@@ -282,136 +271,214 @@ const MenuList = () => {
                       </div>
                     )}
 
-                    {/* Menu Items - Single Row Layout */}
+                    {/* Menu Items - Conditional Layout */}
                     <div className="px-5 py-2">
-                      <div className="overflow-x-auto">
-                        <table className="w-full">
-                          <thead>
-                            <tr className="border-b border-gray-100 dark:border-gray-700">
-                              <th className="text-left py-3 px-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Item</th>
-                              <th className="text-left py-3 px-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Type</th>
-                              <th className="text-left py-3 px-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Price</th>
-                              <th className="text-left py-3 px-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
-                              <th className="text-left py-3 px-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Bestseller</th>
-                              <th className="text-left py-3 px-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
-                            {subCat.items.map((item) => (
-                              <tr
-                                key={item.itemId}
-                                className={`hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors ${!item.available ? 'opacity-60' : ''}`}
-                              >
-                                {/* Item Name with Bestseller */}
-                                <td className="py-4 px-2">
-                                  <div className="flex items-center gap-3">
-                                    {getVegIcon(item.veg)}
-                                    <div>
-                                      <div className="font-medium text-gray-900 dark:text-white">{item.name}</div>
-                                      {item.bestseller && (
-                                        <div className="flex items-center gap-1 text-amber-600 dark:text-amber-400 text-xs mt-1">
-                                          <FiStar className="w-3 h-3" />
-                                          <span>Bestseller</span>
-                                        </div>
-                                      )}
-                                    </div>
-                                  </div>
-                                </td>
+                      {viewType === 'grid' ? (
+                        /* Grid View - Horizontal Scroll */
+                        <div className="flex overflow-x-auto gap-4 pb-4 flex-nowrap">
+                          {subCat.items.map((item) => (
+                            <div
+                              key={item.itemId}
+                              className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 p-4 hover:shadow-md transition-shadow flex-shrink-0 w-64 ${!item.available ? 'opacity-60' : ''}`}
+                            >
+                              {/* Item Image Placeholder */}
+                              <div className="w-full h-32 bg-gray-200 dark:bg-gray-700 rounded-lg mb-3 flex items-center justify-center">
+                                <span className="text-gray-400 dark:text-gray-500 text-sm">No Image</span>
+                              </div>
 
-                                {/* Veg/Non-Veg Type */}
-                                <td className="py-4 px-2">
-                                  <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium ${item.veg ? 'bg-green-50 dark:bg-green-900/30 text-green-800 dark:text-green-300' : 'bg-red-50 dark:bg-red-900/30 text-red-800 dark:text-red-300'}`}>
-                                    <span>{item.veg ? 'Veg' : 'Non-Veg'}</span>
-                                  </div>
-                                </td>
+                              {/* Item Details */}
+                              <div className="space-y-2">
+                                <div className="flex items-center gap-2">
+                                  {getVegIcon(item.veg)}
+                                  <h3 className="font-semibold text-gray-900 dark:text-white text-sm truncate">{item.name}</h3>
+                                </div>
 
-                                {/* Price */}
-                                <td className="py-4 px-2">
+                                {item.bestseller && (
+                                  <div className="flex items-center gap-1 text-amber-600 dark:text-amber-400 text-xs">
+                                    <FiStar className="w-3 h-3" />
+                                    <span>Bestseller</span>
+                                  </div>
+                                )}
+
+                                <div className="flex items-center justify-between">
                                   <div className="space-y-1">
-                                    <div className="flex items-baseline gap-2">
-                                      {item.discountPrice ? (
-                                        <>
-                                          <span className="text-lg font-semibold text-red-600 dark:text-red-400">₹{item.discountPrice}</span>
-                                          <span className="text-sm text-gray-400 line-through">₹{item.price}</span>
-                                        </>
-                                      ) : (
-                                        <span className="text-lg font-semibold text-gray-900 dark:text-white">₹{item.price}</span>
-                                      )}
-                                    </div>
-                                    {item.discountPrice && (
-                                      <div className="text-xs text-green-600 dark:text-green-400 font-medium">
-                                        Save ₹{item.price - item.discountPrice}
-                                      </div>
+                                    {item.discountPrice ? (
+                                      <>
+                                        <span className="text-lg font-bold text-red-600 dark:text-red-400">₹{item.discountPrice}</span>
+                                        <span className="text-sm text-gray-400 line-through">₹{item.price}</span>
+                                      </>
+                                    ) : (
+                                      <span className="text-lg font-bold text-gray-900 dark:text-white">₹{item.price}</span>
                                     )}
                                   </div>
-                                </td>
 
-                                {/* Availability Status */}
-                                <td className="py-4 px-2">
-                                  <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${item.available ? 'bg-green-50 dark:bg-green-900/30 text-green-800 dark:text-green-300' : 'bg-red-50 dark:bg-red-900/30 text-red-800 dark:text-red-300'}`}>
+                                  <div className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${item.available ? 'bg-green-50 dark:bg-green-900/30 text-green-800 dark:text-green-300' : 'bg-red-50 dark:bg-red-900/30 text-red-800 dark:text-red-300'}`}>
                                     {item.available ? (
                                       <>
-                                        <FiCheck className="w-4 h-4" />
+                                        <FiCheck className="w-3 h-3" />
                                         <span>Available</span>
                                       </>
                                     ) : (
                                       <>
-                                        <FiX className="w-4 h-4" />
-                                        <span>Not Available</span>
+                                        <FiX className="w-3 h-3" />
+                                        <span>Unavailable</span>
                                       </>
                                     )}
                                   </div>
-                                </td>
-
-                                {/* Bestseller */}
-                                <td className="py-4 px-2">
-                                  <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${item.bestseller ? 'bg-amber-50 dark:bg-amber-900/30 text-amber-800 dark:text-amber-300' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300'}`}>
-                                    {item.bestseller ? (
-                                      <>
-                                        <FiStar className="w-4 h-4" />
-                                        <span>Yes</span>
-                                      </>
-                                    ) : (
-                                      <>
-                                        <FiX className="w-4 h-4" />
-                                        <span>No</span>
-                                      </>
-                                    )}
-                                  </div>
-                                </td>
+                                </div>
 
                                 {/* Actions */}
-                                <td className="py-4 px-2">
-                                  <div className="flex items-center gap-2">
-                                    <button
-                                      onClick={() => setEditItem(item)}
-                                      className="inline-flex items-center gap-2 px-3 py-2 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 text-blue-600 dark:text-blue-300 rounded-lg font-medium text-sm transition-colors"
-                                      title="Edit Item"
-                                    >
-                                      <FiEdit className="w-4 h-4" />
-                                    </button>
-                                    <button
-                                      onClick={() => handleDelete(item.itemId)}
-                                      className="inline-flex items-center gap-2 px-3 py-2 bg-red-50 dark:bg-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/50 text-red-600 dark:text-red-300 rounded-lg font-medium text-sm transition-colors"
-                                      title="Delete Item"
-                                    >
-                                      <FiTrash2 className="w-4 h-4" />
-                                    </button>
-                                  </div>
-                                </td>
+                                <div className="flex items-center gap-2 pt-2">
+                                  <button
+                                    onClick={() => setEditItem(item)}
+                                    className="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 text-blue-600 dark:text-blue-300 rounded-lg font-medium text-sm transition-colors"
+                                    title="Edit Item"
+                                  >
+                                    <FiEdit className="w-4 h-4" />
+                                  </button>
+                                  <button
+                                    onClick={() => handleDelete(item.itemId)}
+                                    className="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 bg-red-50 dark:bg-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/50 text-red-600 dark:text-red-300 rounded-lg font-medium text-sm transition-colors"
+                                    title="Delete Item"
+                                  >
+                                    <FiTrash2 className="w-4 h-4" />
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        /* List View - Table */
+                        <div className="overflow-x-auto">
+                          <table className="w-full">
+                            <thead>
+                              <tr className="border-b border-gray-100 dark:border-gray-700">
+                                <th className="text-left py-3 px-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Item</th>
+                                <th className="text-left py-3 px-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Type</th>
+                                <th className="text-left py-3 px-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Price</th>
+                                <th className="text-left py-3 px-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                                <th className="text-left py-3 px-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Bestseller</th>
+                                <th className="text-left py-3 px-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
                               </tr>
-                            ))}
-                          </tbody>
-                        </table>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+                              {subCat.items.map((item) => (
+                                <tr
+                                  key={item.itemId}
+                                  className={`hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors ${!item.available ? 'opacity-60' : ''}`}
+                                >
+                                  {/* Item Name with Bestseller */}
+                                  <td className="py-4 px-2">
+                                    <div className="flex items-center gap-3">
+                                      {getVegIcon(item.veg)}
+                                      <div>
+                                        <div className="font-medium text-gray-900 dark:text-white">{item.name}</div>
+                                        {item.bestseller && (
+                                          <div className="flex items-center gap-1 text-amber-600 dark:text-amber-400 text-xs mt-1">
+                                            <FiStar className="w-3 h-3" />
+                                            <span>Bestseller</span>
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </td>
 
-                        {/* Empty State */}
-                        {subCat.items.length === 0 && (
-                          <div className="text-center py-12 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg">
-                            <div className="text-gray-400 dark:text-gray-500 text-lg mb-2">No items in this category</div>
-                            <div className="text-gray-400 dark:text-gray-600 text-sm">Add items to get started</div>
-                          </div>
-                        )}
-                      </div>
+                                  {/* Veg/Non-Veg Type */}
+                                  <td className="py-4 px-2">
+                                    <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium ${item.veg ? 'bg-green-50 dark:bg-green-900/30 text-green-800 dark:text-green-300' : 'bg-red-50 dark:bg-red-900/30 text-red-800 dark:text-red-300'}`}>
+                                      <span>{item.veg ? 'Veg' : 'Non-Veg'}</span>
+                                    </div>
+                                  </td>
+
+                                  {/* Price */}
+                                  <td className="py-4 px-2">
+                                    <div className="space-y-1">
+                                      <div className="flex items-baseline gap-2">
+                                        {item.discountPrice ? (
+                                          <>
+                                            <span className="text-lg font-semibold text-red-600 dark:text-red-400">₹{item.discountPrice}</span>
+                                            <span className="text-sm text-gray-400 line-through">₹{item.price}</span>
+                                          </>
+                                        ) : (
+                                          <span className="text-lg font-semibold text-gray-900 dark:text-white">₹{item.price}</span>
+                                        )}
+                                      </div>
+                                      {item.discountPrice && (
+                                        <div className="text-xs text-green-600 dark:text-green-400 font-medium">
+                                          Save ₹{item.price - item.discountPrice}
+                                        </div>
+                                      )}
+                                    </div>
+                                  </td>
+
+                                  {/* Availability Status */}
+                                  <td className="py-4 px-2">
+                                    <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${item.available ? 'bg-green-50 dark:bg-green-900/30 text-green-800 dark:text-green-300' : 'bg-red-50 dark:bg-red-900/30 text-red-800 dark:text-red-300'}`}>
+                                      {item.available ? (
+                                        <>
+                                          <FiCheck className="w-4 h-4" />
+                                          <span>Available</span>
+                                        </>
+                                      ) : (
+                                        <>
+                                          <FiX className="w-4 h-4" />
+                                          <span>Not Available</span>
+                                        </>
+                                      )}
+                                    </div>
+                                  </td>
+
+                                  {/* Bestseller */}
+                                  <td className="py-4 px-2">
+                                    <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${item.bestseller ? 'bg-amber-50 dark:bg-amber-900/30 text-amber-800 dark:text-amber-300' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300'}`}>
+                                      {item.bestseller ? (
+                                        <>
+                                          <FiStar className="w-4 h-4" />
+                                          <span>Yes</span>
+                                        </>
+                                      ) : (
+                                        <>
+                                          <FiX className="w-4 h-4" />
+                                          <span>No</span>
+                                        </>
+                                      )}
+                                    </div>
+                                  </td>
+
+                                  {/* Actions */}
+                                  <td className="py-4 px-2">
+                                    <div className="flex items-center gap-2">
+                                      <button
+                                        onClick={() => setEditItem(item)}
+                                        className="inline-flex items-center gap-2 px-3 py-2 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 text-blue-600 dark:text-blue-300 rounded-lg font-medium text-sm transition-colors"
+                                        title="Edit Item"
+                                      >
+                                        <FiEdit className="w-4 h-4" />
+                                      </button>
+                                      <button
+                                        onClick={() => handleDelete(item.itemId)}
+                                        className="inline-flex items-center gap-2 px-3 py-2 bg-red-50 dark:bg-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/50 text-red-600 dark:text-red-300 rounded-lg font-medium text-sm transition-colors"
+                                        title="Delete Item"
+                                      >
+                                        <FiTrash2 className="w-4 h-4" />
+                                      </button>
+                                    </div>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+
+                      {/* Empty State */}
+                      {subCat.items.length === 0 && (
+                        <div className="text-center py-12 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg">
+                          <div className="text-gray-400 dark:text-gray-500 text-lg mb-2">No items in this category</div>
+                          <div className="text-gray-400 dark:text-gray-600 text-sm">Add items to get started</div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
