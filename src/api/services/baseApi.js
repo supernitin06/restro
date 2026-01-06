@@ -1,8 +1,8 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import axios from "axios";
-import { logout } from "./authSlice";
+import { logout } from "../services/authSlice";
 
-
+/* ---------------- AXIOS INSTANCE ---------------- */
 const axiosInstance = axios.create({
   baseURL: "https://resto-grandma.onrender.com/api/v1/",
   headers: {
@@ -10,16 +10,16 @@ const axiosInstance = axios.create({
   },
 });
 
-
+/* ---------------- AXIOS BASE QUERY ---------------- */
 const axiosBaseQuery =
-  ({ baseUrl } = { baseUrl: "" }) =>
+  () =>
   async ({ url, method, data, params, headers }, api) => {
     try {
       const state = api.getState();
       const token = state?.auth?.authToken;
 
       const result = await axiosInstance({
-        url: baseUrl + url,
+        url,
         method,
         data,
         params,
@@ -30,38 +30,27 @@ const axiosBaseQuery =
       });
 
       return { data: result.data };
-    } catch (axiosError) {
-      const err = axiosError;
+    } catch (error) {
+      const err = error;
 
-      // 🔐 Unauthorized
-      if (err.response?.status === 401) {
+      // 🔐 Auto logout on unauthorized
+      if (err?.response?.status === 401) {
         api.dispatch(logout());
       }
 
       return {
         error: {
-          status: err.response?.status,
-          data: err.response?.data || err.message,
+          status: err?.response?.status,
+          data: err?.response?.data || err.message,
         },
       };
     }
   };
 
-/**
- * RTK Query base API
- */
+/* ---------------- RTK QUERY BASE API ---------------- */
 export const baseApi = createApi({
   reducerPath: "baseApi",
-  baseQuery: axiosBaseQuery({
-    baseUrl: "",
-  }),
-  tagTypes: [
-    "Auth",
-    "User",
-    "Order",
-    "Menu",
-    "Category",
-    "Dashboard",
-  ],
+  baseQuery: axiosBaseQuery(),
+  tagTypes: ["Auth", "User", "Order", "Menu", "Category", "Dashboard"],
   endpoints: () => ({}),
 });

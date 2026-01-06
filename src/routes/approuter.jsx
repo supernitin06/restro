@@ -27,7 +27,7 @@ import CookingLoader from "../pages/Loader";
 // loaders/generalLoader.js
 export const generalLoader = async () => {
   // simulate API delay or global data fetching
-  await new Promise((resolve) => setTimeout(resolve, 800)); // Reduced slightly for better UX on frequent clicks
+  await new Promise((resolve) => setTimeout(resolve, 300)); // Reduced slightly for better UX on frequent clicks
 
   return null;
 };
@@ -197,6 +197,10 @@ const AppRouter = createBrowserRouter(
     future: {
       v7_startTransition: true,
       v7_relativeSplatPath: true,
+      v7_fetcherPersist: true,
+      v7_normalizeFormMethod: true,
+      v7_partialHydration: true,
+      v7_skipActionErrorRevalidation: true,
     },
   }
   

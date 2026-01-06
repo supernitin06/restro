@@ -140,7 +140,7 @@ const AssignAdmin = () => {
 
     console.log('Updating permissions for:', selectedAdmin.name);
     console.log('New permissions:', modifiedPermissions);
-    alert('Permissions updated successfully!');
+    showSuccessAlert('Permissions updated successfully!');
     navigate('/sub-admin');
   };
 

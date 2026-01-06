@@ -17,7 +17,7 @@ export const deliveryPartnerApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["DeliveryPartner"],
     }),
-    updateDeliveryPartner: builder.mutation({
+    EditDeliveryPartner: builder.mutation({
       query: ({ id, ...payload }) => ({
         url: `admin/delivery-partners/${id}`,
         method: "PUT",
@@ -25,6 +25,23 @@ export const deliveryPartnerApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["DeliveryPartner"],
     }),
+    getdeliveryPartnerOrders: builder.query({
+      query: (id) => ({
+        url: `admin/delivery-partners/${id}/orders`,
+        method: "GET",
+      }),
+      providesTags: ["DeliveryPartner"],
+    }),
+     
+    updateDeliveryPartner: builder.mutation({
+      query: (id) => ({
+        url: `admin/delivery-partners/${id}/toggle-status`,
+        method: "PUT",
+      }),
+      invalidatesTags: ["DeliveryPartner"],
+    }),
+
+
   }),
   overrideExisting: false,
 });
@@ -32,5 +49,7 @@ export const deliveryPartnerApi = baseApi.injectEndpoints({
 export const {
   useGetDeliveryPartnersQuery,
   useCreateDeliveryPartnerMutation,
-  useUpdateDeliveryPartnerMutation,
+  useEditDeliveryPartnerMutation,
+  useGetdeliveryPartnerOrdersQuery,
+  useUpdateDeliveryPartnerMutation
 } = deliveryPartnerApi;

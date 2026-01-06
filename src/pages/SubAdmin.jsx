@@ -182,7 +182,7 @@ const columns = [
     header: "Customer",
     render: (admin) => (
       <div className="flex items-center gap-3">
-        <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
+        <div className="w-11 h-11 rounded-xl bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
           {admin.name.charAt(0)}
         </div>
         <div>

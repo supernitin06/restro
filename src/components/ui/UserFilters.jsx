@@ -30,8 +30,8 @@ const FiltersBar = ({
               name="search"
               type="text"
               placeholder={search.placeholder || "Search..."}
-              value={search.value}
-              onChange={(e) => search.onChange(e.target.value)}
+              value={search.value}               // controlled input
+              onChange={(e) => search.onChange(e.target.value)} 
             />
           ) : filterConfig?.showSearch ? (
             <div className="text-red-500 text-sm">

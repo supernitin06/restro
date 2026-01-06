@@ -137,7 +137,7 @@ const Transactions = () => {
       icon: RefreshCw,
       onClick: (transaction) => {
         console.log('Process refund for:', transaction);
-        alert(`Processing refund for ${transaction.name}`);
+        showInfoAlert(`Processing refund for ${transaction.name}`);
       },
       color: 'amber',
       disabled: (transaction) => transaction.status !== 'completed',
