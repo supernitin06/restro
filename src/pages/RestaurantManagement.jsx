@@ -1,9 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import SearchFilterBar from "../components/restaurant/SearchFilterBar";
 import RestaurantStats from "../components/restaurant/RestaurantStats";
 import RestaurantGrid from "../components/restaurant/RestaurantGrid";
 import ViewDetailsModal from "../components/restaurant/ViewDetailsModal";
 import EditRestaurantModal from "../components/restaurant/EditRestaurantModal";
+import Table from "../components/ui/Table"; 
+import Pagination from "../components/ui/Pagination"; // ✅ your pagination component
+
 import {
   useGetRestaurantsQuery,
   useGetRestaurantByIdQuery,
@@ -17,101 +20,122 @@ function RestaurantManagement() {
   const [toggleStatus] = useToggleRestaurantStatusMutation();
   const [deleteRestaurant] = useDeleteRestaurantMutation();
   const [updateRestaurant] = useUpdateRestaurantMutation();
-  
+
+  const [viewMode, setViewMode] = useState("grid"); // default card view
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const restaurants = Array.isArray(data?.data) ? data.data : data ? [data] : [];
 
   const [selectedRestaurantId, setSelectedRestaurantId] = useState(null);
   const { data: restaurantDetails } = useGetRestaurantByIdQuery(
     selectedRestaurantId,
-    { skip: !selectedRestaurantId } // only fetch if an ID exists
+    { skip: !selectedRestaurantId }
   );
 
   const [editRestaurant, setEditRestaurant] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
 
+  // ===== Filtered Restaurants =====
+  const filteredRestaurants = restaurants.filter((r) => {
+    const matchesSearch = r.name.toLowerCase().includes(searchTerm.toLowerCase());
+
+    let matchesStatus = true;
+    if (statusFilter === "Approved") {
+      matchesStatus = r.isActive === "active" || r.isActive === true;
+    } else if (statusFilter === "Suspended") {
+      matchesStatus = r.isActive === "suspended" || r.isActive === false;
+    }
+
+    return matchesSearch && matchesStatus;
+  });
+
+  // ===== Reset page when filter/search changes =====
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, statusFilter]);
+
+  // ===== Pagination logic =====
+  const totalPages = Math.ceil(filteredRestaurants.length / itemsPerPage);
+  const paginatedRestaurants = filteredRestaurants.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   // ===== Handlers =====
-const handleApprove = async (id) => {
-  try {
-    await toggleStatus(id).unwrap();
-    refetch();
-  } catch (err) {
-    console.error("Approve failed", err);
-  }
-};
+  const handleApprove = async (id) => {
+    try {
+      await toggleStatus(id).unwrap();
+      refetch();
+    } catch (err) {
+      console.error("Approve failed", err);
+    }
+  };
 
+  const handleSuspend = async (id) => {
+    try {
+      await toggleStatus(id).unwrap();
+      refetch();
+    } catch (err) {
+      console.error("Suspend failed", err);
+    }
+  };
 
-const handleSuspend = async (id) => {
-  try {
-    await toggleStatus(id).unwrap();
-    refetch();
-  } catch (err) {
-    console.error("Suspend failed", err);
-  }
-};
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure?")) return;
+    try {
+      await deleteRestaurant(id).unwrap();
+      refetch();
+    } catch (err) {
+      console.error("Delete failed", err);
+    }
+  };
 
+  const handleUpdate = async () => {
+    if (!editRestaurant) return;
+    try {
+      await updateRestaurant({
+        id: editRestaurant._id,
+        body: {
+          name: editRestaurant.name,
+          brandName: editRestaurant.brandName,
+          logo: editRestaurant.logo,
+        },
+      }).unwrap();
 
-
-const handleDelete = async (id) => {
-  if (!window.confirm("Are you sure?")) return;
-
-  try {
-    await deleteRestaurant(id).unwrap();
-    refetch();
-  } catch (err) {
-    console.error("Delete failed", err);
-  }
-};
-const handleUpdate = async () => {
-  if (!editRestaurant) return;
-
-  try {
-    await updateRestaurant({
-      id: editRestaurant._id,
-      body: {
-        name: editRestaurant.name,
-        brandName: editRestaurant.brandName,
-        logo: editRestaurant.logo,
-      },
-    }).unwrap();
-
-    setEditRestaurant(null);
-    refetch();
-  } catch (err) {
-    console.error("Update failed", err);
-  }
-};
-
-
+      setEditRestaurant(null);
+      refetch();
+    } catch (err) {
+      console.error("Update failed", err);
+    }
+  };
 
   const handleEdit = (restaurant) => setEditRestaurant({ ...restaurant });
   const handleView = (restaurant) => setSelectedRestaurantId(restaurant._id);
+  const handleCloseModal = () => setSelectedRestaurantId(null);
 
-  const handleCloseModal = () => {
-    setSelectedRestaurantId(null);
-  };
+  const restaurantColumns = [
+    { header: "Name", key: "name" },
+    { header: "Brand", key: "brandName" },
+    {
+      header: "Status",
+      key: "isActive",
+      render: (row) =>
+        row.isActive === true || row.isActive === "active" ? "Approved" : "Suspended",
+    },
+  ];
 
- 
-
-  // ===== Filtered Restaurants =====
-const filteredRestaurants = restaurants.filter((r) => {
-  const matchesSearch = r.name.toLowerCase().includes(searchTerm.toLowerCase());
-
-  // handle boolean or string API response
-  let matchesStatus = true;
-  if (statusFilter === "Approved") {
-    matchesStatus = r.isActive === "active" || r.isActive === true;
-  } else if (statusFilter === "Suspended") {
-    matchesStatus = r.isActive === "suspended" || r.isActive === false;
-  }
-
-  return matchesSearch && matchesStatus;
-});
-
+  const restaurantActions = [
+    { label: "View", onClick: (row) => handleView(row) },
+    { label: "Edit", onClick: (row) => handleEdit(row) },
+    { label: "Delete", variant: "danger", onClick: (row) => handleDelete(row._id) },
+  ];
 
   const getStatusColor = (isActive) =>
-    isActive ? "bg-green-100 text-green-800 border border-green-300" : "bg-red-100 text-red-800 border border-red-300";
+    isActive
+      ? "bg-green-100 text-green-800 border border-green-300"
+      : "bg-red-100 text-red-800 border border-red-300";
 
   return (
     <div className="page page-background">
@@ -128,53 +152,78 @@ const filteredRestaurants = restaurants.filter((r) => {
       </div>
 
       {/* Search & Filter */}
-<SearchFilterBar
-  searchTerm={searchTerm}
-  setSearchTerm={setSearchTerm} // ✅ pass the setter directly
-  statusFilter={statusFilter}
-  setStatusFilter={setStatusFilter}
-  onAddNew={() => console.log("Add new clicked")}
-/>
-
+      <SearchFilterBar
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        statusFilter={statusFilter}
+        setStatusFilter={setStatusFilter}
+        onAddNew={() => console.log("Add new clicked")}
+        viewMode={viewMode}
+        setViewMode={setViewMode}
+      />
 
       {/* Stats */}
-     <RestaurantStats restaurants={filteredRestaurants} />
-
+      <RestaurantStats restaurants={filteredRestaurants} />
 
       {isLoading && <p className="text-center mt-6">Loading restaurants...</p>}
       {isError && <p className="text-center mt-6 text-red-500">Failed to load restaurants</p>}
 
-      {/* Restaurant Grid */}
-      <RestaurantGrid
-         filteredRestaurants={filteredRestaurants}
-        onApprove={handleApprove}
-        onSuspend={handleSuspend}
-        onView={handleView}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        getStatusColor={getStatusColor}
-      />
+      {/* Grid view */}
+      {viewMode === "grid" && (
+        <>
+          <RestaurantGrid
+            filteredRestaurants={paginatedRestaurants} // ✅ paginated
+            onApprove={handleApprove}
+            onSuspend={handleSuspend}
+            onView={handleView}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            getStatusColor={getStatusColor}
+          />
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={(page) => setCurrentPage(page)}
+          />
+        </>
+      )}
+
+      {/* Table view */}
+      {viewMode === "table" && (
+        <>
+          <Table
+            title="Restaurants"
+            data={paginatedRestaurants} // ✅ paginated
+            columns={restaurantColumns}
+            actions={restaurantActions}
+          />
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={(page) => setCurrentPage(page)}
+          />
+        </>
+      )}
 
       {/* View Details Modal */}
       {selectedRestaurantId && (
         <ViewDetailsModal
-          restaurant={restaurantDetails?.data} // full details from API
-          onClose={handleCloseModal} // ✅ FIXED
+          restaurant={restaurantDetails?.data}
+          onClose={handleCloseModal}
           onApprove={handleApprove}
           onSuspend={handleSuspend}
         />
       )}
 
       {/* Edit Modal */}
-     {editRestaurant && (
-  <EditRestaurantModal
-    editRestaurant={editRestaurant}
-    setEditRestaurant={setEditRestaurant}
-    onCancel={() => setEditRestaurant(null)}
-    onSave={handleUpdate}
-  />
-)}
-
+      {editRestaurant && (
+        <EditRestaurantModal
+          editRestaurant={editRestaurant}
+          setEditRestaurant={setEditRestaurant}
+          onCancel={() => setEditRestaurant(null)}
+          onSave={handleUpdate}
+        />
+      )}
     </div>
   );
 }
