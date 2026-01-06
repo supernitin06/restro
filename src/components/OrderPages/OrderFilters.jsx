@@ -1,43 +1,54 @@
 import React from "react";
 import FilterBar from "../ui/UserFilters";
+import { Grid, List } from 'lucide-react';
+import Button from '../ui/Button';
 
 const OrderFilters = ({
   searchTerm,
-  setSearchTerm,
-  statusFilter,
-  setStatusFilter,
+  onSearch,
+  filters,
+  onFilterChange,
+  onClearFilters,
+  viewMode,
+  onViewModeChange,
 }) => {
-  const handleFilterChange = (key, value) => {
-    if (key === 'status') setStatusFilter(value);
-  };
-
-  const handleClear = () => {
-    setSearchTerm('');
-    setStatusFilter('all');
-  };
-
   return (
     <FilterBar
       search={{
         value: searchTerm,
-        onChange: setSearchTerm,
+        onChange: onSearch,
         placeholder: "Search orders..."
       }}
       filters={[
         {
           key: 'status',
-          value: statusFilter,
+          value: filters.status,
           options: [
-            { value: "all", label: "All Orders" },
+            { value: "all", label: "All Status" },
+            { value: "placed", label: "Placed" },
+            { value: "confirmed", label: "Confirmed" },
+            { value: "preparing", label: "Preparing" },
             { value: "on-process", label: "Processing" },
+            { value: "assigned", label: "Assigned" },
+            { value: "picked", label: "Picked Up" },
+            { value: "delivered", label: "Delivered" },
             { value: "completed", label: "Completed" },
             { value: "cancelled", label: "Cancelled" },
           ]
         }
       ]}
-      onFilterChange={handleFilterChange}
-      onClear={handleClear}
-    />
+      onFilterChange={onFilterChange}
+      onClear={onClearFilters}
+    >
+      <div className="flex items-center gap-2">
+        <Button variant={viewMode === 'grid' ? 'primary' : 'ghost'} onClick={() => onViewModeChange('grid')} className="p-2.5" title="Grid View">
+          <Grid size={18} />
+        </Button>
+        <Button variant={viewMode === 'list' ? 'primary' : 'ghost'} onClick={() => onViewModeChange('list')} className="p-2.5" title="List View">
+          <List size={18} />
+        </Button>
+      </div>
+    </FilterBar>
   );
 };
 

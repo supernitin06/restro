@@ -1,5 +1,5 @@
 import React from "react";
-import { ShoppingBag, Users, Star, DollarSign } from "lucide-react";
+import { ShoppingBag, Users, Star, DollarSign, Clock, CheckCircle } from "lucide-react";
 
 import StatCard from "../components/ui/StatCard";
 import RevenueChart from "../components/PageDashboard/RevenueChart";
@@ -11,8 +11,33 @@ import TrendingMenu from "../components/PageDashboard/TrendingMenu";
 import CustomerReviews from "../components/PageDashboard/CustomerReviews";
 import RecentActivity from "../components/PageDashboard/RecentActivity";
 import Footer from "../components/PageDashboard/Footer";
+import OrderSummaryCard from "../components/PageDashboard/OrderSummaryCard";
 
 const Dashboard = () => {
+  // Dummy data for new cards
+  // Orders that have just been placed and are waiting for admin confirmation
+  const upcomingOrders = [
+    { id: 'ORD001', customer: 'Aman Verma', amount: 415, time: '11:30 AM', status: 'placed' },
+    { id: 'ORD007', customer: 'Anjali Sharma', amount: 180, time: '12:15 PM', status: 'placed' },
+    { id: 'ORD009', customer: 'Suresh Gupta', amount: 250, time: '12:30 PM', status: 'placed' },
+    { id: 'ORD010', customer: 'Priya Jain', amount: 600, time: '12:35 PM', status: 'placed' },
+  ];
+
+  // Orders that have been confirmed by the admin and are now being processed
+  const confirmedOrders = [
+    { id: 'ORD002', customer: 'Neha Singh', amount: 330, time: '11:45 AM', status: 'preparing', deliveryBoy: { id: 'DB01', name: 'Ravi Kumar' } },
+    { id: 'ORD003', customer: 'Rohit Kumar', amount: 390, time: '12:05 PM', status: 'packing', deliveryBoy: null },
+    { id: 'ORD008', customer: 'Vikram Singh', amount: 550, time: '12:20 PM', status: 'preparing', deliveryBoy: { id: 'DB02', name: 'Sunil Verma' } },
+    { id: 'ORD004', customer: 'Pooja Mehta', amount: 260, time: '12:25 PM', status: 'confirmed', deliveryBoy: null },
+    { id: 'ORD005', customer: 'Arjun Malik', amount: 480, time: '12:40 PM', status: 'confirmed', deliveryBoy: null },
+  ];
+
+  const deliveryBoys = [
+    { id: 'DB01', name: 'Ravi Kumar' },
+    { id: 'DB02', name: 'Sunil Verma' },
+    { id: 'DB03', name: 'Ankit Patel' },
+  ];
+
   return (
     <div className="min-h-screen page-background">
       {/* Page Container */}
@@ -67,6 +92,25 @@ const Dashboard = () => {
               color="green"
             />
           </div>
+        </section>
+
+        {/* ================= UPCOMING & CONFIRMED ORDERS ================= */}
+        <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <OrderSummaryCard
+            title="Upcoming Orders"
+            orders={upcomingOrders}
+            icon={Clock}
+            color="orange"
+            type="upcoming"
+          />
+          <OrderSummaryCard
+            title="Confirmed Orders"
+            orders={confirmedOrders}
+            icon={CheckCircle}
+            color="blue"
+            type="confirmed"
+            deliveryBoys={deliveryBoys}
+          />
         </section>
 
         {/* ================= REVENUE + CATEGORIES ================= */}

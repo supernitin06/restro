@@ -2,6 +2,7 @@
 import React from "react";
 import DeliveryPartnerStatusBadge from "./DeliveryPartnerStatusBadge";
 import Button from "../ui/Button";
+import { X, Mail, Phone, MapPin, Truck, Bike, Shield, Calendar } from 'lucide-react';
 
 const DeliveryPartnerDetailsModal = ({ partner, onClose, updatePartner }) => {
   if (!partner) return null;
@@ -14,67 +15,62 @@ const DeliveryPartnerDetailsModal = ({ partner, onClose, updatePartner }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex text-primary items-center justify-center z-50 p-3">
-      <div className="bg-primary w-full max-w-4xl rounded-2xl shadow-xl overflow-hidden">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-white dark:bg-gray-800 w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-700">
 
         {/* Header */}
-        <div className="bg-gradient-sidebar px-5 py-3 flex justify-between items-center">
-          <div>
-            <h2 className="text-lg font-semibold text-white">{registrationData?.name}</h2>
-            <p className="text-xs text-white/70">Partner ID : <span className="font-medium">{partnerId}</span></p>
+        <div className="p-5 flex justify-between items-center border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+          <div className="flex items-center gap-3">
+             <img src={registrationData?.image || `https://api.dicebear.com/7.x/avataaars/svg?seed=${partnerId}`} alt={registrationData?.name} className="w-12 h-12 rounded-xl object-cover border-2 border-white dark:border-gray-700" />
+            <div>
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white">{registrationData?.name}</h2>
+              <p className="text-xs text-gray-500 dark:text-gray-400 font-mono">Partner ID: {partnerId}</p>
+            </div>
           </div>
           <div className="flex items-center gap-3">
             <DeliveryPartnerStatusBadge status={listView.status} />
-            <Button onClick={onClose} className="bg-transparent text-white hover:text-white w-auto px-2 py-1" fullWidth={false}>✕</Button>
+            <button onClick={onClose} className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors text-gray-500">
+              <X size={20} />
+            </button>
           </div>
         </div>
 
         {/* Body */}
-        <div className="p-5 space-y-4">
+        <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
 
-          {/* Profile */}
-          <div className="flex gap-4 items-start">
-            <img src={registrationData?.image || "https://images.unsplash.com/photo-1603415526960-f7e0328c63b1"} alt={registrationData?.name} className="w-20 h-20 rounded-xl object-cover border-white" />
-            <div className="flex-1">
-              <div className="grid grid-cols-2 gap-x-5 gap-y-2 text-sm">
-                {Object.entries(registrationData || {}).map(([key, value]) => (
-                  <div key={key} className="text-white">
-                    <span className="text-gray-500 capitalize">{key.replace(/([A-Z])/g, " $1")} :</span>{" "}
-                    <span className="font-medium">{value || "N/A"}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+          {/* Details Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <DetailItem icon={Phone} label="Mobile Number" value={registrationData?.mobileNumber} color="blue" />
+            <DetailItem icon={Mail} label="Email" value={registrationData?.email || 'N/A'} color="red" />
+            <DetailItem icon={MapPin} label="City / Area" value={registrationData?.cityArea || 'N/A'} color="orange" />
+            <DetailItem icon={listView.vehicleType === 'Bike' ? Bike : Truck} label="Vehicle Type" value={registrationData?.vehicleType} color="purple" />
+            <DetailItem icon={Shield} label="KYC Status" value={listView.kycStatus} color={listView.kycStatus === 'VERIFIED' ? 'green' : 'yellow'} />
+            <DetailItem icon={Calendar} label="Joined On" value={partner.registrationData?.createdAt ? new Date(partner.registrationData.createdAt).toLocaleDateString() : 'N/A'} color="teal" />
           </div>
 
-          {/* Actions */}
-          <div className="flex justify-end gap-2">
-            <Button onClick={toggleStatus} className={listView.status === "Active" ? "btn-secondary" : "btn-primary"} fullWidth={false}>
-              {listView.status === "Active" ? "Deactivate" : "Activate"}
-            </Button>
-            <Button className="btn-secondary" fullWidth={false}>Manual Assign</Button>
-          </div>
 
           {/* Order History */}
           <div>
-            <h3 className="text-sm font-semibold text-white mb-2">Order History</h3>
+            <h3 className="text-base font-bold text-gray-800 dark:text-gray-100 mb-3">Order History</h3>
             {orderHistory?.length === 0 ? (
-              <p className="text-xs text-white/70">No orders yet</p>
+              <div className="text-center py-8 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                <p className="text-sm text-gray-500 dark:text-gray-400">No order history available.</p>
+              </div>
             ) : (
-              <div className="max-h-[200px] overflow-auto border rounded-lg">
-                <table className="w-full text-xs">
-                  <thead className="bg-red-50 text-red-700 sticky top-0">
+              <div className="max-h-[200px] overflow-auto rounded-lg border border-gray-200 dark:border-gray-700">
+                <table className="w-full text-sm">
+                  <thead className="bg-gray-50 dark:bg-gray-700/50 sticky top-0">
                     <tr>
                       {Object.keys(orderHistory[0]).map((key) => (
-                        <th key={key} className="p-2 border text-left font-medium">{key.replace(/([A-Z])/g, " $1")}</th>
+                        <th key={key} className="px-4 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{key.replace(/([A-Z])/g, " $1")}</th>
                       ))}
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                     {orderHistory.map((order, idx) => (
-                      <tr key={idx} className="hover:bg-white/10">
+                      <tr key={idx} className="hover:bg-gray-50/50 dark:hover:bg-gray-700/30">
                         {Object.values(order).map((val, i) => (
-                          <td key={i} className="p-2 border">{val}</td>
+                          <td key={i} className="px-4 py-3 whitespace-nowrap">{String(val)}</td>
                         ))}
                       </tr>
                     ))}
@@ -83,11 +79,42 @@ const DeliveryPartnerDetailsModal = ({ partner, onClose, updatePartner }) => {
               </div>
             )}
           </div>
+        </div>
 
+        {/* Footer Actions */}
+        <div className="p-4 bg-gray-50 dark:bg-gray-900/30 border-t border-gray-100 dark:border-gray-700 flex justify-end gap-3">
+          <Button variant="secondary" onClick={onClose}>Close</Button>
+          <Button variant={listView.status === "Active" ? "danger" : "success"} onClick={toggleStatus}>
+            {listView.status === "Active" ? "Deactivate Partner" : "Activate Partner"}
+          </Button>
         </div>
       </div>
     </div>
   );
 };
+
+const DetailItem = ({ icon: Icon, label, value, color = 'gray' }) => {
+  const colors = {
+    blue: 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400',
+    red: 'bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400',
+    orange: 'bg-orange-50 text-orange-600 dark:bg-orange-900/20 dark:text-orange-400',
+    purple: 'bg-purple-50 text-purple-600 dark:bg-purple-900/20 dark:text-purple-400',
+    green: 'bg-green-50 text-green-600 dark:bg-green-900/20 dark:text-green-400',
+    yellow: 'bg-yellow-50 text-yellow-600 dark:bg-yellow-900/20 dark:text-yellow-400',
+    teal: 'bg-teal-50 text-teal-600 dark:bg-teal-900/20 dark:text-teal-400',
+    gray: 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300',
+  }
+  return (
+    <div className="flex items-center gap-3">
+      <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${colors[color]}`}>
+        <Icon size={18} />
+      </div>
+      <div>
+        <p className="text-xs text-gray-500 dark:text-gray-400">{label}</p>
+        <p className="font-semibold text-gray-800 dark:text-gray-200 capitalize">{String(value).toLowerCase()}</p>
+      </div>
+    </div>
+  )
+}
 
 export default DeliveryPartnerDetailsModal;
