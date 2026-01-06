@@ -114,7 +114,7 @@ const LoginForm = ({ role = "admin", onRoleChange }) => {
                 <div style={styles.welcomeIcon}>👨‍🍳</div>
                 <h1 style={styles.title}>Welcome Back</h1>
               </div>
-              <p style={styles.subtitle}>Sign in to manage your restaurant</p>
+             
             </div>
 
             {/* ROLE SWITCHER */}
@@ -200,7 +200,7 @@ const LoginForm = ({ role = "admin", onRoleChange }) => {
               </div>
 
               {/* REMEMBER ME */}
-              <div style={styles.rememberContainer}>
+              {/* <div style={styles.rememberContainer}>
                 <label style={styles.rememberLabel}>
                   <input
                     type="checkbox"
@@ -214,7 +214,7 @@ const LoginForm = ({ role = "admin", onRoleChange }) => {
                   </span>
                   <span style={styles.rememberText}>Remember me for 30 days</span>
                 </label>
-              </div>
+              </div> */}
 
               {/* ERROR */}
               {error && (

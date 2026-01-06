@@ -7,13 +7,20 @@ const UserCard = ({ user, onView, onEdit, onDelete }) => {
   // ✅ SAFETY CHECK
   if (!user) return null;
 
-  // ✅ SAFE FALLBACK VALUES
+  // ✅ API MATCHING (NO UI CHANGE)
   const name = user?.name || "Unknown User";
   const email = user?.email || "-";
-  const phone = user?.phone || "-";
-  const address = user?.address || "-";
-  const totalOrders = user?.totalOrders ?? 0;
-  const totalSpent = user?.totalSpent ?? 0;
+  const phone = user?.mobile || "-";
+  const address = user?.location?.address || "-";
+
+  // backend se abhi nahi aa raha
+  const totalOrders = 0;
+  const totalSpent = 0;
+
+  // ✅ PROFILE IMAGE FIX
+  const profileImage = user?.profile
+    ? `${import.meta.env.VITE_API_URL}/uploads/${user.profile}`
+    : null;
 
   return (
     <GlassCard
@@ -28,8 +35,19 @@ const UserCard = ({ user, onView, onEdit, onDelete }) => {
         <div className="flex items-center gap-3">
           {/* Avatar */}
           <div className="relative bg-gray-200 rounded-full">
-            <div className="relative w-12 h-12 rounded-full flex items-center justify-center text-lg font-semibold">
-              {name.charAt(0).toUpperCase()}
+            <div className="relative w-12 h-12 rounded-full overflow-hidden flex items-center justify-center text-lg font-semibold">
+              {profileImage ? (
+                <img
+                  src={profileImage}
+                  alt={name}
+                  className="w-full h-full object-cover rounded-full"
+                  onError={(e) => {
+                    e.currentTarget.src = "";
+                  }}
+                />
+              ) : (
+                name.charAt(0).toUpperCase()
+              )}
             </div>
           </div>
 
@@ -88,29 +106,15 @@ const UserCard = ({ user, onView, onEdit, onDelete }) => {
 
       {/* ================= ACTIONS ================= */}
       <div className="flex gap-2">
-        <Button
-          onClick={() => onView?.(user)}
-          variant="primary"
-          size="sm"
-          fullWidth
-        >
+        <Button onClick={() => onView?.(user)} variant="primary" size="sm" fullWidth>
           View
         </Button>
 
-        <Button
-          onClick={() => onEdit?.(user)}
-          variant="secondary"
-          size="sm"
-          fullWidth
-        >
+        <Button onClick={() => onEdit?.(user)} variant="secondary" size="sm" fullWidth>
           Edit
         </Button>
 
-        <Button
-          onClick={() => onDelete?.(user._id)}
-          variant="danger"
-          size="sm"
-        >
+        <Button onClick={() => onDelete?.(user._id)} variant="danger" size="sm">
           Delete
         </Button>
       </div>
