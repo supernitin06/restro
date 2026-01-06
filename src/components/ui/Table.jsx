@@ -40,7 +40,7 @@ const Table = ({
         </div>
       )}
 
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto overflow-y-auto">
         <table className="min-w-full">
           <thead className="bg-primary z-50 sticky top-0">
             <tr>
