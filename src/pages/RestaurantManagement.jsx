@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Edit, Eye, Trash2 } from "lucide-react";
-
 import SearchFilterBar from "../components/restaurant/SearchFilterBar";
 import RestaurantStats from "../components/restaurant/RestaurantStats";
 import RestaurantGrid from "../components/restaurant/RestaurantGrid";

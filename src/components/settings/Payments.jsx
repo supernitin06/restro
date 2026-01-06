@@ -1,6 +1,6 @@
 import React from "react";
 import Button from "../../components/ui/Button";
-import cashIcon from "../../assets/cash.png"; // aap apne icon ka path use karein
+import cashIcon from "../../assets/cash.png"; 
 import upiIcon from "../../assets/upi.png";
 import cardIcon from "../../assets/card.png";
 import { useState } from "react";
