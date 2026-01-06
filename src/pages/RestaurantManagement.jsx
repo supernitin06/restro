@@ -14,6 +14,7 @@ import {
   useUpdateRestaurantMutation,
   useDeleteRestaurantMutation,
 } from "../api/services/resturentsapi";
+import { Edit, Eye, Trash2 } from "lucide-react";
 
 function RestaurantManagement() {
   const { data, isLoading, isError, refetch } = useGetRestaurantsQuery();
@@ -135,16 +136,29 @@ function RestaurantManagement() {
     },
   ];
 
-  const restaurantActions = [
-    { label: "View", onClick: (row) => handleView(row) },
-    { label: "Edit", onClick: (row) => handleEdit(row) },
+    const tableActions = [
     {
-      label: "Delete",
-      variant: "danger",
-      onClick: (row) => handleDelete(row._id),
+      key: 'view',
+      label: 'View Details',
+      icon: Eye,
+      color: 'blue',
+      onClick: (item) => console.log('View', item), // Placeholder
+    },
+    {
+      key: 'edit',
+      label: 'Edit Permissions',
+      icon: Edit,
+      color: 'purple',
+      onClick: () => navigate('/sub-admin/assign'),
+    },
+    {
+      key: 'delete',
+      label: 'Delete Admin',
+      icon: Trash2,
+      color: 'rose',
+      onClick: (item) => handleDelete(item.id),
     },
   ];
-
   const getStatusColor = (isActive) =>
     isActive
       ? "bg-green-100 text-green-800 border border-green-300"
@@ -181,8 +195,6 @@ function RestaurantManagement() {
         setViewMode={setViewMode}
       />
 
-      {/* Stats */}
-      <RestaurantStats restaurants={filteredRestaurants} />
 
       {isLoading && <p className="text-center mt-6">Loading restaurants...</p>}
       {isError && (
@@ -218,7 +230,7 @@ function RestaurantManagement() {
             title="Restaurants"
             data={paginatedRestaurants} // ✅ paginated
             columns={restaurantColumns}
-            actions={restaurantActions}
+            actions={tableActions}
           />
           <Pagination
             currentPage={currentPage}
