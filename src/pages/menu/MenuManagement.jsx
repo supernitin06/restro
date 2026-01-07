@@ -15,7 +15,7 @@ const transformItemsData = (items) => {
   const categoriesMap = {};
 
   items.forEach(item => {
-    const cat = item.categoryId || { _id: 'uncategorized', name: 'Uncategorized' };
+    const cat = item.category || item.categoryId || { _id: 'uncategorized', name: 'Uncategorized' };
     const catId = cat._id || 'uncategorized';
 
     if (!categoriesMap[catId]) {
@@ -128,7 +128,7 @@ const MenuManagement = () => {
           viewType={viewType}
         />
       </div>
-      </div>
+    </div>
 
   );
 };

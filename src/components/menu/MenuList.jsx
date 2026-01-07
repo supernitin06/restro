@@ -175,23 +175,22 @@ const MenuList = ({ menus, isLoading, isError, error, searchTerm = '', statusFil
                           {subCat.items.map((item) => (
                             <div
                               key={item.itemId}
-                              className={`group bg-white dark:bg-gray-800 rounded-2xl border-2 border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-2xl hover:border-blue-500 dark:hover:border-blue-400 transition-all duration-300 hover:-translate-y-2 ${!item.available ? 'opacity-60' : ''}`}
+                              className={`group bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl transition-all duration-300 ${!item.available ? 'opacity-60 grayscale' : ''}`}
                             >
-                              {/* Image Container with Overlay */}
-                              <div className="relative h-40 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 overflow-hidden">
-                                <img 
-                                  src={item.image || "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=800&q=60"} 
-                                  alt={item.name} 
-                                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
-                                  onError={(e) => { 
-                                    e.target.onerror = null; 
-                                    e.target.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=60';
+                              {/* Image Container */}
+                              <div className="relative h-48 overflow-hidden">
+                                <img
+                                  src={item.image || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80"}
+                                  alt={item.name}
+                                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                                  onError={(e) => {
+                                    e.target.onerror = null;
+                                    e.target.src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80';
                                   }}
                                 />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                
-                                {/* Badges on Image */}
-                                <div className="absolute top-3 left-3">
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60"></div>
+
+                                <div className="absolute top-3 left-3 flex gap-2">
                                   <VegNonVegIcon isVeg={item.veg} />
                                 </div>
                                 {item.bestseller && (
@@ -199,51 +198,44 @@ const MenuList = ({ menus, isLoading, isError, error, searchTerm = '', statusFil
                                     <BestsellerTag />
                                   </div>
                                 )}
+
+                                <div className="absolute bottom-3 left-3 right-3 flex justify-between items-end text-white">
+                                  <div className="font-bold text-xl drop-shadow-md">₹{item.price}</div>
+                                  {!item.available && (
+                                    <span className="bg-red-500/90 text-white text-xs px-2 py-1 rounded-md font-bold uppercase tracking-wider backdrop-blur-sm">
+                                      Sold Out
+                                    </span>
+                                  )}
+                                </div>
                               </div>
 
-                              {/* Card Content */}
-                              <div className="px-4 py-3 space-y-3">
-                                {/* Item Name */}
-                                <h3 className="font-bold text-lg text-gray-900 dark:text-white line-clamp-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                              {/* Content */}
+                              <div className="p-4 space-y-3">
+                                <h3 className="font-bold text-lg text-gray-800 dark:text-gray-100 leading-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                                   {item.name}
                                 </h3>
 
-                                {/* Price & Status */}
-                                <div className="flex items-center justify-between">
-                                  <div className="flex flex-col">
-                                    <span className="text-xl font-extrabold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                                      ₹{item.price}
-                                    </span>
-                                    {item.discountPrice && (
-                                      <span className="text-sm text-gray-400 line-through">₹{item.discountPrice}</span>
-                                    )}
-                                  </div>
-                                  <div className={`px-3 py-1.5 rounded-full text-xs font-bold shadow-sm ${
-                                    item.available 
-                                      ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' 
-                                      : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
-                                  }`}>
-                                    {item.available ? '✓ Available' : '✗ Out'}
-                                  </div>
-                                </div>
+                                {item.description && (
+                                  <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2">
+                                    {item.description}
+                                  </p>
+                                )}
 
-                                {/* Action Buttons */}
-                                <div className="flex gap-2 pt-3 border-t border-gray-200 dark:border-gray-700">
+                                {/* Actions */}
+                                <div className="pt-2 flex gap-2">
                                   <Button
                                     onClick={() => setEditItem(item)}
-                                    variant="primary"
-                                    className="flex-1"
+                                    variant="outline"
+                                    className="flex-1 text-xs py-1.5 h-8 border-gray-200 dark:border-gray-600"
                                   >
-                                    <Edit className="w-4 h-4" />
                                     Edit
                                   </Button>
                                   <Button
                                     onClick={() => handleDelete(item.itemId)}
-                                    variant="danger"
-                                    className="flex-1"
+                                    variant="outline"
+                                    className="px-3 text-red-500 border-red-100 h-8 hover:bg-red-50 hover:border-red-200 dark:border-red-900/30 dark:hover:bg-red-900/20"
                                   >
-                                    <Trash2 className="w-4 h-4" />
-                                    Delete
+                                    <Trash2 className="w-3.5 h-3.5" />
                                   </Button>
                                 </div>
                               </div>
@@ -251,114 +243,110 @@ const MenuList = ({ menus, isLoading, isError, error, searchTerm = '', statusFil
                           ))}
                         </div>
                       ) : (
-                        /* ===== LIST VIEW - PREMIUM TABLE ===== */
-                        <Table
-                          columns={[
-                            {
-                              header: 'Item Details',
-                              render: (item) => (
-                                <div className="flex items-center gap-3 cursor-pointer">
-                                  <VegNonVegIcon isVeg={item.veg} />
-                                  <div>
-                                    <div className="font-bold text-gray-900 dark:text-white">{item.name}</div>
+                        /* ===== LIST VIEW - CLASSIC MENU STYLE ===== */
+                        <div className="space-y-4">
+                          {subCat.items.map((item) => (
+                            <div
+                              key={item.itemId}
+                              className="group flex flex-col sm:flex-row gap-4 p-4 rounded-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:border-blue-200 dark:hover:border-blue-800 hover:shadow-lg transition-all duration-300"
+                            >
+                              {/* Item Image */}
+                              <div className="relative w-full sm:w-32 h-32 flex-shrink-0 rounded-lg overflow-hidden">
+                                <img
+                                  src={item.image || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80"}
+                                  alt={item.name}
+                                  className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${!item.available ? 'grayscale' : ''}`}
+                                  onError={(e) => {
+                                    e.target.onerror = null;
+                                    e.target.src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80';
+                                  }}
+                                />
+                                {item.bestseller && (
+                                  <div className="absolute top-2 left-2">
+                                    <div className="w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center shadow-md">
+                                      <Star className="w-3.5 h-3.5 text-white fill-white" />
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+
+                              {/* Item Details */}
+                              <div className="flex-1 flex flex-col justify-between">
+                                <div>
+                                  <div className="flex justify-between items-start">
+                                    <div className="flex items-center gap-2">
+                                      <VegNonVegIcon isVeg={item.veg} />
+                                      <h3 className="text-lg font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                                        {item.name}
+                                      </h3>
+                                    </div>
+                                    <div className="text-right">
+                                      <span className="block text-xl font-bold font-mono text-gray-900 dark:text-gray-100">
+                                        ₹{item.price}
+                                      </span>
+                                      {item.discountPrice && (
+                                        <span className="text-sm text-gray-400 line-through">
+                                          ₹{item.discountPrice}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+
+                                  <p className="mt-2 text-sm text-gray-500 dark:text-gray-400 line-clamp-2 max-w-2xl">
+                                    {item.description || "No description available for this delicious item."}
+                                  </p>
+                                </div>
+
+                                <div className="mt-4 flex items-center justify-between">
+                                  <div className="flex items-center gap-3">
+                                    <span className={`text-xs font-bold px-2.5 py-1 rounded-md border ${item.available
+                                        ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:border-green-800'
+                                        : 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:border-red-800'
+                                      }`}>
+                                      {item.available ? 'Available' : 'Unavailable'}
+                                    </span>
                                     {item.bestseller && (
-                                      <div className="mt-1">
-                                        <BestsellerTag />
-                                      </div>
+                                      <span className="text-xs font-bold px-2.5 py-1 rounded-md bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-900/20 dark:border-amber-800">
+                                        Bestseller
+                                      </span>
                                     )}
                                   </div>
+
+                                  <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                    <Button
+                                      onClick={() => setEditItem(item)}
+                                      variant="ghost"
+                                      size="sm"
+                                      className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                                    >
+                                      Edit
+                                    </Button>
+                                    <Button
+                                      onClick={() => handleDelete(item.itemId)}
+                                      variant="ghost"
+                                      size="sm"
+                                      className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+                                    >
+                                      Delete
+                                    </Button>
+                                  </div>
                                 </div>
-                              ),
-                            },
-                            {
-                              header: 'Type',
-                              render: (item) => (
-                                <span className={`inline-flex px-3 py-1.5 rounded-full text-xs font-bold shadow-sm ${
-                                  item.veg 
-                                    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' 
-                                    : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
-                                }`}>
-                                  {item.veg ? '🥬 Veg' : '🍗 Non-Veg'}
-                                </span>
-                              ),
-                            },
-                            {
-                              header: 'Price',
-                              render: (item) => (
-                                <div className="flex flex-col">
-                                  {item.discountPrice ? (
-                                    <>
-                                      <span className="text-lg font-extrabold text-red-600 dark:text-red-400">₹{item.discountPrice}</span>
-                                      <span className="text-sm text-gray-400 line-through">₹{item.price}</span>
-                                      <span className="text-xs text-green-600 dark:text-green-400 font-bold">Save ₹{item.price - item.discountPrice}</span>
-                                    </>
-                                  ) : (
-                                    <span className="text-lg font-extrabold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">₹{item.price}</span>
-                                  )}
-                                </div>
-                              ),
-                            },
-                            {
-                              header: 'Status',
-                              render: (item) => (
-                                <span className={`inline-flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold shadow-sm ${
-                                  item.available 
-                                    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' 
-                                    : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
-                                }`}>
-                                  {item.available ? <><Check className="w-4 h-4" /> Available</> : <><X className="w-4 h-4" /> Unavailable</>}
-                                </span>
-                              ),
-                            },
-                            {
-                              header: 'Bestseller',
-                              render: (item) => (
-                                <span className={`inline-flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold shadow-sm ${
-                                  item.bestseller 
-                                    ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300' 
-                                    : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
-                                }`}>
-                                  {item.bestseller ? <><Star className="w-4 h-4 fill-current" /> Yes</> : <><X className="w-4 h-4" /> No</>}
-                                </span>
-                              ),
-                            },
-                            {
-                              header: 'Actions',
-                              render: (item) => (
-                                <div className="flex items-center gap-2">
-                                  <Button
-                                    onClick={() => setEditItem(item)}
-                                    variant="outline"
-                                    size="icon"
-                                    title="Edit Item"
-                                  >
-                                    <Edit className="w-4 h-4" />
-                                  </Button>
-                                  <Button
-                                    onClick={() => handleDelete(item.itemId)}
-                                    variant="outline"
-                                    size="icon"
-                                    className="text-red-600 hover:text-red-600 border-red-300 hover:bg-red-50 dark:text-red-400 dark:border-red-600 dark:hover:bg-red-900/30"
-                                    title="Delete Item"
-                                  >
-                                    <Trash2 className="w-4 h-4" />
-                                  </Button>
-                                </div>
-                              ),
-                            },
-                          ]}
-                          data={subCat.items}
-                        />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
                       )}
 
-                      {/* Empty State - Premium */}
+                      {/* Empty State */}
                       {subCat.items.length === 0 && (
-                        <div className="text-center py-16 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-2xl bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-750">
-                          <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center shadow-lg">
-                            <Package className="w-10 h-10 text-white" />
+                        <div className="flex flex-col items-center justify-center py-16 px-4 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-50/50 dark:bg-gray-800/50">
+                          <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
+                            <Package className="w-8 h-8 text-gray-400" />
                           </div>
-                          <h3 className="text-xl font-bold text-gray-700 dark:text-gray-300 mb-2">No items in this category</h3>
-                          <p className="text-gray-500 dark:text-gray-400">Add some delicious items to get started!</p>
+                          <h3 className="text-lg font-bold text-gray-900 dark:text-white">No items found</h3>
+                          <p className="text-gray-500 dark:text-gray-400 text-center max-w-sm mt-1">
+                            This category appears to be empty. Add some items to populate your menu.
+                          </p>
                         </div>
                       )}
                     </div>
