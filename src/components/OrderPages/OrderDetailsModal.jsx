@@ -105,37 +105,58 @@ const OrderDetailsModal = ({ order, onClose }) => {
             </div>
 
             {/* Delivery Partner (if assigned) */}
-            {order.deliveryPartner && (
-              <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl p-4 border-2 border-purple-100 dark:border-purple-800">
-                <h3 className="text-sm font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2 mb-3">
-                  <Bike size={18} className="text-purple-600" />
-                  Delivery Partner
-                </h3>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-white dark:bg-gray-800 rounded-xl flex items-center justify-center shadow-sm">
-                      <Bike size={24} className="text-purple-600" />
-                    </div>
-                    <div>
-                      <p className="font-bold text-gray-800 dark:text-gray-100">
-                        {order.deliveryPartner.name}
-                      </p>
-                      <p className="text-xs text-gray-600 dark:text-gray-400">
-                        {order.deliveryPartner.phone}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex flex-col items-end">
-                    <span className="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full text-xs font-bold">
-                      {order.deliveryPartner.status}
-                    </span>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      Vehicle: {order.deliveryPartner.vehicle}
-                    </p>
-                  </div>
-                </div>
-              </div>
+            <div className="mt-4">
+  <h3 className="text-sm font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2 mb-3">
+    <Bike size={18} className="text-purple-600" />
+    Delivery Partner
+  </h3>
+
+  {order.deliveryPartner ? (
+    <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl p-4 border-2 border-purple-100 dark:border-purple-800">
+      <div className="flex items-center justify-between">
+        {/* Left: Icon + Name + Phone + Assigned Time */}
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 bg-white dark:bg-gray-800 rounded-xl flex items-center justify-center shadow-sm">
+            <Bike size={24} className="text-purple-600" />
+          </div>
+          <div>
+            <p className="font-bold text-gray-800 dark:text-gray-100">
+              {order.deliveryPartner.name}
+            </p>
+            <p className="text-xs text-gray-600 dark:text-gray-400">
+              📞 {order.deliveryPartner.phone}
+            </p>
+            {order.deliveryPartner.assignedAt && (
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                🕒 Assigned: {new Date(order.deliveryPartner.assignedAt).toLocaleString()}
+              </p>
             )}
+          </div>
+        </div>
+
+        {/* Right: Status + Vehicle */}
+        <div className="flex flex-col items-end">
+          {order.deliveryPartner.status && (
+            <span className="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full text-xs font-bold">
+              {order.deliveryPartner.status}
+            </span>
+          )}
+          {order.deliveryPartner.vehicle && (
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              Vehicle: {order.deliveryPartner.vehicle}
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  ) : (
+    <div className="flex items-center gap-2 p-4 bg-red-50 dark:bg-red-900/20 rounded-xl border-2 border-red-100 dark:border-red-800 text-red-600 dark:text-red-400">
+      <Bike size={24} className="text-red-500" />
+      <span className="font-bold">Not Assigned</span>
+    </div>
+  )}
+</div>
+
 
             {/* Order Items */}
             <div className="bg-white dark:bg-gray-700 rounded-xl p-4 border-2 border-gray-100 dark:border-gray-600">

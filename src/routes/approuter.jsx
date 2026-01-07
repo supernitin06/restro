@@ -23,7 +23,8 @@ import SupportManagement from "../pages/SupportManagement";
 import MenuManagement from "../pages/menu/MenuManagement";
 import AddMenu from "../components/menu/AddMenu";
 import CookingLoader from "../pages/Loader";
-
+import NewOrders from "../components/OrderPages/NewOrders";
+import ProcessingOrders from "../components/OrderPages/ProcessingOrders";
 // loaders/generalLoader.js
 export const generalLoader = async () => {
   // simulate API delay or global data fetching
@@ -82,11 +83,30 @@ const AppRouter = createBrowserRouter(
           element: <DeliveryPartnerManagement />,
           loader: generalLoader,
         },
-        {
-          path: "orders",
-          element: <Orders />,
+       {
+      path: "orders",
+  loader: generalLoader,
+  children: [
+    {
+      index: true,
+      element: <Orders />,   // default page
+      loader: generalLoader,
+    },
+    {
+      path: "new",
+      element: <NewOrders/>,
           loader: generalLoader,
-        },
+
+    },
+    {
+      path: "processing",
+      element: <ProcessingOrders />,
+          loader: generalLoader,
+
+    },
+  ],
+},
+
         {
           path: "menu-management",
           loader: generalLoader,

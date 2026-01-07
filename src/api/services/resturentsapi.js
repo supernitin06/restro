@@ -28,7 +28,7 @@ export const restaurantApi = baseApi.injectEndpoints({
         method: "POST",
         data, // ✅ FIX (body → data)
       }),
-      invalidatesTags: ["Restaurants"],
+      invalidatesTags: ["Restaurants"], 
     }),
 
     // ✅ TOGGLE status (PATCH)

@@ -3,7 +3,7 @@ import Button from "../../components/ui/Button";
 import emailIcon from "../../assets/email.png";
 import smsIcon from "../../assets/sms.png";
 import whatsappIcon from "../../assets/whatsapp.png";
-import "../../components/settings/Notification.css";
+import "../settings/notification.css";
 
 const Notifications = () => {
   const [selectedMethods, setSelectedMethods] = useState(["Email"]);
