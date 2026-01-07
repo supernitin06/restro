@@ -18,6 +18,7 @@ const DeliveryPartnerManagement = () => {
   const [selectedPartner, setSelectedPartner] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [editingPartner, setEditingPartner] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [viewMode, setViewMode] = useState(() => localStorage.getItem('partnerViewMode') || 'grid');
@@ -46,7 +47,7 @@ const DeliveryPartnerManagement = () => {
         registrationData: {
           name: p.name,
           mobileNumber: p.phone,
-          email: "",
+          email: p.email || "",
           cityArea: "N/A",
           vehicleType: p.vehicleType,
           image: null,
@@ -96,8 +97,20 @@ const DeliveryPartnerManagement = () => {
     setIsModalOpen(false);
   };
 
-  const openForm = () => setIsFormOpen(true);
-  const closeForm = () => setIsFormOpen(false);
+  const handleAddPartner = () => {
+    setEditingPartner(null);
+    setIsFormOpen(true);
+  };
+
+  const handleEditPartner = (partner) => {
+    setEditingPartner(partner);
+    setIsFormOpen(true);
+  };
+
+  const closeForm = () => {
+    setEditingPartner(null);
+    setIsFormOpen(false);
+  };
 
   const updatePartner = (updatedPartner) => {
     const updatedList = partners.map((p) =>
@@ -122,7 +135,7 @@ const DeliveryPartnerManagement = () => {
             Manage delivery partners, assignments, and performance across your platform.
           </p>
         </div>
-        <Button onClick={openForm} variant="primary" className="mt-4 md:mt-0">
+        <Button onClick={handleAddPartner} variant="primary" className="mt-4 md:mt-0">
           <UserPlus size={18} />
           Add Partner
         </Button>
@@ -147,7 +160,7 @@ const DeliveryPartnerManagement = () => {
         <DeliveryPartner
           partners={currentPartners}
           onViewDetails={handleViewDetails}
-          onEdit={openForm}
+          onEdit={handleEditPartner}
           updatePartner={updatePartner}
           viewMode={viewMode}
         />
@@ -175,6 +188,7 @@ const DeliveryPartnerManagement = () => {
       {isFormOpen && (
         <DeliveryPartnerForm
           onClose={closeForm} 
+          partner={editingPartner}
         />
       )}
     </div>

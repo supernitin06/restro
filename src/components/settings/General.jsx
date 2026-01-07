@@ -4,8 +4,9 @@ import Button from "../../components/ui/Button";
 
 const General = () => {
   return (
-    <div className="bg-primary space-y-6">
+    <div className="bg-primary  space-y-6">
       {/* Header */}
+
       <div className="p-6">
         <h2 className="highlight text-3xl mb-2 font-bold">General Settings</h2>
         <p className="text-muted">
@@ -14,6 +15,7 @@ const General = () => {
       </div>
 
       {/* Form */}
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-8">
         <InputField
           label="Restaurant Name"

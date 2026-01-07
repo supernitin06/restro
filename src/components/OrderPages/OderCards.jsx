@@ -1,9 +1,10 @@
 // OrderCard.jsx
 import React, { useState } from 'react';
-import { Edit, Trash2, CheckCircle, XCircle, Clock, Info, Bike, CreditCard, Eye } from 'lucide-react';
+import { Edit, Trash2, CheckCircle, XCircle, Clock, Info, Bike, CreditCard, Eye, MapPin, ShoppingBag, ChevronRight } from 'lucide-react';
 import OrderItem from './OrderItem';
 import OrderDetailsModal from './OrderDetailsModal';
-
+import Card from '../ui/GlassCard';
+import Button from '../ui/Button';
 
 const OrderCard = ({ order, onDelete, onEdit, onUpdateStatus, viewMode }) => {
   const [showDetails, setShowDetails] = useState(false);
@@ -78,8 +79,8 @@ const OrderCard = ({ order, onDelete, onEdit, onUpdateStatus, viewMode }) => {
   if (viewMode === 'list') {
     return (
       <>
-        <div className="card hover:border-primary/50 transition-all duration-300 group mb-3">
-          <div className="p-4">
+        <Card className="hover:border-primary/50 transition-all duration-300 group mb-3 p-0 cursor-pointer hover:shadow-md" onClick={() => setShowDetails(true)}>
+          <div className="p-4 flex flex-col justify-center h-full">
             <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
 
               {/* 1. Order Info (Span 3) */}
@@ -139,31 +140,31 @@ const OrderCard = ({ order, onDelete, onEdit, onUpdateStatus, viewMode }) => {
 
               {/* 5. Actions (Span 2) */}
               <div className="md:col-span-2 flex justify-end gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
-                <button onClick={() => setShowDetails(true)} className="p-2 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg text-blue-600 dark:text-blue-400 transition-colors" title="View Details">
+                <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); setShowDetails(true); }} className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20" title="View Details">
                   <Eye size={16} />
-                </button>
+                </Button>
                 
                 {order.status === 'on-process' && (
                   <>
-                    <button onClick={() => onUpdateStatus(order.id, 'completed')} className="p-2 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg text-green-600 dark:text-green-400 transition-colors" title="Complete">
+                    <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); onUpdateStatus(order.id, 'completed'); }} className="p-2 text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20" title="Complete">
                       <CheckCircle size={16} />
-                    </button>
-                    <button onClick={() => onUpdateStatus(order.id, 'cancelled')} className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg text-red-600 dark:text-red-400 transition-colors" title="Cancel">
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); onUpdateStatus(order.id, 'cancelled'); }} className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20" title="Cancel">
                       <XCircle size={16} />
-                    </button>
+                    </Button>
                   </>
                 )}
 
-                <button onClick={() => onEdit(order)} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-gray-600 dark:text-gray-300 transition-colors" title="Edit">
+                <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); onEdit(order); }} className="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700" title="Edit">
                   <Edit size={16} />
-                </button>
-                <button onClick={() => onDelete(order.id)} className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg text-red-600 dark:text-red-400 transition-colors" title="Delete">
+                </Button>
+                <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); onDelete(order.id); }} className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20" title="Delete">
                   <Trash2 size={16} />
-                </button>
+                </Button>
               </div>
             </div>
           </div>
-        </div>
+        </Card>
 
         {showDetails && (
           <OrderDetailsModal
@@ -179,38 +180,44 @@ const OrderCard = ({ order, onDelete, onEdit, onUpdateStatus, viewMode }) => {
   // ============= GRID VIEW (CARD) =============
   return (
     <>
-      <div className="card hover:border-primary/50 transition-all duration-300 flex flex-col">
+      <Card className="hover:border-primary/50 transition-all duration-300 flex flex-col h-full p-0 overflow-hidden group cursor-pointer hover:shadow-lg hover:-translate-y-1" onClick={() => setShowDetails(true)}>
 
         {/* Header */}
         <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
           <div className="flex justify-between items-start mb-3">
             <div className="flex-1 min-w-0 flex items-center gap-2">
-              <h3 className="text-base font-bold text-gray-800 dark:text-gray-100 truncate">
+              <h3 className="text-base font-bold text-gray-800 dark:text-gray-100 truncate" title={order.customer}>
                 {order.customer}
               </h3>
-              <button
-                onClick={() => setShowDetails(true)}
-                className="p-1 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-all text-blue-600 dark:text-blue-400"
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => { e.stopPropagation(); setShowDetails(true); }}
+                className="p-1 h-auto text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20"
                 title="View Full Details"
               >
                 <Info size={14} />
-              </button>
+              </Button>
             </div>
             <div className="flex gap-1">
-              <button
-                onClick={() => onEdit(order)}
-                className="p-1.5 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all text-primary"
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => { e.stopPropagation(); onEdit(order); }}
+                className="p-1.5 h-auto text-primary hover:bg-blue-50 dark:hover:bg-blue-900/20"
                 title="Edit"
               >
                 <Edit size={14} />
-              </button>
-              <button
-                onClick={() => onDelete(order.id)}
-                className="p-1.5 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all text-red-600 dark:text-red-400"
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => { e.stopPropagation(); onDelete(order.id); }}
+                className="p-1.5 h-auto text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
                 title="Delete"
               >
                 <Trash2 size={14} />
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -258,9 +265,12 @@ const OrderCard = ({ order, onDelete, onEdit, onUpdateStatus, viewMode }) => {
 
         {/* Items */}
         <div className="px-4 py-2 flex-1">
-          <h4 className="text-xs font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">
-            Items ({order.items.length})
-          </h4>
+          <div className="flex items-center justify-between mb-2">
+            <h4 className="text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wide flex items-center gap-1">
+              <ShoppingBag size={12} /> Items ({order.items.length})
+            </h4>
+          </div>
+          
           <div className="space-y-2 max-h-[110px] overflow-y-auto pr-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
             {order.items.map((item, index) => (
               <OrderItem key={index} item={item} />
@@ -280,26 +290,30 @@ const OrderCard = ({ order, onDelete, onEdit, onUpdateStatus, viewMode }) => {
           </div>
 
           {/* Status Action Buttons */}
-          {order.status === 'on-process' && (
+          {order.status === 'on-process' ? (
             <div className="flex gap-2 mb-3">
-              <button
-                onClick={() => onUpdateStatus(order.id, 'completed')}
-                className="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg font-semibold transition-all text-sm flex items-center justify-center gap-1.5"
+              <Button
+                variant="success"
+                onClick={(e) => { e.stopPropagation(); onUpdateStatus(order.id, 'completed'); }}
+                className="flex-1 py-2 text-sm flex items-center justify-center gap-1.5"
               >
                 <CheckCircle size={16} />
                 Complete
-              </button>
-              <button
-                onClick={() => onUpdateStatus(order.id, 'cancelled')}
-                className="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg font-semibold transition-all text-sm flex items-center justify-center gap-1.5"
+              </Button>
+              <Button
+                variant="danger"
+                onClick={(e) => { e.stopPropagation(); onUpdateStatus(order.id, 'cancelled'); }}
+                className="flex-1 py-2 text-sm flex items-center justify-center gap-1.5"
               >
                 <XCircle size={16} />
                 Cancel
-              </button>
+              </Button>
             </div>
+          ) : (
+             // Optional: Add a View Details button for other statuses if needed, or keep empty
+             null
           )}
-
-          {/* View Details Button */}
+          
           {/* <button
             onClick={() => setShowDetails(true)}
             className="w-full btn btn-primary flex items-center justify-center gap-2"
@@ -308,7 +322,7 @@ const OrderCard = ({ order, onDelete, onEdit, onUpdateStatus, viewMode }) => {
             View Full Details
           </button> */}
         </div>
-      </div>
+      </Card>
 
       {showDetails && (
         <OrderDetailsModal

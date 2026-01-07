@@ -7,7 +7,7 @@ export const menuApi = baseApi.injectEndpoints({
         // ================= MENU =================
         getMenus: builder.query({
             query: ({ restaurantId, categoryId, search, status }) => ({
-                url: "admin/item",
+                url: "admin/menu",
                 method: "GET",
                 params: {
                     restaurantId,
@@ -20,10 +20,11 @@ export const menuApi = baseApi.injectEndpoints({
         }),
 
         addMenu: builder.mutation({
-            query: (payload) => ({
-                url: "admin/item",
+            query: ({ restaurantId, ...data }) => ({
+                url: "admin/menu",
                 method: "POST",
-                data: payload,
+                data: { restaurantId, ...data },
+                params: { restaurantId },
             }),
             invalidatesTags: ["Menu"],
         }),
@@ -56,10 +57,10 @@ export const menuApi = baseApi.injectEndpoints({
         }),
 
         addCategory: builder.mutation({
-            query: (payload) => ({
-                url: "admin/cat",
+            query: ({ restaurantId, ...data }) => ({
+                url: `admin/cat/${restaurantId}`,
                 method: "POST",
-                data: payload,
+                data,
             }),
             invalidatesTags: ["Categories"],
         }),
