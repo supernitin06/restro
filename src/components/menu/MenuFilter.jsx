@@ -1,72 +1,48 @@
 import React from "react";
-import { LayoutGrid, List } from "lucide-react";
-import FiltersBar from "../ui/UserFilters";
+import FilterBar from "../ui/UserFilters";
+import { Grid, List } from 'lucide-react';
+import Button from '../ui/Button';
 
 const MenuFilters = ({
   searchTerm,
-  setSearchTerm,
-  statusFilter,
-  setStatusFilter,
+  onSearch,
+  filters,
+  onFilterChange,
+  onClearFilters,
   viewType,
-  setViewType,
+  onViewModeChange,
 }) => {
-  const search = {
-    value: searchTerm,
-    placeholder: "Search menu items...",
-    onChange: setSearchTerm,
-  };
-
-  const filters = [
-    {
-      key: "status",
-      value: statusFilter,
-      options: [
-        { value: "all", label: "All" },
-        { value: "available", label: "Available" },
-        { value: "unavailable", label: "Unavailable" },
-        { value: "bestseller", label: "Bestseller" },
-      ],
-    },
-  ];
-
-  const handleFilterChange = (key, value) => {
-    if (key === "status") setStatusFilter(value);
-  };
-
   return (
-    <FiltersBar
-      search={search}
-      filters={filters}
-      onFilterChange={handleFilterChange}
+    <FilterBar
+      search={{
+        value: searchTerm,
+        onChange: onSearch,
+        placeholder: "Search menu items..."
+      }}
+      filters={[
+        {
+          key: 'status',
+          value: filters?.status || 'all',
+          options: [
+            { value: "all", label: "All" },
+            { value: "available", label: "Available" },
+            { value: "unavailable", label: "Unavailable" },
+            { value: "bestseller", label: "Bestseller" },
+          ]
+        }
+      ]}
+      onFilterChange={onFilterChange}
+      onClear={onClearFilters}
     >
-      {/* View Toggle */}
-      <div className="flex border rounded-lg overflow-hidden">
-        <button
-          onClick={() => setViewType("list")}
-          className={`p-2 ${
-            viewType === "list"
-              ? "bg-emerald-500 text-white"
-              : "bg-white text-gray-600"
-          }`}
-          title="List View"
-        >
+      <div className="flex items-center gap-2">
+        <Button variant={viewType === 'grid' ? 'primary' : 'ghost'} onClick={() => onViewModeChange('grid')} className="p-2.5" title="Grid View">
+          <Grid size={18} />
+        </Button>
+        <Button variant={viewType === 'list' ? 'primary' : 'ghost'} onClick={() => onViewModeChange('list')} className="p-2.5" title="List View">
           <List size={18} />
-        </button>
-
-        <button
-          onClick={() => setViewType("grid")}
-          className={`p-2 ${
-            viewType === "grid"
-              ? "bg-emerald-500 text-white"
-              : "bg-white text-gray-600"
-          }`}
-          title="Grid View"
-        >
-          <LayoutGrid size={18} />
-        </button>
+        </Button>
       </div>
-    </FiltersBar>
+    </FilterBar>
   );
 };
-
 export default MenuFilters;

@@ -3,28 +3,32 @@ import { Phone, MapPin, Truck, Bike, Eye, Info, Edit } from "lucide-react";
 import DeliveryPartnerStatusBadge from "./DeliveryPartnerStatusBadge";
 import Button from "../ui/Button";
 import Card from "../ui/GlassCard";
-import PartnerOrderHistoryModal from "./PartnerOrderHistoryModal";
 import { useUpdateDeliveryPartnerMutation } from "../../api/services/deliveryPartnerApi";
+import PartnerOrderHistoryModal from "./PartnerOrderHistoryModal";
 
 const DeliveryPartner = ({ partners, onViewDetails, onEdit, viewMode = 'grid' }) => {
   const [showOrdersModal, setShowOrdersModal] = useState(false);
   const [selectedPartnerId, setSelectedPartnerId] = useState(null);
-
-  // API Mutation for toggling status
-  const [updatePartnerStatus] = useUpdateDeliveryPartnerMutation();
+  const [updateDeliveryPartner] = useUpdateDeliveryPartnerMutation();
 
   const toggleStatus = async (partner) => {
+    const currentStatus = partner.listView.status;
+    const newIsActive = currentStatus !== "Active";
+
     try {
-      await updatePartnerStatus(partner.partnerId).unwrap();
+      await updateDeliveryPartner({
+        id: partner.partnerId,
+        isActive: newIsActive,
+      }).unwrap();
     } catch (error) {
-      console.error("Failed to update partner status", error);
+      console.error("Failed to update status:", error);
     }
   };
 
   const handleViewOrders = (id) => {
     setSelectedPartnerId(id);
     setShowOrdersModal(true);
-  }
+  };
 
   if (viewMode === 'list') {
     return (
@@ -33,7 +37,7 @@ const DeliveryPartner = ({ partners, onViewDetails, onEdit, viewMode = 'grid' })
           const { partnerId, listView, registrationData } = partner;
           const isActive = listView.status === "Active";
           return (
-            <Card key={partnerId} className="p-3.5 group hover:border-primary/50 transition-all duration-300 hover:shadow-md cursor-pointer">
+            <Card key={partnerId} className="p-3.5 group hover:border-primary/50 transition-all duration-300 hover:shadow-md cursor-pointer" onClick={() => onViewDetails(partner)}>
               <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
 
                 {/* Partner Info */}
@@ -85,14 +89,14 @@ const DeliveryPartner = ({ partners, onViewDetails, onEdit, viewMode = 'grid' })
                   <Button variant="ghost" size="sm" className="h-8 px-2 py-0 text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20" onClick={(e) => { e.stopPropagation(); handleViewOrders(partner.partnerId); }} title="View Orders">
                     <Eye size={14} />
                   </Button>
-                  <Button variant="primary" size="sm" className="h-8 px-2 py-0" onClick={() => alert('Assign Order')}>Assign</Button>
-                  <Button variant={isActive ? "danger" : "success"} size="sm" className="h-8 px-2 py-0" onClick={() => toggleStatus(partner)}>
+                  <Button variant="primary" size="sm" className="h-8 px-2 py-0" onClick={(e) => { e.stopPropagation(); alert('Assign Order'); }}>Assign</Button>
+                  <Button variant={isActive ? "danger" : "success"} size="sm" className="h-8 px-2 py-0" onClick={(e) => { e.stopPropagation(); toggleStatus(partner); }}>
                     {isActive ? "Off" : "On"}
                   </Button>
                 </div>
               </div>
             </Card>
-          )
+          );
         })}
         {showOrdersModal && (
           <PartnerOrderHistoryModal
@@ -101,7 +105,7 @@ const DeliveryPartner = ({ partners, onViewDetails, onEdit, viewMode = 'grid' })
           />
         )}
       </div>
-    )
+    );
   }
 
   return (
@@ -208,7 +212,7 @@ const DeliveryPartner = ({ partners, onViewDetails, onEdit, viewMode = 'grid' })
                     variant={isActive ? "danger" : "success"}
                     size="sm"
                     className="text-[10px] h-8 py-0"
-                    onClick={() => toggleStatus(partner)}
+                    onClick={(e) => { e.stopPropagation(); toggleStatus(partner); }}
                   >
                     {isActive ? "Deactivate" : "Activate"}
                   </Button>
