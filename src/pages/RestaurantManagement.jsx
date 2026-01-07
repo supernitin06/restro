@@ -14,6 +14,7 @@ import {
   useUpdateRestaurantMutation,
   useDeleteRestaurantMutation,
 } from "../api/services/resturentsapi";
+
 function RestaurantManagement() {
   // ===== RTK Query Hooks =====
   const { data, isLoading, isError, refetch } = useGetRestaurantsQuery();

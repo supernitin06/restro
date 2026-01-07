@@ -6,9 +6,11 @@ export default function ErrorPage() {
 
   return (
 
+
     <div className="relative min-h-screen flex items-center justify-center bg-slate-100 px-4">
 
       {/* White Blur Layer */}
+      
       <div className="absolute inset-0 bg-white/60 backdrop-blur-2xl"></div>
       
       {/* Card */}
