@@ -7,7 +7,7 @@ export const menuApi = baseApi.injectEndpoints({
         // ================= MENU =================
         getMenus: builder.query({
             query: ({ restaurantId, categoryId, search, status }) => ({
-                url: "admin/item",
+                url: "admin/menu",
                 method: "GET",
                 params: {
                     restaurantId,
@@ -21,7 +21,7 @@ export const menuApi = baseApi.injectEndpoints({
 
         addMenu: builder.mutation({
             query: (payload) => ({
-                url: "admin/item",
+                url: "admin/menu",
                 method: "POST",
                 data: payload,
             }),
