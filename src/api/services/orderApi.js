@@ -1,3 +1,4 @@
+// src/api/services/orderApi.js
 import { baseApi } from "./baseApi";
 
 export const orderApi = baseApi.injectEndpoints({
@@ -10,8 +11,19 @@ export const orderApi = baseApi.injectEndpoints({
       }),
       providesTags: ["Order"],
     }),
+
+    // ✅ Add this mutation
+assignDelivery: builder.mutation({
+  query: ({ orderId, partnerId }) => ({
+    url: `orders/${orderId}/assign-delivery`, // ✅ path matches
+    method: "POST",
+    body: { deliveryPartnerId: partnerId },  // ✅ body key must match backend
+  }),
+  invalidatesTags: ["Order"], // optional
+}),
+
   }),
   overrideExisting: false,
 });
 
-export const { useGetOrdersQuery } = orderApi;
+export const { useGetOrdersQuery, useAssignDeliveryMutation } = orderApi;

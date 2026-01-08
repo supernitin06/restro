@@ -21,7 +21,11 @@ const initialOrders = [
   {
     id: 2,
     orderId: "ORD007",
-    customer: { name: "Anjali Sharma", phone: "9123456789", membership: "Regular" },
+    customer: {
+      name: "Anjali Sharma",
+      phone: "9123456789",
+      membership: "Regular",
+    },
     location: "Indirapuram, Ghaziabad",
     items: [{ name: "Veg Biryani", qty: 1 }],
     total: 250,
@@ -46,7 +50,9 @@ const NewOrders = () => {
   const [orders, setOrders] = useState(initialOrders);
 
   const updateStatus = (id, status) => {
-    setOrders((prev) => prev.map((order) => (order.id === id ? { ...order, status } : order)));
+    setOrders((prev) =>
+      prev.map((order) => (order.id === id ? { ...order, status } : order))
+    );
   };
 
   return (
@@ -67,29 +73,42 @@ const NewOrders = () => {
         {orders.map((order) => (
           <div
             key={order.id}
-            className={`border rounded-3xl p-4 transition-all shadow-lg transform hover:scale-105 ${statusStyles[order.status]}`}
+            className={`border rounded-3xl p-4 transition-all shadow-lg transform hover:scale-105 ${
+              statusStyles[order.status]
+            }`}
             style={{
-              background: "linear-gradient(to right, #e0f7ff, #ffffff, #ccefff)", // light sky blue gradient
+              background:
+                "linear-gradient(to right, #e0f7ff, #ffffff, #ccefff)", // light sky blue gradient
             }}
           >
             {/* Top Section */}
             <div className="flex justify-between items-start">
               <div>
                 <div className="flex items-center gap-3">
-                  <h2 className="text-xl font-extrabold text-sky-800">{order.orderId}</h2>
+                  <h2 className="text-xl font-extrabold text-sky-800">
+                    {order.orderId}
+                  </h2>
                   <span
-                    className={`flex items-center gap-1 text-xs font-bold px-3 py-1 rounded-full ${membershipStyles[order.customer.membership]}`}
+                    className={`flex items-center gap-1 text-xs font-bold px-3 py-1 rounded-full ${
+                      membershipStyles[order.customer.membership]
+                    }`}
                   >
                     <Star size={12} />
                     {order.customer.membership}
                   </span>
                 </div>
-                <p className="mt-1 font-semibold text-gray-800">{order.customer.name}</p>
+                <p className="mt-1 font-semibold text-gray-800">
+                  {order.customer.name}
+                </p>
                 <p className="text-xs text-gray-500">{order.customer.phone}</p>
               </div>
               <div className="text-right">
-                <p className="text-2xl font-extrabold text-orange-600">₹{order.total}</p>
-                <span className="text-xs font-bold uppercase tracking-wide text-gray-400">{order.status}</span>
+                <p className="text-2xl font-extrabold text-orange-600">
+                  ₹{order.total}
+                </p>
+                <span className="text-xs font-bold uppercase tracking-wide text-gray-400">
+                  {order.status}
+                </span>
               </div>
             </div>
 
@@ -97,7 +116,8 @@ const NewOrders = () => {
             <div
               className="mt-4 flex items-center gap-2 text-sm text-gray-700 rounded-xl px-4 py-2 border"
               style={{
-                background: "linear-gradient(to right, #e0f7ff, #ffffff, #ccefff)", // same light sky blue
+                background:
+                  "linear-gradient(to right, #e0f7ff, #ffffff, #ccefff)", // same light sky blue
                 borderColor: "#7dd3fc",
               }}
             >
@@ -107,10 +127,15 @@ const NewOrders = () => {
 
             {/* Items */}
             <div className="mt-4">
-              <p className="text-xs font-semibold text-gray-400 mb-2">ITEMS ORDERED</p>
+              <p className="text-xs font-semibold text-gray-400 mb-2">
+                ITEMS ORDERED
+              </p>
               <div className="flex flex-wrap gap-2">
                 {order.items.map((item, idx) => (
-                  <span key={idx} className="bg-white border text-xs px-3 py-1 rounded-full">
+                  <span
+                    key={idx}
+                    className="bg-white border text-xs px-3 py-1 rounded-full"
+                  >
                     {item.name} × {item.qty}
                   </span>
                 ))}
@@ -143,10 +168,14 @@ const NewOrders = () => {
                   </>
                 )}
                 {order.status === "confirmed" && (
-                  <span className="text-green-700 font-bold text-sm">✔ Order Confirmed</span>
+                  <span className="text-green-700 font-bold text-sm">
+                    ✔ Order Confirmed
+                  </span>
                 )}
                 {order.status === "cancelled" && (
-                  <span className="text-red-600 font-bold text-sm">✖ Order Cancelled</span>
+                  <span className="text-red-600 font-bold text-sm">
+                    ✖ Order Cancelled
+                  </span>
                 )}
               </div>
             </div>

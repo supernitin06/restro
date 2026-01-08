@@ -1,177 +1,185 @@
 // src/pages/ProcessingOrders.jsx
-import React, { useState } from 'react';
-import Table from '../../components/ui/Table';
-import Button from '../../components/ui/Button';
-import { Bike } from 'lucide-react';
-import OrderDetailsModal from '../../components/OrderPages/OrderDetailsModal';
+import React, { useState } from "react";
+import Table from "../../components/ui/Table";
+import Button from "../../components/ui/Button";
+import { Bike } from "lucide-react";
+import OrderDetailsModal from "../../components/OrderPages/OrderDetailsModal";
 import { useGetDeliveryPartnersQuery } from "../../api/services/deliveryPartnerApi";
-import ActionButton from '../../components/ui/ActionButton';
-import { Eye, CheckCircle, Truck } from 'lucide-react';
-
+import { useAssignDeliveryMutation } from "../../api/services/orderApi";
+import ActionButton from "../../components/ui/ActionButton";
+import { Eye, CheckCircle, Truck } from "lucide-react";
 
 const dummyOrders = [
   {
     id: 1,
-    orderId: '#ORD-2001',
-    customer: { name: 'Neha Singh', phone: '9123456789' },
-    location: 'Sector 62',
+    orderId: "#ORD-2001",
+    customer: { name: "Neha Singh", phone: "9123456789" },
+    location: "Sector 62",
     items: [
-      { name: 'Burger', quantity: 2 },
-      { name: 'French Fries', quantity: 1 },
-      { name: 'Cold Drink', quantity: 1 },
+      { name: "Burger", quantity: 2 },
+      { name: "French Fries", quantity: 1 },
+      { name: "Cold Drink", quantity: 1 },
     ],
-    status: 'preparing',
+    status: "preparing",
     delivery: null,
   },
   {
     id: 2,
-    orderId: '#ORD-2002',
-    customer: { name: 'Aman Gupta', phone: '9988776655' },
-    location: 'Sector 63',
+    orderId: "#ORD-2002",
+    customer: { name: "Aman Gupta", phone: "9988776655" },
+    location: "Sector 63",
     items: [
-      { name: 'Paneer Butter Masala', quantity: 1 },
-      { name: 'Butter Naan', quantity: 3 },
+      { name: "Paneer Butter Masala", quantity: 1 },
+      { name: "Butter Naan", quantity: 3 },
     ],
-    status: 'preparing',
+    status: "preparing",
     delivery: null,
   },
 ];
 
-const dummyPartners = [
-  { id: 1, name: 'Rahul Verma', location: 'Sector 62' },
-  { id: 2, name: 'Vikas Yadav', location: 'Sector 63' },
-  { id: 3, name: 'Anita Sharma', location: 'Sector 64' },
-  { id: 4, name: 'Sonal Mehra', location: 'Sector 62' },
-  { id: 5, name: 'Amit Singh', location: 'Sector 63' },
-];
-
 const ProcessingOrders = () => {
+  const [assignDeliveryApi, { isLoading: assigning }] =
+    useAssignDeliveryMutation();
   const { data: partnerApi } = useGetDeliveryPartnersQuery();
-
-const [partnerSearch, setPartnerSearch] = useState("");
+  const [partnerSearch, setPartnerSearch] = useState("");
   const [orders, setOrders] = useState(dummyOrders);
   const [viewingOrder, setViewingOrder] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [currentOrder, setCurrentOrder] = useState(null);
+  const deliveryPartners = React.useMemo(() => {
+    if (!partnerApi?.success) return [];
 
-const deliveryPartners = React.useMemo(() => {
-  if (!partnerApi?.success) return [];
+    return partnerApi.data.map((p) => ({
+      id: p._id,
+      name: p.name || "",
+      location: p.location || p.city || "", // 👈 future ready
+      isActive: p.isActive,
+    }));
+  }, [partnerApi]);
+  const filteredPartners = React.useMemo(() => {
+    const term = partnerSearch.toLowerCase().trim();
+    if (!term) return deliveryPartners;
+    return deliveryPartners.filter((p) => {
+      const name = p.name.toLowerCase();
+      const location = p.location.toLowerCase(); // empty string safe
 
-  return partnerApi.data.map(p => ({
-    id: p._id,
-    name: p.name || "",
-    location: p.location || p.city || "", // 👈 future ready
-    isActive: p.isActive,
-  }));
-}, [partnerApi]);
-
-
-const filteredPartners = React.useMemo(() => {
-  const term = partnerSearch.toLowerCase().trim();
-  if (!term) return deliveryPartners;
-
-  return deliveryPartners.filter(p => {
-    const name = p.name.toLowerCase();
-    const location = p.location.toLowerCase(); // empty string safe
-
-    return name.includes(term) || location.includes(term);
-  });
-}, [deliveryPartners, partnerSearch]);
-
-
-
-
+      return name.includes(term) || location.includes(term);
+    });
+  }, [deliveryPartners, partnerSearch]);
   const openDrawer = (order) => {
     setCurrentOrder(order);
     setDrawerOpen(true);
   };
-
-  const assignPartner = (partner) => {
+  const assignPartner = async (partner) => {
     if (!currentOrder) return;
-    setOrders(prev =>
-      prev.map(o => o.id === currentOrder.id ? { ...o, delivery: partner } : o)
-    );
-    setDrawerOpen(false);
-    setCurrentOrder(null);
-  };
 
+    try {
+      await assignDeliveryApi({
+        orderId: currentOrder._id, // backend ID
+        partnerId: partner.id,
+      }).unwrap();
+
+      // Update local state
+      setOrders((prev) =>
+        prev.map((o) =>
+          o._id === currentOrder._id ? { ...o, delivery: partner } : o
+        )
+      );
+
+      setDrawerOpen(false);
+      setCurrentOrder(null);
+    } catch (err) {
+      console.error("Failed to assign delivery", err);
+      alert(
+        err?.data?.message ||
+          "Failed to assign delivery partner. Please try again."
+      );
+    }
+  };
   const updateStatus = (order, newStatus) => {
-    setOrders(prev =>
-      prev.map(o => o.id === order.id ? { ...o, status: newStatus } : o)
+    setOrders((prev) =>
+      prev.map((o) => (o.id === order.id ? { ...o, status: newStatus } : o))
     );
   };
-
- const orderActions = [
-  {
-    key: "view",
-    label: "View Order",
-    icon: Eye,
-    color: "blue",           // changed from cyan → blue
-    onClick: (order) => setViewingOrder(order),
-  },
-  {
-    key: "ready",
-    label: "Mark Ready",
-    icon: CheckCircle,
-    color: "emerald",        // same as before
-    show: (order) => order.status === "preparing",
-    onClick: (order) => updateStatus(order, "ready"),
-  },
-  {
-    key: "out",
-    label: "Out for Delivery",
-    icon: Truck,
-    color: "amber",          // changed from purple → amber
-    show: (order) => order.status === "ready",
-    onClick: (order) => updateStatus(order, "out_for_delivery"),
-  },
-];
-
-
-
-  const columns = [
+  const orderActions = [
+    // {
+    //   key: "view",
+    //   label: "View Order",
+    //   icon: Eye,
+    //   color: "blue",
+    //   onClick: (order) => setViewingOrder(order),
+    // },
     {
-      header: 'Order ID',
-      render: order => <span className="font-bold text-purple-700">{order.orderId}</span>,
+      key: "ready",
+      label: "Mark Ready",
+      icon: CheckCircle,
+      color: "emerald", // same as before
+      show: (order) => order.status === "preparing",
+      onClick: (order) => updateStatus(order, "ready"),
     },
     {
-      header: 'Customer',
-      render: order => (
+      key: "out",
+      label: "Out for Delivery",
+      icon: Truck,
+      color: "amber", // changed from purple → amber
+      show: (order) => order.status === "ready",
+      onClick: (order) => updateStatus(order, "out_for_delivery"),
+    },
+  ];
+  const columns = [
+    {
+      header: "Order ID",
+      render: (order) => (
+        <span className="highlight font-bold">{order.orderId}</span>
+      ),
+    },
+    {
+      header: "Customer",
+      render: (order) => (
         <div>
           <div className="font-medium">{order.customer.name}</div>
-          <div className="text-xs text-gray-500">{order.customer.phone}</div>
         </div>
       ),
     },
-   
-  {
-  header: 'Items',
-  render: order => (
-    <div className="relative group min-w-[180px]">
-      {/* Visible Items */}
-      <div className="flex flex-col gap-1">
-        {order.items.slice(0, 2).map((item, idx) => (
-          <div key={idx} className="flex justify-between items-center text-xs">
-            <span className="truncate max-w-[140px]" title={item.name}>
-              {item.name}
-            </span>
-            <span className="font-semibold bg-gray-100 px-2 py-0.5 rounded">
-              {item.quantity}
-            </span>
+
+    {
+      header: "Phone",
+      render: (order) => (
+        <div className="text-sm text-gray-600">{order.customer.phone}</div>
+      ),
+    },
+
+    {
+      header: "Items",
+      render: (order) => (
+        <div className="relative group min-w-[180px]">
+          {/* Visible Items */}
+          <div className="flex flex-col gap-1">
+            {order.items.slice(0, 2).map((item, idx) => (
+              <div
+                key={idx}
+                className="flex justify-between items-center text-xs"
+              >
+                <span className="truncate max-w-[140px]" title={item.name}>
+                  {item.name}
+                </span>
+                <span className="font-semibold bg-gray-100 px-2 py-0.5 rounded">
+                  {item.quantity}
+                </span>
+              </div>
+            ))}
+
+            {order.items.length > 2 && (
+              <span className="highlight font-medium cursor-pointer">
+                +{order.items.length - 2} more
+              </span>
+            )}
           </div>
-        ))}
 
-        {order.items.length > 2 && (
-          <span className="text-xs text-purple-600 font-medium cursor-pointer">
-            +{order.items.length - 2} more
-          </span>
-        )}
-      </div>
-
-      {/* Hover Popover */}
-{order.items.length > 2 && (
-  <div
-    className="
+          {/* Hover Popover */}
+          {order.items.length > 2 && (
+            <div
+              className="
       absolute
       left-full
       top-0
@@ -187,53 +195,53 @@ const filteredPartners = React.useMemo(() => {
       group-hover:translate-x-0
       group-hover:pointer-events-auto
     "
-  >
-    <div className="bg-white shadow-2xl rounded-xl p-4 w-64 border border-purple-100">
-      <h4 className="text-sm font-bold text-purple-700 mb-2">
-        All Items
-      </h4>
+            >
+              <div className="bg-white shadow-2xl rounded-xl p-4 w-64 border border-purple-100">
+                <h4 className="text-sm font-bold text-purple-700 mb-2">
+                  All Items
+                </h4>
 
-      <div className="space-y-2 max-h-48 overflow-y-auto">
-        {order.items.map((item, idx) => (
-          <div
-            key={idx}
-            className="flex justify-between items-center text-sm"
-          >
-            <span className="truncate">{item.name}</span>
-            <span className="bg-purple-100 text-purple-700 px-2 py-0.5 rounded text-xs font-semibold">
-              {item.quantity}
-            </span>
-          </div>
-        ))}
-      </div>
-    </div>
-  </div>
-)}
-
-
-    </div>
-  ),
-  },
+                <div className="space-y-2 max-h-48 overflow-y-auto">
+                  {order.items.map((item, idx) => (
+                    <div
+                      key={idx}
+                      className="flex justify-between items-center text-sm"
+                    >
+                      <span className="truncate">{item.name}</span>
+                      <span className="bg-purple-100 text-purple-700 px-2 py-0.5 rounded text-xs font-semibold">
+                        {item.quantity}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      ),
+    },
 
     {
-      header: 'Status',
-      render: order => (
-        <span className={`px-3 py-1 rounded-lg text-xs font-bold capitalize ${
-          order.status === 'preparing'
-            ? 'bg-gradient-to-r from-blue-100 to-blue-200 text-blue-700'
-            : order.status === 'ready'
-            ? 'bg-gradient-to-r from-green-100 to-green-200 text-green-700'
-            : order.status === 'out_for_delivery'
-            ? 'bg-gradient-to-r from-purple-100 to-purple-200 text-purple-700'
-            : 'bg-gradient-to-r from-cyan-100 to-cyan-200 text-cyan-700'
-        }`}>
-          {order.status.replace(/_/g, ' ')}
+      header: "Status",
+      render: (order) => (
+        <span
+          className={`px-3 py-1 rounded-lg text-xs font-bold capitalize ${
+            order.status === "preparing"
+              ? "bg-gradient-to-r from-blue-100 to-blue-200 text-blue-700"
+              : order.status === "ready"
+              ? "bg-gradient-to-r from-green-100 to-green-200 text-green-700"
+              : order.status === "out_for_delivery"
+              ? "bg-gradient-to-r from-purple-100 to-purple-200 text-purple-700"
+              : "bg-gradient-to-r from-cyan-100 to-cyan-200 text-cyan-700"
+          }`}
+        >
+          {order.status.replace(/_/g, " ")}
         </span>
       ),
     },
     {
-      header: 'Delivery Partner',
-      render: order => (
+      header: "Delivery Partner",
+      render: (order) => (
         <div className="flex items-center gap-2">
           {order.delivery ? (
             <>
@@ -241,130 +249,128 @@ const filteredPartners = React.useMemo(() => {
               <span className="text-sm font-medium">{order.delivery.name}</span>
             </>
           ) : (
-            <Button size="sm" variant="primary" onClick={() => openDrawer(order)}>Assign</Button>
+            <Button
+              size="sm"
+              variant="primary"
+              onClick={() => openDrawer(order)}
+            >
+              Assign
+            </Button>
           )}
         </div>
       ),
     },
-    
+
     {
-  header: 'Actions',
-  render: order => (
-    <ActionButton
-      item={order}
-      actions={orderActions}
-      maxVisible={2}
-      size="sm"
-    />
-  ),
-
-
+      header: "Actions",
+      render: (order) => (
+        <ActionButton
+          item={order}
+          actions={orderActions}
+          maxVisible={2}
+          size="sm"
+        />
+      ),
     },
   ];
 
   return (
     <div className="app page p-6">
-
       {/* Page Header */}
-<div className="mb-6 bg-gradient-to-r from-purple-50 via-white to-purple-50 shadow-lg rounded-xl p-6 flex flex-col">
-  <div className="flex items-center justify-between">
-    <h1 className="text-4xl font-extrabold text-purple-700">
-      Processing Orders
-    </h1>
-    <span className="text-sm font-medium text-purple-500 bg-purple-100 px-3 py-1 rounded-full">
-      {orders.length} Orders
-    </span>
-  </div>
-  <p className="text-gray-500 mt-2">
-    Manage all ongoing orders and assign delivery partners efficiently
-  </p>
-</div>
-
-      
+      <div className="mb-6 bg-gradient-to-r from-purple-50 via-white to-purple-50 shadow-lg rounded-xl p-6 flex flex-col">
+        <div className="flex items-center justify-between">
+          <h1 className="highlight text-4xl font-extrabold">
+            Processing Orders
+          </h1>
+          <span className="highlight font-bold bg-purple-100 px-3 py-1 rounded-full">
+            {orders.length} Orders
+          </span>
+        </div>
+        <p className="text-gray-500 mt-2">
+          Manage all ongoing orders and assign delivery partners efficiently
+        </p>
+      </div>
 
       {orders.length === 0 ? (
-        <div className="text-center py-20 text-gray-400">No processing orders</div>
+        <div className="text-center py-20 text-gray-400">
+          No processing orders
+        </div>
       ) : (
-      <div className="bg-gradient-to-r from-white to-gray-50 shadow-2xl rounded-xl p-6">
-  <div className="overflow-x-auto">
-    <Table columns={columns} data={orders} />
-  </div>
-</div>
-
+        <div className="bg-gradient-to-r from-white to-gray-50 shadow-2xl rounded-xl p-6">
+          <div className="overflow-x-auto">
+            <Table columns={columns} data={orders} />
+          </div>
+        </div>
       )}
 
       {viewingOrder && (
-        <OrderDetailsModal order={viewingOrder} onClose={() => setViewingOrder(null)} />
+        <OrderDetailsModal
+          order={viewingOrder}
+          onClose={() => setViewingOrder(null)}
+        />
       )}
 
-
-  <div
-  className={`fixed top-0 right-0 h-full w-96 bg-white origin-top shadow-2xl z-50 transform transition-transform duration-500 ${
-    drawerOpen ? 'scale-100' : 'scale-0'
-  } flex flex-col rounded-l-3xl overflow-hidden`}
->
-  {/* Drawer Header */}
-  <div className="flex justify-between items-center p-5 border-b border-gray-200 bg-white shadow-md">
-    <h2 className="text-2xl font-extrabold text-red-600 tracking-wide">
-      Assign Delivery Partner
-    </h2>
-    {/* Optional Close Button */}
-    {/* <button
-      className="text-red-500 hover:text-red-700 text-3xl font-bold transition-colors duration-300"
-      onClick={() => setDrawerOpen(false)}
-    >
-      ✕
-    </button> */}
-  </div>
-
-  {/* Drawer Content: Scrollable Partner List */}
-  <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-white">
-  {/* Search Input */}
-<div className="p-4 border-b">
-  <input
-    type="text"
-    placeholder="Search by name or location"
-    value={partnerSearch}
-    onChange={(e) => setPartnerSearch(e.target.value)}
-    className="w-full px-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-400"
-  />
-</div>
-
-{/* Partner List */}
-<div className="flex-1 overflow-y-auto p-4 space-y-4 bg-white">
-  {filteredPartners.length === 0 ? (
-    <div className="text-center text-gray-400 mt-10">
-      No delivery partners found
-    </div>
-  ) : (
-    filteredPartners.map(partner => (
       <div
-        key={partner.id}
-        className="flex justify-between items-center p-4 bg-white rounded-2xl shadow-md hover:shadow-lg cursor-pointer transition-all duration-300 border border-red-100 hover:bg-red-50"
-        onClick={() => assignPartner(partner)}
+        className={`fixed top-0 right-0 h-full w-96 bg-white origin-top shadow-2xl z-50 transform transition-transform duration-500 ${
+          drawerOpen ? "scale-100" : "scale-0"
+        } flex flex-col rounded-l-3xl overflow-hidden`}
       >
-        <div className="flex flex-col">
-          <span className="font-semibold text-lg">{partner.name}</span>
-          <span className="text-sm text-gray-500">{partner.location}</span>
+        {/* Drawer Header */}
+        <div className="flex justify-between items-center p-5 border-b border-gray-200 bg-white shadow-md">
+          <h2 className="text-2xl font-extrabold text-red-600 tracking-wide">
+            Assign Delivery Partner
+          </h2>
         </div>
-        <Bike size={20} className="text-red-500" />
+
+        {/* Drawer Content: Scrollable Partner List */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-white">
+          {/* Search Input */}
+          <div className="p-4 border-b">
+            <input
+              type="text"
+              placeholder="Search by name or location"
+              value={partnerSearch}
+              onChange={(e) => setPartnerSearch(e.target.value)}
+              className="w-full px-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-400"
+            />
+          </div>
+
+          {/* Partner List */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-white">
+            {filteredPartners.length === 0 ? (
+              <div className="text-center text-gray-400 mt-10">
+                No delivery partners found
+              </div>
+            ) : (
+              filteredPartners.map((partner) => (
+                <div
+                  key={partner.id}
+                  className="flex justify-between items-center p-4 bg-white rounded-2xl shadow-md hover:shadow-lg cursor-pointer transition-all duration-300 border border-red-100 hover:bg-red-50"
+                  onClick={() => assignPartner(partner)}
+                >
+                  <div className="flex flex-col">
+                    <span className="font-semibold text-lg">
+                      {partner.name}
+                    </span>
+                    <span className="text-sm text-gray-500">
+                      {partner.location}
+                    </span>
+                  </div>
+                  <Bike size={20} className="text-red-500" />
+                </div>
+              ))
+            )}
+          </div>
+        </div>
       </div>
-    ))
-  )}
-</div>
 
-  </div>
-</div>
-
-{/* Overlay */}
-<div
-  className={`fixed inset-0 bg-black/20 z-40 transition-opacity duration-500 ${
-    drawerOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
-  }`}
-  onClick={() => setDrawerOpen(false)}
-></div>
-
-
+      {/* Overlay */}
+      <div
+        className={`fixed inset-0 bg-black/20 z-40 transition-opacity duration-500 ${
+          drawerOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+        }`}
+        onClick={() => setDrawerOpen(false)}
+      ></div>
     </div>
   );
 };
