@@ -55,7 +55,7 @@ const NewOrders = () => {
       <div className="mb-6 bg-gradient-to-r from-sky-50 via-white to-sky-50 shadow-lg rounded-3xl p-6 flex flex-col">
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-extrabold text-sky-700">New Orders</h1>
-          <span className="text-sm font-medium text-sky-500 bg-sky-100 px-3 py-1 rounded-full">
+          <span className="text-sm font-medium text-sky-500 bg-sky-50 px-3 py-1 rounded-full">
             {orders.length} Orders
           </span>
         </div>

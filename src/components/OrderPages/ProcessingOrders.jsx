@@ -4,6 +4,10 @@ import Table from '../../components/ui/Table';
 import Button from '../../components/ui/Button';
 import { Bike } from 'lucide-react';
 import OrderDetailsModal from '../../components/OrderPages/OrderDetailsModal';
+import { useGetDeliveryPartnersQuery } from "../../api/services/deliveryPartnerApi";
+import ActionButton from '../../components/ui/ActionButton';
+import { Eye, CheckCircle, Truck } from 'lucide-react';
+
 
 const dummyOrders = [
   {
@@ -42,10 +46,40 @@ const dummyPartners = [
 ];
 
 const ProcessingOrders = () => {
+  const { data: partnerApi } = useGetDeliveryPartnersQuery();
+
+const [partnerSearch, setPartnerSearch] = useState("");
   const [orders, setOrders] = useState(dummyOrders);
   const [viewingOrder, setViewingOrder] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [currentOrder, setCurrentOrder] = useState(null);
+
+const deliveryPartners = React.useMemo(() => {
+  if (!partnerApi?.success) return [];
+
+  return partnerApi.data.map(p => ({
+    id: p._id,
+    name: p.name || "",
+    location: p.location || p.city || "", // 👈 future ready
+    isActive: p.isActive,
+  }));
+}, [partnerApi]);
+
+
+const filteredPartners = React.useMemo(() => {
+  const term = partnerSearch.toLowerCase().trim();
+  if (!term) return deliveryPartners;
+
+  return deliveryPartners.filter(p => {
+    const name = p.name.toLowerCase();
+    const location = p.location.toLowerCase(); // empty string safe
+
+    return name.includes(term) || location.includes(term);
+  });
+}, [deliveryPartners, partnerSearch]);
+
+
+
 
   const openDrawer = (order) => {
     setCurrentOrder(order);
@@ -67,6 +101,34 @@ const ProcessingOrders = () => {
     );
   };
 
+ const orderActions = [
+  {
+    key: "view",
+    label: "View Order",
+    icon: Eye,
+    color: "blue",           // changed from cyan → blue
+    onClick: (order) => setViewingOrder(order),
+  },
+  {
+    key: "ready",
+    label: "Mark Ready",
+    icon: CheckCircle,
+    color: "emerald",        // same as before
+    show: (order) => order.status === "preparing",
+    onClick: (order) => updateStatus(order, "ready"),
+  },
+  {
+    key: "out",
+    label: "Out for Delivery",
+    icon: Truck,
+    color: "amber",          // changed from purple → amber
+    show: (order) => order.status === "ready",
+    onClick: (order) => updateStatus(order, "out_for_delivery"),
+  },
+];
+
+
+
   const columns = [
     {
       header: 'Order ID',
@@ -81,27 +143,78 @@ const ProcessingOrders = () => {
         </div>
       ),
     },
-    {
-      header: 'Items',
-      render: order => (
-        <div className="flex flex-col gap-1 min-w-[180px]">
-          {order.items.slice(0, 2).map((item, idx) => (
-            <div key={idx} className="flex justify-between items-center text-xs">
-              <span title={item.name} className="truncate max-w-[140px]">{item.name}</span>
-              <span className="font-semibold bg-gray-100 px-2 py-0.5 rounded">{item.quantity}</span>
-            </div>
-          ))}
-          {order.items.length > 2 && (
-            <span
-              className="text-xs text-purple-600 font-medium cursor-pointer hover:underline"
-              onClick={() => setViewingOrder(order)}
-            >
-              +{order.items.length - 2} more
+   
+  {
+  header: 'Items',
+  render: order => (
+    <div className="relative group min-w-[180px]">
+      {/* Visible Items */}
+      <div className="flex flex-col gap-1">
+        {order.items.slice(0, 2).map((item, idx) => (
+          <div key={idx} className="flex justify-between items-center text-xs">
+            <span className="truncate max-w-[140px]" title={item.name}>
+              {item.name}
             </span>
-          )}
-        </div>
-      ),
-    },
+            <span className="font-semibold bg-gray-100 px-2 py-0.5 rounded">
+              {item.quantity}
+            </span>
+          </div>
+        ))}
+
+        {order.items.length > 2 && (
+          <span className="text-xs text-purple-600 font-medium cursor-pointer">
+            +{order.items.length - 2} more
+          </span>
+        )}
+      </div>
+
+      {/* Hover Popover */}
+{order.items.length > 2 && (
+  <div
+    className="
+      absolute
+      left-full
+      top-0
+      ml-[-200px]
+      z-[9999]
+      opacity-0
+      translate-x-2
+      pointer-events-none
+      transition-all
+      duration-300
+      ease-out
+      group-hover:opacity-100
+      group-hover:translate-x-0
+      group-hover:pointer-events-auto
+    "
+  >
+    <div className="bg-white shadow-2xl rounded-xl p-4 w-64 border border-purple-100">
+      <h4 className="text-sm font-bold text-purple-700 mb-2">
+        All Items
+      </h4>
+
+      <div className="space-y-2 max-h-48 overflow-y-auto">
+        {order.items.map((item, idx) => (
+          <div
+            key={idx}
+            className="flex justify-between items-center text-sm"
+          >
+            <span className="truncate">{item.name}</span>
+            <span className="bg-purple-100 text-purple-700 px-2 py-0.5 rounded text-xs font-semibold">
+              {item.quantity}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+)}
+
+
+    </div>
+  ),
+  },
+
     {
       header: 'Status',
       render: order => (
@@ -133,19 +246,19 @@ const ProcessingOrders = () => {
         </div>
       ),
     },
+    
     {
-      header: 'Actions',
-      render: order => (
-        <div className="flex gap-2">
-          <Button size="sm" variant="secondary" onClick={() => setViewingOrder(order)}>View</Button>
-          {order.status === 'preparing' && (
-            <Button size="sm" variant="success" onClick={() => updateStatus(order, 'ready')}>Mark Ready</Button>
-          )}
-          {order.status === 'ready' && (
-            <Button size="sm" variant="warning" onClick={() => updateStatus(order, 'out_for_delivery')}>Out for Delivery</Button>
-          )}
-        </div>
-      ),
+  header: 'Actions',
+  render: order => (
+    <ActionButton
+      item={order}
+      actions={orderActions}
+      maxVisible={2}
+      size="sm"
+    />
+  ),
+
+
     },
   ];
 
@@ -172,14 +285,18 @@ const ProcessingOrders = () => {
       {orders.length === 0 ? (
         <div className="text-center py-20 text-gray-400">No processing orders</div>
       ) : (
-        <div className="bg-gradient-to-r from-white to-gray-50 shadow-2xl rounded-xl p-6 overflow-x-auto">
-          <Table columns={columns} data={orders} />
-        </div>
+      <div className="bg-gradient-to-r from-white to-gray-50 shadow-2xl rounded-xl p-6">
+  <div className="overflow-x-auto">
+    <Table columns={columns} data={orders} />
+  </div>
+</div>
+
       )}
 
       {viewingOrder && (
         <OrderDetailsModal order={viewingOrder} onClose={() => setViewingOrder(null)} />
       )}
+
 
   <div
   className={`fixed top-0 right-0 h-full w-96 bg-white origin-top shadow-2xl z-50 transform transition-transform duration-500 ${
@@ -202,19 +319,40 @@ const ProcessingOrders = () => {
 
   {/* Drawer Content: Scrollable Partner List */}
   <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-white">
-    {dummyPartners.map(partner => (
+  {/* Search Input */}
+<div className="p-4 border-b">
+  <input
+    type="text"
+    placeholder="Search by name or location"
+    value={partnerSearch}
+    onChange={(e) => setPartnerSearch(e.target.value)}
+    className="w-full px-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-400"
+  />
+</div>
+
+{/* Partner List */}
+<div className="flex-1 overflow-y-auto p-4 space-y-4 bg-white">
+  {filteredPartners.length === 0 ? (
+    <div className="text-center text-gray-400 mt-10">
+      No delivery partners found
+    </div>
+  ) : (
+    filteredPartners.map(partner => (
       <div
         key={partner.id}
         className="flex justify-between items-center p-4 bg-white rounded-2xl shadow-md hover:shadow-lg cursor-pointer transition-all duration-300 border border-red-100 hover:bg-red-50"
         onClick={() => assignPartner(partner)}
       >
         <div className="flex flex-col">
-          <span className="font-semibold  text-lg">{partner.name}</span>
-          <span className="text-sm">{partner.location}</span>
+          <span className="font-semibold text-lg">{partner.name}</span>
+          <span className="text-sm text-gray-500">{partner.location}</span>
         </div>
-        <Bike size={20} className="" />
+        <Bike size={20} className="text-red-500" />
       </div>
-    ))}
+    ))
+  )}
+</div>
+
   </div>
 </div>
 
