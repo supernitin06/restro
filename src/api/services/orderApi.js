@@ -13,17 +13,26 @@ export const orderApi = baseApi.injectEndpoints({
     }),
 
     // ✅ Add this mutation
-assignDelivery: builder.mutation({
-  query: ({ orderId, partnerId }) => ({
-    url: `orders/${orderId}/assign-delivery`, // ✅ path matches
-    method: "POST",
-    body: { deliveryPartnerId: partnerId },  // ✅ body key must match backend
-  }),
-  invalidatesTags: ["Order"], // optional
-}),
+    assignDelivery: builder.mutation({
+      query: ({ orderId, partnerId }) => ({
+        url: `orders/${orderId}/assign-delivery`, // ✅ path matches
+        method: "POST",
+        body: { deliveryPartnerId: partnerId },  // ✅ body key must match backend
+      }),
+      invalidatesTags: ["Order"], // optional
+    }),
+
+    OrderStatusUpdate: builder.mutation({
+      query: ({ id, status }) => ({
+        url: `/admin/orders/${id}/admin-status`,
+        method: "PATCH",
+        body: { status },
+      }),
+      invalidatesTags: ["Order"],
+    }),
 
   }),
   overrideExisting: false,
 });
 
-export const { useGetOrdersQuery, useAssignDeliveryMutation } = orderApi;
+export const { useGetOrdersQuery, useAssignDeliveryMutation, useOrderStatusUpdateMutation } = orderApi;
