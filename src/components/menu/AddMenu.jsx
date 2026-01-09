@@ -9,7 +9,7 @@ import InputField from "../ui/InputField";
 import Textarea from "../ui/Textarea";
 // import Select from "../ui/Select";
 import Modal from "../ui/Modal";
-import { showSuccessAlert, showErrorAlert } from "../../utils/sweetAlert";
+import { showSuccessAlert, showErrorAlert, showPromiseToast } from "../../utils/toastAlert";
 import {
   useGetCategoriesQuery,
   useAddCategoryMutation,
@@ -159,47 +159,67 @@ const AddMenuItem = () => {
     if (!restaurantId) return showErrorAlert("Restaurant ID missing.");
 
     try {
-      const result = await addCategory({
-        restaurantId,
-        name: newCategoryName,
-        order: newCategoryOrder,
-      }).unwrap();
+      const result = await showPromiseToast(
+        addCategory({
+          restaurantId,
+          name: newCategoryName,
+          order: newCategoryOrder,
+        }).unwrap(),
+        {
+          loading: 'Adding category...',
+          success: 'Category added!',
+          error: (err) => err?.data?.message || "Failed to add category."
+        }
+      );
 
-      showSuccessAlert("Category added!");
       await refetchCategories();
-      setCategory(result._id);
+      if (result && result._id) {
+        setCategory(result._id);
+      }
       setNewCategoryName("");
       setShowAddCategory(false);
     } catch (err) {
-      showErrorAlert(err?.data?.message || "Failed to add category.");
+      console.error(err);
     }
   };
 
   const handleUpdateCategory = async () => {
     if (!newCategoryName.trim() || !editingCategory) return;
     try {
-      await updateCategory({
-        id: editingCategory._id,
-        payload: { name: newCategoryName, order: newCategoryOrder },
-      }).unwrap();
-      showSuccessAlert("Category updated!");
+      await showPromiseToast(
+        updateCategory({
+          id: editingCategory._id,
+          payload: { name: newCategoryName, order: newCategoryOrder },
+        }).unwrap(),
+        {
+          loading: 'Updating category...',
+          success: 'Category updated!',
+          error: "Failed to update category"
+        }
+      );
       await refetchCategories();
       setEditingCategory(null);
       setShowAddCategory(false);
     } catch (err) {
-      showErrorAlert("Failed to update category");
+      console.error(err);
     }
   };
 
   const handleDeleteCategory = async (id) => {
     if (!window.confirm("Delete this category?")) return;
     try {
-      await toggleCategory(id).unwrap();
-      showSuccessAlert("Category deleted!");
+      await showPromiseToast(
+        toggleCategory(id).unwrap(),
+        {
+          loading: 'Deleting category...',
+          success: 'Category deleted!',
+          error: 'Failed to delete category'
+        }
+      );
       await refetchCategories();
       if (category === id) setCategory(categories[0]?._id || "");
     } catch (err) {
-      showErrorAlert("Failed to delete category");
+      console.error(err);
     }
   };
 
@@ -232,30 +252,33 @@ const AddMenuItem = () => {
         imagePayload = await convertToBase64(imageFile);
       }
 
-      await addMenu({
-        restaurantId,
-        restaurant: restaurantId,
-        category,
-        name,
-        description,
-        basePrice: Number(price),
-        foodType,
-        isVeg,
-        tags,
-        isAvailable: available,
-        variants: variants.map(v => ({ name: v.name, price: Number(v.price) })),
-        addons: addons.map(a => ({ name: a.name, price: Number(a.price) })),
-        image: imagePayload,
-        altText,
-      }).unwrap();
+      await showPromiseToast(
+        addMenu({
+          restaurantId,
+          restaurant: restaurantId,
+          category,
+          name,
+          description,
+          basePrice: Number(price),
+          foodType,
+          isVeg,
+          tags,
+          isAvailable: available,
+          variants: variants.map(v => ({ name: v.name, price: Number(v.price) })),
+          addons: addons.map(a => ({ name: a.name, price: Number(a.price) })),
+          image: imagePayload,
+          altText,
+        }).unwrap(),
+        {
+          loading: 'Saving menu item...',
+          success: t("menuItemSaved"),
+          error: (err) => err?.data?.message || err?.data?.error || "Failed to save menu item"
+        }
+      );
 
-      showSuccessAlert(t("menuItemSaved"));
       navigate("/menu-management");
     } catch (err) {
       console.error("Add menu failed", err);
-      // ✅ Fix: Show specific validation error from server
-      const errorMessage = err?.data?.message || err?.data?.error || "Failed to save menu item";
-      showErrorAlert(errorMessage);
     }
   };
 

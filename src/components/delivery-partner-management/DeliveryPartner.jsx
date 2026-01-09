@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { showPromiseToast } from "../../utils/toastAlert";
 import { Phone, MapPin, Truck, Bike, Eye, Info, Edit } from "lucide-react";
 import DeliveryPartnerStatusBadge from "./DeliveryPartnerStatusBadge";
 import Button from "../ui/Button";
@@ -16,10 +17,17 @@ const DeliveryPartner = ({ partners, onViewDetails, onEdit, viewMode = 'grid' })
     const newIsActive = currentStatus !== "Active";
 
     try {
-      await updateDeliveryPartner({
-        id: partner.partnerId,
-        isActive: newIsActive,
-      }).unwrap();
+      await showPromiseToast(
+        updateDeliveryPartner({
+          id: partner.partnerId,
+          isActive: newIsActive,
+        }).unwrap(),
+        {
+          loading: 'Updating status...',
+          success: `Partner ${newIsActive ? 'activated' : 'deactivated'}!`,
+          error: 'Failed to update status'
+        }
+      );
     } catch (error) {
       console.error("Failed to update status:", error);
     }

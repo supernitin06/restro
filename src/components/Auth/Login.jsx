@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { showPromiseToast } from "../../utils/toastAlert";
 import restaurantImage from "../../assets/loginimage1.jpg";
 import grandmaLogo from "../../assets/grandma.webp";
 import { useLoginMutation } from "../../api/services/authapi";
@@ -49,7 +50,14 @@ const LoginForm = ({ role = "admin", onRoleChange }) => {
     };
 
     try {
-      const response = await login(payload).unwrap();
+      await showPromiseToast(
+        login(payload).unwrap(),
+        {
+          loading: 'Logging in...',
+          success: 'Login successful! Redirecting...',
+          error: (err) => err?.data?.message || err?.error || "Login failed"
+        }
+      );
       // Token is now handled in authapi onQueryStarted
       // optional: rememberMe logic
       if (formData.rememberMe) {
@@ -114,7 +122,7 @@ const LoginForm = ({ role = "admin", onRoleChange }) => {
                 <div style={styles.welcomeIcon}>👨‍🍳</div>
                 <h1 style={styles.title}>Welcome Back</h1>
               </div>
-             
+
             </div>
 
             {/* ROLE SWITCHER */}

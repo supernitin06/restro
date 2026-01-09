@@ -10,8 +10,29 @@ export const orderApi = baseApi.injectEndpoints({
       }),
       providesTags: ["Order"],
     }),
+
+   OrderKitchenStatus: builder.mutation({
+     query: (params = {}, partnerId) => ({
+       url: `orders/${params.id}/kitchen-status`,
+       method: "PATCH",
+       params,
+       partnerId,
+     }),
+     invalidatesTags: ["Order"],
+   }),
+
+   OrderStatusUpdate: builder.mutation({
+     query: (params = {}, status) => ({
+       url: `/admin/orders/${params.id}/admin-status`,
+       method: "PATCH",
+       params,
+       status,
+     }),
+     invalidatesTags: ["Order"],
+   }),
+
   }),
   overrideExisting: false,
 });
 
-export const { useGetOrdersQuery } = orderApi;
+export const { useGetOrdersQuery, useOrderKitchenStatusMutation, useOrderStatusUpdateMutation } = orderApi;

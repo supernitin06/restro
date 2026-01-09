@@ -11,7 +11,8 @@ import TrendingMenu from "../components/PageDashboard/TrendingMenu";
 import CustomerReviews from "../components/PageDashboard/CustomerReviews";
 import RecentActivity from "../components/PageDashboard/RecentActivity";
 import Footer from "../components/PageDashboard/Footer";
-import OrderSummaryCard from "../components/PageDashboard/OrderSummaryCard";
+import UpcomingOrders from "../components/PageDashboard/UpcomingOrders";
+import ConfirmedOrders from "../components/PageDashboard/ConfirmedOrders";
 
 const Dashboard = () => {
   // Dummy data for new cards
@@ -39,9 +40,9 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen page-background">
+    <div className="min-h-screen page">
       {/* Page Container */}
-      <div className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8 pt-6 pb-10 space-y-8">
+      <div className="mx-auto px-4 md:px-6 lg:px-8 pt-6 pb-10 space-y-8">
 
         {/* ================= HEADER ================= */}
         <div className="flex bg-primary flex-col md:flex-row justify-between items-start md:items-center bg-white dark:bg-gray-800 p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
@@ -96,14 +97,14 @@ const Dashboard = () => {
 
         {/* ================= UPCOMING & CONFIRMED ORDERS ================= */}
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <OrderSummaryCard
+          <UpcomingOrders
             title="Upcoming Orders"
             orders={upcomingOrders}
             icon={Clock}
             color="orange"
             type="upcoming"
           />
-          <OrderSummaryCard
+          <ConfirmedOrders
             title="Confirmed Orders"
             orders={confirmedOrders}
             icon={CheckCircle}
