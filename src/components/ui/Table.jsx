@@ -42,14 +42,14 @@ const Table = ({
 
       <div className="overflow-x-auto overflow-y-auto">
         <table className="min-w-full">
-          <thead className="bg-primary z-50 sticky top-0">
+          <thead className="bg-primary z-40 sticky top-0">
             <tr>
               {displayColumns.map((col, index) => (
                 <th
                   key={col.key || index}
                   className={`px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider ${
                     index === 0
-                      ? "sticky z-50 left-0 bg-primary "
+                      ? "sticky z-40 left-0 bg-primary "
                       : ""
                   }`}
                 >

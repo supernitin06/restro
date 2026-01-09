@@ -21,6 +21,7 @@ import {
   Circle,
   Menu,
   X,
+  Clock,
 } from "lucide-react";
 
 import Button from "../ui/Button";
@@ -67,12 +68,28 @@ const Sidebar = ({ theme = "dark" }) => {
       icon: Bike,
       path: "/delivery-partners",
     },
+  {
+  id: "orders",
+  label: "Orders",
+  path: "/orders",
+  icon: ShoppingBag,
+  hasDropdown: true,
+  subItems: [
     {
-      id: "orders",
-      label: "Orders",
-      icon: ShoppingBag,
-      path: "/orders",
+      id: "new-orders",
+      label: "New Orders",
+      icon: Clock,
+      path: "/orders/new",
     },
+    {
+      id: "processing-orders",
+      label: "Processing Orders",
+      icon: Bike,
+      path: "/orders/processing",
+    },
+  ],
+},
+
     {
       id:"menu_items",
       label:"Menu",

@@ -7,7 +7,6 @@ import ViewDetailsModal from "../components/restaurant/ViewDetailsModal";
 import EditRestaurantModal from "../components/restaurant/EditRestaurantModal";
 import Table from "../components/ui/Table";
 import Pagination from "../components/ui/Pagination";
-
 import {
   useGetRestaurantsQuery,
   useGetRestaurantByIdQuery,
@@ -23,51 +22,40 @@ function RestaurantManagement() {
     null,
     { skip: true } // skip initially
   );
-
   const [toggleStatus] = useToggleRestaurantStatusMutation();
   const [updateRestaurant] = useUpdateRestaurantMutation();
   const [deleteRestaurant] = useDeleteRestaurantMutation();
-
   // ===== State =====
   const [viewMode, setViewMode] = useState("grid");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
-
   const [selectedRestaurantId, setSelectedRestaurantId] = useState(null);
   const [editRestaurant, setEditRestaurant] = useState(null);
-
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
-
   // ===== Prepare restaurants =====
   const restaurants = Array.isArray(data?.data) ? data.data : [];
-
   // ===== Filtered Restaurants =====
   const filteredRestaurants = restaurants.filter((r) => {
     const matchesSearch = r.name?.toLowerCase().includes(searchTerm.toLowerCase());
     let matchesStatus = true;
-
     if (statusFilter === "Approved") {
       matchesStatus = r.isActive === true || r.isActive === "active";
     } else if (statusFilter === "Suspended") {
       matchesStatus = r.isActive === false || r.isActive === "suspended";
     }
-
     return matchesSearch && matchesStatus;
   });
-
   // ===== Reset page when search/status changes =====
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, statusFilter]);
-
   // ===== Pagination =====
   const totalPages = Math.ceil(filteredRestaurants.length / itemsPerPage);
   const paginatedRestaurants = filteredRestaurants.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
-
   // ===== Handlers =====
   const handleApprove = async (id) => {
     try {
@@ -77,7 +65,6 @@ function RestaurantManagement() {
       console.error("Approve failed", err);
     }
   };
-
   const handleSuspend = async (id) => {
     try {
       await toggleStatus(id).unwrap();
@@ -86,7 +73,6 @@ function RestaurantManagement() {
       console.error("Suspend failed", err);
     }
   };
-
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure?")) return;
     try {
@@ -96,7 +82,6 @@ function RestaurantManagement() {
       console.error("Delete failed", err);
     }
   };
-
   const handleUpdate = async () => {
     if (!editRestaurant) return;
     try {
@@ -114,11 +99,9 @@ function RestaurantManagement() {
       console.error("Update failed", err);
     }
   };
-
   const handleEdit = (restaurant) => setEditRestaurant({ ...restaurant });
   const handleView = (restaurant) => setSelectedRestaurantId(restaurant._id);
   const handleCloseModal = () => setSelectedRestaurantId(null);
-
   const restaurantColumns = [
     { header: "Name", key: "name" },
     { header: "Brand", key: "brandName" },
@@ -131,7 +114,6 @@ function RestaurantManagement() {
           : "Suspended",
     },
   ];
-
   const tableActions = [
     {
       key: "view",
@@ -155,7 +137,6 @@ function RestaurantManagement() {
       onClick: (item) => handleDelete(item._id || item.id),
     },
   ];
-
   const getStatusColor = (isActive) =>
     isActive
       ? "bg-green-100 text-green-800 border border-green-300"

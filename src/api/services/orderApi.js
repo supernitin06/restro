@@ -1,3 +1,4 @@
+// src/api/services/orderApi.js
 import { baseApi } from "./baseApi";
 
 export const orderApi = baseApi.injectEndpoints({
@@ -11,28 +12,18 @@ export const orderApi = baseApi.injectEndpoints({
       providesTags: ["Order"],
     }),
 
-   OrderKitchenStatus: builder.mutation({
-     query: (params = {}, partnerId) => ({
-       url: `orders/${params.id}/kitchen-status`,
-       method: "PATCH",
-       params,
-       partnerId,
-     }),
-     invalidatesTags: ["Order"],
-   }),
-
-   OrderStatusUpdate: builder.mutation({
-     query: (params = {}, status) => ({
-       url: `/admin/orders/${params.id}/admin-status`,
-       method: "PATCH",
-       params,
-       status,
-     }),
-     invalidatesTags: ["Order"],
-   }),
+    // ✅ Add this mutation
+assignDelivery: builder.mutation({
+  query: ({ orderId, partnerId }) => ({
+    url: `orders/${orderId}/assign-delivery`, // ✅ path matches
+    method: "POST",
+    body: { deliveryPartnerId: partnerId },  // ✅ body key must match backend
+  }),
+  invalidatesTags: ["Order"], // optional
+}),
 
   }),
   overrideExisting: false,
 });
 
-export const { useGetOrdersQuery, useOrderKitchenStatusMutation, useOrderStatusUpdateMutation } = orderApi;
+export const { useGetOrdersQuery, useAssignDeliveryMutation } = orderApi;

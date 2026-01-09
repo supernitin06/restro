@@ -75,14 +75,23 @@ const Orders = () => {
         phone: '',
         email: ''
       },
-      deliveryPartner: null, // Not provided in API
-      items: (apiOrder.items || []).map((item, idx) => ({
-        id: item.menuItem || item.itemId || idx,
-        name: item.name,
-        quantity: item.quantity,
-        price: item.price || item.finalItemPrice || 0,
-        image: '🍽️' // Placeholder emoji
-      })),
+     deliveryPartner: apiOrder.delivery?.partner
+  ? {
+      id: apiOrder.delivery.partner._id,
+      name: apiOrder.delivery.partner.name,
+      phone: apiOrder.delivery.partner.phone,
+      assignedAt: apiOrder.delivery.assignedAt
+    }
+  : null,
+
+items: (apiOrder.items || []).map((item, idx) => ({
+  id: item.menuItem || item.itemId || idx,
+  name: item.name,
+  quantity: item.quantity,
+  price: item.price || item.finalItemPrice || 0,
+  image: '🍽️' // Placeholder emoji
+})),
+
       subtotal: apiOrder.subtotal || apiOrder.price?.itemsTotal || 0,
       deliveryFee: apiOrder.deliveryCharge || apiOrder.price?.deliveryFee || 0,
       tax: apiOrder.tax || apiOrder.price?.tax || 0,
@@ -203,24 +212,40 @@ const Orders = () => {
         </div>
       )
     },
-    {
-      header: 'Items',
-      render: (order) => (
-        <div className="flex flex-col gap-1 min-w-[160px]">
-          {order.items.slice(0, 2).map((item, idx) => (
-            <div key={idx} className="flex justify-between items-center text-xs">
-              <span className="text-gray-700 dark:text-gray-300 truncate max-w-[120px]" title={item.name}>{item.name}</span>
-              <span className="font-semibold bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded text-gray-800 dark:text-gray-200">x{item.quantity}</span>
-            </div>
-          ))}
-          {order.items.length > 2 && (
-            <span className="text-xs text-primary font-medium cursor-pointer hover:underline" onClick={() => setViewingOrder(order)}>
-              +{order.items.length - 2} more items
-            </span>
-          )}
-        </div>
-      )
-    },
+    
+   {
+   header: 'Items',
+  render: (order) => (
+    <div className="flex flex-col gap-1 min-w-[120px]">
+      {order.items.slice(0, 2).map((item, idx) => (
+        <span key={idx} className="text-gray-700 dark:text-gray-300 text-xs truncate" title={item.name}>
+          {item.name}
+        </span>
+      ))}
+      {order.items.length > 2 && (
+        <span
+          className="text-xs text-primary font-medium cursor-pointer hover:underline"
+          onClick={() => setViewingOrder(order)}
+        >
+          +{order.items.length - 2} more
+        </span>
+      )}
+    </div>
+  ),
+},
+  {
+  header: 'Quantity',
+  render: (order) => (
+    <div className="flex flex-col gap-1 min-w-[60px]">
+      {order.items.slice(0, 2).map((item, idx) => (
+        <span key={idx} className="text-gray-800 dark:text-gray-200 text-xs">
+          {item.quantity}
+        </span>
+      ))}
+      {order.items.length > 2 && <span className="text-xs text-gray-500">{/* placeholder */}</span>}
+    </div>
+  ),
+},
     {
       header: 'Details',
       render: (order) => (
@@ -240,26 +265,51 @@ const Orders = () => {
       header: 'Status',
       render: (order) => getStatusBadge(order.status)
     },
-    {
-      header: 'Payment & Delivery',
-      render: (order) => (
-        <div>
-          <div className="flex items-center gap-1.5 text-sm font-bold text-gray-800 dark:text-gray-200">
-            ${order.total.toFixed(2)}
+{
+  header: 'Payment',
+  render: (order) => (
+    <div className="text-xs">
+      {/* Total Amount */}
+      <div className="flex items-center gap-1.5 text-sm font-bold text-gray-800 dark:text-gray-200">
+        ${order.total.toFixed(2)}
+      </div>
+
+      {/* Payment Method */}
+      <div className="text-xs text-gray-500 mt-1 flex items-center gap-1.5">
+        <CreditCard size={13} className="text-green-500" />
+        {order.paymentMethod}
+      </div>
+    </div>
+  )
+},
+{
+  header: 'Delivery Partner',
+  render: (order) => (
+    <div className="text-xs">
+      {order.deliveryPartner ? (
+        <div className="flex flex-col gap-0.5">
+          <div className="flex items-center gap-1.5">
+            <Bike size={13} className="text-purple-500" />
+            <span className="font-medium">{order.deliveryPartner.name}</span>
           </div>
-          <div className="text-xs text-gray-500 mt-1 flex items-center gap-1.5">
-            <CreditCard size={13} className="text-green-500" />
-            {order.paymentMethod}
+          <div className="flex items-center gap-2 ml-5">
+            <span className="text-gray-400">📞 {order.deliveryPartner.phone}</span>
+            <span className="text-gray-400">
+              🕒 Assigned: {new Date(order.deliveryPartner.assignedAt).toLocaleString()}
+            </span>
           </div>
-          {order.deliveryPartner && (
-            <div className="text-xs text-gray-500 mt-1 flex items-center gap-1.5">
-              <Bike size={13} className="text-purple-500" />
-              {order.deliveryPartner.name}
-            </div>
-          )}
         </div>
-      )
-    },
+      ) : (
+        <div className="flex items-center gap-1.5 text-red-500">
+          <Bike size={13} className="text-purple-500" />
+          Not Assigned
+        </div>
+      )}
+    </div>
+  )
+},
+
+
     {
       header: 'Actions',
       render: (order) => (
