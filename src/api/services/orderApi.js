@@ -24,7 +24,7 @@ export const orderApi = baseApi.injectEndpoints({
 
     OrderStatusUpdate: builder.mutation({
       query: ({ id, status }) => ({
-        url: `/admin/orders/${id}/admin-status`,
+        url: `admin/orders/${id}/admin-status`,
         method: "PATCH",
         body: { status },
       }),

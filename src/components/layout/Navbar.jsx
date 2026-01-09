@@ -1,9 +1,10 @@
+// src/components/Navbar/Navbar.jsx
 import React, { useState, useRef, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { data, useNavigate } from "react-router-dom";
-import { io } from "socket.io-client";
+import { useNavigate } from "react-router-dom";
 import { logout } from "../../api/services/authSlice";
 import { showSuccessAlert, showErrorAlert } from "../../utils/toastAlert";
+import { useSockets } from "../../context/SocketContext";
 
 import fallbackImg from "../../assets/fallback.png";
 
@@ -29,7 +30,14 @@ import CreateOfferModal from "./NavbarCom/CreateOfferModal";
 const Navbar = ({ toggleSidebar }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { user, authToken } = useSelector((state) => state.auth);
+  const { user } = useSelector((state) => state.auth);
+  const { ordersSocket } = useSockets(); // ✅ get ordersSocket from context
+  const {mainSocket} = useSockets();
+
+  const [notifications, setNotifications] = useState([]);
+  const [messages, setMessages] = useState([]);
+  const [gifts, setGifts] = useState([]);
+  const [isConnected, setIsConnected] = useState(false);
 
   const restaurantId = user?.restaurantId;
 
@@ -38,84 +46,36 @@ const Navbar = ({ toggleSidebar }) => {
   const messagesRef = useRef(null);
   const giftsRef = useRef(null);
 
-  const socketRef = useRef(null);
-
   const [openProfile, setOpenProfile] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isMessagesOpen, setIsMessagesOpen] = useState(false);
   const [isGiftsOpen, setIsGiftsOpen] = useState(false);
   const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
 
-  const [notifications, setNotifications] = useState([]);
-  const [messages, setMessages] = useState([]);
-  const [gifts, setGifts] = useState([]);
   /* =====================================================
-     SOCKET SETUP — CREATE ONCE
+     SOCKET EVENTS + ROOM JOIN
   ===================================================== */
   useEffect(() => {
-    if (!authToken) return;
-
-    socketRef.current = io("http://localhost:5004/orders", {
-      path: "/socket.io",
-      transports: ["websocket"],
-      auth: { token: authToken },
-      autoConnect: false,
-      reconnection: true,
-      reconnectionAttempts: 5,
-      reconnectionDelay: 1000,
-    });
-
-    socketRef.current.on("WELCOME", (data) => {
-      console.log("welcome ", data);
-    });
-
-    socketRef.current.emit("connected_successful", "hello");
-
-    return () => {
-      socketRef.current?.disconnect();
-      socketRef.current = null;
-    };
-  }, [authToken]);
-
-  /* =====================================================
-     CONNECT + JOIN ROOM
-  ===================================================== */
-  useEffect(() => {
-    if (!socketRef.current || !restaurantId) return;
-
-    socketRef.current.connect();
+    if (!ordersSocket || !restaurantId) return;
 
     const handleConnect = () => {
-      console.log("✅ Socket connected:", socketRef.current.id);
-      if (restaurantId) {
-        console.log("📢 Joining Room ID:", restaurantId);
-        socketRef.current.emit("JOIN_RESTAURANT_ROOM", { restaurantId });
-      } else {
-        console.warn("⚠️ No Restaurant ID found to join room.");
-      }
-      socketRef.current.on("JOINED_RESTAURANT_ROOM", (data) => {
-        console.log("join_restaurant_room", data);
-      });
+      console.log("✅ Orders socket connected:", ordersSocket.id);
+      setIsConnected(true);
+      ordersSocket.emit("JOIN_RESTAURANT_ROOM", { restaurantId });
     };
 
-    socketRef.current.on("connect", handleConnect);
-
-    return () => {
-      socketRef.current?.off("connect", handleConnect);
+    const handlemainConnect = () => {
+      console.log("✅ Main socket connected:", mainSocket.id);
     };
-  }, [restaurantId]);
 
-  /* =====================================================
-     SOCKET EVENTS (ONCE)
-  ===================================================== */
-  useEffect(() => {
-    if (!socketRef.current) return;
+    const handleDisconnect = (reason) => {
+      console.log("❌ Orders socket disconnected:", reason);
+      setIsConnected(false);
+    };
 
     const handleNewOrder = (data) => {
       showSuccessAlert(`New Order #${data.customOrderId} Accepted`);
-      console.log("new_order", data);
       setNotifications((prev) => [
         {
           id: Date.now(),
@@ -132,32 +92,25 @@ const Navbar = ({ toggleSidebar }) => {
     const handleError = (data) => {
       showErrorAlert(data?.message || "Socket error");
     };
-    socketRef.current.on("NEW_ORDER", handleNewOrder);
-    socketRef.current.on("ERROR", handleError);
+
+    // Attach listeners
+    ordersSocket.on("connect", handleConnect);
+    mainSocket.on("connect", handlemainConnect);
+
+    ordersSocket.on("disconnect", handleDisconnect);
+    ordersSocket.on("NEW_ORDER", handleNewOrder);
+    ordersSocket.on("ERROR", handleError);
+
+    // If already connected (hot reload)
+    if (ordersSocket.connected) handleConnect();
 
     return () => {
-      socketRef.current?.off("NEW_ORDER", handleNewOrder);
-      socketRef.current?.off("ERROR", handleError);
+      ordersSocket.off("connect", handleConnect);
+      ordersSocket.off("disconnect", handleDisconnect);
+      ordersSocket.off("NEW_ORDER", handleNewOrder);
+      ordersSocket.off("ERROR", handleError);
     };
-  }, []);
-
-  /* =====================================================
-     REJOIN ROOM ON RECONNECT
-  ===================================================== */
-  useEffect(() => {
-    if (!socketRef.current || !restaurantId) return;
-
-    const handleReconnect = () => {
-      console.log("🔄 Reconnected → Rejoining room");
-      socketRef.current.emit("JOIN_RESTAURANT_ROOM", { restaurantId });
-    };
-
-    socketRef.current.on("reconnect", handleReconnect);
-
-    return () => {
-      socketRef.current?.off("reconnect", handleReconnect);
-    };
-  }, [restaurantId]);
+  }, [ordersSocket, restaurantId]);
 
   /* =====================================================
      CLICK OUTSIDE HANDLER
@@ -189,7 +142,6 @@ const Navbar = ({ toggleSidebar }) => {
   return (
     <div className="sticky top-0 z-40 w-full backdrop-blur bg-white/80 dark:bg-gray-900/80 border-b">
       <div className="px-6 py-4 flex items-center justify-between gap-4">
-
         {/* LEFT */}
         <div className="flex items-center gap-4 flex-1">
           <button onClick={toggleSidebar} className="lg:hidden p-2 rounded-lg">
@@ -276,7 +228,6 @@ const Navbar = ({ toggleSidebar }) => {
 };
 
 /* ================= SMALL COMPONENTS ================= */
-
 const IconButton = ({ icon, count, onClick }) => (
   <button
     onClick={onClick}
@@ -291,7 +242,6 @@ const IconButton = ({ icon, count, onClick }) => (
 
 const AdminProfilePopup = ({ user, handleLogout, handleSettings }) => (
   <div className="absolute right-0 mt-4 w-80 rounded-3xl bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border border-gray-100 dark:border-gray-800 shadow-2xl overflow-hidden ring-1 ring-black/5 animate-in fade-in zoom-in-95 duration-200 origin-top-right z-50">
-
     {/* Header Section */}
     <div className="relative p-6 pb-8 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent">
       <div className="flex items-center gap-4">
