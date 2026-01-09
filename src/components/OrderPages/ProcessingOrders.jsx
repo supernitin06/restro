@@ -75,11 +75,11 @@ const ProcessingOrders = () => {
 
     try {
       await assignDeliveryApi({
-        orderId: currentOrder._id, // backend ID
+        orderId: currentOrder._id, // must be backend ID
         partnerId: partner.id,
       }).unwrap();
 
-      // Update local state
+      // Update frontend state
       setOrders((prev) =>
         prev.map((o) =>
           o._id === currentOrder._id ? { ...o, delivery: partner } : o
@@ -90,12 +90,9 @@ const ProcessingOrders = () => {
       setCurrentOrder(null);
     } catch (err) {
       console.error("Failed to assign delivery", err);
-      alert(
-        err?.data?.message ||
-          "Failed to assign delivery partner. Please try again."
-      );
     }
   };
+
   const updateStatus = (order, newStatus) => {
     setOrders((prev) =>
       prev.map((o) => (o.id === order.id ? { ...o, status: newStatus } : o))
