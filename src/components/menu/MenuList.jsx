@@ -2,8 +2,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { Check, Star, Edit, Trash2, ChevronDown, ChevronUp, ImageOff, X, Package } from "lucide-react";
 import EditMenuModal from "./EditMenuModal";
-import { showConfirmAlert } from "../../utils/sweetAlert";
-import { showSuccessAlert, showErrorAlert } from "../../utils/sweetAlert";
+import { showConfirmAlert, showPromiseToast } from "../../utils/toastAlert";
 
 import Button from "../ui/Button";
 import Table from "../ui/Table";
@@ -47,13 +46,15 @@ const MenuList = ({ menus, isLoading, isError, error, searchTerm = '', statusFil
   const handleDelete = React.useCallback(async (itemId) => {
     const result = await showConfirmAlert("Are you sure you want to delete this item?", "Delete", "Cancel");
     if (!result.isConfirmed) return;
-    try {
-      await deleteMenu(itemId).unwrap();
-      showSuccessAlert("Item deleted successfully.");
-    } catch (err) {
-      showErrorAlert("Failed to delete item.");
-      console.error("Delete failed", err);
-    }
+
+    await showPromiseToast(
+      deleteMenu(itemId).unwrap(),
+      {
+        loading: 'Deleting item...',
+        success: 'Item deleted successfully.',
+        error: 'Failed to delete item.'
+      }
+    );
   }, [deleteMenu]);
 
   const handleEditSave = React.useCallback(async (updatedItem) => {
@@ -300,8 +301,8 @@ const MenuList = ({ menus, isLoading, isError, error, searchTerm = '', statusFil
                                 <div className="mt-4 flex items-center justify-between">
                                   <div className="flex items-center gap-3">
                                     <span className={`text-xs font-bold px-2.5 py-1 rounded-md border ${item.available
-                                        ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:border-green-800'
-                                        : 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:border-red-800'
+                                      ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:border-green-800'
+                                      : 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:border-red-800'
                                       }`}>
                                       {item.available ? 'Available' : 'Unavailable'}
                                     </span>

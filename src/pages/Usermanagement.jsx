@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from "react";
+import { showPromiseToast } from "../utils/toastAlert";
 import FiltersBar from "../components/ui/UserFilters";
 import UserModal from "../components/users/UserModal";
 import UserOrdersModal from "../components/users/UserOrdersModal";
@@ -98,12 +99,19 @@ const UserManagement = () => {
   const inactiveUsers = users.filter(u => u.isBlocked).length;
 
   // -------------------- Handlers --------------------
-  const handleBlockToggle = (user) => {
+  const handleBlockToggle = async (user) => {
     console.log("user", user);
-    updateUserBlock({
-      id: user._id,
-      body: { isBlocked: !user.isBlocked },
-    });
+    await showPromiseToast(
+      updateUserBlock({
+        id: user._id,
+        body: { isBlocked: !user.isBlocked },
+      }).unwrap(),
+      {
+        loading: 'Updating user status...',
+        success: `User ${!user.isBlocked ? 'blocked' : 'unblocked'} successfully!`,
+        error: 'Failed to update user status'
+      }
+    );
   };
 
   const handleActiveToggle = (user) => {

@@ -57,7 +57,7 @@ const RevenueChart = () => {
       </div>
 
       <div className="h-64">
-        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={undefined} aspect={undefined}>
+        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
           <LineChart data={data}>
             <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
             <XAxis

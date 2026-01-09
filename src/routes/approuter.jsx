@@ -51,12 +51,7 @@ const AppRouter = createBrowserRouter(
     {
       element: <ProtectedRoute />,
       errorElement: <ErrorPage />,
-      children : [
-    {
-      path: "/",
-      element: <Layout />,
-      loader: generalLoader,
-      errorElement: <ErrorPage />,
+      // hydrateFallbackElement: <CookingLoader />,
       children: [
         {
           index: true,
@@ -110,120 +105,144 @@ const AppRouter = createBrowserRouter(
         {
           path: "menu-management",
           loader: generalLoader,
+          errorElement: <ErrorPage />,
           children: [
             {
               index: true,
-              element: <MenuManagement />,
+              element: <Dashboard />,
               loader: generalLoader,
             },
             {
-              path: "add",
-              element: <AddMenu />,
+              path: "users",
+              element: <UserManagement />,
               loader: generalLoader,
-            }
-          ]
-        },
-        {
-          path: "settings",
-          element: <Settings />,
-          loader: generalLoader,
-        },
+            },
+            {
+              path: "restaurants",
+              element: <RestaurantManagement />,
+              loader: generalLoader,
+            },
+            {
+              path: "delivery-settings",
+              element: <DeliverySettings />,
+              loader: generalLoader,
+            },
+            {
+              path: "delivery-partners",
+              element: <DeliveryPartnerManagement />,
+              loader: generalLoader,
+            },
+            {
+              path: "orders",
+              element: <Orders />,
+              loader: generalLoader,
+            },
+            {
+              path: "menu-management",
+              loader: generalLoader,
+              children: [
+                {
+                  index: true,
+                  element: <MenuManagement />,
+                  loader: generalLoader,
+                },
+                {
+                  path: "add",
+                  element: <AddMenu />,
+                  loader: generalLoader,
+                }
+              ]
+            },
+            {
+              path: "settings",
+              element: <Settings />,
+              loader: generalLoader,
+            },
 
-        {
-          path: "support-tickets",
-          element: <SupportManagement />,
-          loader: generalLoader,
-        },
-        {
-          path: "reviews",
-          element: <CustomerReviewsPage />,
-          loader: generalLoader,
-        },
-        /* 💳 PAYMENTS (nested inside Layout) */
-        {
-          path: "payments",
-          loader: generalLoader,
-          children: [
             {
-              path: "dashboard",
-              element: <PaymentDashboard />,
+              path: "support-tickets",
+              element: <SupportManagement />,
               loader: generalLoader,
             },
             {
-              path: "transactions",
-              element: <Transactions />,
+              path: "reviews",
+              element: <CustomerReviewsPage />,
               loader: generalLoader,
             },
+            /* 💳 PAYMENTS (nested inside Layout) */
             {
-              path: "transactions/:id",
-              element: <TransactionDetails />,
+              path: "payments",
               loader: generalLoader,
+              children: [
+                {
+                  path: "dashboard",
+                  element: <PaymentDashboard />,
+                  loader: generalLoader,
+                },
+                {
+                  path: "transactions",
+                  element: <Transactions />,
+                  loader: generalLoader,
+                },
+                {
+                  path: "transactions/:id",
+                  element: <TransactionDetails />,
+                  loader: generalLoader,
+                },
+                {
+                  path: "refunds",
+                  element: <Refunds />,
+                  loader: generalLoader,
+                },
+                {
+                  path: "invoice",
+                  element: <Invoice />,
+                  loader: generalLoader,
+                },
+                {
+                  path: "details",
+                  element: <TransactionDetails />,
+                  loader: generalLoader,
+                }
+              ],
             },
+
             {
-              path: "refunds",
-              element: <Refunds />,
+              path: "offers",
+              element: <OffersManagement />,
               loader: generalLoader,
+
             },
+
+
             {
-              path: "invoice",
-              element: <Invoice />,
+              path: "sub-admin",
               loader: generalLoader,
+              children: [
+                {
+                  index: true, // /sub-admin
+                  element: <SubAdmin />,
+                  loader: generalLoader,
+                },
+                {
+                  path: "create", // /sub-admin/create
+                  element: <CreateAdmin />,
+                  loader: generalLoader,
+                },
+                {
+                  path: "assign", // /sub-admin/assign
+                  element: <AssignAdmin />,
+                  loader: generalLoader,
+                },
+              ],
             },
-            {
-              path: "details",
-              element: <TransactionDetails />,
-              loader: generalLoader,
-            }
+
           ],
         },
-
-        {
-          path: "offers",
-          element: <OffersManagement />,
-          loader: generalLoader,
-
-        },
-
-
-        {
-          path: "sub-admin",
-          loader: generalLoader,
-          children: [
-            {
-              index: true, // /sub-admin
-              element: <SubAdmin />,
-              loader: generalLoader,
-            },
-            {
-              path: "create", // /sub-admin/create
-              element: <CreateAdmin />,
-              loader: generalLoader,
-            },
-            {
-              path: "assign", // /sub-admin/assign
-              element: <AssignAdmin />,
-              loader: generalLoader,
-            },
-          ],
-        },
-
       ],
     },
-   ],
-  },
 
-  ],
-  {
-    future: {
-      v7_startTransition: true,
-      v7_relativeSplatPath: true,
-      v7_fetcherPersist: true,
-      v7_normalizeFormMethod: true,
-      v7_partialHydration: true,
-      v7_skipActionErrorRevalidation: true,
-    },
-  }
-  
+  ]
 );
 
 export default AppRouter;

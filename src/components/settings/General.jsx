@@ -12,7 +12,7 @@ const General = () => {
           Basic restaurant and website configuration
         </p>
       </div>
-
+      
       {/* Form */}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-8">
@@ -22,7 +22,7 @@ const General = () => {
           placeholder="Enter restaurant name"
           required
         />
-
+        
         <InputField
           label="Website Title"
           name="websiteTitle"

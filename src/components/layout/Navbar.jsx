@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
-
+import { data, useNavigate } from "react-router-dom";
+import { io } from "socket.io-client";
 import { logout } from "../../api/services/authSlice";
+import { showSuccessAlert, showErrorAlert } from "../../utils/toastAlert";
 
 import fallbackImg from "../../assets/fallback.png";
 
@@ -28,12 +29,16 @@ import CreateOfferModal from "./NavbarCom/CreateOfferModal";
 const Navbar = ({ toggleSidebar }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { user } = useSelector((state) => state.auth);
+  const { user, authToken } = useSelector((state) => state.auth);
+
+  const restaurantId = user?.restaurantId;
 
   const profileRef = useRef(null);
   const notificationRef = useRef(null);
   const messagesRef = useRef(null);
   const giftsRef = useRef(null);
+
+  const socketRef = useRef(null);
 
   const [openProfile, setOpenProfile] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -46,53 +51,137 @@ const Navbar = ({ toggleSidebar }) => {
   const [notifications, setNotifications] = useState([]);
   const [messages, setMessages] = useState([]);
   const [gifts, setGifts] = useState([]);
+  /* =====================================================
+     SOCKET SETUP — CREATE ONCE
+  ===================================================== */
+  useEffect(() => {
+    if (!authToken) return;
 
-  // /* ---------------- SOCKET LISTENERS ---------------- */
-  // useEffect(() => {
-  //   if (!user) return;
+    socketRef.current = io("http://localhost:5004/orders", {
+      path: "/socket.io",
+      transports: ["websocket"],
+      auth: { token: authToken },
+      autoConnect: false,
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
+    });
 
-  //   socket.connect();
-  //   socket.emit("register-user", { userId: user._id });
+    socketRef.current.on("WELCOME", (data) => {
+      console.log("welcome ", data);
+    });
 
-  //   socket.on("notification", (data) => {
-  //     setNotifications((prev) => [data, ...prev]);
-  //   });
+    socketRef.current.emit("connected_successful", "hello");
 
-  //   socket.on("message", (data) => {
-  //     setMessages((prev) => [data, ...prev]);
-  //   });
+    return () => {
+      socketRef.current?.disconnect();
+      socketRef.current = null;
+    };
+  }, [authToken]);
 
-  //   return () => {
-  //     socket.off("notification");
-  //     socket.off("message");
-  //   };
-  // }, [user]);
+  /* =====================================================
+     CONNECT + JOIN ROOM
+  ===================================================== */
+  useEffect(() => {
+    if (!socketRef.current || !restaurantId) return;
 
-  /* ---------------- CLICK OUTSIDE ---------------- */
+    socketRef.current.connect();
+
+    const handleConnect = () => {
+      console.log("✅ Socket connected:", socketRef.current.id);
+      if (restaurantId) {
+        console.log("📢 Joining Room ID:", restaurantId);
+        socketRef.current.emit("JOIN_RESTAURANT_ROOM", { restaurantId });
+      } else {
+        console.warn("⚠️ No Restaurant ID found to join room.");
+      }
+      socketRef.current.on("JOINED_RESTAURANT_ROOM", (data) => {
+        console.log("join_restaurant_room", data);
+      });
+    };
+
+    socketRef.current.on("connect", handleConnect);
+
+    return () => {
+      socketRef.current?.off("connect", handleConnect);
+    };
+  }, [restaurantId]);
+
+  /* =====================================================
+     SOCKET EVENTS (ONCE)
+  ===================================================== */
+  useEffect(() => {
+    if (!socketRef.current) return;
+
+    const handleNewOrder = (data) => {
+      showSuccessAlert(`New Order #${data.customOrderId} Accepted`);
+      console.log("new_order", data);
+      setNotifications((prev) => [
+        {
+          id: Date.now(),
+          title: "New Order",
+          message: `Order #${data.customOrderId} has been accepted.`,
+          type: "success",
+          read: false,
+          time: new Date().toISOString(),
+        },
+        ...prev,
+      ]);
+    };
+
+    const handleError = (data) => {
+      showErrorAlert(data?.message || "Socket error");
+    };
+    socketRef.current.on("NEW_ORDER", handleNewOrder);
+    socketRef.current.on("ERROR", handleError);
+
+    return () => {
+      socketRef.current?.off("NEW_ORDER", handleNewOrder);
+      socketRef.current?.off("ERROR", handleError);
+    };
+  }, []);
+
+  /* =====================================================
+     REJOIN ROOM ON RECONNECT
+  ===================================================== */
+  useEffect(() => {
+    if (!socketRef.current || !restaurantId) return;
+
+    const handleReconnect = () => {
+      console.log("🔄 Reconnected → Rejoining room");
+      socketRef.current.emit("JOIN_RESTAURANT_ROOM", { restaurantId });
+    };
+
+    socketRef.current.on("reconnect", handleReconnect);
+
+    return () => {
+      socketRef.current?.off("reconnect", handleReconnect);
+    };
+  }, [restaurantId]);
+
+  /* =====================================================
+     CLICK OUTSIDE HANDLER
+  ===================================================== */
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (profileRef.current && !profileRef.current.contains(e.target)) {
+      if (profileRef.current && !profileRef.current.contains(e.target))
         setOpenProfile(false);
-      }
-      if (notificationRef.current && !notificationRef.current.contains(e.target)) {
+      if (notificationRef.current && !notificationRef.current.contains(e.target))
         setIsNotificationsOpen(false);
-      }
-      if (messagesRef.current && !messagesRef.current.contains(e.target)) {
+      if (messagesRef.current && !messagesRef.current.contains(e.target))
         setIsMessagesOpen(false);
-      }
-      if (giftsRef.current && !giftsRef.current.contains(e.target)) {
+      if (giftsRef.current && !giftsRef.current.contains(e.target))
         setIsGiftsOpen(false);
-      }
     };
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  /* ---------------- ACTIONS ---------------- */
-  const handleLogout = () => {
-    dispatch(logout());
-  };
-
+  /* =====================================================
+     ACTIONS
+  ===================================================== */
+  const handleLogout = () => dispatch(logout());
   const handleSettings = () => navigate("/settings");
 
   if (!user) return null;
@@ -122,7 +211,6 @@ const Navbar = ({ toggleSidebar }) => {
         <div className="flex items-center gap-3">
           <ThemeToggle />
 
-          {/* Notifications */}
           <div ref={notificationRef} className="relative">
             <IconButton
               icon={<Bell />}
@@ -136,20 +224,15 @@ const Navbar = ({ toggleSidebar }) => {
             />
           </div>
 
-          {/* Messages */}
           <div ref={messagesRef} className="relative">
             <IconButton
               icon={<MessageSquare />}
               count={messages.filter((m) => m.unread).length}
               onClick={() => setIsMessagesOpen(!isMessagesOpen)}
             />
-            <MessagesDropdown
-              isOpen={isMessagesOpen}
-              messages={messages}
-            />
+            <MessagesDropdown isOpen={isMessagesOpen} messages={messages} />
           </div>
 
-          {/* Gifts */}
           <div ref={giftsRef} className="relative">
             <IconButton
               icon={<Gift />}
@@ -165,18 +248,13 @@ const Navbar = ({ toggleSidebar }) => {
 
           <div className="h-8 w-px bg-gray-300 mx-2" />
 
-          {/* PROFILE */}
           <div ref={profileRef} className="relative">
-            <div
+            <img
               onClick={() => setOpenProfile(!openProfile)}
-              className="flex items-center gap-3 cursor-pointer"
-            >
-              <img
-                src={user.avatar || fallbackImg}
-                className="w-10 h-10 rounded-full border"
-                alt={user.name}
-              />
-            </div>
+              src={user.avatar || fallbackImg}
+              className="w-10 h-10 rounded-full border cursor-pointer"
+              alt={user.name}
+            />
 
             {openProfile && (
               <AdminProfilePopup
@@ -197,16 +275,16 @@ const Navbar = ({ toggleSidebar }) => {
   );
 };
 
-/* ---------------- SMALL COMPONENTS ---------------- */
+/* ================= SMALL COMPONENTS ================= */
 
 const IconButton = ({ icon, count, onClick }) => (
   <button
     onClick={onClick}
-    className="relative p-2.5 rounded-xl text-gray-500 hover:text-primary hover:bg-primary/10 transition-all duration-200"
+    className="relative p-2.5 rounded-xl hover:bg-primary/10"
   >
     {React.cloneElement(icon, { className: "w-5 h-5" })}
     {count > 0 && (
-      <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full ring-2 ring-white dark:ring-gray-900 animate-pulse" />
+      <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full" />
     )}
   </button>
 );
