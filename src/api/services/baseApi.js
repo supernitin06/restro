@@ -4,8 +4,8 @@ import { logout } from "../services/authSlice";
 
 /* ---------------- AXIOS INSTANCE ---------------- */
 const axiosInstance = axios.create({
-  baseURL: "https://resto-grandma.onrender.com/api/v1/",
-  // baseURL: "http://192.168.1.108:5004/api/v1/",
+  // baseURL: "https://resto-grandma.onrender.com/api/v1/",
+  baseURL: "http://192.168.1.108:5004/api/v1/",
 // 
   headers: {
     "Content-Type": "application/json",
@@ -15,7 +15,7 @@ const axiosInstance = axios.create({
 /* ---------------- AXIOS BASE QUERY ---------------- */
 const axiosBaseQuery =
   () =>
-  async ({ url, method, data, params, headers }, api) => {
+  async ({ url, method, data, body, params, headers }, api) => {
     try {
       const state = api.getState();
       const token = state?.auth?.authToken;

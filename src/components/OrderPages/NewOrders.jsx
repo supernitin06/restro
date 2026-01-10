@@ -3,73 +3,34 @@ import { MapPin } from "lucide-react";
 import Button from "../../components/ui/Button";
 import { useSockets } from "../../context/SocketContext";
 import { showSuccessAlert, showErrorAlert } from "../../utils/toastAlert";
-import { useUpdateOrderStatusMutation } from "../../api/services/orderApi";
-
-const STORAGE_KEY = "NEW_ORDERS";
+import { useUpdateOrderStatusMutation, useGetOrdersQuery } from "../../api/services/orderApi";
 
 const NewOrders = () => {
   const { ordersSocket } = useSockets();
   const [updateStatus] = useUpdateOrderStatusMutation();
-
-  const [orders, setOrders] = useState(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      console.log("Loaded orders from storage:", stored);
-      return stored ? JSON.parse(stored) : [];
-    } catch {
-      return [];
-    }
-  });
+  const { data, refetch } = useGetOrdersQuery({ status: 'PLACED' });
+  const orders = data?.data || [];
 
   const [processingOrderId, setProcessingOrderId] = useState(null);
 
-  const saveOrders = (updatedOrders) => {
-    setOrders(updatedOrders);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedOrders));
-  };
-
-  // Listen to new orders from socket
+  // Listen to new orders from socket and refetch
   useEffect(() => {
     if (!ordersSocket) return;
 
     const handleNewOrder = (payload) => {
-      const orderData = payload?.data || payload;
-
-      if (!orderData?.orderId) return; // skip invalid
-
-      const newOrder = {
-        ...orderData,
-        orderId: orderData.orderId, // Unique id for API and key
-        customOrderId: orderData.customOrderId || orderData.orderId, // Display id
-        total: orderData.price?.grandTotal || 0,
-        customer: orderData.deliveryAddress,
-        items: orderData.items?.map((item) => ({
-          name: item.name,
-          quantity: item.quantity,
-        })),
-        location: orderData.deliveryAddress?.addressLine,
-        status: orderData.status?.toLowerCase(),
-      };
-
-      setOrders((prev) => {
-        const exists = prev.some((o) => o.orderId === orderData.orderId);
-        if (exists) return prev;
-
-        const updated = [newOrder, ...prev];
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-        return updated;
-      });
-
-      showSuccessAlert(`New Order: ${orderData.orderId}`);
+      console.log("🆕 NEW_ORDER payload:", payload);
+      refetch(); // Refetch orders to include new ones
     };
 
     ordersSocket.on("NEW_ORDER", handleNewOrder);
     return () => ordersSocket.off("NEW_ORDER", handleNewOrder);
-  }, [ordersSocket]);
+  }, [ordersSocket, refetch]);
 
   // Handle accept/reject
   const handleUpdateStatus = async (orderId, statusInput) => {
+    console.log("handleUpdateStatus called with orderId:", orderId, "statusInput:", statusInput);
     if (!orderId) {
+      console.log("Order ID missing!");
       showErrorAlert("Order ID missing!");
       return;
     }
@@ -77,33 +38,36 @@ const NewOrders = () => {
     // 1️⃣ Prepare Validation Formats
     const apiStatus = statusInput.toUpperCase(); // Backend expects: "ACCEPTED", "REJECTED"
     const uiStatus = statusInput.toLowerCase();  // UI checks: "accepted", "rejected"
+    console.log("apiStatus:", apiStatus, "uiStatus:", uiStatus);
     
     try {
       setProcessingOrderId(orderId);
       
       // 2️⃣ Send UPPERCASE to Backend
+      console.log("Calling updateStatus API with id:", orderId, "status:", apiStatus);
       await updateStatus({ id: orderId, status: apiStatus }).unwrap();
+      console.log("API call successful");
 
-      // 3️⃣ Update Local State with lowercase (to match UI checks)
-      const updatedOrders = orders.map((order) =>
-        order.orderId === orderId ? { ...order, status: uiStatus } : order
-      );
-      saveOrders(updatedOrders);
+      // Refetch to update the list (accepted orders will be removed)
+      refetch();
+      console.log("Refetched orders after status update");
 
       showSuccessAlert(
-        status === "ACCEPTED" ? "Order Accepted" : "Order Rejected"
+        uiStatus === "accepted" ? "Order Accepted" : "Order Rejected"
       );
     } catch (error) {
       console.error("ORDER STATUS ERROR:", error);
       showErrorAlert(error?.data?.message || "Failed to update order");
     } finally {
       setProcessingOrderId(null);
+      console.log("Processing completed for orderId:", orderId);
     }
   };
 
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6">New Orders ({orders.length})</h1>
+      {console.log("Rendering orders:", orders)}
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {orders.map((order) => (
