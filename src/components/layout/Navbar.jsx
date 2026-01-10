@@ -5,9 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { logout } from "../../api/services/authSlice";
 import { showSuccessAlert, showErrorAlert } from "../../utils/toastAlert";
 import { useSockets } from "../../context/SocketContext";
-
 import fallbackImg from "../../assets/fallback.png";
-
 import {
   Bell,
   MessageSquare,
@@ -28,6 +26,7 @@ import GiftsDropdown from "./NavbarCom/GiftsDropdown";
 import CreateOfferModal from "./NavbarCom/CreateOfferModal";
 
 const Navbar = ({ toggleSidebar }) => {
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
@@ -38,7 +37,6 @@ const Navbar = ({ toggleSidebar }) => {
   const [messages, setMessages] = useState([]);
   const [gifts, setGifts] = useState([]);
   const [isConnected, setIsConnected] = useState(false);
-
   const restaurantId = user?.restaurantId;
 
   const profileRef = useRef(null);
@@ -75,6 +73,7 @@ const Navbar = ({ toggleSidebar }) => {
     };
 
     const handleNewOrder = (data) => {
+      console.log("🆕 NEW_ORDER received:", data);
       showSuccessAlert(`New Order #${data.customOrderId} Accepted`);
       setNotifications((prev) => [
         {

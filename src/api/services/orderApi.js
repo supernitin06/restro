@@ -22,7 +22,7 @@ export const orderApi = baseApi.injectEndpoints({
       invalidatesTags: ["Order"], // optional
     }),
 
-    OrderStatusUpdate: builder.mutation({
+  updateOrderStatus: builder.mutation({
       query: ({ id, status }) => ({
         url: `admin/orders/${id}/admin-status`,
         method: "PATCH",
@@ -30,9 +30,10 @@ export const orderApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Order"],
     }),
+  
 
   }),
   overrideExisting: false,
 });
 
-export const { useGetOrdersQuery, useAssignDeliveryMutation, useOrderStatusUpdateMutation } = orderApi;
+export const { useGetOrdersQuery, useAssignDeliveryMutation, useUpdateOrderStatusMutation } = orderApi;
