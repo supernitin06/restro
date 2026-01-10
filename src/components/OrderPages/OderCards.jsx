@@ -1,70 +1,84 @@
 // OrderCard.jsx
 import React, { useState } from 'react';
-import { Edit, Trash2, CheckCircle, XCircle, Clock, Info, Bike, CreditCard, Eye, MapPin, ShoppingBag, ChevronRight } from 'lucide-react';
+import { Edit, Trash2, CheckCircle, XCircle, Clock, Info, Bike, CreditCard, Eye, MapPin, ShoppingBag, ChevronRight, ChefHat } from 'lucide-react';
 import OrderItem from './OrderItem';
 import OrderDetailsModal from './OrderDetailsModal';
 import Card from '../ui/GlassCard';
 import Button from '../ui/Button';
 
+import OrderTimeline from './OrderTimeline';
+
 const OrderCard = ({ order, onDelete, onEdit, onUpdateStatus, viewMode }) => {
   const [showDetails, setShowDetails] = useState(false);
 
   const statusConfig = {
-    completed: {
+    COMPLETED: {
       bg: 'bg-green-100 dark:bg-green-900/30',
       text: 'text-green-700 dark:text-green-400',
       icon: CheckCircle,
       label: 'Completed'
     },
-    delivered: {
+    DELIVERED: {
       bg: 'bg-green-100 dark:bg-green-900/30',
       text: 'text-green-700 dark:text-green-400',
       icon: CheckCircle,
       label: 'Delivered'
     },
-    cancelled: {
+    CANCELLED: {
       bg: 'bg-red-100 dark:bg-red-900/30',
       text: 'text-red-700 dark:text-red-400',
       icon: XCircle,
       label: 'Cancelled'
     },
-    'on-process': { // Fallback/default
+    'ON-PROCESS': { // Fallback/default
       bg: 'bg-blue-100 dark:bg-blue-900/30',
       text: 'text-blue-700 dark:text-blue-400',
       icon: Clock,
       label: 'Processing'
     },
-    preparing: {
+    PREPARING: {
       bg: 'bg-blue-100 dark:bg-blue-900/30',
       text: 'text-blue-700 dark:text-blue-400',
       icon: Clock,
       label: 'Preparing'
     },
-    confirmed: {
+    CONFIRMED: {
       bg: 'bg-cyan-100 dark:bg-cyan-900/30',
       text: 'text-cyan-700 dark:text-cyan-400',
       icon: CheckCircle,
       label: 'Confirmed'
     },
-    placed: {
+    PLACED: {
       bg: 'bg-orange-100 dark:bg-orange-900/30',
       text: 'text-orange-700 dark:text-orange-400',
       icon: Clock,
       label: 'Placed'
     },
-    accepted: {
+    ACCEPTED: {
       bg: 'bg-indigo-100 dark:bg-indigo-900/30',
       text: 'text-indigo-700 dark:text-indigo-400',
       icon: CheckCircle,
       label: 'Accepted'
     },
-    assigned: {
+    READY: {
+      bg: 'bg-teal-100 dark:bg-teal-900/30',
+      text: 'text-teal-700 dark:text-teal-400',
+      icon: ChefHat, // Using ChefHat if available or fallback
+      label: 'Ready'
+    },
+    OUT_FOR_DELIVERY: {
+      bg: 'bg-purple-100 dark:bg-purple-900/30',
+      text: 'text-purple-700 dark:text-purple-400',
+      icon: Bike,
+      label: 'Out For Delivery'
+    },
+    ASSIGNED: {
       bg: 'bg-purple-100 dark:bg-purple-900/30',
       text: 'text-purple-700 dark:text-purple-400',
       icon: Bike,
       label: 'Assigned'
     },
-    picked: {
+    PICKED: {
       bg: 'bg-purple-100 dark:bg-purple-900/30',
       text: 'text-purple-700 dark:text-purple-400',
       icon: Bike,
@@ -72,7 +86,7 @@ const OrderCard = ({ order, onDelete, onEdit, onUpdateStatus, viewMode }) => {
     }
   };
 
-  const config = statusConfig[order.status] || statusConfig['on-process'];
+  const config = statusConfig[order.status] || statusConfig['ON-PROCESS'];
   const StatusIcon = config.icon;
 
   // ============= LIST VIEW =============
@@ -143,13 +157,13 @@ const OrderCard = ({ order, onDelete, onEdit, onUpdateStatus, viewMode }) => {
                 <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); setShowDetails(true); }} className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20" title="View Details">
                   <Eye size={16} />
                 </Button>
-                
-                {order.status === 'on-process' && (
+
+                {['PLACED', 'ACCEPTED', 'PREPARING', 'READY', 'OUT_FOR_DELIVERY', 'ON-PROCESS'].includes(order.status) && (
                   <>
-                    <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); onUpdateStatus(order.id, 'completed'); }} className="p-2 text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20" title="Complete">
+                    <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); onUpdateStatus(order.id, 'COMPLETED'); }} className="p-2 text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20" title="Complete">
                       <CheckCircle size={16} />
                     </Button>
-                    <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); onUpdateStatus(order.id, 'cancelled'); }} className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20" title="Cancel">
+                    <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); onUpdateStatus(order.id, 'CANCELLED'); }} className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20" title="Cancel">
                       <XCircle size={16} />
                     </Button>
                   </>
@@ -256,10 +270,13 @@ const OrderCard = ({ order, onDelete, onEdit, onUpdateStatus, viewMode }) => {
                   <span>{order.deliveryPartner.name}</span>
                 </div>
                 <span className="px-2 py-1 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 rounded-md text-xs font-bold hover:bg-green-100 dark:hover:bg-green-900/40 transition-colors cursor-default">
-                  {order.deliveryPartner.status}
+                  {order.deliveryPartner.status || 'Assigned'}
                 </span>
               </div>
             )}
+
+            {/* Timeline */}
+            <OrderTimeline currentStatus={order.status} timeline={order.timeline} />
           </div>
         </div>
 
@@ -270,7 +287,7 @@ const OrderCard = ({ order, onDelete, onEdit, onUpdateStatus, viewMode }) => {
               <ShoppingBag size={12} /> Items ({order.items.length})
             </h4>
           </div>
-          
+
           <div className="space-y-2 max-h-[110px] overflow-y-auto pr-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
             {order.items.map((item, index) => (
               <OrderItem key={index} item={item} />
@@ -290,11 +307,11 @@ const OrderCard = ({ order, onDelete, onEdit, onUpdateStatus, viewMode }) => {
           </div>
 
           {/* Status Action Buttons */}
-          {order.status === 'on-process' ? (
+          {['PLACED', 'ACCEPTED', 'PREPARING', 'READY', 'OUT_FOR_DELIVERY', 'ON-PROCESS'].includes(order.status) ? (
             <div className="flex gap-2 mb-3">
               <Button
                 variant="success"
-                onClick={(e) => { e.stopPropagation(); onUpdateStatus(order.id, 'completed'); }}
+                onClick={(e) => { e.stopPropagation(); onUpdateStatus(order.id, 'COMPLETED'); }}
                 className="flex-1 py-2 text-sm flex items-center justify-center gap-1.5"
               >
                 <CheckCircle size={16} />
@@ -302,7 +319,7 @@ const OrderCard = ({ order, onDelete, onEdit, onUpdateStatus, viewMode }) => {
               </Button>
               <Button
                 variant="danger"
-                onClick={(e) => { e.stopPropagation(); onUpdateStatus(order.id, 'cancelled'); }}
+                onClick={(e) => { e.stopPropagation(); onUpdateStatus(order.id, 'CANCELLED'); }}
                 className="flex-1 py-2 text-sm flex items-center justify-center gap-1.5"
               >
                 <XCircle size={16} />
@@ -310,10 +327,10 @@ const OrderCard = ({ order, onDelete, onEdit, onUpdateStatus, viewMode }) => {
               </Button>
             </div>
           ) : (
-             // Optional: Add a View Details button for other statuses if needed, or keep empty
-             null
+            // Optional: Add a View Details button for other statuses if needed, or keep empty
+            null
           )}
-          
+
           {/* <button
             onClick={() => setShowDetails(true)}
             className="w-full btn btn-primary flex items-center justify-center gap-2"

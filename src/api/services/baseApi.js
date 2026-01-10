@@ -6,7 +6,7 @@ import { logout } from "../services/authSlice";
 const axiosInstance = axios.create({
   baseURL: "https://resto-grandma.onrender.com/api/v1/",
   // baseURL: "http://192.168.1.108:5004/api/v1/",
-// 
+  // 
   headers: {
     "Content-Type": "application/json",
   },
@@ -15,39 +15,40 @@ const axiosInstance = axios.create({
 /* ---------------- AXIOS BASE QUERY ---------------- */
 const axiosBaseQuery =
   () =>
-  async ({ url, method, data, params, headers }, api) => {
-    try {
-      const state = api.getState();
-      const token = state?.auth?.authToken;
+    async ({ url, method, data, body, params, headers }, api) => {
+      try {
+        const state = api.getState();
+        const token = state?.auth?.authToken;
 
-      const result = await axiosInstance({
-        url,
-        method,
-        data,
-        params,
-        headers: {
-          ...headers,
-          Authorization: token ? `Bearer ${token}` : undefined,
-        },
-      });
+        const result = await axiosInstance({
+          url,
+          method,
+          data: data || body, // Support both 'data' and 'body'
 
-      return { data: result.data };
-    } catch (error) {
-      const err = error;
+          params,
+          headers: {
+            ...headers,
+            Authorization: token ? `Bearer ${token}` : undefined,
+          },
+        });
 
-      // 🔐 Auto logout on unauthorized
-      if (err?.response?.status === 401) {
-        api.dispatch(logout());
+        return { data: result.data };
+      } catch (error) {
+        const err = error;
+
+        // 🔐 Auto logout on unauthorized
+        if (err?.response?.status === 401) {
+          api.dispatch(logout());
+        }
+
+        return {
+          error: {
+            status: err?.response?.status,
+            data: err?.response?.data || err.message,
+          },
+        };
       }
-
-      return {
-        error: {
-          status: err?.response?.status,
-          data: err?.response?.data || err.message,
-        },
-      };
-    }
-  };
+    };
 
 /* ---------------- RTK QUERY BASE API ---------------- */
 export const baseApi = createApi({

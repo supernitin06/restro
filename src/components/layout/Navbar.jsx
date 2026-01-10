@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { logout } from "../../api/services/authSlice";
-import { showSuccessAlert, showErrorAlert } from "../../utils/toastAlert";
+
 import { useSockets } from "../../context/SocketContext";
 import fallbackImg from "../../assets/fallback.png";
 import {
@@ -30,14 +30,13 @@ const Navbar = ({ toggleSidebar }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
-  const { ordersSocket } = useSockets(); // ✅ get ordersSocket from context
-  const {mainSocket} = useSockets();
+  /* ----------------------------------------------------------------
+     CONSUME CONTEXT (Notifications & Sockets)
+  ---------------------------------------------------------------- */
+  const { notifications, setNotifications } = useSockets();
 
-  const [notifications, setNotifications] = useState([]);
   const [messages, setMessages] = useState([]);
   const [gifts, setGifts] = useState([]);
-  const [isConnected, setIsConnected] = useState(false);
-  const restaurantId = user?.restaurantId;
 
   const profileRef = useRef(null);
   const notificationRef = useRef(null);
@@ -54,63 +53,7 @@ const Navbar = ({ toggleSidebar }) => {
   /* =====================================================
      SOCKET EVENTS + ROOM JOIN
   ===================================================== */
-  useEffect(() => {
-    if (!ordersSocket || !restaurantId) return;
 
-    const handleConnect = () => {
-      console.log("✅ Orders socket connected:", ordersSocket.id);
-      setIsConnected(true);
-      ordersSocket.emit("JOIN_RESTAURANT_ROOM", { restaurantId });
-    };
-
-    const handlemainConnect = () => {
-      console.log("✅ Main socket connected:", mainSocket.id);
-    };
-
-    const handleDisconnect = (reason) => {
-      console.log("❌ Orders socket disconnected:", reason);
-      setIsConnected(false);
-    };
-
-    const handleNewOrder = (data) => {
-      console.log("🆕 NEW_ORDER received:", data);
-      
-      showSuccessAlert(`New Order #${data.customOrderId} Accepted`);
-      setNotifications((prev) => [
-        {
-          id: Date.now(),
-          title: "New Order",
-          message: `Order #${data.customOrderId} has been accepted.`,
-          type: "success",
-          read: false,
-          time: new Date().toISOString(),
-        },
-        ...prev,
-      ]);
-    };
-
-    const handleError = (data) => {
-      showErrorAlert(data?.message || "Socket error");
-    };
-
-    // Attach listeners
-    ordersSocket.on("connect", handleConnect);
-    mainSocket.on("connect", handlemainConnect);
-
-    ordersSocket.on("disconnect", handleDisconnect);
-    ordersSocket.on("NEW_ORDER", handleNewOrder);
-    ordersSocket.on("ERROR", handleError);
-
-    // If already connected (hot reload)
-    if (ordersSocket.connected) handleConnect();
-
-    return () => {
-      ordersSocket.off("connect", handleConnect);
-      ordersSocket.off("disconnect", handleDisconnect);
-      ordersSocket.off("NEW_ORDER", handleNewOrder);
-      ordersSocket.off("ERROR", handleError);
-    };
-  }, [ordersSocket, restaurantId]);
 
   /* =====================================================
      CLICK OUTSIDE HANDLER
@@ -131,7 +74,7 @@ const Navbar = ({ toggleSidebar }) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
- 
+
   /* =====================================================
      ACTIONS
   ===================================================== */

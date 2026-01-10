@@ -5,68 +5,12 @@ import { useSockets } from "../../context/SocketContext";
 import { showSuccessAlert, showErrorAlert } from "../../utils/toastAlert";
 import { useUpdateOrderStatusMutation } from "../../api/services/orderApi";
 
-const STORAGE_KEY = "NEW_ORDERS";
-
 const NewOrders = () => {
-  const { ordersSocket } = useSockets();
+  const { newOrders, setNewOrders } = useSockets();
   const [updateStatus] = useUpdateOrderStatusMutation();
-
-  const [orders, setOrders] = useState(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      console.log("Loaded orders from storage:", stored);
-      return stored ? JSON.parse(stored) : [];
-    } catch {
-      return [];
-    }
-  });
-
   const [processingOrderId, setProcessingOrderId] = useState(null);
 
-  const saveOrders = (updatedOrders) => {
-    setOrders(updatedOrders);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedOrders));
-  };
-
-  // Listen to new orders from socket
-  useEffect(() => {
-    if (!ordersSocket) return;
-
-    const handleNewOrder = (payload) => {
-      const orderData = payload?.data || payload;
-
-      if (!orderData?.orderId) return; // skip invalid
-
-      const newOrder = {
-        ...orderData,
-        orderId: orderData.orderId, // Unique id for API and key
-        customOrderId: orderData.customOrderId || orderData.orderId, // Display id
-        total: orderData.price?.grandTotal || 0,
-        customer: orderData.deliveryAddress,
-        items: orderData.items?.map((item) => ({
-          name: item.name,
-          quantity: item.quantity,
-        })),
-        location: orderData.deliveryAddress?.addressLine,
-        status: orderData.status?.toLowerCase(),
-      };
-
-      setOrders((prev) => {
-        const exists = prev.some((o) => o.orderId === orderData.orderId);
-        if (exists) return prev;
-
-        const updated = [newOrder, ...prev];
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-        return updated;
-      });
-
-      showSuccessAlert(`New Order: ${orderData.orderId}`);
-    };
-
-    ordersSocket.on("NEW_ORDER", handleNewOrder);
-    return () => ordersSocket.off("NEW_ORDER", handleNewOrder);
-  }, [ordersSocket]);
-
+  // Handle accept/reject
   // Handle accept/reject
   const handleUpdateStatus = async (orderId, statusInput) => {
     if (!orderId) {
@@ -77,21 +21,22 @@ const NewOrders = () => {
     // 1️⃣ Prepare Validation Formats
     const apiStatus = statusInput.toUpperCase(); // Backend expects: "ACCEPTED", "REJECTED"
     const uiStatus = statusInput.toLowerCase();  // UI checks: "accepted", "rejected"
-    
+
     try {
       setProcessingOrderId(orderId);
-      
+
       // 2️⃣ Send UPPERCASE to Backend
       await updateStatus({ id: orderId, status: apiStatus }).unwrap();
 
-      // 3️⃣ Update Local State with lowercase (to match UI checks)
-      const updatedOrders = orders.map((order) =>
-        order.orderId === orderId ? { ...order, status: uiStatus } : order
+      // 3️⃣ Update Shared Context State
+      setNewOrders((prev) =>
+        prev.map((order) =>
+          order.orderId === orderId ? { ...order, status: uiStatus } : order
+        )
       );
-      saveOrders(updatedOrders);
 
       showSuccessAlert(
-        status === "ACCEPTED" ? "Order Accepted" : "Order Rejected"
+        apiStatus === "ACCEPTED" ? "Order Accepted" : "Order Rejected"
       );
     } catch (error) {
       console.error("ORDER STATUS ERROR:", error);
@@ -103,10 +48,10 @@ const NewOrders = () => {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">New Orders ({orders.length})</h1>
+      <h1 className="text-2xl font-bold mb-6">New Orders ({newOrders.length})</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        {orders.map((order) => (
+        {newOrders.map((order) => (
           <div
             key={order.orderId}
             className="rounded-2xl bg-white shadow-md p-5 space-y-4"
@@ -145,11 +90,11 @@ const NewOrders = () => {
               </div>
 
               <div className="flex gap-2">
-                {order.status === "ACCEPTED" ? (
+                {order.status === "accepted" ? (
                   <span className="px-4 py-1 text-sm font-semibold rounded-full bg-green-100 text-green-700">
                     ✅ Order Accepted
                   </span>
-                ) : order.status === "REJECTED" ? (
+                ) : order.status === "rejected" ? (
                   <span className="px-4 py-1 text-sm font-semibold rounded-full bg-red-100 text-red-700">
                     ❌ Order Rejected
                   </span>
@@ -179,7 +124,7 @@ const NewOrders = () => {
           </div>
         ))}
 
-        {orders.length === 0 && (
+        {newOrders.length === 0 && (
           <div className="text-gray-400 text-center col-span-full py-20">
             No new orders
           </div>
