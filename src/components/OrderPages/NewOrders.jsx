@@ -39,7 +39,8 @@ const NewOrders = () => {
 
       const newOrder = {
         ...orderData,
-        customOrderId: orderData.orderId, // display only
+        orderId: orderData.orderId, // Unique id for API and key
+        customOrderId: orderData.customOrderId || orderData.orderId, // Display id
         total: orderData.price?.grandTotal || 0,
         customer: orderData.deliveryAddress,
         items: orderData.items?.map((item) => ({
@@ -67,23 +68,30 @@ const NewOrders = () => {
   }, [ordersSocket]);
 
   // Handle accept/reject
-  const handleUpdateStatus = async (orderId, status) => {
+  const handleUpdateStatus = async (orderId, statusInput) => {
     if (!orderId) {
       showErrorAlert("Order ID missing!");
       return;
     }
 
+    // 1️⃣ Prepare Validation Formats
+    const apiStatus = statusInput.toUpperCase(); // Backend expects: "ACCEPTED", "REJECTED"
+    const uiStatus = statusInput.toLowerCase();  // UI checks: "accepted", "rejected"
+    
     try {
       setProcessingOrderId(orderId);
-      await updateStatus({ id: orderId, status }).unwrap();
+      
+      // 2️⃣ Send UPPERCASE to Backend
+      await updateStatus({ id: orderId, status: apiStatus }).unwrap();
 
+      // 3️⃣ Update Local State with lowercase (to match UI checks)
       const updatedOrders = orders.map((order) =>
-        order.orderId === orderId ? { ...order, status } : order
+        order.orderId === orderId ? { ...order, status: uiStatus } : order
       );
       saveOrders(updatedOrders);
 
       showSuccessAlert(
-        status === "accepted" ? "Order Accepted" : "Order Rejected"
+        status === "ACCEPTED" ? "Order Accepted" : "Order Rejected"
       );
     } catch (error) {
       console.error("ORDER STATUS ERROR:", error);
@@ -100,7 +108,7 @@ const NewOrders = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {orders.map((order) => (
           <div
-            key={order.orderId} // use orderId as key
+            key={order.orderId}
             className="rounded-2xl bg-white shadow-md p-5 space-y-4"
           >
             {/* Header */}
@@ -137,11 +145,11 @@ const NewOrders = () => {
               </div>
 
               <div className="flex gap-2">
-                {order.status === "accepted" ? (
+                {order.status === "ACCEPTED" ? (
                   <span className="px-4 py-1 text-sm font-semibold rounded-full bg-green-100 text-green-700">
                     ✅ Order Accepted
                   </span>
-                ) : order.status === "rejected" ? (
+                ) : order.status === "REJECTED" ? (
                   <span className="px-4 py-1 text-sm font-semibold rounded-full bg-red-100 text-red-700">
                     ❌ Order Rejected
                   </span>
@@ -160,7 +168,7 @@ const NewOrders = () => {
                       size="sm"
                       variant="danger"
                       disabled={processingOrderId === order.orderId}
-                      onClick={() => handleUpdateStatus(order.orderId, "rejected")}
+                      onClick={() => handleUpdateStatus(order.orderId, "REJECTED")}
                     >
                       Reject
                     </Button>

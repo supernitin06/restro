@@ -74,6 +74,7 @@ const Navbar = ({ toggleSidebar }) => {
 
     const handleNewOrder = (data) => {
       console.log("🆕 NEW_ORDER received:", data);
+      
       showSuccessAlert(`New Order #${data.customOrderId} Accepted`);
       setNotifications((prev) => [
         {
