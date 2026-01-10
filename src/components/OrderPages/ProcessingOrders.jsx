@@ -1,18 +1,23 @@
 // src/pages/ProcessingOrders.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Table from "../../components/ui/Table";
 import Button from "../../components/ui/Button";
 import { Bike } from "lucide-react";
 import OrderDetailsModal from "../../components/OrderPages/OrderDetailsModal";
 import { useGetDeliveryPartnersQuery } from "../../api/services/deliveryPartnerApi";
 import { useAssignDeliveryMutation } from "../../api/services/orderApi";
+import { ordersSocket } from "../../socket/ordersSocket";
+
 import ActionButton from "../../components/ui/ActionButton";
 import { Eye, CheckCircle, Truck } from "lucide-react";
+import { showSuccessAlert } from "../../utils/toastAlert";
+
 
 const dummyOrders = [
   {
     id: 1,
-    orderId: "#ORD-2001",
+    orderId: "ORD-1767894592252-647",
+    resId: "695cde37e3a25484182d11a5",
     customer: { name: "Neha Singh", phone: "9123456789" },
     location: "Sector 62",
     items: [
@@ -25,7 +30,7 @@ const dummyOrders = [
   },
   {
     id: 2,
-    orderId: "#ORD-2002",
+    orderId: "ORD-1767894592252-647",
     customer: { name: "Aman Gupta", phone: "9988776655" },
     location: "Sector 63",
     items: [
@@ -40,6 +45,7 @@ const dummyOrders = [
 const ProcessingOrders = () => {
   const [assignDeliveryApi, { isLoading: assigning }] =
     useAssignDeliveryMutation();
+    
   const { data: partnerApi } = useGetDeliveryPartnersQuery();
   const [partnerSearch, setPartnerSearch] = useState("");
   const [orders, setOrders] = useState(dummyOrders);
@@ -47,55 +53,84 @@ const ProcessingOrders = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [currentOrder, setCurrentOrder] = useState(null);
   const deliveryPartners = React.useMemo(() => {
-    if (!partnerApi?.success) return [];
+  if (!partnerApi?.success) return [];
+  return partnerApi.data; // 👈 FULL DATA
+}, [partnerApi]);
+ const filteredPartners = React.useMemo(() => {
+  const term = partnerSearch.toLowerCase().trim();
+  if (!term) return deliveryPartners;
 
-    return partnerApi.data.map((p) => ({
-      id: p._id,
-      name: p.name || "",
-      location: p.location || p.city || "", // 👈 future ready
-      isActive: p.isActive,
-    }));
-  }, [partnerApi]);
-  const filteredPartners = React.useMemo(() => {
-    const term = partnerSearch.toLowerCase().trim();
-    if (!term) return deliveryPartners;
-    return deliveryPartners.filter((p) => {
-      const name = p.name.toLowerCase();
-      const location = p.location.toLowerCase(); // empty string safe
+  return deliveryPartners.filter((p) =>
+    p.name?.toLowerCase().includes(term) ||
+    p.city?.toLowerCase().includes(term)
+  );
+}, [deliveryPartners, partnerSearch]);
 
-      return name.includes(term) || location.includes(term);
-    });
-  }, [deliveryPartners, partnerSearch]);
   const openDrawer = (order) => {
     setCurrentOrder(order);
     setDrawerOpen(true);
   };
-  const assignPartner = async (partner) => {
-    if (!currentOrder) return;
+const assignPartner = (partner) => {
+  console.log("🟡 Assign clicked");
 
-    try {
-      await assignDeliveryApi({
-        orderId: currentOrder._id, // backend ID
-        partnerId: partner.id,
-      }).unwrap();
+  if (!currentOrder) return;
 
-      // Update local state
-      setOrders((prev) =>
-        prev.map((o) =>
-          o._id === currentOrder._id ? { ...o, delivery: partner } : o
-        )
-      );
-
-      setDrawerOpen(false);
-      setCurrentOrder(null);
-    } catch (err) {
-      console.error("Failed to assign delivery", err);
-      alert(
-        err?.data?.message ||
-          "Failed to assign delivery partner. Please try again."
-      );
-    }
+  const payload = {
+    order: {
+      id: currentOrder.id,
+      resId: currentOrder.resId,
+      orderId: currentOrder.orderId,
+      customer: currentOrder.customer,
+      items: currentOrder.items,
+      location: currentOrder.location,
+      status: currentOrder.status,
+    },
+    deliveryPartner: {
+      id: partner._id,
+      name: partner.name,
+      phone: partner.phone,
+      vehicleType: partner.vehicleType,
+    },
+    timestamp: new Date().toISOString(),
   };
+
+  console.log("📦 Emitting ASSIGN_DELIVERY:", payload);
+
+  ordersSocket.emit("ASSIGN_DELIVERY", payload);
+
+  // Show success toast with partner name
+  showSuccessAlert(`✅ Successfully assigned to ${partner.name}`);
+
+  // optimistic UI update
+  setOrders((prev) =>
+    prev.map((o) =>
+      o.id === currentOrder.id ? { ...o, delivery: partner } : o
+    )
+  );
+
+  setDrawerOpen(false);
+  setCurrentOrder(null);
+};
+
+useEffect(() => {
+  if (!ordersSocket) return;
+
+  console.log("🧩 Registering socket listeners");
+
+  ordersSocket.on("DELIVERY_ASSIGNED", (data) => {
+    console.log("✅ DELIVERY_ASSIGNED:", data);
+    if (data?.deliveryPartner?.name) {
+      showSuccessAlert(`✅ ${data.deliveryPartner.name} is on the way!`);
+    }
+  });
+
+  return () => {
+    console.log("🧹 Removing socket listeners");
+    ordersSocket.off("DELIVERY_ASSIGNED");
+  };
+}, []);
+
+
   const updateStatus = (order, newStatus) => {
     setOrders((prev) =>
       prev.map((o) => (o.id === order.id ? { ...o, status: newStatus } : o))
@@ -343,21 +378,21 @@ const ProcessingOrders = () => {
               </div>
             ) : (
               filteredPartners.map((partner) => (
-                <div
-                  key={partner.id}
-                  className="flex justify-between items-center p-4 bg-white rounded-2xl shadow-md hover:shadow-lg cursor-pointer transition-all duration-300 border border-red-100 hover:bg-red-50"
-                  onClick={() => assignPartner(partner)}
-                >
-                  <div className="flex flex-col">
-                    <span className="font-semibold text-lg">
-                      {partner.name}
-                    </span>
-                    <span className="text-sm text-gray-500">
-                      {partner.location}
-                    </span>
-                  </div>
-                  <Bike size={20} className="text-red-500" />
-                </div>
+               <div
+  key={partner._id}
+  className="flex justify-between items-center p-4 bg-white rounded-2xl shadow-md"
+  onClick={() => assignPartner(partner)}
+>
+  <div className="flex flex-col">
+    <span className="font-semibold text-lg">{partner.name}</span>
+    <span className="text-sm text-gray-500">{partner.phone}</span>
+    <span className="text-xs text-gray-400">
+      {partner.vehicleType} • {partner.isOnline ? "🟢 Online" : "🔴 Offline"}
+    </span>
+  </div>
+  <Bike className="text-red-500" />
+</div>
+
               ))
             )}
           </div>

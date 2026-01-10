@@ -25,6 +25,7 @@ import AddMenu from "../components/menu/AddMenu";
 import CookingLoader from "../pages/Loader";
 import NewOrders from "../components/OrderPages/NewOrders";
 import ProcessingOrders from "../components/OrderPages/ProcessingOrders";
+
 // loaders/generalLoader.js
 export const generalLoader = async () => {
   // simulate API delay or global data fetching

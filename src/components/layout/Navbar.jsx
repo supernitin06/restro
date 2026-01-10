@@ -1,12 +1,11 @@
+// src/components/Navbar/Navbar.jsx
 import React, { useState, useRef, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { data, useNavigate } from "react-router-dom";
-import { io } from "socket.io-client";
+import { useNavigate } from "react-router-dom";
 import { logout } from "../../api/services/authSlice";
 import { showSuccessAlert, showErrorAlert } from "../../utils/toastAlert";
-
+import { useSockets } from "../../context/SocketContext";
 import fallbackImg from "../../assets/fallback.png";
-
 import {
   Bell,
   MessageSquare,
@@ -27,10 +26,17 @@ import GiftsDropdown from "./NavbarCom/GiftsDropdown";
 import CreateOfferModal from "./NavbarCom/CreateOfferModal";
 
 const Navbar = ({ toggleSidebar }) => {
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { user, authToken } = useSelector((state) => state.auth);
+  const { user } = useSelector((state) => state.auth);
+  const { ordersSocket } = useSockets(); // ✅ get ordersSocket from context
+  const {mainSocket} = useSockets();
 
+  const [notifications, setNotifications] = useState([]);
+  const [messages, setMessages] = useState([]);
+  const [gifts, setGifts] = useState([]);
+  const [isConnected, setIsConnected] = useState(false);
   const restaurantId = user?.restaurantId;
 
   const profileRef = useRef(null);
@@ -38,19 +44,92 @@ const Navbar = ({ toggleSidebar }) => {
   const messagesRef = useRef(null);
   const giftsRef = useRef(null);
 
-  const socketRef = useRef(null);
-
   const [openProfile, setOpenProfile] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isMessagesOpen, setIsMessagesOpen] = useState(false);
   const [isGiftsOpen, setIsGiftsOpen] = useState(false);
   const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
 
-  const [notifications, setNotifications] = useState([]);
-  const [messages, setMessages] = useState([]);
-  const [gifts, setGifts] = useState([]);
+  /* =====================================================
+     SOCKET EVENTS + ROOM JOIN
+  ===================================================== */
+  useEffect(() => {
+    if (!ordersSocket || !restaurantId) return;
+
+    const handleConnect = () => {
+      console.log("✅ Orders socket connected:", ordersSocket.id);
+      setIsConnected(true);
+      ordersSocket.emit("JOIN_RESTAURANT_ROOM", { restaurantId });
+    };
+
+    const handlemainConnect = () => {
+      console.log("✅ Main socket connected:", mainSocket.id);
+    };
+
+    const handleDisconnect = (reason) => {
+      console.log("❌ Orders socket disconnected:", reason);
+      setIsConnected(false);
+    };
+
+    const handleNewOrder = (data) => {
+      console.log("🆕 NEW_ORDER received:", data);
+      
+      showSuccessAlert(`New Order #${data.customOrderId} Accepted`);
+      setNotifications((prev) => [
+        {
+          id: Date.now(),
+          title: "New Order",
+          message: `Order #${data.customOrderId} has been accepted.`,
+          type: "success",
+          read: false,
+          time: new Date().toISOString(),
+        },
+        ...prev,
+      ]);
+    };
+
+    const handleError = (data) => {
+      showErrorAlert(data?.message || "Socket error");
+    };
+
+    // Attach listeners
+    ordersSocket.on("connect", handleConnect);
+    mainSocket.on("connect", handlemainConnect);
+
+    ordersSocket.on("disconnect", handleDisconnect);
+    ordersSocket.on("NEW_ORDER", handleNewOrder);
+    ordersSocket.on("ERROR", handleError);
+
+    // If already connected (hot reload)
+    if (ordersSocket.connected) handleConnect();
+
+    return () => {
+      ordersSocket.off("connect", handleConnect);
+      ordersSocket.off("disconnect", handleDisconnect);
+      ordersSocket.off("NEW_ORDER", handleNewOrder);
+      ordersSocket.off("ERROR", handleError);
+    };
+  }, [ordersSocket, restaurantId]);
+
+  /* =====================================================
+     CLICK OUTSIDE HANDLER
+  ===================================================== */
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (profileRef.current && !profileRef.current.contains(e.target))
+        setOpenProfile(false);
+      if (notificationRef.current && !notificationRef.current.contains(e.target))
+        setIsNotificationsOpen(false);
+      if (messagesRef.current && !messagesRef.current.contains(e.target))
+        setIsMessagesOpen(false);
+      if (giftsRef.current && !giftsRef.current.contains(e.target))
+        setIsGiftsOpen(false);
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
  
   /* =====================================================
@@ -150,7 +229,6 @@ const Navbar = ({ toggleSidebar }) => {
 };
 
 /* ================= SMALL COMPONENTS ================= */
-
 const IconButton = ({ icon, count, onClick }) => (
   <button
     onClick={onClick}
@@ -165,7 +243,6 @@ const IconButton = ({ icon, count, onClick }) => (
 
 const AdminProfilePopup = ({ user, handleLogout, handleSettings }) => (
   <div className="absolute right-0 mt-4 w-80 rounded-3xl bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border border-gray-100 dark:border-gray-800 shadow-2xl overflow-hidden ring-1 ring-black/5 animate-in fade-in zoom-in-95 duration-200 origin-top-right z-50">
-
     {/* Header Section */}
     <div className="relative p-6 pb-8 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent">
       <div className="flex items-center gap-4">
