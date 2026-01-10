@@ -51,133 +51,8 @@ const Navbar = ({ toggleSidebar }) => {
   const [notifications, setNotifications] = useState([]);
   const [messages, setMessages] = useState([]);
   const [gifts, setGifts] = useState([]);
-  /* =====================================================
-     SOCKET SETUP — CREATE ONCE
-  ===================================================== */
-  useEffect(() => {
-    if (!authToken) return;
 
-    socketRef.current = io("http://localhost:5004/orders", {
-      path: "/socket.io",
-      transports: ["websocket"],
-      auth: { token: authToken },
-      autoConnect: false,
-      reconnection: true,
-      reconnectionAttempts: 5,
-      reconnectionDelay: 1000,
-    });
-
-    socketRef.current.on("WELCOME", (data) => {
-      console.log("welcome ", data);
-    });
-
-    socketRef.current.emit("connected_successful", "hello");
-
-    return () => {
-      socketRef.current?.disconnect();
-      socketRef.current = null;
-    };
-  }, [authToken]);
-
-  /* =====================================================
-     CONNECT + JOIN ROOM
-  ===================================================== */
-  useEffect(() => {
-    if (!socketRef.current || !restaurantId) return;
-
-    socketRef.current.connect();
-
-    const handleConnect = () => {
-      console.log("✅ Socket connected:", socketRef.current.id);
-      if (restaurantId) {
-        console.log("📢 Joining Room ID:", restaurantId);
-        socketRef.current.emit("JOIN_RESTAURANT_ROOM", { restaurantId });
-      } else {
-        console.warn("⚠️ No Restaurant ID found to join room.");
-      }
-      socketRef.current.on("JOINED_RESTAURANT_ROOM", (data) => {
-        console.log("join_restaurant_room", data);
-      });
-    };
-
-    socketRef.current.on("connect", handleConnect);
-
-    return () => {
-      socketRef.current?.off("connect", handleConnect);
-    };
-  }, [restaurantId]);
-
-  /* =====================================================
-     SOCKET EVENTS (ONCE)
-  ===================================================== */
-  useEffect(() => {
-    if (!socketRef.current) return;
-
-    const handleNewOrder = (data) => {
-      showSuccessAlert(`New Order #${data.customOrderId} Accepted`);
-      console.log("new_order", data);
-      setNotifications((prev) => [
-        {
-          id: Date.now(),
-          title: "New Order",
-          message: `Order #${data.customOrderId} has been accepted.`,
-          type: "success",
-          read: false,
-          time: new Date().toISOString(),
-        },
-        ...prev,
-      ]);
-    };
-
-    const handleError = (data) => {
-      showErrorAlert(data?.message || "Socket error");
-    };
-    socketRef.current.on("NEW_ORDER", handleNewOrder);
-    socketRef.current.on("ERROR", handleError);
-
-    return () => {
-      socketRef.current?.off("NEW_ORDER", handleNewOrder);
-      socketRef.current?.off("ERROR", handleError);
-    };
-  }, []);
-
-  /* =====================================================
-     REJOIN ROOM ON RECONNECT
-  ===================================================== */
-  useEffect(() => {
-    if (!socketRef.current || !restaurantId) return;
-
-    const handleReconnect = () => {
-      console.log("🔄 Reconnected → Rejoining room");
-      socketRef.current.emit("JOIN_RESTAURANT_ROOM", { restaurantId });
-    };
-
-    socketRef.current.on("reconnect", handleReconnect);
-
-    return () => {
-      socketRef.current?.off("reconnect", handleReconnect);
-    };
-  }, [restaurantId]);
-
-  /* =====================================================
-     CLICK OUTSIDE HANDLER
-  ===================================================== */
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (profileRef.current && !profileRef.current.contains(e.target))
-        setOpenProfile(false);
-      if (notificationRef.current && !notificationRef.current.contains(e.target))
-        setIsNotificationsOpen(false);
-      if (messagesRef.current && !messagesRef.current.contains(e.target))
-        setIsMessagesOpen(false);
-      if (giftsRef.current && !giftsRef.current.contains(e.target))
-        setIsGiftsOpen(false);
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
+ 
   /* =====================================================
      ACTIONS
   ===================================================== */
@@ -189,7 +64,6 @@ const Navbar = ({ toggleSidebar }) => {
   return (
     <div className="sticky top-0 z-40 w-full backdrop-blur bg-white/80 dark:bg-gray-900/80 border-b">
       <div className="px-6 py-4 flex items-center justify-between gap-4">
-
         {/* LEFT */}
         <div className="flex items-center gap-4 flex-1">
           <button onClick={toggleSidebar} className="lg:hidden p-2 rounded-lg">
