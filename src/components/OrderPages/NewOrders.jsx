@@ -3,17 +3,34 @@ import { MapPin } from "lucide-react";
 import Button from "../../components/ui/Button";
 import { useSockets } from "../../context/SocketContext";
 import { showSuccessAlert, showErrorAlert } from "../../utils/toastAlert";
-import { useUpdateOrderStatusMutation } from "../../api/services/orderApi";
+import { useUpdateOrderStatusMutation, useGetOrdersQuery } from "../../api/services/orderApi";
 
 const NewOrders = () => {
   const { newOrders, setNewOrders } = useSockets();
   const [updateStatus] = useUpdateOrderStatusMutation();
+  const { data, refetch } = useGetOrdersQuery({ status: 'PLACED' });
+  const orders = data?.data || [];
+
   const [processingOrderId, setProcessingOrderId] = useState(null);
 
-  // Handle accept/reject
+  // Listen to new orders from socket and refetch
+  useEffect(() => {
+    if (!ordersSocket) return;
+
+    const handleNewOrder = (payload) => {
+      console.log("🆕 NEW_ORDER payload:", payload);
+      refetch(); // Refetch orders to include new ones
+    };
+
+    ordersSocket.on("NEW_ORDER", handleNewOrder);
+    return () => ordersSocket.off("NEW_ORDER", handleNewOrder);
+  }, [ordersSocket, refetch]);
+
   // Handle accept/reject
   const handleUpdateStatus = async (orderId, statusInput) => {
+    console.log("handleUpdateStatus called with orderId:", orderId, "statusInput:", statusInput);
     if (!orderId) {
+      console.log("Order ID missing!");
       showErrorAlert("Order ID missing!");
       return;
     }
@@ -26,7 +43,9 @@ const NewOrders = () => {
       setProcessingOrderId(orderId);
 
       // 2️⃣ Send UPPERCASE to Backend
+      console.log("Calling updateStatus API with id:", orderId, "status:", apiStatus);
       await updateStatus({ id: orderId, status: apiStatus }).unwrap();
+      console.log("API call successful");
 
       // 3️⃣ Update Shared Context State
       setNewOrders((prev) =>
@@ -37,18 +56,21 @@ const NewOrders = () => {
 
       showSuccessAlert(
         apiStatus === "ACCEPTED" ? "Order Accepted" : "Order Rejected"
+
       );
     } catch (error) {
       console.error("ORDER STATUS ERROR:", error);
       showErrorAlert(error?.data?.message || "Failed to update order");
     } finally {
       setProcessingOrderId(null);
+      console.log("Processing completed for orderId:", orderId);
     }
   };
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">New Orders ({newOrders.length})</h1>
+      <h1 className="text-2xl font-bold mb-6">New Orders ({orders.length})</h1>
+      {console.log("Rendering orders:", orders)}
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {newOrders.map((order) => (

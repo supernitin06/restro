@@ -98,6 +98,28 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
       ordersSocket.emit("JOIN_RESTAURANT_ROOM", { restaurantId });
     }
 
+
+
+    /* =============================
+       5️⃣ Order status updates
+    ============================== */
+    const onOrderStatusUpdated = (data) => {
+      console.log("🔄 ORDER_STATUS_UPDATED:", data);
+    };
+
+    
+
+    ordersSocket.on("ORDER_STATUS_UPDATED", onOrderStatusUpdated);
+    ordersSocket.on("ORDER_PICKED_UP", (data) => {
+      console.log("✅ ORDER_PICKED_UP:", data);
+      alert(`Order Picked Up: ${data}`);
+    });
+     
+    
+
+    /* =============================
+       🧹 CLEANUP (VERY IMPORTANT)
+    ============================== */
     return () => {
       ordersSocket.off("connect", onConnected);
       ordersSocket.off("JOINED_RESTAURANT_ROOM", onJoinedRoom);

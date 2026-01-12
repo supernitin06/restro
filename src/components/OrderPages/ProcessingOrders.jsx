@@ -5,50 +5,22 @@ import Button from "../../components/ui/Button";
 import { Bike } from "lucide-react";
 import OrderDetailsModal from "../../components/OrderPages/OrderDetailsModal";
 import { useGetDeliveryPartnersQuery } from "../../api/services/deliveryPartnerApi";
-import { useAssignDeliveryMutation } from "../../api/services/orderApi";
+import { useAssignDeliveryMutation, useGetOrdersQuery } from "../../api/services/orderApi";
 import { ordersSocket } from "../../socket/ordersSocket";
 
 import ActionButton from "../../components/ui/ActionButton";
 import { Eye, CheckCircle, Truck } from "lucide-react";
 import { showSuccessAlert } from "../../utils/toastAlert";
 
-
-const dummyOrders = [
-  {
-    id: 1,
-    orderId: "ORD-1767894592252-647",
-    resId: "695cde37e3a25484182d11a5",
-    customer: { name: "Neha Singh", phone: "9123456789" },
-    location: "Sector 62",
-    items: [
-      { name: "Burger", quantity: 2 },
-      { name: "French Fries", quantity: 1 },
-      { name: "Cold Drink", quantity: 1 },
-    ],
-    status: "preparing",
-    delivery: null,
-  },
-  {
-    id: 2,
-    orderId: "ORD-1767894592252-647",
-    customer: { name: "Aman Gupta", phone: "9988776655" },
-    location: "Sector 63",
-    items: [
-      { name: "Paneer Butter Masala", quantity: 1 },
-      { name: "Butter Naan", quantity: 3 },
-    ],
-    status: "preparing",
-    delivery: null,
-  },
-];
-
 const ProcessingOrders = () => {
   const [assignDeliveryApi, { isLoading: assigning }] =
     useAssignDeliveryMutation();
     
   const { data: partnerApi } = useGetDeliveryPartnersQuery();
+  console.log("📋 Delivery partners data:", partnerApi);
+  const { data, refetch } = useGetOrdersQuery({ status: 'ACCEPTED' });
+  const orders = data?.data || [];
   const [partnerSearch, setPartnerSearch] = useState("");
-  const [orders, setOrders] = useState(dummyOrders);
   const [viewingOrder, setViewingOrder] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [currentOrder, setCurrentOrder] = useState(null);
@@ -67,11 +39,12 @@ const ProcessingOrders = () => {
 }, [deliveryPartners, partnerSearch]);
 
   const openDrawer = (order) => {
+    console.log("🔍 Opening drawer for order:", order);
     setCurrentOrder(order);
     setDrawerOpen(true);
   };
-const assignPartner = (partner) => {
-  console.log("🟡 Assign clicked");
+const assignPartner = async (partner) => {
+  console.log("🟡 Assign partner function called with:", partner);
 
   if (!currentOrder) return;
 
@@ -96,17 +69,16 @@ const assignPartner = (partner) => {
 
   console.log("📦 Emitting ASSIGN_DELIVERY:", payload);
 
-  ordersSocket.emit("ASSIGN_DELIVERY", payload);
+  // API call first
+  console.log("🚀 Calling assignDelivery API with orderId:", currentOrder.orderId, "partnerId:", partner.id);
+  await assignDeliveryApi({ orderId: currentOrder.orderId, partnerId: partner.id });
+  console.log("✅ Assign API call successful");
 
   // Show success toast with partner name
   showSuccessAlert(`✅ Successfully assigned to ${partner.name}`);
 
-  // optimistic UI update
-  setOrders((prev) =>
-    prev.map((o) =>
-      o.id === currentOrder.id ? { ...o, delivery: partner } : o
-    )
-  );
+  // Refetch to update the list
+  refetch();
 
   setDrawerOpen(false);
   setCurrentOrder(null);
@@ -131,11 +103,7 @@ useEffect(() => {
 }, []);
 
 
-  const updateStatus = (order, newStatus) => {
-    setOrders((prev) =>
-      prev.map((o) => (o.id === order.id ? { ...o, status: newStatus } : o))
-    );
-  };
+
   const orderActions = [
     // {
     //   key: "view",
@@ -144,22 +112,22 @@ useEffect(() => {
     //   color: "blue",
     //   onClick: (order) => setViewingOrder(order),
     // },
-    {
-      key: "ready",
-      label: "Mark Ready",
-      icon: CheckCircle,
-      color: "emerald", // same as before
-      show: (order) => order.status === "preparing",
-      onClick: (order) => updateStatus(order, "ready"),
-    },
-    {
-      key: "out",
-      label: "Out for Delivery",
-      icon: Truck,
-      color: "amber", // changed from purple → amber
-      show: (order) => order.status === "ready",
-      onClick: (order) => updateStatus(order, "out_for_delivery"),
-    },
+    // {
+    //   key: "ready",
+    //   label: "Mark Ready",
+    //   icon: CheckCircle,
+    //   color: "emerald", // same as before
+    //   show: (order) => order.status === "preparing",
+    //   onClick: (order) => updateStatus(order, "ready"),
+    // },
+    // {
+    //   key: "out",
+    //   label: "Out for Delivery",
+    //   icon: Truck,
+    //   color: "amber", // changed from purple → amber
+    //   show: (order) => order.status === "ready",
+    //   onClick: (order) => updateStatus(order, "out_for_delivery"),
+    // },
   ];
   const columns = [
     {
@@ -257,20 +225,16 @@ useEffect(() => {
     },
 
     {
-      header: "Status",
+      header: "Payment",
       render: (order) => (
         <span
-          className={`px-3 py-1 rounded-lg text-xs font-bold capitalize ${
-            order.status === "preparing"
-              ? "bg-gradient-to-r from-blue-100 to-blue-200 text-blue-700"
-              : order.status === "ready"
-              ? "bg-gradient-to-r from-green-100 to-green-200 text-green-700"
-              : order.status === "out_for_delivery"
-              ? "bg-gradient-to-r from-purple-100 to-purple-200 text-purple-700"
-              : "bg-gradient-to-r from-cyan-100 to-cyan-200 text-cyan-700"
+          className={`px-2 py-1 rounded text-xs font-semibold ${
+            order.payment?.status === "PAID"
+              ? "bg-green-100 text-green-700"
+              : "bg-yellow-100 text-yellow-700"
           }`}
         >
-          {order.status.replace(/_/g, " ")}
+          {order.payment?.status || "PENDING"}
         </span>
       ),
     },
@@ -281,7 +245,7 @@ useEffect(() => {
           {order.delivery ? (
             <>
               <Bike size={16} className="text-purple-500" />
-              <span className="text-sm font-medium">{order.delivery.name}</span>
+              <span className="text-sm font-medium">{order.delivery.partner?.name || 'Assigned'}</span>
             </>
           ) : (
             <Button
