@@ -11,11 +11,11 @@ import {
 const NewOrders = () => {
   const { ordersSocket } = useSockets();
 
-  const { data, refetch } = useGetOrdersQuery({ status: "PLACED" });
-  const orders = data?.data || [];
+  const { data, refetch } = useGetOrdersQuery({});
+  const allOrders = data?.data || [];
+  const orders = allOrders.filter(order => order.status === "PLACED" || order.status === "REJECTED");
 
   const [updateStatus] = useUpdateOrderStatusMutation();
-  const [updateKitchenStatus] = useUpdateKitchenStatusMutation();
 
   const [processingOrderId, setProcessingOrderId] = useState(null);
 
@@ -28,8 +28,17 @@ const NewOrders = () => {
       refetch();
     };
 
+    const handleStatusUpdate = (payload) => {
+      console.log("🔄 ORDER_STATUS_UPDATED payload:", payload);
+      refetch();
+    };
+
     ordersSocket.on("NEW_ORDER", handleNewOrder);
-    return () => ordersSocket.off("NEW_ORDER", handleNewOrder);
+    ordersSocket.on("ORDER_STATUS_UPDATED", handleStatusUpdate);
+    return () => {
+      ordersSocket.off("NEW_ORDER", handleNewOrder);
+      ordersSocket.off("ORDER_STATUS_UPDATED", handleStatusUpdate);
+    };
   }, [ordersSocket, refetch]);
 
   // ✅ Accept / Reject Order
@@ -43,12 +52,21 @@ const NewOrders = () => {
       setProcessingOrderId(orderId);
 
       // ✅ Admin order status
+      const body = { status };
+      if (status === "REJECTED") {
+        body.message = "Sorry, the order is not available today. Please try again later.";
+      }
+
       await updateStatus({
         id: orderId,
-        status, // ACCEPTED / REJECTED
+        ...body,
       }).unwrap();
 
-     
+      showSuccessAlert(
+        status === "ACCEPTED"
+          ? "Order accepted successfully!"
+          : "Order rejected and customer notified."
+      );
 
       refetch();
     } catch (error) {

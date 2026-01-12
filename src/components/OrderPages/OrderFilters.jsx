@@ -34,6 +34,7 @@ const OrderFilters = ({
             { value: "delivered", label: "Delivered" },
             { value: "completed", label: "Completed" },
             { value: "cancelled", label: "Cancelled" },
+            { value: "rejected", label: "Rejected" },
           ]
         }
       ]}
