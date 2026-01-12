@@ -3,94 +3,92 @@ import { MapPin } from "lucide-react";
 import Button from "../../components/ui/Button";
 import { useSockets } from "../../context/SocketContext";
 import { showSuccessAlert, showErrorAlert } from "../../utils/toastAlert";
-import { useUpdateOrderStatusMutation, useGetOrdersQuery, useUpdateKitchenStatusMutation, } from "../../api/services/orderApi";
-
+import {
+  useUpdateOrderStatusMutation,
+  useGetOrdersQuery,
+} from "../../api/services/orderApi";
 
 const NewOrders = () => {
-  const { ordersSocket, newOrders, setNewOrders } = useSockets();
-  const [updateStatus] = useUpdateOrderStatusMutation();
-  const { data, refetch } = useGetOrdersQuery({ status: 'PLACED' });
-  const [updateKitchenStatus] = useUpdateKitchenStatusMutation();
+  const { ordersSocket } = useSockets();
 
+  const { data, refetch } = useGetOrdersQuery({ status: "PLACED" });
   const orders = data?.data || [];
+
+  const [updateStatus] = useUpdateOrderStatusMutation();
+  const [updateKitchenStatus] = useUpdateKitchenStatusMutation();
 
   const [processingOrderId, setProcessingOrderId] = useState(null);
 
-  // Listen to new orders from socket and refetch
+  // 🔔 Listen for new orders via socket
   useEffect(() => {
     if (!ordersSocket) return;
 
     const handleNewOrder = (payload) => {
       console.log("🆕 NEW_ORDER payload:", payload);
-      refetch(); // Refetch orders to include new ones
+      refetch();
     };
 
     ordersSocket.on("NEW_ORDER", handleNewOrder);
     return () => ordersSocket.off("NEW_ORDER", handleNewOrder);
   }, [ordersSocket, refetch]);
 
-  // Handle accept/reject
- const handleUpdateStatus = async (orderId, statusInput) => {
-  if (!orderId) {
-    showErrorAlert("Order ID missing!");
-    return;
-  }
+  // ✅ Accept / Reject Order
+  const handleUpdateStatus = async (orderId, status) => {
+    if (!orderId) {
+      showErrorAlert("Order ID missing!");
+      return;
+    }
 
-    // 1️⃣ Prepare Validation Formats
-    const apiStatus = statusInput.toUpperCase(); // Backend expects: "ACCEPTED", "REJECTED"
-    const uiStatus = statusInput.toLowerCase();  // UI checks: "accepted", "rejected"
+    try {
+      setProcessingOrderId(orderId);
 
+      // ✅ Admin order status
+      await updateStatus({
+        id: orderId,
+        status, // ACCEPTED / REJECTED
+      }).unwrap();
+
+     
+
+      refetch();
+    } catch (error) {
+      console.error("ORDER STATUS UPDATE ERROR:", error);
+      showErrorAlert(error?.data?.message || "Failed to update order");
+    } finally {
+      setProcessingOrderId(null);
+    }
   };
-  try {
-    setProcessingOrderId(orderId);
-
-    // ✅ 1. Admin status ACCEPT
-    await updateStatus({
-      id: orderId,
-      status: "ACCEPTED",
-    }).unwrap();
-
-    // ✅ 2. Kitchen status READY
-    await updateKitchenStatus({
-      orderId,
-      status: "READY",
-    }).unwrap();
-
-    // ✅ 3. Refresh list
-    refetch();
-
-    showSuccessAlert("Order Accepted & Sent to Kitchen");
-
-  } catch (error) {
-    console.error("ORDER ACCEPT ERROR:", error);
-    showErrorAlert(error?.data?.message || "Failed to accept order");
-  } finally {
-    setProcessingOrderId(null);
-  }
-};
-
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">New Orders ({orders.length})</h1>
-      {console.log("Rendering orders:", orders)}
+      <h1 className="text-2xl font-bold mb-6">
+        New Orders ({orders.length})
+      </h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        {newOrders.map((order) => (
+        {orders.map((order) => (
           <div
             key={order.orderId}
             className="rounded-2xl bg-white shadow-md p-5 space-y-4"
           >
             {/* Header */}
             <div className="flex justify-between">
-              <h2 className="font-bold text-lg">{order.customOrderId}</h2>
-              <span className="text-orange-600 font-bold">₹{order.total}</span>
+              <h2 className="font-bold text-lg">
+                {order.customOrderId}
+              </h2>
+              <span className="text-orange-600 font-bold">
+                ₹{order.total}
+              </span>
             </div>
 
             {/* Customer */}
             <div>
-              <p className="font-semibold">{order.customer?.name}</p>
-              <p className="text-sm text-gray-500">{order.customer?.phone}</p>
+              <p className="font-semibold">
+                {order.customer?.name}
+              </p>
+              <p className="text-sm text-gray-500">
+                {order.customer?.phone}
+              </p>
             </div>
 
             {/* Location */}
@@ -115,11 +113,11 @@ const NewOrders = () => {
               </div>
 
               <div className="flex gap-2">
-                {order.status === "accepted" ? (
+                {order.status === "ACCEPTED" ? (
                   <span className="px-4 py-1 text-sm font-semibold rounded-full bg-green-100 text-green-700">
                     ✅ Order Accepted
                   </span>
-                ) : order.status === "rejected" ? (
+                ) : order.status === "REJECTED" ? (
                   <span className="px-4 py-1 text-sm font-semibold rounded-full bg-red-100 text-red-700">
                     ❌ Order Rejected
                   </span>
@@ -129,16 +127,22 @@ const NewOrders = () => {
                       size="sm"
                       variant="success"
                       disabled={processingOrderId === order.orderId}
-                      onClick={() => handleUpdateStatus(order.orderId, "ACCEPTED")}
+                      onClick={() =>
+                        handleUpdateStatus(order.orderId, "ACCEPTED")
+                      }
                     >
-                      {processingOrderId === order.orderId ? "Processing..." : "Accept"}
+                      {processingOrderId === order.orderId
+                        ? "Processing..."
+                        : "Accept"}
                     </Button>
 
                     <Button
                       size="sm"
                       variant="danger"
                       disabled={processingOrderId === order.orderId}
-                      onClick={() => handleUpdateStatus(order.orderId, "REJECTED")}
+                      onClick={() =>
+                        handleUpdateStatus(order.orderId, "REJECTED")
+                      }
                     >
                       Reject
                     </Button>
@@ -149,7 +153,7 @@ const NewOrders = () => {
           </div>
         ))}
 
-        {newOrders.length === 0 && (
+        {orders.length === 0 && (
           <div className="text-gray-400 text-center col-span-full py-20">
             No new orders
           </div>
