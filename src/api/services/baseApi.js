@@ -20,34 +20,35 @@ const axiosBaseQuery =
       const state = api.getState();
       const token = state?.auth?.authToken;
 
-      const result = await axiosInstance({
-        url,
-        method,
-        data,
-        params,
-        headers: {
-          ...headers,
-          Authorization: token ? `Bearer ${token}` : undefined,
-        },
-      });
+        const result = await axiosInstance({
+          url,
+          method,
+          data: data || body, // Support both 'data' and 'body'
 
-      return { data: result.data };
-    } catch (error) {
-      const err = error;
+          params,
+          headers: {
+            ...headers,
+            Authorization: token ? `Bearer ${token}` : undefined,
+          },
+        });
 
-      // 🔐 Auto logout on unauthorized
-      if (err?.response?.status === 401) {
-        api.dispatch(logout());
+        return { data: result.data };
+      } catch (error) {
+        const err = error;
+
+        // 🔐 Auto logout on unauthorized
+        if (err?.response?.status === 401) {
+          api.dispatch(logout());
+        }
+
+        return {
+          error: {
+            status: err?.response?.status,
+            data: err?.response?.data || err.message,
+          },
+        };
       }
-
-      return {
-        error: {
-          status: err?.response?.status,
-          data: err?.response?.data || err.message,
-        },
-      };
-    }
-  };
+    };
 
 /* ---------------- RTK QUERY BASE API ---------------- */
 export const baseApi = createApi({

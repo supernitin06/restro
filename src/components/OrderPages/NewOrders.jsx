@@ -3,65 +3,67 @@ import { MapPin } from "lucide-react";
 import Button from "../../components/ui/Button";
 import { useSockets } from "../../context/SocketContext";
 import { showSuccessAlert, showErrorAlert } from "../../utils/toastAlert";
-import { useUpdateOrderStatusMutation, useGetOrdersQuery } from "../../api/services/orderApi";
+import {
+  useUpdateOrderStatusMutation,
+  useGetOrdersQuery,
+} from "../../api/services/orderApi";
 
 const NewOrders = () => {
   const { ordersSocket } = useSockets();
-  const [updateStatus] = useUpdateOrderStatusMutation();
-  const { data, refetch } = useGetOrdersQuery({ status: 'PLACED' });
 
+  const { data, refetch } = useGetOrdersQuery({ status: "PLACED" });
   const orders = data?.data || [];
+
+  const [updateStatus] = useUpdateOrderStatusMutation();
+  const [updateKitchenStatus] = useUpdateKitchenStatusMutation();
 
   const [processingOrderId, setProcessingOrderId] = useState(null);
 
-  // Listen to new orders from socket and refetch
+  // 🔔 Listen for new orders via socket
   useEffect(() => {
     if (!ordersSocket) return;
 
     const handleNewOrder = (payload) => {
       console.log("🆕 NEW_ORDER payload:", payload);
-      refetch(); // Refetch orders to include new ones
+      refetch();
     };
 
     ordersSocket.on("NEW_ORDER", handleNewOrder);
     return () => ordersSocket.off("NEW_ORDER", handleNewOrder);
   }, [ordersSocket, refetch]);
 
-  // Handle accept/reject
- const handleUpdateStatus = async (orderId, statusInput) => {
-  if (!orderId) {
-    showErrorAlert("Order ID missing!");
-    return;
-  }
+  // ✅ Accept / Reject Order
+  const handleUpdateStatus = async (orderId, status) => {
+    if (!orderId) {
+      showErrorAlert("Order ID missing!");
+      return;
+    }
 
-  try {
-    setProcessingOrderId(orderId);
+    try {
+      setProcessingOrderId(orderId);
 
-    // ✅ 1. Admin status ACCEPT
-    await updateStatus({
-      id: orderId,
-      status: "ACCEPTED",
-    }).unwrap();
+      // ✅ Admin order status
+      await updateStatus({
+        id: orderId,
+        status, // ACCEPTED / REJECTED
+      }).unwrap();
 
+     
 
-    // ✅ 3. Refresh list
-    refetch();
-
-    showSuccessAlert("Order Accepted & Sent to Kitchen");
-
-  } catch (error) {
-    console.error("ORDER ACCEPT ERROR:", error);
-    showErrorAlert(error?.data?.message || "Failed to accept order");
-  } finally {
-    setProcessingOrderId(null);
-  }
-};
-
+      refetch();
+    } catch (error) {
+      console.error("ORDER STATUS UPDATE ERROR:", error);
+      showErrorAlert(error?.data?.message || "Failed to update order");
+    } finally {
+      setProcessingOrderId(null);
+    }
+  };
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">New Orders ({orders.length})</h1>
-      {console.log("Rendering orders:", orders)}
+      <h1 className="text-2xl font-bold mb-6">
+        New Orders ({orders.length})
+      </h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {orders.map((order) => (
@@ -71,14 +73,22 @@ const NewOrders = () => {
           >
             {/* Header */}
             <div className="flex justify-between">
-              <h2 className="font-bold text-lg">{order.customOrderId}</h2>
-              <span className="text-orange-600 font-bold">₹{order.total}</span>
+              <h2 className="font-bold text-lg">
+                {order.customOrderId}
+              </h2>
+              <span className="text-orange-600 font-bold">
+                ₹{order.total}
+              </span>
             </div>
 
             {/* Customer */}
             <div>
-              <p className="font-semibold">{order.customer?.name}</p>
-              <p className="text-sm text-gray-500">{order.customer?.phone}</p>
+              <p className="font-semibold">
+                {order.customer?.name}
+              </p>
+              <p className="text-sm text-gray-500">
+                {order.customer?.phone}
+              </p>
             </div>
 
             {/* Location */}
@@ -117,16 +127,22 @@ const NewOrders = () => {
                       size="sm"
                       variant="success"
                       disabled={processingOrderId === order.orderId}
-                      onClick={() => handleUpdateStatus(order.orderId, "ACCEPTED")}
+                      onClick={() =>
+                        handleUpdateStatus(order.orderId, "ACCEPTED")
+                      }
                     >
-                      {processingOrderId === order.orderId ? "Processing..." : "Accept"}
+                      {processingOrderId === order.orderId
+                        ? "Processing..."
+                        : "Accept"}
                     </Button>
 
                     <Button
                       size="sm"
                       variant="danger"
                       disabled={processingOrderId === order.orderId}
-                      onClick={() => handleUpdateStatus(order.orderId, "REJECTED")}
+                      onClick={() =>
+                        handleUpdateStatus(order.orderId, "REJECTED")
+                      }
                     >
                       Reject
                     </Button>

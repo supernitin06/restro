@@ -6,19 +6,32 @@ import { restaurantSocket } from "../socket/restaurantSocket";
 const SocketContext = createContext(null);
 
 export const SocketProvider = ({ children, authToken, restaurantId }) => {
+  const [newOrders, setNewOrders] = React.useState(() => {
+    try {
+      const stored = localStorage.getItem("NEW_ORDERS");
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const [notifications, setNotifications] = React.useState([]);
+
+  // Persist orders
+  useEffect(() => {
+    localStorage.setItem("NEW_ORDERS", JSON.stringify(newOrders));
+  }, [newOrders]);
+
   useEffect(() => {
     if (!authToken) return;
 
     /* =============================
-       1️⃣ Attach auth token
+       1️⃣ Attach auth token & Connect
     ============================== */
     mainSocket.auth = { token: authToken };
     ordersSocket.auth = { token: authToken };
     restaurantSocket.auth = { token: authToken };
 
-    /* =============================
-       2️⃣ Connect sockets
-    ============================== */
     mainSocket.connect();
     ordersSocket.connect();
     restaurantSocket.connect();
@@ -26,24 +39,63 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
     console.log("🔌 Connecting sockets...");
 
     /* =============================
-       3️⃣ Connection confirmation
+       2️⃣ Event Handlers
     ============================== */
-    const onConnected = (data) => {
-      console.log("✅ Socket connected:", data);
-    };
+    const onConnected = () => console.log("✅ Socket connected");
 
-    ordersSocket.on("CONNECTION_ESTABLISHED", onConnected);
+    const onJoinedRoom = (data) => console.log("🏠 Joined restaurant room:", data);
+
+    const onNewOrder = (payload) => {
+      console.log("🆕 NEW_ORDER received:", payload);
+      const orderData = payload?.data || payload;
+      if (!orderData?.orderId) return;
+
+      const newOrder = {
+        ...orderData,
+        orderId: orderData.orderId,
+        customOrderId: orderData.customOrderId || orderData.orderId,
+        total: orderData.price?.grandTotal || 0,
+        customer: orderData.deliveryAddress,
+        items: orderData.items?.map((item) => ({
+          name: item.name,
+          quantity: item.quantity,
+        })),
+        location: orderData.deliveryAddress?.addressLine,
+        status: orderData.status?.toLowerCase(),
+        receivedAt: new Date().toISOString(),
+      };
+
+      // Update Orders List (Prevent Duplicates)
+      setNewOrders((prev) => {
+        if (prev.some((o) => o.orderId === newOrder.orderId)) return prev;
+        return [newOrder, ...prev];
+      });
+
+      // Add Notification
+      setNotifications((prev) => [
+        {
+          id: Date.now(),
+          title: "New Order",
+          message: `Order #${newOrder.customOrderId} received`,
+          type: "success",
+          read: false,
+          time: new Date().toISOString(),
+          orderId: newOrder.orderId
+        },
+        ...prev,
+      ]);
+    };
 
     /* =============================
-       4️⃣ Join restaurant room
+       3️⃣ Attach Listeners
     ============================== */
-    const onJoinedRoom = (data) => {
-      console.log("🏠 Joined restaurant room:", data);
-    };
+    ordersSocket.on("connect", onConnected);
+    ordersSocket.on("JOINED_RESTAURANT_ROOM", onJoinedRoom);
+    ordersSocket.on("NEW_ORDER", onNewOrder);
 
+    // Join Room
     if (restaurantId) {
       ordersSocket.emit("JOIN_RESTAURANT_ROOM", { restaurantId });
-      ordersSocket.on("JOINED_RESTAURANT_ROOM", onJoinedRoom);
     }
 
 
@@ -69,11 +121,9 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
        🧹 CLEANUP (VERY IMPORTANT)
     ============================== */
     return () => {
-      console.log("🧹 Disconnecting sockets");
-
-      ordersSocket.off("CONNECTION_ESTABLISHED", onConnected);
+      ordersSocket.off("connect", onConnected);
       ordersSocket.off("JOINED_RESTAURANT_ROOM", onJoinedRoom);
-      ordersSocket.off("ORDER_STATUS_UPDATED", onOrderStatusUpdated);
+      ordersSocket.off("NEW_ORDER", onNewOrder);
 
       mainSocket.disconnect();
       ordersSocket.disconnect();
@@ -83,7 +133,15 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
 
   return (
     <SocketContext.Provider
-      value={{ mainSocket, ordersSocket, restaurantSocket }}
+      value={{
+        mainSocket,
+        ordersSocket,
+        restaurantSocket,
+        newOrders,
+        setNewOrders,
+        notifications,
+        setNotifications
+      }}
     >
       {children}
     </SocketContext.Provider>

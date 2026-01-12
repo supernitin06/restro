@@ -13,7 +13,20 @@ export const orderApi = baseApi.injectEndpoints({
       providesTags: ["Order"],
     }),
 
+<<<<<<< HEAD
     // 🔹 ACCEPT / REJECT (ADMIN STATUS)
+=======
+    // ✅ Add this mutation
+    assignDelivery: builder.mutation({
+      query: ({ orderId, partnerId }) => ({
+        url: `admin/delivery-partners/order/${orderId}/assign`, 
+        method: "PATCH",
+        body: { deliveryPartnerId: partnerId },  
+      }),
+      invalidatesTags: ["Order"], // optional
+    }),
+
+>>>>>>> f06f5f7c393aee35af21574e950daf4d75bebd19
     updateOrderStatus: builder.mutation({
       query: ({ id, status }) => ({
         url: `admin/orders/${id}/admin-status`,
