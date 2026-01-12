@@ -26,6 +26,9 @@ import CookingLoader from "../pages/Loader";
 import NewOrders from "../components/OrderPages/NewOrders";
 import ProcessingOrders from "../components/OrderPages/ProcessingOrders";
 
+import AcceptedOrders from "../components/OrderPages/AcceptedOrders";
+
+
 // loaders/generalLoader.js
 export const generalLoader = async () => {
   // simulate API delay or global data fetching
@@ -99,6 +102,14 @@ const AppRouter = createBrowserRouter([
                 element: <ProcessingOrders />,
                 loader: generalLoader,
               },
+
+               {
+                path: "accepted",
+                element: <AcceptedOrders />,
+                loader: generalLoader,
+              },
+
+
             ],
           },
           {

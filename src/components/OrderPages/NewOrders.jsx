@@ -3,12 +3,14 @@ import { MapPin } from "lucide-react";
 import Button from "../../components/ui/Button";
 import { useSockets } from "../../context/SocketContext";
 import { showSuccessAlert, showErrorAlert } from "../../utils/toastAlert";
-import { useUpdateOrderStatusMutation, useGetOrdersQuery } from "../../api/services/orderApi";
+import { useUpdateOrderStatusMutation, useGetOrdersQuery, useUpdateKitchenStatusMutation, } from "../../api/services/orderApi";
 
 const NewOrders = () => {
   const { ordersSocket } = useSockets();
   const [updateStatus] = useUpdateOrderStatusMutation();
   const { data, refetch } = useGetOrdersQuery({ status: 'PLACED' });
+  const [updateKitchenStatus] = useUpdateKitchenStatusMutation();
+
   const orders = data?.data || [];
 
   const [processingOrderId, setProcessingOrderId] = useState(null);
@@ -27,42 +29,40 @@ const NewOrders = () => {
   }, [ordersSocket, refetch]);
 
   // Handle accept/reject
-  const handleUpdateStatus = async (orderId, statusInput) => {
-    console.log("handleUpdateStatus called with orderId:", orderId, "statusInput:", statusInput);
-    if (!orderId) {
-      console.log("Order ID missing!");
-      showErrorAlert("Order ID missing!");
-      return;
-    }
+ const handleUpdateStatus = async (orderId, statusInput) => {
+  if (!orderId) {
+    showErrorAlert("Order ID missing!");
+    return;
+  }
 
-    // 1️⃣ Prepare Validation Formats
-    const apiStatus = statusInput.toUpperCase(); // Backend expects: "ACCEPTED", "REJECTED"
-    const uiStatus = statusInput.toLowerCase();  // UI checks: "accepted", "rejected"
-    console.log("apiStatus:", apiStatus, "uiStatus:", uiStatus);
-    
-    try {
-      setProcessingOrderId(orderId);
-      
-      // 2️⃣ Send UPPERCASE to Backend
-      console.log("Calling updateStatus API with id:", orderId, "status:", apiStatus);
-      await updateStatus({ id: orderId, status: apiStatus }).unwrap();
-      console.log("API call successful");
+  try {
+    setProcessingOrderId(orderId);
 
-      // Refetch to update the list (accepted orders will be removed)
-      refetch();
-      console.log("Refetched orders after status update");
+    // ✅ 1. Admin status ACCEPT
+    await updateStatus({
+      id: orderId,
+      status: "ACCEPTED",
+    }).unwrap();
 
-      showSuccessAlert(
-        uiStatus === "accepted" ? "Order Accepted" : "Order Rejected"
-      );
-    } catch (error) {
-      console.error("ORDER STATUS ERROR:", error);
-      showErrorAlert(error?.data?.message || "Failed to update order");
-    } finally {
-      setProcessingOrderId(null);
-      console.log("Processing completed for orderId:", orderId);
-    }
-  };
+    // ✅ 2. Kitchen status READY
+    await updateKitchenStatus({
+      orderId,
+      status: "READY",
+    }).unwrap();
+
+    // ✅ 3. Refresh list
+    refetch();
+
+    showSuccessAlert("Order Accepted & Sent to Kitchen");
+
+  } catch (error) {
+    console.error("ORDER ACCEPT ERROR:", error);
+    showErrorAlert(error?.data?.message || "Failed to accept order");
+  } finally {
+    setProcessingOrderId(null);
+  }
+};
+
 
   return (
     <div className="p-6">
