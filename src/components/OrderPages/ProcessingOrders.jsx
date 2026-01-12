@@ -18,7 +18,7 @@ const ProcessingOrders = () => {
     
   const { data: partnerApi } = useGetDeliveryPartnersQuery();
   console.log("📋 Delivery partners data:", partnerApi);
-  const { data, refetch } = useGetOrdersQuery({ status: 'ACCEPTED' });
+  const { data, refetch } = useGetOrdersQuery({ status: 'READY' });
   const orders = data?.data || [];
   const [partnerSearch, setPartnerSearch] = useState("");
   const [viewingOrder, setViewingOrder] = useState(null);

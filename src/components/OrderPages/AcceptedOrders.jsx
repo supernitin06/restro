@@ -1,81 +1,75 @@
 import React, { useEffect, useState } from "react";
 import { MapPin, ChefHat, CheckCircle, XCircle } from "lucide-react";
 import { useSockets } from "../../context/SocketContext";
+import { useNavigate } from "react-router-dom";
 import {
   useGetOrdersQuery,
   useUpdateOrderStatusMutation,
+  useUpdateKitchenStatusMutation,
 } from "../../api/services/orderApi";
-import {
-  showSuccessAlert,
-  showErrorAlert,
-} from "../../utils/toastAlert";
+import { showSuccessAlert, showErrorAlert } from "../../utils/toastAlert";
 
 const AcceptedOrders = () => {
   const { ordersSocket } = useSockets();
+  const navigate = useNavigate();
 
-  const { data, refetch, isLoading } = useGetOrdersQuery({
-    status: "ACCEPTED",
-  });
-
+  const { data, refetch } = useGetOrdersQuery({ status: "ACCEPTED" });
   const orders = data?.data || [];
+  console.log("ORDERS:", orders);
 
+
+  const [updateKitchenStatus] = useUpdateKitchenStatusMutation();
   const [updateOrderStatus] = useUpdateOrderStatusMutation();
   const [loadingId, setLoadingId] = useState(null);
 
-  // 🔌 Socket refresh
+  // 🔌 Socket: refresh
   useEffect(() => {
     if (!ordersSocket) return;
 
-    const refresh = () => refetch();
+    const refreshOrders = () => refetch();
 
-    ordersSocket.on("ORDER_ACCEPTED", refresh);
-    ordersSocket.on("KITCHEN_STATUS_UPDATED", refresh);
+    ordersSocket.on("ORDER_ACCEPTED", refreshOrders);
+    ordersSocket.on("KITCHEN_STATUS_UPDATED", refreshOrders);
 
     return () => {
-      ordersSocket.off("ORDER_ACCEPTED", refresh);
-      ordersSocket.off("KITCHEN_STATUS_UPDATED", refresh);
+      ordersSocket.off("ORDER_ACCEPTED", refreshOrders);
+      ordersSocket.off("KITCHEN_STATUS_UPDATED", refreshOrders);
     };
   }, [ordersSocket, refetch]);
 
-  // ✅ READY
-  const markReady = async (orderId) => {
+  // ✅ Ready → move to Processing page
+  const handleReady = async (orderId) => {
     try {
       setLoadingId(orderId);
 
-      await updateOrderStatus({
-        id: orderId,
-        status: "READY",
-      }).unwrap();
+      await updateKitchenStatus({ orderId, status: "READY" }).unwrap();
 
-      showSuccessAlert("Order marked READY");
+      showSuccessAlert("Order moved to Processing!");
       refetch();
+
+      navigate("/orders/processing"); // Move to Processing page
     } catch (err) {
-      showErrorAlert("Failed to mark READY");
+      console.error("READY ERROR:", err);
+      showErrorAlert("Failed to update kitchen status");
     } finally {
       setLoadingId(null);
     }
   };
 
-  // ❌ REJECT
-  const rejectOrder = async (orderId) => {
+  // ❌ Reject → move back to rejected
+  const handleReject = async (orderId) => {
     try {
       setLoadingId(orderId);
-
-      await updateOrderStatus({
-        id: orderId,
-        status: "REJECTED",
-      }).unwrap();
-
-      showSuccessAlert("Order rejected");
+      await updateOrderStatus({ id: orderId, status: "REJECTED" }).unwrap();
+      showSuccessAlert("Order Rejected");
       refetch();
     } catch (err) {
+      console.error("REJECT ERROR:", err);
       showErrorAlert("Failed to reject order");
     } finally {
       setLoadingId(null);
     }
   };
-
-  if (isLoading) return <div className="p-6">Loading...</div>;
 
   return (
     <div className="p-6">
@@ -92,20 +86,16 @@ const AcceptedOrders = () => {
             {/* Header */}
             <div className="flex justify-between">
               <h2 className="font-bold">{order.customOrderId}</h2>
-              <span className="text-green-600 font-bold">
-                ₹{order.total}
-              </span>
+              <span className="text-green-600 font-bold">₹{order.total}</span>
             </div>
 
             {/* Customer */}
             <div>
               <p className="font-semibold">{order.customer?.name}</p>
-              <p className="text-sm text-gray-500">
-                {order.customer?.phone}
-              </p>
+              <p className="text-sm text-gray-500">{order.customer?.phone}</p>
             </div>
 
-            {/* Address */}
+            {/* Location */}
             <div className="flex gap-2 text-sm text-gray-600">
               <MapPin size={14} />
               {order.location}
@@ -121,46 +111,47 @@ const AcceptedOrders = () => {
             </div>
 
             {/* Status */}
-            <div className="flex justify-between items-center pt-3 border-t">
-              <span className="flex items-center gap-1 text-green-700 font-semibold text-sm">
-                <CheckCircle size={14} />
-                Accepted
+            <div className="flex justify-between pt-3 border-t">
+              <span className="flex items-center gap-1 text-green-700 text-sm font-semibold">
+                <CheckCircle size={14} /> Accepted
               </span>
 
-              <span className="flex items-center gap-1 text-xs px-3 py-1 rounded-full bg-blue-100 text-blue-700">
+              <span
+                className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold ${
+                  order.kitchenStatus === "READY"
+                    ? "bg-orange-100 text-orange-700"
+                    : "bg-blue-100 text-blue-700"
+                }`}
+              >
                 <ChefHat size={12} />
                 {order.kitchenStatus || "PREPARING"}
               </span>
             </div>
 
-            {/* 🔥 ACTION BUTTONS */}
+            {/* Actions */}
             <div className="flex gap-2 pt-3">
               <button
-                onClick={() => markReady(order.orderId)}
+                className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg text-sm"
                 disabled={loadingId === order.orderId}
-                className="flex-1 bg-green-600 hover:bg-green-700 text-white text-sm py-2 rounded-lg disabled:opacity-50"
+                onClick={() => handleReady(order.orderId)}
               >
-                Ready
+                {loadingId === order.orderId ? "Processing..." : "Ready"}
               </button>
 
               <button
-                onClick={() => rejectOrder(order.orderId)}
+                className="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg text-sm"
                 disabled={loadingId === order.orderId}
-                className="flex-1 bg-red-600 hover:bg-red-700 text-white text-sm py-2 rounded-lg disabled:opacity-50"
+                onClick={() => handleReject(order.orderId)}
               >
                 Reject
               </button>
-            </div>
-
-            <div className="text-xs text-gray-400">
-              {order.createdAt}
             </div>
           </div>
         ))}
 
         {orders.length === 0 && (
-          <div className="col-span-full text-center text-gray-400 py-20">
-            No accepted orders
+          <div className="text-gray-400 text-center col-span-full py-20">
+            No accepted orders yet
           </div>
         )}
       </div>

@@ -3,13 +3,12 @@ import { MapPin } from "lucide-react";
 import Button from "../../components/ui/Button";
 import { useSockets } from "../../context/SocketContext";
 import { showSuccessAlert, showErrorAlert } from "../../utils/toastAlert";
-import { useUpdateOrderStatusMutation, useGetOrdersQuery, useUpdateKitchenStatusMutation, } from "../../api/services/orderApi";
+import { useUpdateOrderStatusMutation, useGetOrdersQuery } from "../../api/services/orderApi";
 
 const NewOrders = () => {
   const { ordersSocket } = useSockets();
   const [updateStatus] = useUpdateOrderStatusMutation();
   const { data, refetch } = useGetOrdersQuery({ status: 'PLACED' });
-  const [updateKitchenStatus] = useUpdateKitchenStatusMutation();
 
   const orders = data?.data || [];
 
@@ -44,11 +43,6 @@ const NewOrders = () => {
       status: "ACCEPTED",
     }).unwrap();
 
-    // ✅ 2. Kitchen status READY
-    await updateKitchenStatus({
-      orderId,
-      status: "READY",
-    }).unwrap();
 
     // ✅ 3. Refresh list
     refetch();
