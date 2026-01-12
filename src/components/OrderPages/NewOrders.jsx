@@ -5,8 +5,9 @@ import { useSockets } from "../../context/SocketContext";
 import { showSuccessAlert, showErrorAlert } from "../../utils/toastAlert";
 import { useUpdateOrderStatusMutation, useGetOrdersQuery } from "../../api/services/orderApi";
 
+
 const NewOrders = () => {
-  const { newOrders, setNewOrders } = useSockets();
+  const { ordersSocket, newOrders, setNewOrders } = useSockets();
   const [updateStatus] = useUpdateOrderStatusMutation();
   const { data, refetch } = useGetOrdersQuery({ status: 'PLACED' });
   const orders = data?.data || [];

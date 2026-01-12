@@ -15,8 +15,8 @@ export const orderApi = baseApi.injectEndpoints({
     // ✅ Add this mutation
     assignDelivery: builder.mutation({
       query: ({ orderId, partnerId }) => ({
-        url: `delivery-partners/order/${orderId}/assign`, 
-        method: "POST",
+        url: `admin/delivery-partners/order/${orderId}/assign`, 
+        method: "PATCH",
         body: { deliveryPartnerId: partnerId },  
       }),
       invalidatesTags: ["Order"], // optional
