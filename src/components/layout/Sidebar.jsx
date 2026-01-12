@@ -22,6 +22,7 @@ import {
   Menu,
   X,
   Clock,
+  CheckCircle,
 } from "lucide-react";
 
 import Button from "../ui/Button";
@@ -87,6 +88,13 @@ const Sidebar = ({ theme = "dark" }) => {
       icon: Bike,
       path: "/orders/processing",
     },
+    {
+  id: "accepted-orders",
+  label: "Accepted Orders",
+  icon: CheckCircle,
+  path: "/orders/accepted",
+}
+
   ],
 },
 

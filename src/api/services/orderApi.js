@@ -31,9 +31,19 @@ export const orderApi = baseApi.injectEndpoints({
       invalidatesTags: ["Order"],
     }),
 
+     updateKitchenStatus: builder.mutation({
+      query: ({ orderId, status }) => ({
+        url: `admin/orders/${orderId}/kitchen-status`,
+        method: "PATCH",
+        data: { status },
+      }),
+      invalidatesTags: ["Order"],
+    }),
+
+  
 
   }),
   overrideExisting: false,
 });
 
-export const { useGetOrdersQuery, useAssignDeliveryMutation, useUpdateOrderStatusMutation } = orderApi;
+export const { useGetOrdersQuery, useAssignDeliveryMutation, useUpdateOrderStatusMutation, useUpdateKitchenStatusMutation } = orderApi;
