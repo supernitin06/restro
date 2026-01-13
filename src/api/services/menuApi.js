@@ -66,13 +66,14 @@ export const menuApi = baseApi.injectEndpoints({
         }),
 
         addCategory: builder.mutation({
-            query: ({ restaurantId, ...data }) => ({
-                url: `admin/cat/${restaurantId}`,
+            query: (data) => ({
+                url: `admin/cat`,
                 method: "POST",
                 data,
             }),
             invalidatesTags: ["Categories"],
         }),
+
 
         updateCategory: builder.mutation({
             query: ({ id, payload }) => ({

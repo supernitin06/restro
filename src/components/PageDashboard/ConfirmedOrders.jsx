@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
-import { ArrowRight, Bike, ClipboardList, ChevronDown, ChevronUp } from 'lucide-react';
+import { ArrowRight, CheckCircle, XCircle, ChevronDown, ChevronUp, ChefHat } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { createPortal } from 'react-dom';
+import { useUpdateKitchenStatusMutation, useUpdateOrderStatusMutation } from '../../api/services/orderApi';
+import { showSuccessAlert, showErrorAlert } from '../../utils/toastAlert';
 
-const ConfirmedOrders = ({ title, orders, icon: Icon, color, deliveryBoys }) => {
-    // We'll track which menu is open by ID and Type ('status' or 'assign')
-    const [activeMenu, setActiveMenu] = useState({ id: null, type: null });
+const ConfirmedOrders = ({ title, orders, icon: Icon, color }) => {
     const [expandedOrderId, setExpandedOrderId] = useState(null);
-    const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
+
+    // Mutations
+    const [updateKitchenStatus] = useUpdateKitchenStatusMutation();
+    const [updateOrderStatus] = useUpdateOrderStatusMutation(); // For Reject if needed
+
     const navigate = useNavigate();
 
     const colorClasses = {
@@ -28,59 +31,36 @@ const ConfirmedOrders = ({ title, orders, icon: Icon, color, deliveryBoys }) => 
         preparing: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
         packing: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300',
         confirmed: 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/40 dark:text-cyan-300',
-        cooking: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300'
+        cooking: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300',
+        ready: 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300'
     };
 
     const classes = colorClasses[color] || colorClasses.blue;
-    const nextStatuses = ['Preparing', 'Cooking', 'Packing', 'Ready for Pickup'];
 
-    const handleAssign = (orderId, boyName) => {
-        if (window.confirm(`Assign ${boyName} to order ${orderId}?`)) {
-            console.log(`Order ${orderId} assigned to ${boyName}`);
-            closeMenu();
+    const handleMarkReady = async (orderId) => {
+        try {
+            await updateKitchenStatus({ orderId, status: "READY" }).unwrap();
+            showSuccessAlert("Order marked as Ready!");
+        } catch (err) {
+            console.error(err);
+            showErrorAlert("Failed to mark as Ready");
         }
     };
 
-    const handleStatusUpdate = (orderId, newStatus) => {
-        if (window.confirm(`Update order ${orderId} to "${newStatus}"?`)) {
-            console.log(`Order ${orderId} status updated to ${newStatus}`);
-            closeMenu();
+    const handleReject = async (orderId) => {
+        if (!window.confirm("Are you sure you want to reject this confirmed order?")) return;
+        try {
+            await updateOrderStatus({ id: orderId, status: "REJECTED" }).unwrap();
+            showSuccessAlert("Order rejected.");
+        } catch (err) {
+            console.error(err);
+            showErrorAlert("Failed to reject order");
         }
-    };
-
-    const getDeliveryBoyInitials = (name) => {
-        if (!name) return '';
-        const parts = name.split(' ');
-        if (parts.length > 1 && parts[parts.length - 1]) {
-            return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
-        }
-        return name.substring(0, 2).toUpperCase();
-    };
-
-    const toggleMenu = (e, orderId, type) => {
-        e.stopPropagation();
-        if (activeMenu.id === orderId && activeMenu.type === type) {
-            closeMenu();
-        } else {
-            const rect = e.currentTarget.getBoundingClientRect();
-            // Calculate position differently based on menu type width if needed, but centering/align right is standard
-            setMenuPosition({
-                top: rect.bottom + window.scrollY + 8,
-                left: type === 'assign' ? rect.left + window.scrollX - 200 : rect.left + window.scrollX - 160
-            });
-            setActiveMenu({ id: orderId, type });
-        }
-    };
-
-    const closeMenu = () => {
-        setActiveMenu({ id: null, type: null });
-        setMenuPosition(null);
     };
 
     const toggleExpand = (orderId) => {
         setExpandedOrderId(expandedOrderId === orderId ? null : orderId);
     };
-
 
     return (
         <div className="h-full max-h-[600px] overflow-hidden flex flex-col bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-[2rem] shadow-2xl border border-white/20 dark:border-gray-800 transition-all duration-300 relative group ring-1 ring-black/5">
@@ -123,7 +103,7 @@ const ConfirmedOrders = ({ title, orders, icon: Icon, color, deliveryBoys }) => 
                 ) : (
                     orders.map((order, index) => (
                         <div
-                            key={order.id}
+                            key={order.orderId}
                             style={{ animationDelay: `${index * 50}ms` }}
                             className="relative p-5 rounded-2xl bg-white dark:bg-gray-800/40 border border-gray-100 dark:border-gray-700/50 hover:border-gray-300 dark:hover:border-gray-500 hover:shadow-lg dark:hover:shadow-black/20 transition-all duration-300 bg-gradient-to-br from-transparent to-gray-50/50 dark:to-gray-800/30 animate-in slide-in-from-bottom-2 fill-mode-backwards"
                         >
@@ -132,12 +112,12 @@ const ConfirmedOrders = ({ title, orders, icon: Icon, color, deliveryBoys }) => 
                                     <div className="bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-2.5 py-1 rounded-lg shadow-md">
                                         <span className="text-xs font-bold tracking-wider">#{order.id}</span>
                                     </div>
-                                    <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-sm ring-1 ring-inset ring-black/5 ${statusStyles[order.status.toLowerCase()] || 'bg-gray-100 text-gray-600'}`}>
+                                    <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-sm ring-1 ring-inset ring-black/5 ${statusStyles[(order.status || '').toLowerCase()] || 'bg-gray-100 text-gray-600'}`}>
                                         {order.status}
                                     </span>
                                 </div>
                                 <div className="text-right">
-                                    <span className={`text-xl font-extrabold ${classes.text} tracking-tight`}>${order.amount.toFixed(2)}</span>
+                                    <span className={`text-xl font-extrabold ${classes.text} tracking-tight`}>${(order.amount || 0).toFixed(2)}</span>
                                 </div>
                             </div>
 
@@ -148,46 +128,37 @@ const ConfirmedOrders = ({ title, orders, icon: Icon, color, deliveryBoys }) => 
                                         <span>{order.time}</span>
                                         <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600" />
                                         <button
-                                            onClick={() => toggleExpand(order.id)}
+                                            onClick={() => toggleExpand(order.orderId)}
                                             className="flex items-center gap-1 hover:text-primary transition-colors focus:outline-none"
                                         >
                                             {order.items ? order.items.length : 0} Items
-                                            {expandedOrderId === order.id ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                                            {expandedOrderId === order.orderId ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
                                         </button>
                                     </div>
                                 </div>
 
                                 <div className="flex items-center gap-2 pl-2">
-                                    {/* Status Update Button */}
-                                    <div className="relative">
-                                        <button
-                                            onClick={(e) => toggleMenu(e, order.id, 'status')}
-                                            className="w-10 h-10 flex items-center justify-center rounded-xl bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/40 border border-green-100 dark:border-green-800/50 hover:border-green-200 transition-all duration-200 shadow-sm hover:shadow-green-500/10"
-                                            title="Update Status"
-                                        >
-                                            <ClipboardList size={18} />
-                                        </button>
-                                    </div>
+                                    {/* Action Buttons */}
+                                    <button
+                                        onClick={() => handleMarkReady(order.orderId)}
+                                        className="flex items-center gap-1.5 px-3 py-2 bg-green-500 hover:bg-green-600 text-white rounded-xl shadow-md shadow-green-200 dark:shadow-none transition-all duration-200 text-xs font-bold"
+                                        title="Mark as Ready"
+                                    >
+                                        <ChefHat size={14} /> Ready
+                                    </button>
 
-                                    {/* Assign/Change Delivery Boy Button */}
-                                    <div className="relative">
-                                        <button
-                                            onClick={(e) => toggleMenu(e, order.id, 'assign')}
-                                            className={`w-10 h-10 flex items-center justify-center rounded-xl border transition-all duration-200 shadow-sm
-                                                ${order.deliveryBoy
-                                                    ? 'bg-purple-50 dark:bg-purple-900/20 border-purple-100 dark:border-purple-800 text-purple-600 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-purple-900/40 hover:shadow-purple-500/10'
-                                                    : 'bg-gray-50 dark:bg-gray-700/30 border-gray-200 dark:border-gray-600 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500'
-                                                }`}
-                                            title={order.deliveryBoy ? `Assigned to: ${order.deliveryBoy.name}` : 'Assign Delivery Partner'}
-                                        >
-                                            {order.deliveryBoy ? getDeliveryBoyInitials(order.deliveryBoy.name) : <Bike size={18} />}
-                                        </button>
-                                    </div>
+                                    <button
+                                        onClick={() => handleReject(order.orderId)}
+                                        className="p-2 bg-red-50 hover:bg-red-100 text-red-500 rounded-xl transition-all duration-200"
+                                        title="Reject Order"
+                                    >
+                                        <XCircle size={18} />
+                                    </button>
                                 </div>
                             </div>
 
                             {/* Expanded Details Accordion */}
-                            {expandedOrderId === order.id && order.items && (
+                            {expandedOrderId === order.orderId && order.items && (
                                 <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-700/50 animate-in slide-in-from-top-2 fade-in duration-200">
                                     <ul className="space-y-2">
                                         {order.items.map((item, idx) => (
@@ -219,62 +190,6 @@ const ConfirmedOrders = ({ title, orders, icon: Icon, color, deliveryBoys }) => 
                     </span>
                 </button>
             </div>
-
-            {/* Portal Dropdown Menus */}
-            {(activeMenu.id && menuPosition) && createPortal(
-                <div className="fixed inset-0 z-[9999] isolate" style={{ zIndex: 9999 }}>
-                    <div className="absolute inset-0 bg-transparent" onClick={closeMenu} />
-
-                    {/* Status Update Menu */}
-                    {activeMenu.type === 'status' && (
-                        <div
-                            className="absolute w-48 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 overflow-hidden animate-in zoom-in-95 duration-200 ring-1 ring-black/5 origin-top-left"
-                            style={{ top: `${menuPosition.top}px`, left: `${menuPosition.left}px` }}
-                        >
-                            <div className="p-3 border-b border-gray-100 dark:border-gray-700 bg-gray-50/80 dark:bg-gray-800/80 backdrop-blur-sm">
-                                <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest text-center">Set Status</p>
-                            </div>
-                            <div className="p-1.5 space-y-0.5">
-                                {nextStatuses.map(status => (
-                                    <button key={status} onClick={() => handleStatusUpdate(activeMenu.id, status)} className="w-full text-left text-sm px-3 py-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700/50 text-gray-700 dark:text-gray-200 cursor-pointer transition-colors font-medium">
-                                        {status}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Assignment Menu */}
-                    {activeMenu.type === 'assign' && (
-                        <div
-                            className="absolute w-60 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 overflow-hidden animate-in zoom-in-95 duration-200 ring-1 ring-black/5 origin-top-left"
-                            style={{ top: `${menuPosition.top}px`, left: `${menuPosition.left}px` }}
-                        >
-                            <div className="p-3 border-b border-gray-100 dark:border-gray-700 bg-gray-50/80 dark:bg-gray-800/80 backdrop-blur-sm">
-                                <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest text-center">Delivery Partner</p>
-                            </div>
-                            <div className="p-1.5 space-y-0.5 max-h-56 overflow-y-auto custom-scrollbar">
-                                {(deliveryBoys || []).length > 0 ? (
-                                    (deliveryBoys || []).map(boy => (
-                                        <button key={boy.id} onClick={() => handleAssign(activeMenu.id, boy.name)} className="w-full text-left text-sm px-3 py-2.5 rounded-xl hover:bg-purple-50 dark:hover:bg-purple-900/20 text-gray-700 dark:text-gray-200 hover:text-purple-700 dark:hover:text-purple-300 cursor-pointer transition-colors flex items-center gap-3 font-medium">
-                                            <div className="w-7 h-7 rounded-lg bg-purple-100 dark:bg-purple-900/40 flex items-center justify-center text-[10px] font-bold text-purple-700 dark:text-purple-300 ring-1 ring-inset ring-black/5">
-                                                {getDeliveryBoyInitials(boy.name)}
-                                            </div>
-                                            {boy.name}
-                                        </button>
-                                    ))
-                                ) : (
-                                    <div className="px-4 py-8 text-center bg-gray-50 dark:bg-gray-800/50 rounded-xl m-1 border border-dashed border-gray-200 dark:border-gray-700">
-                                        <Bike size={20} className="mx-auto text-gray-300 mb-2" />
-                                        <p className="text-xs text-gray-400 font-medium">No partners active</p>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    )}
-                </div>,
-                document.body
-            )}
         </div>
     );
 };

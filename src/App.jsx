@@ -15,7 +15,7 @@ function App() {
         <div className=''>
           <RouterProvider router={router} />
           <Toaster
-            position="top-right"
+            position="top-center"
             toastOptions={{
               duration: 3000,
               style: {

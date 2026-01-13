@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
 import { ArrowRight, MoreVertical, Check, X, ChevronDown, ChevronUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-
 import { createPortal } from 'react-dom';
-// import { useOrderStatusUpdateMutation } from '../../api/services/orderApi';
+import { useUpdateOrderStatusMutation } from '../../api/services/orderApi';
+import { showSuccessAlert, showErrorAlert } from '../../utils/toastAlert';
 
 const UpcomingOrders = ({ title, orders, icon: Icon, color }) => {
     const [actionsMenuOrderId, setActionsMenuOrderId] = useState(null);
     const [expandedOrderId, setExpandedOrderId] = useState(null);
     const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
-    // const [orderStatusUpdate] = useOrderStatusUpdateMutation();
+
+    // API Mutation
+    const [updateOrderStatus] = useUpdateOrderStatusMutation();
     const navigate = useNavigate();
 
     const colorClasses = {
@@ -35,11 +37,16 @@ const UpcomingOrders = ({ title, orders, icon: Icon, color }) => {
 
     const classes = colorClasses[color] || colorClasses.orange;
 
-    const handleUpdateOrderStatus = (orderId) => {
-        updateOrderStatus(orderId, '');
+    const handleUpdateStatus = async (orderId, newStatus) => {
+        try {
+            await updateOrderStatus({ id: orderId, status: newStatus }).unwrap();
+            showSuccessAlert(`Order {newStatus.toLowerCase()} successfully!`);
+            closeMenu();
+        } catch (error) {
+            console.error(error);
+            showErrorAlert("Failed to update order status");
+        }
     };
-
-   
 
     const toggleMenu = (e, orderId) => {
         e.stopPropagation();
@@ -49,7 +56,7 @@ const UpcomingOrders = ({ title, orders, icon: Icon, color }) => {
             const rect = e.currentTarget.getBoundingClientRect();
             setMenuPosition({
                 top: rect.bottom + window.scrollY + 8,
-                left: rect.left + window.scrollX - 140 // Align mostly to the left of the button
+                left: rect.left + window.scrollX - 140
             });
             setActionsMenuOrderId(orderId);
         }
@@ -68,7 +75,8 @@ const UpcomingOrders = ({ title, orders, icon: Icon, color }) => {
         <div className="h-full max-h-[600px] overflow-hidden flex flex-col bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-[2rem] shadow-2xl border border-white/20 dark:border-gray-800 transition-all duration-300 relative group ring-1 ring-black/5">
 
             {/* Background Aesthetic */}
-            <div className={`absolute -top-24 -right-24 w-64 h-64 bg-gradient-to-br from-${color}-500/20 to-purple-500/20 rounded-full blur-[80px] -z-10 transition-all duration-700`} />
+            <div className={`absolute -top-24 -right-24 w-64 h-64 bg-gradient-to-br from-$
+{color}-500/20 to-purple-500/20 rounded-full blur-[80px] -z-10 transition-all duration-700`} />
 
             {/* Header */}
             <div className="px-6 py-5 flex-shrink-0 border-b border-gray-100/50 dark:border-gray-800/50">
@@ -108,7 +116,7 @@ const UpcomingOrders = ({ title, orders, icon: Icon, color }) => {
                 ) : (
                     orders.map((order, index) => (
                         <div
-                            key={order.id}
+                            key={order.orderId} // Use Mongo ID key
                             style={{ animationDelay: `${index * 50}ms` }}
                             className="relative p-5 rounded-2xl bg-white dark:bg-gray-800/40 border border-gray-100 dark:border-gray-700/50 hover:border-gray-300 dark:hover:border-gray-500 hover:shadow-lg dark:hover:shadow-black/20 transition-all duration-300 bg-gradient-to-br from-transparent to-gray-50/50 dark:to-gray-800/30 animate-in slide-in-from-bottom-2 fill-mode-backwards"
                         >
@@ -117,12 +125,12 @@ const UpcomingOrders = ({ title, orders, icon: Icon, color }) => {
                                     <div className="bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-2.5 py-1 rounded-lg shadow-md">
                                         <span className="text-xs font-bold tracking-wider">#{order.id}</span>
                                     </div>
-                                    <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-sm ring-1 ring-inset ring-black/5 ${statusStyles[order.status.toLowerCase()] || 'bg-gray-100 text-gray-600'}`}>
+                                    <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-sm ring-1 ring-inset ring-black/5 ${statusStyles[(order.status || '').toLowerCase()] || 'bg-gray-100 text-gray-600'}`}>
                                         {order.status}
                                     </span>
                                 </div>
                                 <div className="text-right">
-                                    <span className={`text-xl font-extrabold ${classes.text} tracking-tight`}>${order.amount.toFixed(2)}</span>
+                                    <span className={`text-xl font-extrabold ${classes.text} tracking-tight`}>Rs. {(order.amount || 0).toFixed(2)}</span>
                                 </div>
                             </div>
 
@@ -133,18 +141,18 @@ const UpcomingOrders = ({ title, orders, icon: Icon, color }) => {
                                         <span>{order.time}</span>
                                         <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600" />
                                         <button
-                                            onClick={() => toggleExpand(order.id)}
+                                            onClick={() => toggleExpand(order.orderId)}
                                             className="flex items-center gap-1 hover:text-primary transition-colors focus:outline-none"
                                         >
                                             {order.items ? order.items.length : 0} Items
-                                            {expandedOrderId === order.id ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                                            {expandedOrderId === order.orderId ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
                                         </button>
                                     </div>
                                 </div>
 
                                 <div className="relative">
                                     <button
-                                        onClick={(e) => toggleMenu(e, order.id)}
+                                        onClick={(e) => toggleMenu(e, order.orderId)} // Pass Mongo ID
                                         className="w-9 h-9 flex items-center justify-center rounded-xl bg-gray-50 dark:bg-gray-700/50 text-gray-500 hover:text-primary hover:bg-white dark:hover:bg-gray-700 border border-transparent hover:border-gray-200 dark:hover:border-gray-600 hover:shadow-md transition-all duration-200"
                                     >
                                         <MoreVertical size={18} />
@@ -153,7 +161,7 @@ const UpcomingOrders = ({ title, orders, icon: Icon, color }) => {
                             </div>
 
                             {/* Expanded Details Accordion */}
-                            {expandedOrderId === order.id && order.items && (
+                            {expandedOrderId === order.orderId && order.items && (
                                 <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-700/50 animate-in slide-in-from-top-2 fade-in duration-200">
                                     <ul className="space-y-2">
                                         {order.items.map((item, idx) => (
@@ -189,7 +197,7 @@ const UpcomingOrders = ({ title, orders, icon: Icon, color }) => {
             {/* Portal Dropdown Menu */}
             {actionsMenuOrderId && createPortal(
                 <div className="fixed inset-0 z-[9999] isolate" style={{ zIndex: 9999 }}>
-                    {/* Backdrop to close menu on click outside */}
+                    {/* Backdrop */}
                     <div className="absolute inset-0 bg-transparent" onClick={closeMenu} />
 
                     {/* The Menu */}
@@ -200,12 +208,19 @@ const UpcomingOrders = ({ title, orders, icon: Icon, color }) => {
                             left: `${menuPosition.left}px`
                         }}
                     >
-                        <div className="p-1.5 space-y-1">
-                           <Select
-                           value={selectedStatus}
-                           onChange={(e) => setSelectedStatus(e.target.value)}
-                           options={statusOptions}
-                           />
+                        <div className="p-1 space-y-1">
+                            <button
+                                onClick={() => handleUpdateStatus(actionsMenuOrderId, 'ACCEPTED')}
+                                className="w-full text-left px-3 py-2 rounded-xl hover:bg-green-50 dark:hover:bg-green-900/20 text-green-600 dark:text-green-400 text-sm font-bold flex items-center gap-2 transition-colors"
+                            >
+                                <Check size={14} /> Accept Order
+                            </button>
+                            <button
+                                onClick={() => handleUpdateStatus(actionsMenuOrderId, 'REJECTED')}
+                                className="w-full text-left px-3 py-2 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 text-sm font-bold flex items-center gap-2 transition-colors"
+                            >
+                                <X size={14} /> Reject Order
+                            </button>
                         </div>
                     </div>
                 </div>,

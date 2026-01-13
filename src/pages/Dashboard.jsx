@@ -13,26 +13,40 @@ import RecentActivity from "../components/PageDashboard/RecentActivity";
 import Footer from "../components/PageDashboard/Footer";
 import UpcomingOrders from "../components/PageDashboard/UpcomingOrders";
 import ConfirmedOrders from "../components/PageDashboard/ConfirmedOrders";
+import { useGetOrdersQuery } from "../api/services/orderApi";
+import { format } from "date-fns"; // Ensure date-fns is installed or use native
 
 const Dashboard = () => {
-  // Dummy data for new cards
-  // Orders that have just been placed and are waiting for admin confirmation
-  const upcomingOrders = [
-    { id: 'ORD001', customer: 'Aman Verma', amount: 415, time: '11:30 AM', status: 'placed' },
-    { id: 'ORD007', customer: 'Anjali Sharma', amount: 180, time: '12:15 PM', status: 'placed' },
-    { id: 'ORD009', customer: 'Suresh Gupta', amount: 250, time: '12:30 PM', status: 'placed' },
-    { id: 'ORD010', customer: 'Priya Jain', amount: 600, time: '12:35 PM', status: 'placed' },
-  ];
+  // Fetch Real Data
+  const { data: placedData } = useGetOrdersQuery({ status: "PLACED" }, { pollingInterval: 30000 });
+  const { data: acceptedData } = useGetOrdersQuery({ status: "ACCEPTED" }, { pollingInterval: 30000 });
+  const { data: readyData } = useGetOrdersQuery({ status: "READY" }, { pollingInterval: 30000 });
 
-  // Orders that have been confirmed by the admin and are now being processed
+
+  
+  const transformOrder = (order) => ({
+    id: order.orderId || order.customOrderId || order._id, // Visual ID "ORD-..."
+    orderId: order._id, // API ID
+    customer: order.customer?.name || "Guest",
+    amount: order.price?.grandTotal || 0,
+    time: order.createdAt || "Just Now",
+    status: order.status,
+    items: (order.items || []).map(item => ({
+      name: item.name,
+      quantity: item.quantity,
+      price: item.finalItemPrice || item.basePrice || 0
+    })),
+    deliveryBoy: order.deliveryPartner || null // If populated in future
+  });
+
+  const upcomingOrders = (placedData?.data || []).map(transformOrder);
+
+  // Combine Accepted and Ready for the "Confirmed/In-Progress" view
   const confirmedOrders = [
-    { id: 'ORD002', customer: 'Neha Singh', amount: 330, time: '11:45 AM', status: 'preparing', deliveryBoy: { id: 'DB01', name: 'Ravi Kumar' } },
-    { id: 'ORD003', customer: 'Rohit Kumar', amount: 390, time: '12:05 PM', status: 'packing', deliveryBoy: null },
-    { id: 'ORD008', customer: 'Vikram Singh', amount: 550, time: '12:20 PM', status: 'preparing', deliveryBoy: { id: 'DB02', name: 'Sunil Verma' } },
-    { id: 'ORD004', customer: 'Pooja Mehta', amount: 260, time: '12:25 PM', status: 'confirmed', deliveryBoy: null },
-    { id: 'ORD005', customer: 'Arjun Malik', amount: 480, time: '12:40 PM', status: 'confirmed', deliveryBoy: null },
-  ];
+    ...(acceptedData?.data || []),
+  ].map(transformOrder);
 
+  // Delivery Boys (Mock for now, or fetch if API exists)
   const deliveryBoys = [
     { id: 'DB01', name: 'Ravi Kumar' },
     { id: 'DB02', name: 'Sunil Verma' },

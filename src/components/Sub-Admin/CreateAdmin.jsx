@@ -220,7 +220,7 @@ const CreateAdmin = () => {
 
   return (
     <div className="page">
-      <div className="max-w-7xl mx-auto">
+      <div className=" mx-auto">
         {/* Header */}
         <div className="mb-8">
   

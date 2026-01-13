@@ -73,10 +73,13 @@ const AddMenuItem = () => {
 
   // Category Modal States
   const [newCategoryName, setNewCategoryName] = useState("");
+  const [newCategoryDescription, setNewCategoryDescription] = useState("");
+  const [newCategoryFoodType, setNewCategoryFoodType] = useState("VEG");
   const [newCategoryOrder, setNewCategoryOrder] = useState(1);
   const [showAddCategory, setShowAddCategory] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+  const [categoryImage, setCategoryImage] = useState(null);
 
   // Item Details States
   const [name, setName] = useState("");
@@ -153,18 +156,31 @@ const AddMenuItem = () => {
     }
   };
 
+  // ✅ Category Image Handler
+  const handleCategoryImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setCategoryImage(file);
+    }
+  };
+
   /* ✅ Category Handlers */
   const handleAddCategory = async () => {
     if (!newCategoryName.trim()) return;
     if (!restaurantId) return showErrorAlert("Restaurant ID missing.");
 
     try {
+      const formData = new FormData();
+      formData.append("restaurantId", restaurantId);
+      formData.append("name", newCategoryName);
+      formData.append("description", newCategoryDescription);
+      formData.append("foodType", newCategoryFoodType);
+      if (categoryImage) {
+        formData.append("image", categoryImage);
+      }
+
       const result = await showPromiseToast(
-        addCategory({
-          restaurantId,
-          name: newCategoryName,
-          order: newCategoryOrder,
-        }).unwrap(),
+        addCategory(formData).unwrap(),
         {
           loading: 'Adding category...',
           success: 'Category added!',
@@ -177,6 +193,9 @@ const AddMenuItem = () => {
         setCategory(result._id);
       }
       setNewCategoryName("");
+      setNewCategoryDescription("");
+      setNewCategoryFoodType("VEG"); // Reset
+      setCategoryImage(null);
       setShowAddCategory(false);
     } catch (err) {
       console.error(err);
@@ -649,7 +668,7 @@ const AddMenuItem = () => {
         {/* Add/Edit Category Modal */}
         {showAddCategory && (
           <Modal
-            onClose={() => { setShowAddCategory(false); setEditingCategory(null); setNewCategoryName(""); }}
+            onClose={() => { setShowAddCategory(false); setEditingCategory(null); setNewCategoryName(""); setNewCategoryDescription(""); setNewCategoryFoodType("VEG"); setCategoryImage(null); }}
             title={editingCategory ? "Edit Category" : "Create New Category"}
           >
             <div className="space-y-4 p-1">
@@ -659,13 +678,44 @@ const AddMenuItem = () => {
                 onChange={(e) => setNewCategoryName(e.target.value)}
                 placeholder="e.g. Starters, Main Course"
               />
-              <InputField
-                label="Display Order"
-                type="number"
-                value={newCategoryOrder}
-                onChange={(e) => setNewCategoryOrder(parseInt(e.target.value))}
-                placeholder="1"
-              />
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
+                <Textarea
+                  value={newCategoryDescription}
+                  onChange={(e) => setNewCategoryDescription(e.target.value)}
+                  rows={2}
+                  placeholder="Short description..."
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Food Type</label>
+                <div className="flex gap-4">
+                  <label className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-all ${newCategoryFoodType === 'VEG' ? 'border-green-500 bg-green-50 dark:bg-green-900/20' : 'border-gray-200 dark:border-gray-600'}`}>
+                    <input type="radio" className="hidden" checked={newCategoryFoodType === "VEG"} onChange={() => setNewCategoryFoodType("VEG")} />
+                    <div className="w-3 h-3 border border-green-600 flex items-center justify-center rounded-sm"><div className="w-1.5 h-1.5 bg-green-600 rounded-full"></div></div>
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-200">Veg</span>
+                  </label>
+
+                  <label className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-all ${newCategoryFoodType === 'NON_VEG' ? 'border-red-500 bg-red-50 dark:bg-red-900/20' : 'border-gray-200 dark:border-gray-600'}`}>
+                    <input type="radio" className="hidden" checked={newCategoryFoodType === "NON_VEG"} onChange={() => setNewCategoryFoodType("NON_VEG")} />
+                    <div className="w-3 h-3 border border-red-600 flex items-center justify-center rounded-sm"><div className="w-1.5 h-1.5 bg-red-600 rounded-full"></div></div>
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-200">Non-Veg</span>
+                  </label>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Category Image</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleCategoryImageUpload}
+                  className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                />
+                {categoryImage && <p className="text-xs text-green-600">Image selected: {categoryImage.name}</p>}
+              </div>
+
               <div className="flex gap-3 justify-end mt-6">
                 <Button onClick={() => setShowAddCategory(false)} variant="outline">
                   Cancel

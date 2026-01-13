@@ -104,12 +104,12 @@ function RestaurantManagement() {
   const handleCloseModal = () => setSelectedRestaurantId(null);
   const restaurantColumns = [
     { header: "Name", key: "name" },
-    { header: "Brand", key: "brandName" },
+    { header: "Rating", key: "ratingSummary" },
     {
       header: "Status",
       key: "isActive",
       render: (row) =>
-        row.isActive === true || row.isActive === "active"
+        (row.isActive === true || row.isActive === "active")
           ? "Approved"
           : "Suspended",
     },

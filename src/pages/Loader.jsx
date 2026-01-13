@@ -4,7 +4,7 @@ import "../assets/css/loader.css";
 
 const CookingLoader = () => {
     return (
-        <div className="relative flex flex-col items-center justify-center h-full w-full bg-white overflow-hidden">
+        <div className="relative flex flex-col items-center justify-center h-full w-full bg-primary overflow-hidden">
 
 
             {/* Pot */}
