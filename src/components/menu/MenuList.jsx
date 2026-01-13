@@ -9,6 +9,7 @@ import Table from "../ui/Table";
 import {
   useDeleteMenuMutation,
   useUpdateMenuMutation,
+  useUpdateMenuStockStatusMutation,
 } from "../../api/services/menuApi";
 
 // ===== REUSABLE COMPONENTS =====
@@ -26,6 +27,23 @@ const BestsellerTag = () => (
   </div>
 );
 
+const ToggleSwitch = ({ checked, onChange, label }) => (
+  <button
+    onClick={(e) => { e.stopPropagation(); onChange(); }}
+    className={`flex items-center gap-2 group`}
+    title={label}
+  >
+    <div className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${checked ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'
+      }`}>
+      <span
+        className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${checked ? 'translate-x-6' : 'translate-x-1'
+          }`}
+      />
+    </div>
+    {label && <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{label}</span>}
+  </button>
+);
+
 // ===== MAIN COMPONENT =====
 
 const MenuList = ({ menus, isLoading, isError, error, searchTerm = '', statusFilter = 'all', viewType = 'list' }) => {
@@ -33,7 +51,7 @@ const MenuList = ({ menus, isLoading, isError, error, searchTerm = '', statusFil
   const [expandedCategories, setExpandedCategories] = useState({});
   const [deleteMenu] = useDeleteMenuMutation();
   const [updateMenu] = useUpdateMenuMutation();
-
+  const [updateMenuStockStatus] = useUpdateMenuStockStatusMutation();
   // Categories are collapsed by default.
 
   const toggleCategory = (categoryId) => {
@@ -56,6 +74,18 @@ const MenuList = ({ menus, isLoading, isError, error, searchTerm = '', statusFil
       }
     );
   }, [deleteMenu]);
+
+  const handleToggleStock = async (item) => {
+    console.log(item);
+    await showPromiseToast(
+      updateMenuStockStatus({ id: item.itemId, inStock: !item.inStock }).unwrap(),
+      {
+        loading: 'Updating stock...',
+        success: `Item marked as ${!item.inStock ? 'In Stock' : 'Out of Stock'}`,
+        error: 'Failed to update stock.'
+      }
+    );
+  };
 
   const handleEditSave = React.useCallback(async (updatedItem) => {
     await updateMenu({
@@ -176,7 +206,7 @@ const MenuList = ({ menus, isLoading, isError, error, searchTerm = '', statusFil
                           {subCat.items.map((item) => (
                             <div
                               key={item.itemId}
-                              className={`group bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl transition-all duration-300 ${!item.available ? 'opacity-60 grayscale' : ''}`}
+                              className={`group bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl transition-all duration-300 ${!item.inStock ? 'opacity-60 grayscale' : ''}`}
                             >
                               {/* Image Container */}
                               <div className="relative h-48 overflow-hidden">
@@ -202,7 +232,7 @@ const MenuList = ({ menus, isLoading, isError, error, searchTerm = '', statusFil
 
                                 <div className="absolute bottom-3 left-3 right-3 flex justify-between items-end text-white">
                                   <div className="font-bold text-xl drop-shadow-md">₹{item.price}</div>
-                                  {!item.available && (
+                                  {!item.inStock && (
                                     <span className="bg-red-500/90 text-white text-xs px-2 py-1 rounded-md font-bold uppercase tracking-wider backdrop-blur-sm">
                                       Sold Out
                                     </span>
@@ -223,21 +253,27 @@ const MenuList = ({ menus, isLoading, isError, error, searchTerm = '', statusFil
                                 )}
 
                                 {/* Actions */}
-                                <div className="pt-2 flex gap-2">
-                                  <Button
-                                    onClick={() => setEditItem(item)}
-                                    variant="outline"
-                                    className="flex-1 text-xs py-1.5 h-8 border-gray-200 dark:border-gray-600"
-                                  >
-                                    Edit
-                                  </Button>
-                                  <Button
-                                    onClick={() => handleDelete(item.itemId)}
-                                    variant="outline"
-                                    className="px-3 text-red-500 border-red-100 h-8 hover:bg-red-50 hover:border-red-200 dark:border-red-900/30 dark:hover:bg-red-900/20"
-                                  >
-                                    <Trash2 className="w-3.5 h-3.5" />
-                                  </Button>
+                                <div className="pt-2 flex items-center justify-between gap-2">
+                                  <ToggleSwitch
+                                    checked={item.inStock}
+                                    onChange={() => handleToggleStock(item)}
+                                  />
+                                  <div className="flex flex-1 gap-2 justify-end">
+                                    <Button
+                                      onClick={() => setEditItem(item)}
+                                      variant="outline"
+                                      className="flex-1 text-xs py-1.5 h-8 border-gray-200 dark:border-gray-600"
+                                    >
+                                      Edit
+                                    </Button>
+                                    <Button
+                                      onClick={() => handleDelete(item.itemId)}
+                                      variant="outline"
+                                      className="px-3 text-red-500 border-red-100 h-8 hover:bg-red-50 hover:border-red-200 dark:border-red-900/30 dark:hover:bg-red-900/20"
+                                    >
+                                      <Trash2 className="w-3.5 h-3.5" />
+                                    </Button>
+                                  </div>
                                 </div>
                               </div>
                             </div>
@@ -256,7 +292,7 @@ const MenuList = ({ menus, isLoading, isError, error, searchTerm = '', statusFil
                                 <img
                                   src={item.image || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80"}
                                   alt={item.name}
-                                  className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${!item.available ? 'grayscale' : ''}`}
+                                  className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${!item.inStock ? 'grayscale' : ''}`}
                                   onError={(e) => {
                                     e.target.onerror = null;
                                     e.target.src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80';
@@ -300,12 +336,11 @@ const MenuList = ({ menus, isLoading, isError, error, searchTerm = '', statusFil
 
                                 <div className="mt-4 flex items-center justify-between">
                                   <div className="flex items-center gap-3">
-                                    <span className={`text-xs font-bold px-2.5 py-1 rounded-md border ${item.available
-                                      ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:border-green-800'
-                                      : 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:border-red-800'
-                                      }`}>
-                                      {item.available ? 'Available' : 'Unavailable'}
-                                    </span>
+                                    <ToggleSwitch
+                                      checked={item.inStock}
+                                      onChange={() => handleToggleStock(item)}
+                                      label={item.inStock ? 'In Stock' : 'Out of Stock'}
+                                    />
                                     {item.bestseller && (
                                       <span className="text-xs font-bold px-2.5 py-1 rounded-md bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-900/20 dark:border-amber-800">
                                         Bestseller

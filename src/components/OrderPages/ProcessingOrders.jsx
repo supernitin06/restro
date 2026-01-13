@@ -18,7 +18,7 @@ const ProcessingOrders = () => {
 
   const { data: partnerApi } = useGetDeliveryPartnersQuery();
   console.log("📋 Delivery partners data:", partnerApi);
-  const { data, refetch } = useGetOrdersQuery({ status: 'ACCEPTED' });
+  const { data, refetch } = useGetOrdersQuery({ status: 'READY' });
   const orders = data?.data || [];
   const [partnerSearch, setPartnerSearch] = useState("");
   const [viewingOrder, setViewingOrder] = useState(null);
@@ -199,7 +199,7 @@ const ProcessingOrders = () => {
       group-hover:pointer-events-auto
     "
             >
-              <div className="bg-white shadow-2xl rounded-xl p-4 w-64 border border-purple-100">
+              <div className="page shadow-2xl rounded-xl p-4 w-64 border border-purple-100">
                 <h4 className="text-sm font-bold text-purple-700 mb-2">
                   All Items
                 </h4>
@@ -275,12 +275,12 @@ const ProcessingOrders = () => {
   return (
     <div className="app page p-6">
       {/* Page Header */}
-      <div className="mb-6 bg-gradient-to-r from-purple-50 via-white to-purple-50 shadow-lg rounded-xl p-6 flex flex-col">
+      <div className="mb-6 bg-primary shadow-lg rounded-xl p-6 flex flex-col">
         <div className="flex items-center justify-between">
           <h1 className="highlight text-4xl font-extrabold">
             Processing Orders
           </h1>
-          <span className="highlight font-bold bg-purple-100 px-3 py-1 rounded-full">
+          <span className="highlight font-bold bg-primary px-3 py-1 rounded-full">
             {orders.length} Orders
           </span>
         </div>
@@ -294,7 +294,7 @@ const ProcessingOrders = () => {
           No processing orders
         </div>
       ) : (
-        <div className="bg-gradient-to-r from-white to-gray-50 shadow-2xl rounded-xl p-6">
+        <div className="bg-primary shadow-2xl rounded-xl p-6">
           <div className="overflow-x-auto">
             <Table columns={columns} data={orders} />
           </div>
@@ -313,14 +313,14 @@ const ProcessingOrders = () => {
           } flex flex-col rounded-l-3xl overflow-hidden`}
       >
         {/* Drawer Header */}
-        <div className="flex justify-between items-center p-5 border-b border-gray-200 bg-white shadow-md">
+        <div className="flex justify-between items-center p-5 border-b border-gray-200 bg-primary shadow-md">
           <h2 className="text-2xl font-extrabold text-red-600 tracking-wide">
             Assign Delivery Partner
           </h2>
         </div>
 
         {/* Drawer Content: Scrollable Partner List */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-white">
+        <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-primary">
           {/* Search Input */}
           <div className="p-4 border-b">
             <input
@@ -333,7 +333,7 @@ const ProcessingOrders = () => {
           </div>
 
           {/* Partner List */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-white">
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-primary">
             {filteredPartners.length === 0 ? (
               <div className="text-center text-gray-400 mt-10">
                 No delivery partners found
@@ -342,7 +342,7 @@ const ProcessingOrders = () => {
               filteredPartners.map((partner) => (
                 <div
                   key={partner._id}
-                  className="flex justify-between items-center p-4 bg-white rounded-2xl shadow-md"
+                  className="flex justify-between items-center p-4 bg-primary rounded-2xl shadow-md"
                   onClick={() => assignPartner(partner)}
                 >
                   <div className="flex flex-col">

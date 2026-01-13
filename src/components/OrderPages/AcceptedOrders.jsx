@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { MapPin, ChefHat, CheckCircle, XCircle } from "lucide-react";
+import OrderCard from "./OrderCard";
 import { useSockets } from "../../context/SocketContext";
 import {
   useGetOrdersQuery,
   useUpdateOrderStatusMutation,
+  useUpdateKitchenStatusMutation,
 } from "../../api/services/orderApi";
 import {
   showSuccessAlert,
@@ -20,6 +21,7 @@ const AcceptedOrders = () => {
   const orders = data?.data || [];
 
   const [updateOrderStatus] = useUpdateOrderStatusMutation();
+  const [updateKitchenStatus] = useUpdateKitchenStatusMutation();
   const [loadingId, setLoadingId] = useState(null);
 
   // 🔌 Socket refresh
@@ -42,8 +44,8 @@ const AcceptedOrders = () => {
     try {
       setLoadingId(orderId);
 
-      await updateOrderStatus({
-        id: orderId,
+      await updateKitchenStatus({
+        orderId: orderId,
         status: "READY",
       }).unwrap();
 
@@ -85,77 +87,13 @@ const AcceptedOrders = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {orders.map((order) => (
-          <div
+          <OrderCard
             key={order.orderId}
-            className="bg-white rounded-2xl shadow p-5 space-y-4 border border-green-200"
-          >
-            {/* Header */}
-            <div className="flex justify-between">
-              <h2 className="font-bold">{order.customOrderId}</h2>
-              <span className="text-green-600 font-bold">
-                ₹{order.total}
-              </span>
-            </div>
-
-            {/* Customer */}
-            <div>
-              <p className="font-semibold">{order.customer?.name}</p>
-              <p className="text-sm text-gray-500">
-                {order.customer?.phone}
-              </p>
-            </div>
-
-            {/* Address */}
-            <div className="flex gap-2 text-sm text-gray-600">
-              <MapPin size={14} />
-              {order.location}
-            </div>
-
-            {/* Items */}
-            <div className="text-sm">
-              {order.items?.map((item, i) => (
-                <div key={i}>
-                  {item.name} × {item.quantity}
-                </div>
-              ))}
-            </div>
-
-            {/* Status */}
-            <div className="flex justify-between items-center pt-3 border-t">
-              <span className="flex items-center gap-1 text-green-700 font-semibold text-sm">
-                <CheckCircle size={14} />
-                Accepted
-              </span>
-
-              <span className="flex items-center gap-1 text-xs px-3 py-1 rounded-full bg-blue-100 text-blue-700">
-                <ChefHat size={12} />
-                {order.kitchenStatus || "PREPARING"}
-              </span>
-            </div>
-
-            {/* 🔥 ACTION BUTTONS */}
-            <div className="flex gap-2 pt-3">
-              <button
-                onClick={() => markReady(order.orderId)}
-                disabled={loadingId === order.orderId}
-                className="flex-1 bg-green-600 hover:bg-green-700 text-white text-sm py-2 rounded-lg disabled:opacity-50"
-              >
-                Ready
-              </button>
-
-              <button
-                onClick={() => rejectOrder(order.orderId)}
-                disabled={loadingId === order.orderId}
-                className="flex-1 bg-red-600 hover:bg-red-700 text-white text-sm py-2 rounded-lg disabled:opacity-50"
-              >
-                Reject
-              </button>
-            </div>
-
-            <div className="text-xs text-gray-400">
-              {order.createdAt}
-            </div>
-          </div>
+            order={order}
+            isProcessing={loadingId === order.orderId}
+            onReady={() => markReady(order.orderId)}
+            onReject={() => rejectOrder(order.orderId)}
+          />
         ))}
 
         {orders.length === 0 && (

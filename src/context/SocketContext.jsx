@@ -107,15 +107,15 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
       console.log("🔄 ORDER_STATUS_UPDATED:", data);
     };
 
-    
+
 
     ordersSocket.on("ORDER_STATUS_UPDATED", onOrderStatusUpdated);
     ordersSocket.on("ORDER_PICKED_UP", (data) => {
       console.log("✅ ORDER_PICKED_UP:", data);
       alert(`Order Picked Up: ${data}`);
     });
-     
-    
+
+
 
     /* =============================
        🧹 CLEANUP (VERY IMPORTANT)

@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { Plus, Loader2, Eye, Edit, Trash2, CheckCircle, XCircle, Clock, Bike, CreditCard } from 'lucide-react';
-import OrderCard from '../components/OrderPages/OderCards';
+import AllOrderCards from '../components/OrderPages/OderCards';
 import OrderFormModal from '../components/OrderPages/OrderForm';
 import OrderFilters from '../components/OrderPages/OrderFilters';
 import OrderDetailsModal from '../components/OrderPages/OrderDetailsModal';
@@ -407,7 +407,7 @@ const Orders = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
               {currentOrders.map(order => (
-                <OrderCard
+                <AllOrderCards
                   key={order.id}
                   order={order}
                   onDelete={handleDeleteOrder}

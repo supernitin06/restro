@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { MapPin } from "lucide-react";
-import Button from "../../components/ui/Button";
+import OrderCard from "./OrderCard";
 import { useSockets } from "../../context/SocketContext";
-import { showSuccessAlert, showErrorAlert } from "../../utils/toastAlert";
+import { showErrorAlert } from "../../utils/toastAlert";
 import {
   useUpdateOrderStatusMutation,
   useGetOrdersQuery,
@@ -15,7 +14,6 @@ const NewOrders = () => {
   const orders = data?.data || [];
 
   const [updateStatus] = useUpdateOrderStatusMutation();
-  const [updateKitchenStatus] = useUpdateKitchenStatusMutation();
 
   const [processingOrderId, setProcessingOrderId] = useState(null);
 
@@ -48,7 +46,7 @@ const NewOrders = () => {
         status, // ACCEPTED / REJECTED
       }).unwrap();
 
-     
+
 
       refetch();
     } catch (error) {
@@ -67,90 +65,13 @@ const NewOrders = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {orders.map((order) => (
-          <div
+          <OrderCard
             key={order.orderId}
-            className="rounded-2xl bg-white shadow-md p-5 space-y-4"
-          >
-            {/* Header */}
-            <div className="flex justify-between">
-              <h2 className="font-bold text-lg">
-                {order.customOrderId}
-              </h2>
-              <span className="text-orange-600 font-bold">
-                ₹{order.total}
-              </span>
-            </div>
-
-            {/* Customer */}
-            <div>
-              <p className="font-semibold">
-                {order.customer?.name}
-              </p>
-              <p className="text-sm text-gray-500">
-                {order.customer?.phone}
-              </p>
-            </div>
-
-            {/* Location */}
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <MapPin size={14} />
-              {order.location}
-            </div>
-
-            {/* Items */}
-            <div className="text-sm">
-              {order.items?.map((item, i) => (
-                <div key={i}>
-                  {item.name} × {item.quantity}
-                </div>
-              ))}
-            </div>
-
-            {/* Footer */}
-            <div className="flex justify-between items-center pt-4 border-t">
-              <div className="text-xs text-gray-400">
-                {order.createdAt || "Just now"}
-              </div>
-
-              <div className="flex gap-2">
-                {order.status === "ACCEPTED" ? (
-                  <span className="px-4 py-1 text-sm font-semibold rounded-full bg-green-100 text-green-700">
-                    ✅ Order Accepted
-                  </span>
-                ) : order.status === "REJECTED" ? (
-                  <span className="px-4 py-1 text-sm font-semibold rounded-full bg-red-100 text-red-700">
-                    ❌ Order Rejected
-                  </span>
-                ) : (
-                  <>
-                    <Button
-                      size="sm"
-                      variant="success"
-                      disabled={processingOrderId === order.orderId}
-                      onClick={() =>
-                        handleUpdateStatus(order.orderId, "ACCEPTED")
-                      }
-                    >
-                      {processingOrderId === order.orderId
-                        ? "Processing..."
-                        : "Accept"}
-                    </Button>
-
-                    <Button
-                      size="sm"
-                      variant="danger"
-                      disabled={processingOrderId === order.orderId}
-                      onClick={() =>
-                        handleUpdateStatus(order.orderId, "REJECTED")
-                      }
-                    >
-                      Reject
-                    </Button>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
+            order={order}
+            isProcessing={processingOrderId === order.orderId}
+            onAccept={() => handleUpdateStatus(order.orderId, "ACCEPTED")}
+            onReject={() => handleUpdateStatus(order.orderId, "REJECTED")}
+          />
         ))}
 
         {orders.length === 0 && (

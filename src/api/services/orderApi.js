@@ -15,9 +15,9 @@ export const orderApi = baseApi.injectEndpoints({
     // ✅ Add this mutation
     assignDelivery: builder.mutation({
       query: ({ orderId, partnerId }) => ({
-        url: `admin/delivery-partners/order/${orderId}/assign`, 
+        url: `admin/delivery-partners/order/${orderId}/assign`,
         method: "PATCH",
-        body: { deliveryPartnerId: partnerId },  
+        body: { deliveryPartnerId: partnerId },
       }),
       invalidatesTags: ["Order"], // optional
     }),
@@ -26,21 +26,21 @@ export const orderApi = baseApi.injectEndpoints({
       query: ({ id, status }) => ({
         url: `admin/orders/${id}/admin-status`,
         method: "PATCH",
-        data: { status },
+        body: { status },
       }),
       invalidatesTags: ["Order"],
     }),
 
-     updateKitchenStatus: builder.mutation({
+    updateKitchenStatus: builder.mutation({
       query: ({ orderId, status }) => ({
         url: `admin/orders/${orderId}/kitchen-status`,
         method: "PATCH",
-        data: { status },
+        body: { status },
       }),
       invalidatesTags: ["Order"],
     }),
 
-  
+
 
   }),
   overrideExisting: false,

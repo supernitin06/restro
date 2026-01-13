@@ -19,6 +19,15 @@ export const menuApi = baseApi.injectEndpoints({
             providesTags: ["Menu"],
         }),
 
+        updateMenuStockStatus: builder.mutation({
+            query: ({ id, ...payload }) => ({
+                url: `admin/menu/${id}/inStock`,
+                method: "PUT",
+                data: payload,
+            }),
+            invalidatesTags: ["Menu"],
+        }),
+
         addMenu: builder.mutation({
             query: ({ restaurantId, ...data }) => ({
                 url: "admin/menu",
@@ -98,4 +107,5 @@ export const {
     useUpdateCategoryMutation,
     useToggleCategoryMutation,
     useAddMenuMutation,
+    useUpdateMenuStockStatusMutation,
 } = menuApi;
