@@ -63,12 +63,27 @@ const Sidebar = ({ theme = "dark" }) => {
       icon: Truck,
       path: "/delivery-settings",
     },
+   {
+  id: "delivery-partners",
+  label: "Delivery Partners",
+  icon: Bike,
+  hasDropdown: true,
+  subItems: [
     {
-      id: "delivery-partners",
-      label: "Delivery Partners",
+      id: "all-partners",
+      label: "Manage Partners",
+      path: "/delivery-partners", // your existing approved partners page
       icon: Bike,
-      path: "/delivery-partners",
     },
+    {
+      id: "pending-partners",
+      label: "Pending Approvals",
+      path: "/pending-delivery-partners", // new pending partners page
+      icon: Clock, // or any other icon
+    },
+  ],
+},
+
   {
   id: "orders",
   label: "Orders",

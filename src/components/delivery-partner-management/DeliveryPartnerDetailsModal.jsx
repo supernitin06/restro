@@ -1,120 +1,247 @@
-// DeliveryPartnerDetailsModal.jsx
-import React from "react";
-import DeliveryPartnerStatusBadge from "./DeliveryPartnerStatusBadge";
+import React, { useState } from "react";
+import {
+  X,
+  Mail,
+  Phone,
+  MapPin,
+  Truck,
+  Bike,
+  Shield,
+  Calendar,
+  FileText,
+} from "lucide-react";
 import Button from "../ui/Button";
-import { X, Mail, Phone, MapPin, Truck, Bike, Shield, Calendar } from 'lucide-react';
+import DeliveryPartnerStatusBadge from "./DeliveryPartnerStatusBadge";
 
-const DeliveryPartnerDetailsModal = ({ partner, onClose, updatePartner }) => {
+const DeliveryPartnerDetailsModal = ({
+  partner,
+  onClose,
+  updatePartner,
+}) => {
+  const [selectedDoc, setSelectedDoc] = useState(null);
+
   if (!partner) return null;
 
-  const { registrationData, listView, orderHistory, partnerId } = partner;
+  const {
+    partnerId,
+    registrationData,
+    listView,
+    orderHistory = [],
+    documents = [],
+  } = partner;
 
   const toggleStatus = () => {
     const newStatus = listView.status === "Active" ? "Inactive" : "Active";
-    updatePartner({ ...partner, listView: { ...listView, status: newStatus } });
+    updatePartner({
+      ...partner,
+      listView: { ...listView, status: newStatus },
+    });
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-gray-800 w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-700">
+    <>
+      {/* BACKDROP */}
+      <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div className="bg-white dark:bg-gray-800 w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden">
 
-        {/* Header */}
-        <div className="p-5 flex justify-between items-center border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-          <div className="flex items-center gap-3">
-             <img src={registrationData?.image || `https://api.dicebear.com/7.x/avataaars/svg?seed=${partnerId}`} alt={registrationData?.name} className="w-12 h-12 rounded-xl object-cover border-2 border-white dark:border-gray-700" />
-            <div>
-              <h2 className="text-lg font-bold text-gray-900 dark:text-white">{registrationData?.name}</h2>
-              <p className="text-xs text-gray-500 dark:text-gray-400 font-mono">Partner ID: {partnerId}</p>
+          {/* HEADER */}
+          <div className="flex justify-between items-center p-5 border-b bg-gray-50 dark:bg-gray-900">
+            <div className="flex items-center gap-4">
+              <img
+                src={
+                  registrationData?.image ||
+                  `https://api.dicebear.com/7.x/avataaars/svg?seed=${partnerId}`
+                }
+                className="w-12 h-12 rounded-xl border"
+                alt="avatar"
+              />
+              <div>
+                <h2 className="font-bold text-lg">
+                  {registrationData?.name}
+                </h2>
+                <p className="text-xs text-gray-500">
+                  Partner ID: {partnerId}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <DeliveryPartnerStatusBadge status={listView.status} />
+              <button onClick={onClose}>
+                <X />
+              </button>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <DeliveryPartnerStatusBadge status={listView.status} />
-            <button onClick={onClose} className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors text-gray-500">
-              <X size={20} />
-            </button>
-          </div>
-        </div>
 
-        {/* Body */}
-        <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
+          {/* BODY */}
+          <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
 
-          {/* Details Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <DetailItem icon={Phone} label="Mobile Number" value={registrationData?.mobileNumber} color="blue" />
-            <DetailItem icon={Mail} label="Email" value={registrationData?.email || 'N/A'} color="red" />
-            <DetailItem icon={MapPin} label="City / Area" value={registrationData?.cityArea || 'N/A'} color="orange" />
-            <DetailItem icon={listView.vehicleType === 'Bike' ? Bike : Truck} label="Vehicle Type" value={registrationData?.vehicleType} color="purple" />
-            <DetailItem icon={Shield} label="KYC Status" value={listView.kycStatus} color={listView.kycStatus === 'VERIFIED' ? 'green' : 'yellow'} />
-            <DetailItem icon={Calendar} label="Joined On" value={partner.registrationData?.createdAt ? new Date(partner.registrationData.createdAt).toLocaleDateString() : 'N/A'} color="teal" />
-          </div>
+            {/* BASIC DETAILS */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Detail icon={Phone} label="Phone" value={registrationData.mobileNumber} />
+              <Detail icon={Mail} label="Email" value={registrationData.email} />
+              <Detail icon={MapPin} label="City" value={registrationData.cityArea} />
+              <Detail
+                icon={listView.vehicleType === "Bike" ? Bike : Truck}
+                label="Vehicle"
+                value={registrationData.vehicleType}
+              />
+              <Detail
+                icon={Shield}
+                label="KYC Status"
+                value={listView.kycStatus}
+              />
+              <Detail
+                icon={Calendar}
+                label="Joined On"
+                value={
+                  registrationData.createdAt
+                    ? new Date(registrationData.createdAt).toLocaleDateString()
+                    : "N/A"
+                }
+              />
+            </div>
 
+            {/* DOCUMENTS */}
+            <div>
+              <h3 className="font-bold mb-3">Documents</h3>
 
-          {/* Order History */}
-          <div>
-            <h3 className="text-base font-bold text-gray-800 dark:text-gray-100 mb-3">Order History</h3>
-            {orderHistory?.length === 0 ? (
-              <div className="text-center py-8 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                <p className="text-sm text-gray-500 dark:text-gray-400">No order history available.</p>
-              </div>
-            ) : (
-              <div className="max-h-[200px] overflow-auto rounded-lg border border-gray-200 dark:border-gray-700">
-                <table className="w-full text-sm">
-                  <thead className="bg-gray-50 dark:bg-gray-700/50 sticky top-0">
+              {documents.length ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                  {documents.map((doc) => (
+                    <div
+                      key={doc.type}
+                      className="border rounded-xl p-4 bg-gray-50 dark:bg-gray-700"
+                    >
+                      <div
+                        className="h-32 flex items-center justify-center bg-white dark:bg-gray-800 rounded cursor-pointer"
+                        onClick={() => setSelectedDoc(doc.url)}
+                      >
+                        {doc.url.endsWith(".pdf") ? (
+                          <FileText size={36} />
+                        ) : (
+                          <img
+                            src={doc.url}
+                            alt={doc.type}
+                            className="h-full object-contain"
+                          />
+                        )}
+                      </div>
+
+                      <div className="mt-2">
+                        <p className="font-semibold capitalize">
+                          {doc.type.replace("_", " ")}
+                        </p>
+
+                        <span
+                          className={`text-xs px-2 py-0.5 rounded-full ${
+                            doc.status === "VERIFIED"
+                              ? "bg-green-100 text-green-700"
+                              : "bg-yellow-100 text-yellow-700"
+                          }`}
+                        >
+                          {doc.status}
+                        </span>
+
+                        <a
+                          href={doc.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="block text-xs text-blue-500 mt-1"
+                        >
+                          View / Download
+                        </a>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-gray-500">
+                  No documents uploaded
+                </p>
+              )}
+            </div>
+
+            {/* ORDER HISTORY */}
+            <div>
+              <h3 className="font-bold mb-2">Order History</h3>
+
+              {orderHistory.length === 0 ? (
+                <p className="text-sm text-gray-500">
+                  No orders assigned yet
+                </p>
+              ) : (
+                <table className="w-full text-sm border">
+                  <thead className="bg-gray-100">
                     <tr>
                       {Object.keys(orderHistory[0]).map((key) => (
-                        <th key={key} className="px-4 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{key.replace(/([A-Z])/g, " $1")}</th>
+                        <th key={key} className="px-3 py-2 text-left">
+                          {key}
+                        </th>
                       ))}
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+                  <tbody>
                     {orderHistory.map((order, idx) => (
-                      <tr key={idx} className="hover:bg-gray-50/50 dark:hover:bg-gray-700/30">
+                      <tr key={idx} className="border-t">
                         {Object.values(order).map((val, i) => (
-                          <td key={i} className="px-4 py-3 whitespace-nowrap">{String(val)}</td>
+                          <td key={i} className="px-3 py-2">
+                            {String(val)}
+                          </td>
                         ))}
                       </tr>
                     ))}
                   </tbody>
                 </table>
-              </div>
-            )}
+              )}
+            </div>
+          </div>
+
+          {/* FOOTER */}
+          <div className="p-4 border-t flex justify-end gap-3 bg-gray-50 dark:bg-gray-900">
+            <Button variant="secondary" onClick={onClose}>
+              Close
+            </Button>
+            <Button
+              variant={listView.status === "Active" ? "danger" : "success"}
+              onClick={toggleStatus}
+            >
+              {listView.status === "Active"
+                ? "Deactivate"
+                : "Activate"}
+            </Button>
           </div>
         </div>
-
-        {/* Footer Actions */}
-        <div className="p-4 bg-gray-50 dark:bg-gray-900/30 border-t border-gray-100 dark:border-gray-700 flex justify-end gap-3">
-          <Button variant="secondary" onClick={onClose}>Close</Button>
-          <Button variant={listView.status === "Active" ? "danger" : "success"} onClick={toggleStatus}>
-            {listView.status === "Active" ? "Deactivate Partner" : "Activate Partner"}
-          </Button>
-        </div>
       </div>
-    </div>
+
+      {/* DOCUMENT PREVIEW */}
+      {selectedDoc && (
+        <div
+          className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center"
+          onClick={() => setSelectedDoc(null)}
+        >
+          <img
+            src={selectedDoc}
+            className="max-h-[90vh] max-w-[90vw] rounded"
+            alt="doc"
+          />
+        </div>
+      )}
+    </>
   );
 };
 
-const DetailItem = ({ icon: Icon, label, value, color = 'gray' }) => {
-  const colors = {
-    blue: 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400',
-    red: 'bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400',
-    orange: 'bg-orange-50 text-orange-600 dark:bg-orange-900/20 dark:text-orange-400',
-    purple: 'bg-purple-50 text-purple-600 dark:bg-purple-900/20 dark:text-purple-400',
-    green: 'bg-green-50 text-green-600 dark:bg-green-900/20 dark:text-green-400',
-    yellow: 'bg-yellow-50 text-yellow-600 dark:bg-yellow-900/20 dark:text-yellow-400',
-    teal: 'bg-teal-50 text-teal-600 dark:bg-teal-900/20 dark:text-teal-400',
-    gray: 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300',
-  }
-  return (
-    <div className="flex items-center gap-3">
-      <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${colors[color]}`}>
-        <Icon size={18} />
-      </div>
-      <div>
-        <p className="text-xs text-gray-500 dark:text-gray-400">{label}</p>
-        <p className="font-semibold text-gray-800 dark:text-gray-200 capitalize">{String(value).toLowerCase()}</p>
-      </div>
+/* SMALL DETAIL COMPONENT */
+const Detail = ({ icon: Icon, label, value }) => (
+  <div className="flex items-center gap-3">
+    <div className="w-10 h-10 bg-gray-100 dark:bg-gray-700 rounded-xl flex items-center justify-center">
+      <Icon size={18} />
     </div>
-  )
-}
+    <div>
+      <p className="text-xs text-gray-500">{label}</p>
+      <p className="font-semibold">{value || "N/A"}</p>
+    </div>
+  </div>
+);
 
 export default DeliveryPartnerDetailsModal;

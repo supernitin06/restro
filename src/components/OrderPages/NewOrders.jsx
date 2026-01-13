@@ -3,74 +3,50 @@ import { MapPin } from "lucide-react";
 import Button from "../../components/ui/Button";
 import { useSockets } from "../../context/SocketContext";
 import { showSuccessAlert, showErrorAlert } from "../../utils/toastAlert";
-import {
-  useUpdateOrderStatusMutation,
-  useGetOrdersQuery,
-} from "../../api/services/orderApi";
+import { useUpdateOrderStatusMutation, useGetOrdersQuery } from "../../api/services/orderApi";
 
 const NewOrders = () => {
   const { ordersSocket } = useSockets();
-
   const { data, refetch } = useGetOrdersQuery({});
   const allOrders = data?.data || [];
-  const orders = allOrders.filter(order => order.status === "PLACED" || order.status === "REJECTED");
+  const orders = allOrders.filter(
+    (order) => order.status === "PLACED" || order.status === "REJECTED"
+  );
 
   const [updateStatus] = useUpdateOrderStatusMutation();
-
   const [processingOrderId, setProcessingOrderId] = useState(null);
 
-  // 🔔 Listen for new orders via socket
   useEffect(() => {
     if (!ordersSocket) return;
-
-    const handleNewOrder = (payload) => {
-      console.log("🆕 NEW_ORDER payload:", payload);
-      refetch();
-    };
-
-    const handleStatusUpdate = (payload) => {
-      console.log("🔄 ORDER_STATUS_UPDATED payload:", payload);
-      refetch();
-    };
+    const handleNewOrder = () => refetch();
+    const handleStatusUpdate = () => refetch();
 
     ordersSocket.on("NEW_ORDER", handleNewOrder);
     ordersSocket.on("ORDER_STATUS_UPDATED", handleStatusUpdate);
+
     return () => {
       ordersSocket.off("NEW_ORDER", handleNewOrder);
       ordersSocket.off("ORDER_STATUS_UPDATED", handleStatusUpdate);
     };
   }, [ordersSocket, refetch]);
 
-  // ✅ Accept / Reject Order
   const handleUpdateStatus = async (orderId, status) => {
-    if (!orderId) {
-      showErrorAlert("Order ID missing!");
-      return;
-    }
-
+    if (!orderId) return showErrorAlert("Order ID missing!");
     try {
       setProcessingOrderId(orderId);
-
-      // ✅ Admin order status
       const body = { status };
       if (status === "REJECTED") {
-        body.message = "Sorry, the order is not available today. Please try again later.";
+        body.message =
+          "Sorry, the order is not available today. Please try again later.";
       }
-
-      await updateStatus({
-        id: orderId,
-        ...body,
-      }).unwrap();
-
+      await updateStatus({ id: orderId, ...body }).unwrap();
       showSuccessAlert(
         status === "ACCEPTED"
           ? "Order accepted successfully!"
-          : "Order rejected and customer notified."
+          : "Order rejected"
       );
-
       refetch();
     } catch (error) {
-      console.error("ORDER STATUS UPDATE ERROR:", error);
       showErrorAlert(error?.data?.message || "Failed to update order");
     } finally {
       setProcessingOrderId(null);
@@ -78,66 +54,87 @@ const NewOrders = () => {
   };
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">
-        New Orders ({orders.length})
-      </h1>
+    <div className="p-8 min-h-screen transition-colors duration-500 bg-gray-50 dark:bg-gray-900">
+      {/* ===== HEADER ===== */}
+      <div className="flex items-center justify-between mb-10">
+        <h1 className="text-3xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">
+          New Orders
+        </h1>
+        <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+          ({orders.length})
+        </span>
+      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+      {/* ===== ORDERS GRID ===== */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
         {orders.map((order) => (
           <div
             key={order.orderId}
-            className="rounded-2xl bg-white shadow-md p-5 space-y-4"
+            className="relative bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden transform hover:-translate-y-1"
           >
-            {/* Header */}
-            <div className="flex justify-between">
-              <h2 className="font-bold text-lg">
-                {order.customOrderId}
-              </h2>
-              <span className="text-orange-600 font-bold">
-                ₹{order.total}
-              </span>
-            </div>
+            {/* Gradient top accent */}
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400"></div>
 
-            {/* Customer */}
-            <div>
-              <p className="font-semibold">
-                {order.customer?.name}
-              </p>
-              <p className="text-sm text-gray-500">
-                {order.customer?.phone}
-              </p>
-            </div>
-
-            {/* Location */}
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <MapPin size={14} />
-              {order.location}
-            </div>
-
-            {/* Items */}
-            <div className="text-sm">
-              {order.items?.map((item, i) => (
-                <div key={i}>
-                  {item.name} × {item.quantity}
+            <div className="p-6 flex flex-col h-full space-y-5">
+              {/* ===== HEADER ===== */}
+              <div className="flex items-start justify-between">
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                    {order.customOrderId}
+                  </h2>
+                  <p className="text-xs text-gray-400 dark:text-gray-400">
+                    {order.createdAt || "Just now"}
+                  </p>
                 </div>
-              ))}
-            </div>
 
-            {/* Footer */}
-            <div className="flex justify-between items-center pt-4 border-t">
-              <div className="text-xs text-gray-400">
-                {order.createdAt || "Just now"}
+                <div className="text-right">
+                  <p className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                    ₹{order.total}
+                  </p>
+                  <span className="text-xs font-medium px-3 py-1 rounded-full bg-gradient-to-r from-yellow-100 to-orange-100 text-orange-600 dark:bg-yellow-900 dark:text-yellow-400">
+                    New
+                  </span>
+                </div>
               </div>
 
-              <div className="flex gap-2">
+              {/* ===== CUSTOMER ===== */}
+              <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 shadow-inner backdrop-blur-sm">
+                <p className="font-semibold text-gray-900 dark:text-gray-100">
+                  {order.customer?.name}
+                </p>
+                <p className="text-sm text-gray-500 dark:text-gray-300">
+                  {order.customer?.phone}
+                </p>
+              </div>
+
+              {/* ===== LOCATION ===== */}
+              <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                <MapPin size={16} className="text-gray-400 dark:text-gray-400" />
+                <span className="line-clamp-1">{order.location}</span>
+              </div>
+
+              {/* ===== ITEMS ===== */}
+              <div className="text-sm space-y-2 text-gray-700 dark:text-gray-300">
+                {order.items?.map((item, i) => (
+                  <div
+                    key={i}
+                    className="flex justify-between px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
+                  >
+                    <span>{item.name}</span>
+                    <span className="font-medium">× {item.quantity}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* ===== FOOTER ===== */}
+              <div className="pt-4 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3 mt-auto">
                 {order.status === "ACCEPTED" ? (
-                  <span className="px-4 py-1 text-sm font-semibold rounded-full bg-green-100 text-green-700">
-                    ✅ Order Accepted
+                  <span className="px-4 py-1.5 text-sm font-semibold rounded-full bg-green-50 dark:bg-green-900 text-green-600 dark:text-green-400 shadow-sm">
+                    ✅ Accepted
                   </span>
                 ) : order.status === "REJECTED" ? (
-                  <span className="px-4 py-1 text-sm font-semibold rounded-full bg-red-100 text-red-700">
-                    ❌ Order Rejected
+                  <span className="px-4 py-1.5 text-sm font-semibold rounded-full bg-red-50 dark:bg-red-900 text-red-600 dark:text-red-400 shadow-sm">
+                    ❌ Rejected
                   </span>
                 ) : (
                   <>
@@ -172,7 +169,7 @@ const NewOrders = () => {
         ))}
 
         {orders.length === 0 && (
-          <div className="text-gray-400 text-center col-span-full py-20">
+          <div className="col-span-full py-20 text-center text-gray-400 dark:text-gray-500">
             No new orders
           </div>
         )}

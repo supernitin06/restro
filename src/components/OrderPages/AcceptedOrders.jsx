@@ -15,7 +15,10 @@ const AcceptedOrders = () => {
 
   const { data, refetch } = useGetOrdersQuery({});
   const allOrders = data?.data || [];
-  const orders = allOrders.filter(order => order.status === "ACCEPTED" || order.status === "REJECTED");
+  const orders = allOrders.filter(order => 
+    (order.status === "ACCEPTED" && order.kitchenStatus !== "READY") || 
+    order.status === "REJECTED"
+  );
   console.log("ORDERS:", orders);
 
 
