@@ -1,26 +1,34 @@
 import React, { useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { TrendingUp } from 'lucide-react';
+import { TrendingUp, Loader2 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import Select from '../../components/ui/Select';
+import { useGetRevenueChartQuery } from '../../api/services/dashboardApi';
+import { FaIndianRupeeSign } from "react-icons/fa6";
 
 const RevenueChart = () => {
-  const [selectedPeriod, setSelectedPeriod] = useState('Last 6 Months');
+  const [selectedPeriod, setSelectedPeriod] = useState('Last Month');
   const { theme } = useTheme();
+
+  // Map dropdown labels to API period parameters
+  const periodMapping = {
+    "Last 6 Months": "6_months",
+    "Last 3 Months": "3_months",
+    "Last Month": "monthly",
+    "This Year": "yearly"
+  };
+
+  // Fetch data from API
+  const { data: apiData, isLoading, isError } = useGetRevenueChartQuery(
+    periodMapping[selectedPeriod] || "monthly"
+  );
+
+  const chartData = apiData?.data || [];
+  const totalRevenue = apiData?.totalRevenue || 0;
+  const revenueGrowth = apiData?.growth || 0;
 
   const axisColor = theme === 'dark' ? '#9ca3af' : '#6b7280';
   const gridColor = theme === 'dark' ? '#374151' : '#e5e7eb';
-
-  const data = [
-    { name: 'Jan', revenue: 15000, orders: 120 },
-    { name: 'Feb', revenue: 18000, orders: 145 },
-    { name: 'Mar', revenue: 22000, orders: 168 },
-    { name: 'Apr', revenue: 19000, orders: 152 },
-    { name: 'May', revenue: 25000, orders: 189 },
-    { name: 'Jun', revenue: 28000, orders: 205 },
-    { name: 'Jul', revenue: 24000, orders: 178 },
-    { name: 'Aug', revenue: 30000, orders: 220 },
-  ];
 
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
@@ -41,10 +49,14 @@ const RevenueChart = () => {
         <div>
           <h3 className="text-xl font-bold text-primary mb-1">Total Revenue</h3>
           <div className="flex items-center gap-3">
-            <p className="text-3xl font-bold text-primary">$184,839</p>
-            <div className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400">
-              <TrendingUp className="w-3.5 h-3.5" />
-              +12.5%
+            <p className="flex items-center gap-1 text-3xl font-bold text-primary">
+  <FaIndianRupeeSign className="text-2xl" />
+  {totalRevenue.toLocaleString()}
+</p>
+
+            <div className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${revenueGrowth >= 0 ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'}`}>
+              <TrendingUp className={`w-3.5 h-3.5 ${revenueGrowth < 0 ? 'rotate-180' : ''}`} />
+              {revenueGrowth >= 0 ? '+' : ''}{revenueGrowth}%
             </div>
           </div>
         </div>
@@ -56,38 +68,48 @@ const RevenueChart = () => {
         />
       </div>
 
-      <div className="w-full" style={{ height: 256 }}>
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
-            <XAxis
-              dataKey="name"
-              tick={{ fill: axisColor, fontSize: 12 }}
-              axisLine={{ stroke: gridColor }}
-            />
-            <YAxis
-              tick={{ fill: axisColor, fontSize: 12 }}
-              axisLine={{ stroke: gridColor }}
-            />
-            <Tooltip content={<CustomTooltip />} />
-            <Line
-              type="monotone"
-              dataKey="revenue"
-              stroke="#2563eb"
-              strokeWidth={3}
-              dot={{ fill: '#2563eb', r: 5 }}
-              activeDot={{ r: 7 }}
-            />
-            <Line
-              type="monotone"
-              dataKey="orders"
-              stroke="#eb2528"
-              strokeWidth={3}
-              dot={{ fill: '#eb2528', r: 5 }}
-              activeDot={{ r: 7 }}
-            />
-          </LineChart>
-        </ResponsiveContainer>
+      <div className="h-64">
+        {isLoading ? (
+          <div className="h-full flex items-center justify-center">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          </div>
+        ) : isError ? (
+          <div className="h-full flex items-center justify-center text-red-500">
+            Failed to load chart data
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
+            <LineChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+              <XAxis
+                dataKey="name"
+                tick={{ fill: axisColor, fontSize: 12 }}
+                axisLine={{ stroke: gridColor }}
+              />
+              <YAxis
+                tick={{ fill: axisColor, fontSize: 12 }}
+                axisLine={{ stroke: gridColor }}
+              />
+              <Tooltip content={<CustomTooltip />} />
+              <Line
+                type="monotone"
+                dataKey="revenue"
+                stroke="#2563eb"
+                strokeWidth={3}
+                dot={{ fill: '#2563eb', r: 5 }}
+                activeDot={{ r: 7 }}
+              />
+              <Line
+                type="monotone"
+                dataKey="orders"
+                stroke="#eb2528"
+                strokeWidth={3}
+                dot={{ fill: '#eb2528', r: 5 }}
+                activeDot={{ r: 7 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        )}
       </div>
 
       <div className="flex items-center justify-center gap-8 mt-4">

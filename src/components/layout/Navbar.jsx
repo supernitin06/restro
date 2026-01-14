@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { logout } from "../../api/services/authSlice";
 import { useSockets } from "../../context/SocketContext";
 import fallbackImg from "../../assets/fallback.png";
+import notificationSound from "../../assets/mixkit-correct-answer-tone-2870.wav";
 import {
   Bell,
   MessageSquare,
@@ -43,6 +44,17 @@ const Navbar = ({ toggleSidebar }) => {
   const [isMessagesOpen, setIsMessagesOpen] = useState(false);
   const [isGiftsOpen, setIsGiftsOpen] = useState(false);
   const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
+
+  // Sound Notification Logic
+  const prevNotificationCount = useRef(notifications.length);
+
+  useEffect(() => {
+    if (notifications.length > prevNotificationCount.current) {
+      const audio = new Audio(notificationSound);
+      audio.play().catch((err) => console.log("Audio play failed:", err));
+    }
+    prevNotificationCount.current = notifications.length;
+  }, [notifications]);
 
   /* =====================================================
      SOCKET EVENTS + ROOM JOIN
