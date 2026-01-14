@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect } from "react";
 import { mainSocket } from "../socket/mainSocket";
 import { ordersSocket } from "../socket/ordersSocket";
 import { restaurantSocket } from "../socket/restaurantSocket";
+import toast from "react-hot-toast";
 
 const SocketContext = createContext(null);
 
@@ -113,7 +114,8 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
     ordersSocket.on("ORDER_STATUS_UPDATED", onOrderStatusUpdated);
     ordersSocket.on("ORDER_PICKED_UP", (data) => {
       console.log("✅ ORDER_PICKED_UP:", data);
-      alert(`Order Picked Up: ${data}`);
+      toast.success("Order Picked Up Successfully");
+
     });
 
 

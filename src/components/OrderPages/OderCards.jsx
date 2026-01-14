@@ -30,6 +30,12 @@ const OrderCard = ({ order, onDelete, onEdit, onUpdateStatus, viewMode }) => {
       icon: XCircle,
       label: 'Cancelled'
     },
+    REJECTED: {
+      bg: 'bg-red-100 dark:bg-red-900/30',
+      text: 'text-red-700 dark:text-red-400',
+      icon: XCircle,
+      label: 'Rejected'
+    },
     'ON-PROCESS': { // Fallback/default
       bg: 'bg-blue-100 dark:bg-blue-900/30',
       text: 'text-blue-700 dark:text-blue-400',

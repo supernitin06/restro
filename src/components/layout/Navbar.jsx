@@ -3,7 +3,6 @@ import React, { useState, useRef, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { logout } from "../../api/services/authSlice";
-
 import { useSockets } from "../../context/SocketContext";
 import fallbackImg from "../../assets/fallback.png";
 import {
@@ -17,7 +16,6 @@ import {
   ShieldCheck,
   Mail,
 } from "lucide-react";
-
 import ThemeToggle from "./ThemeToggle";
 import InputField from "../ui/InputField";
 import NotificationDropdown from "./NavbarCom/NotificationDropdown";
@@ -26,7 +24,6 @@ import GiftsDropdown from "./NavbarCom/GiftsDropdown";
 import CreateOfferModal from "./NavbarCom/CreateOfferModal";
 
 const Navbar = ({ toggleSidebar }) => {
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
@@ -34,15 +31,12 @@ const Navbar = ({ toggleSidebar }) => {
      CONSUME CONTEXT (Notifications & Sockets)
   ---------------------------------------------------------------- */
   const { notifications, setNotifications } = useSockets();
-
   const [messages, setMessages] = useState([]);
   const [gifts, setGifts] = useState([]);
-
   const profileRef = useRef(null);
   const notificationRef = useRef(null);
   const messagesRef = useRef(null);
   const giftsRef = useRef(null);
-
   const [openProfile, setOpenProfile] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
@@ -69,7 +63,6 @@ const Navbar = ({ toggleSidebar }) => {
       if (giftsRef.current && !giftsRef.current.contains(e.target))
         setIsGiftsOpen(false);
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);

@@ -9,25 +9,26 @@ import DeliveryPartnerForm from "../components/delivery-partner-management/Deliv
 import DeliveryPartnerSearchFilter from "../components/delivery-partner-management/DeliveryPartnerSearchFilter";
 import Pagination from "../components/ui/Pagination";
 import Button from "../components/ui/Button";
+import { toast } from "react-toastify";
+
+// TODO: Implement these API calls in your service
+// import { approvePartnerApi, rejectPartnerApi } from "../api/services/deliveryPartnerApprovalApi";
 
 const DeliveryPartnerManagement = () => {
   const { data: apiResponse, isLoading, error } = useGetDeliveryPartnersQuery();
   const [partners, setPartners] = useState([]);
 
-  const [filteredPartners, setFilteredPartners] = useState(partners);
+  const [filteredPartners, setFilteredPartners] = useState([]);
   const [selectedPartner, setSelectedPartner] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingPartner, setEditingPartner] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
-  const [viewMode, setViewMode] = useState(() => localStorage.getItem('partnerViewMode') || 'grid');
+  const [approvalFilter, setApprovalFilter] = useState("All");
+  const [viewMode, setViewMode] = useState(() => localStorage.getItem("partnerViewMode") || "grid");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-
-  // Debugging logs
-  console.log("Delivery Partners API Response:", apiResponse);
-  console.log("Delivery Partners API Error:", error);
 
   // Sync API data to local state
   useEffect(() => {
@@ -37,12 +38,13 @@ const DeliveryPartnerManagement = () => {
         listView: {
           name: p.name,
           phone: p.phone,
-          city: "N/A", // API does not provide city currently
+          city: "N/A",
           status: p.isActive ? "Active" : "Inactive",
+          approvalStatus: p.isApproved ? "Approved" : "Pending",
           assignedOrdersCount: p.totalOrders || 0,
           vehicleType: p.vehicleType,
           kycStatus: p.kyc?.status || "PENDING",
-          isOnline: p.isOnline
+          isOnline: p.isOnline,
         },
         registrationData: {
           name: p.name,
@@ -60,58 +62,67 @@ const DeliveryPartnerManagement = () => {
 
   // Persist view mode
   useEffect(() => {
-    localStorage.setItem('partnerViewMode', viewMode);
+    localStorage.setItem("partnerViewMode", viewMode);
   }, [viewMode]);
 
+  // Filter partners based on search, status, and approval
   useEffect(() => {
     let filtered = partners.filter((p) =>
       p.listView.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
+
     if (statusFilter !== "All") {
       filtered = filtered.filter((p) => p.listView.status === statusFilter);
     }
-    setFilteredPartners(filtered);
-    setCurrentPage(1); // Reset to first page on filter change
-  }, [partners, searchTerm, statusFilter]);
 
-  const partnerCounts = useMemo(() => {
-    return {
-      all: partners.length,
-      active: partners.filter(p => p.listView.status === 'Active').length,
-      inactive: partners.filter(p => p.listView.status === 'Inactive').length,
+    if (approvalFilter !== "All") {
+      filtered = filtered.filter((p) => p.listView.approvalStatus === approvalFilter);
     }
-  }, [partners]);
 
+    setFilteredPartners(filtered);
+    setCurrentPage(1);
+  }, [partners, searchTerm, statusFilter, approvalFilter]);
+
+  // Partner counts
+  const partnerCounts = useMemo(() => ({
+    all: partners.length,
+    active: partners.filter((p) => p.listView.status === "Active").length,
+    inactive: partners.filter((p) => p.listView.status === "Inactive").length,
+    pending: partners.filter((p) => p.listView.approvalStatus === "Pending").length,
+  }), [partners]);
+
+  // Pagination
   const totalPages = Math.ceil(filteredPartners.length / itemsPerPage);
   const currentPartners = useMemo(() => {
-      const startIndex = (currentPage - 1) * itemsPerPage;
-      return filteredPartners.slice(startIndex, startIndex + itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredPartners.slice(startIndex, startIndex + itemsPerPage);
   }, [filteredPartners, currentPage, itemsPerPage]);
+
+  // Modal Handlers
   const handleViewDetails = (partner) => {
     setSelectedPartner(partner);
     setIsModalOpen(true);
   };
-
   const closeModal = () => {
     setSelectedPartner(null);
     setIsModalOpen(false);
   };
 
+  // Form Handlers
   const handleAddPartner = () => {
     setEditingPartner(null);
     setIsFormOpen(true);
   };
-
   const handleEditPartner = (partner) => {
     setEditingPartner(partner);
     setIsFormOpen(true);
   };
-
   const closeForm = () => {
     setEditingPartner(null);
     setIsFormOpen(false);
   };
 
+  // Update Partner in state
   const updatePartner = (updatedPartner) => {
     const updatedList = partners.map((p) =>
       p.partnerId === updatedPartner.partnerId ? updatedPartner : p
@@ -123,11 +134,44 @@ const DeliveryPartnerManagement = () => {
     }
   };
 
+  // Approve / Reject Partner
+  const handleApprove = async (partner) => {
+    try {
+      const response = await approvePartnerApi(partner.partnerId);
+      if (response.success) {
+        updatePartner({
+          ...partner,
+          listView: { ...partner.listView, approvalStatus: "Approved", status: "Active" },
+        });
+        toast.success("Partner approved successfully");
+        closeModal();
+      }
+    } catch (err) {
+      toast.error("Failed to approve partner");
+    }
+  };
+
+  const handleReject = async (partner) => {
+    try {
+      const response = await rejectPartnerApi(partner.partnerId);
+      if (response.success) {
+        updatePartner({
+          ...partner,
+          listView: { ...partner.listView, approvalStatus: "Rejected", status: "Inactive" },
+        });
+        toast.error("Partner rejected");
+        closeModal();
+      }
+    } catch (err) {
+      toast.error("Failed to reject partner");
+    }
+  };
+
   return (
-    <div className="page page-background ">
+    <div className="page page-background">
       {/* Header */}
       <div className="flex bg-primary flex-col mb-6 md:flex-row justify-between items-start md:items-center bg-white dark:bg-gray-800 p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
-        <div >
+        <div>
           <h1 className="highlight text-4xl font-extrabold tracking-tight">
             Delivery Partner Management
           </h1>
@@ -141,17 +185,19 @@ const DeliveryPartnerManagement = () => {
         </Button>
       </div>
 
-      {/* Search */}
+      {/* Search & Filters */}
       <DeliveryPartnerSearchFilter
         onSearchChange={(e) => setSearchTerm(e.target.value)}
         statusFilter={statusFilter}
         onStatusChange={setStatusFilter}
+        approvalFilter={approvalFilter}
+        onApprovalFilterChange={setApprovalFilter}
         viewMode={viewMode}
         onViewModeChange={setViewMode}
         counts={partnerCounts}
       />
 
-      {/* List */}
+      {/* Partner List */}
       {isLoading ? (
         <div className="flex justify-center items-center py-20">
           <Loader2 className="animate-spin text-primary w-10 h-10" />
@@ -166,7 +212,7 @@ const DeliveryPartnerManagement = () => {
         />
       )}
 
-      {/* Details Modal */}
+      {/* Pagination */}
       {totalPages > 1 && (
         <div className="mt-8 flex justify-center">
           <Pagination
@@ -176,18 +222,22 @@ const DeliveryPartnerManagement = () => {
           />
         </div>
       )}
+
+      {/* Details Modal */}
       {isModalOpen && selectedPartner && (
         <DeliveryPartnerDetailsModal
           partner={selectedPartner}
           onClose={closeModal}
           updatePartner={updatePartner}
+          onApprove={() => handleApprove(selectedPartner)}
+          onReject={() => handleReject(selectedPartner)}
         />
       )}
 
-      {/* Add Form */}
+      {/* Add / Edit Form */}
       {isFormOpen && (
         <DeliveryPartnerForm
-          onClose={closeForm} 
+          onClose={closeForm}
           partner={editingPartner}
         />
       )}
