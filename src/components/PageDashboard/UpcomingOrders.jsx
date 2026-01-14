@@ -40,7 +40,7 @@ const UpcomingOrders = ({ title, orders, icon: Icon, color }) => {
     const handleUpdateStatus = async (orderId, newStatus) => {
         try {
             await updateOrderStatus({ id: orderId, status: newStatus }).unwrap();
-            showSuccessAlert(`Order {newStatus.toLowerCase()} successfully!`);
+            showSuccessAlert(`Order ${newStatus.toLowerCase()} successfully!`);
             closeMenu();
         } catch (error) {
             console.error(error);

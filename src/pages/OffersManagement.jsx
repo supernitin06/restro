@@ -1,22 +1,47 @@
 import React, { useState } from "react";
 import offersData from "../assets/json/offers.json";
-import { normalizeCoupon, normalizeOffer } from "../utils/normalizeCoupon"; // मान लो दोनों normalize फंक्शन हैं
+import { normalizeCoupon, normalizeOffer } from "../utils/normalizeCoupon";
 
 import SearchFilter from "../components/offers/SearchFilter";
-import OffersTable from "../components/offers/OffersTable";     // नया टेबल बनाया
+import OffersTable from "../components/offers/OffersTable";
 import CouponsTable from "../components/offers/CouponsTable";
-import OfferModal from "../components/offers/OfferModal";       // नया modal
+import OfferModal from "../components/offers/OfferModal";
 import CouponModal from "../components/offers/CouponModal";
 import Button from "../components/ui/Button";
+import {
+  useGetOffersQuery,
+  usePostOfferMutation,
+  useUpdateOfferMutation,
+  useDeleteOfferMutation
+} from "../api/services/offer";
+import toast from "react-hot-toast";
 
 const OffersManagement = () => {
-  // टैब स्टेट
-  const [activeTab, setActiveTab] = useState("offers"); // "offers" या "coupons"
+  // \u091f\u0948\u092b \u0938\u094d\u091f\u0947\u091f
+  const [activeTab, setActiveTab] = useState("offers"); // "offers" or "coupons"
 
-  // डेटा
-  const [offers, setOffers] = useState(
-    offersData.offersManagement.offersList.map(normalizeOffer)
-  );
+  // API Hooks
+  const { data: offersDataApi, isLoading, isError } = useGetOffersQuery();
+  const [createOffer] = usePostOfferMutation(   { refetchOnMountOrArgChange: true }) ;
+  const [updateOffer] = useUpdateOfferMutation(   { refetchOnMountOrArgChange: true });
+  const [deleteOfferApi] = useDeleteOfferMutation(   { refetchOnMountOrArgChange: true });
+
+  // Transform API Data
+  const transformOffer = (apiOffer) => ({
+    offerId: apiOffer._id,
+    title: apiOffer.title,
+    code: apiOffer.code || '',
+    description: apiOffer.description,
+    discountType: apiOffer.offerType?.toLowerCase() || 'percentage',
+    discountValue: apiOffer.discountValue,
+    minOrderValue: apiOffer.minOrderValue,
+    status: apiOffer.isActive ? 'active' : 'inactive',
+    validity: { startDate: apiOffer.validFrom, endDate: apiOffer.validUntil },
+    image: apiOffer.image,
+  });
+
+  const offers = offersDataApi?.data?.map(transformOffer) || [];
+
   const [coupons, setCoupons] = useState(
     offersData.offersManagement.couponsList.map(normalizeCoupon)
   );
@@ -32,7 +57,7 @@ const OffersManagement = () => {
 
   // फिल्टर लॉजिक (दोनों के लिए एक ही सर्च/फिल्टर यूज कर रहे हैं)
   const filteredOffers = offers.filter((o) => {
-    const matchSearch = o.title.toLowerCase().includes(searchText.toLowerCase());
+    const matchSearch = o.title?.toLowerCase().includes(searchText.toLowerCase());
     const matchStatus = filterStatus ? o.status === filterStatus.toLowerCase() : true;
     return matchSearch && matchStatus;
   });
@@ -56,16 +81,35 @@ const OffersManagement = () => {
     setIsModalOpen(false);
   };
 
-  const saveOffer = (data) => {
-    if (modalMode === "add") {
-      setOffers((prev) => [
-        { ...data, offerId: "OFF" + Date.now(), actions: { canEdit: true } },
-        ...prev,
-      ]);
-    } else {
-      setOffers((prev) => prev.map((o) => (o.offerId === data.offerId ? data : o)));
+  const saveOffer = async (data) => {
+    // Transform Modal Data to API Payload if needed
+    // Assuming Modal returns clean data matching API expectation or close enough
+    const payload = {
+      title: data.title,
+      description: data.description,
+      offerType: data.discountType?.toUpperCase() || "PERCENTAGE",
+      discountValue: Number(data.discountValue),
+      minOrderValue: Number(data.minOrderValue),
+      validFrom: data.validity?.startDate,
+      validUntil: data.validity?.endDate,
+      isActive: data.status === 'active',
+      image: data.image
+    };
+
+    try {
+      if (modalMode === "add") {
+        await createOffer(payload).unwrap();
+        toast.success("Offer added successfully");
+        // Toast handled by API middleware or add here?
+      } else {
+        await updateOffer({ id: data.offerId, ...payload }).unwrap(); // Check if updateOffer expects (id, data) or ({id, ...data})
+        toast.success("Offer updated successfully");
+      }
+      closeModal();
+    } catch (error) {
+      console.error("Failed to save offer:", error);
+      toast.error("Failed to save offer");
     }
-    closeModal();
   };
 
   const saveCoupon = (data) => {
@@ -80,9 +124,13 @@ const OffersManagement = () => {
     closeModal();
   };
 
-  const deleteOffer = (id) => {
+  const deleteOffer = async (id) => {
     if (!window.confirm("Delete this offer?")) return;
-    setOffers((prev) => prev.filter((o) => o.offerId !== id));
+    try {
+      await deleteOfferApi(id).unwrap();
+    } catch (error) {
+      console.error("Failed to delete offer:", error);
+    }
   };
 
   const deleteCoupon = (id) => {
@@ -120,7 +168,7 @@ const OffersManagement = () => {
             setFilterStatus("");
           }}
           className={`pb-3 px-1 font-medium text-lg border-b-4 transition-colors ${activeTab === "offers"
-                ? "border-highlight rounded-sm highlight text-blue-500"
+            ? "border-highlight rounded-sm highlight text-blue-500"
             : "border-none text-gray-500"
             }`}
         >

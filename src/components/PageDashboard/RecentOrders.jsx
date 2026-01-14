@@ -3,43 +3,18 @@ import { Search, MoreVertical } from 'lucide-react';
 import Button from '../ui/Button';
 import Select from '../ui/Select';
 
-const RecentOrders = () => {
-  const [filter, setFilter] = useState('This Week');
-  const orders = [
-    {
-      id: 'ORD7205',
-      image: '🍣',
-      name: 'Sashimi Sushi Roll',
-      description: 'Salmon',
-      quantity: 3,
-      amount: '$33.00',
-      customer: 'Diana Woods',
-      status: 'On Process',
-      statusColor: 'bg-orange-500'
-    },
-    {
-      id: 'ORD7206',
-      image: '🍝',
-      name: 'Spaghetti Carbonara',
-      description: 'Bacon',
-      quantity: 1,
-      amount: '$26.00',
-      customer: 'Eve Carter',
-      status: 'Complete',
-      statusColor: 'bg-gray-800'
-    },
-    {
-      id: 'ORD7207',
-      image: '🍔',
-      name: 'Classic Cheeseburger',
-      description: 'Burger',
-      quantity: 2,
-      amount: '$30.00',
-      customer: 'Charlie Brown',
-      status: 'On Process',
-      statusColor: 'bg-orange-500'
-    }
-  ];
+const RecentOrders = ({ data = [], loading = false }) => {
+  // const [filter, setFilter] = useState('This Week'); // Controlled by parent Dashboard
+
+  if (loading) {
+    return (
+      <div className="bg-primary p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 h-full flex items-center justify-center">
+        <p>Loading recent orders...</p>
+      </div>
+    )
+  }
+
+  const orders = data; // Use passed data directly
 
   return (
     <div className="bg-primary p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 h-full">
@@ -54,12 +29,7 @@ const RecentOrders = () => {
               className="pl-10 pr-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm text-primary focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all w-64"
             />
           </div>
-          <Select
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            options={["This Week", "Last Week", "This Month"]}
-            className="w-36"
-          />
+          {/* Filter moved to Dashboard Header */}
           <Button variant="primary" className="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-sm font-medium hover:border-[#2563eb] hover:bg-opacity-90 transition-all">
             See All Orders
           </Button>
@@ -91,26 +61,29 @@ const RecentOrders = () => {
                 </td>
                 <td className="py-4 px-4">
                   <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-100 dark:from-orange-900/40 to-orange-50 dark:to-orange-900/20 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
-                    {order.image}
+                    🍽️
                   </div>
                 </td>
                 <td className="py-4 px-4">
                   <div>
-                    <p className="font-semibold text-primary text-sm">{order.name}</p>
-                    <p className="text-xs text-primary opacity-60">{order.description}</p>
+                    {/* Display first item or summary since dashboard typically shows 1 line per order */}
+                    <p className="font-semibold text-primary text-sm">{order.items?.[0]?.name || 'Unknown Item'}</p>
+                    {order.items?.length > 1 && <p className="text-xs text-primary opacity-60">+{order.items.length - 1} more</p>}
                   </div>
                 </td>
                 <td className="py-4 px-4">
-                  <span className="text-sm font-medium text-primary opacity-80">{order.quantity}</span>
+                  <span className="text-sm font-medium text-primary opacity-80">{order.items?.[0]?.quantity || 1}</span>
                 </td>
                 <td className="py-4 px-4">
                   <span className="text-sm font-bold text-primary">{order.amount}</span>
                 </td>
                 <td className="py-4 px-4">
-                  <span className="text-sm font-medium text-primary opacity-80">{order.customer}</span>
+                  <span className="text-sm font-medium text-primary opacity-80">{order.customer || 'Guest'}</span>
                 </td>
                 <td className="py-4 px-4 ">
-                  <span className={`${order.statusColor} text-white px-3 py-1.5 rounded-full text-xs w-20 text-nowrap  font-semibold inline-block`}>
+                  <span className={`px-3 py-1.5 rounded-full text-xs w-20 text-nowrap font-semibold inline-block 
+                    ${order.status === 'DELIVERED' || order.status === 'COMPLETED' ? 'bg-green-500' :
+                      order.status === 'CANCELLED' ? 'bg-red-500' : 'bg-orange-500'} text-white`}>
                     {order.status}
                   </span>
                 </td>

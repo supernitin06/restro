@@ -31,6 +31,8 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
     mainSocket.auth = { token: authToken };
     ordersSocket.auth = { token: authToken };
     restaurantSocket.auth = { token: authToken };
+    mainSocket.on("CONNECTION_ESTABLISHED", (data) => console.log("🔌 Connection established", data));
+
 
     mainSocket.connect();
     ordersSocket.connect();
@@ -70,7 +72,6 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
         if (prev.some((o) => o.orderId === newOrder.orderId)) return prev;
         return [newOrder, ...prev];
       });
-
       // Add Notification
       setNotifications((prev) => [
         {

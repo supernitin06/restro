@@ -1,5 +1,6 @@
 import React from "react";
 import { ShoppingBag, Users, Star, DollarSign, Clock, CheckCircle } from "lucide-react";
+import Select from "../components/ui/Select";
 
 import StatCard from "../components/ui/StatCard";
 import RevenueChart from "../components/PageDashboard/RevenueChart";
@@ -17,13 +18,26 @@ import { useGetOrdersQuery } from "../api/services/orderApi";
 import { format } from "date-fns"; // Ensure date-fns is installed or use native
 
 const Dashboard = () => {
+  const [filterType, setFilterType] = React.useState('Month');
+
+  const getPeriodParams = (type) => {
+    switch (type) {
+      case 'Week': return 'week';
+      case 'Month': return 'month';
+      case 'Year': return 'year';
+      default: return 'month';
+    }
+  };
+
+
+
   // Fetch Real Data
   const { data: placedData } = useGetOrdersQuery({ status: "PLACED" }, { pollingInterval: 30000 });
   const { data: acceptedData } = useGetOrdersQuery({ status: "ACCEPTED" }, { pollingInterval: 30000 });
   const { data: readyData } = useGetOrdersQuery({ status: "READY" }, { pollingInterval: 30000 });
 
 
-  
+
   const transformOrder = (order) => ({
     id: order.orderId || order.customOrderId || order._id, // Visual ID "ORD-..."
     orderId: order._id, // API ID
@@ -68,6 +82,18 @@ const Dashboard = () => {
               Welcome back! Here's what's happening today.
             </p>
           </div>
+          <div className="mt-4 md:mt-0">
+            <Select
+              value={filterType}
+              onChange={(e) => setFilterType(e.target.value)}
+              options={[
+                { value: 'Week', label: 'Last Week' },
+                { value: 'Month', label: 'Last Month' },
+                { value: 'Year', label: 'Last Year' }
+              ]}
+              className="w-40"
+            />
+          </div>
 
         </div>
 
@@ -76,7 +102,7 @@ const Dashboard = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <StatCard
               title="Total Orders"
-              value="48,652"
+              value={0}
               icon={ShoppingBag}
               trend="up"
               trendValue="+14%"
@@ -84,7 +110,7 @@ const Dashboard = () => {
             />
             <StatCard
               title="Total Customers"
-              value="1,248"
+              value="1,248" // Not in provided API snippet yet
               icon={Users}
               trend="up"
               trendValue="+8.5%"
@@ -92,7 +118,7 @@ const Dashboard = () => {
             />
             <StatCard
               title="Total Reviews"
-              value="12,486"
+              value="12,486" // Not in provided API snippet yet
               icon={Star}
               trend="up"
               trendValue="+3.8%"
@@ -100,7 +126,7 @@ const Dashboard = () => {
             />
             <StatCard
               title="Total Revenue"
-              value="$184,839"
+              value={0}
               icon={DollarSign}
               trend="up"
               trendValue="+12.5%"
@@ -147,7 +173,9 @@ const Dashboard = () => {
         {/* ================= RECENT ORDERS ================= */}
         <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
-            <RecentOrders />
+            <RecentOrders
+            
+            />
           </div>
           <TrendingMenu />
         </section>

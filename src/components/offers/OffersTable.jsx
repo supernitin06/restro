@@ -12,21 +12,21 @@ const OffersTable = ({ offers = [], onView, onEdit, onDelete }) => {
       label: 'View Details',
       icon: Eye,
       color: 'blue',
-      onClick: (item) => console.log('View', item), // Placeholder
+      onClick: (item) => onView(item),
     },
     {
       key: 'edit',
-      label: 'Edit Permissions',
+      label: 'Edit Offer',
       icon: Edit,
       color: 'purple',
-      onClick: () => navigate('/sub-admin/assign'),
+      onClick: (item) => onEdit(item),
     },
     {
       key: 'delete',
-      label: 'Delete Admin',
+      label: 'Delete Offer',
       icon: Trash2,
       color: 'rose',
-      onClick: (item) => handleDelete(item.id),
+      onClick: (item) => onDelete(item.offerId),
     },
   ];
 

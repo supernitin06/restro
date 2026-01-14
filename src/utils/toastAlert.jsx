@@ -2,6 +2,7 @@ import toast from 'react-hot-toast';
 import React from 'react';
 
 export const showSuccessAlert = (message) => {
+    console.log("Toast Triggered:", message);
     toast.success(message);
 };
 

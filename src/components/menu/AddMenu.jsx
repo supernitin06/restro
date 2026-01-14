@@ -179,6 +179,11 @@ const AddMenuItem = () => {
         formData.append("image", categoryImage);
       }
 
+      // Debug: Log FormData entries to verify file format
+      for (let [key, value] of formData.entries()) {
+        console.log(`FormData ${key}:`, value);
+      }
+
       const result = await showPromiseToast(
         addCategory(formData).unwrap(),
         {

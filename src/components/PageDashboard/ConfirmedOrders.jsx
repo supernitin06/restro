@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ArrowRight, CheckCircle, XCircle, ChevronDown, ChevronUp, ChefHat } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useUpdateKitchenStatusMutation, useUpdateOrderStatusMutation } from '../../api/services/orderApi';
-import { showSuccessAlert, showErrorAlert } from '../../utils/toastAlert';
+import { showSuccessAlert, showErrorAlert, showConfirmAlert } from '../../utils/toastAlert';
 
 const ConfirmedOrders = ({ title, orders, icon: Icon, color }) => {
     const [expandedOrderId, setExpandedOrderId] = useState(null);
@@ -40,7 +40,7 @@ const ConfirmedOrders = ({ title, orders, icon: Icon, color }) => {
     const handleMarkReady = async (orderId) => {
         try {
             await updateKitchenStatus({ orderId, status: "READY" }).unwrap();
-            showSuccessAlert("Order marked as Ready!");
+            showSuccessAlert("Order Ready");
         } catch (err) {
             console.error(err);
             showErrorAlert("Failed to mark as Ready");
@@ -48,7 +48,9 @@ const ConfirmedOrders = ({ title, orders, icon: Icon, color }) => {
     };
 
     const handleReject = async (orderId) => {
-        if (!window.confirm("Are you sure you want to reject this confirmed order?")) return;
+        const result = await showConfirmAlert("Are you sure you want to reject this confirmed order?");
+        if (!result.isConfirmed) return;
+
         try {
             await updateOrderStatus({ id: orderId, status: "REJECTED" }).unwrap();
             showSuccessAlert("Order rejected.");
