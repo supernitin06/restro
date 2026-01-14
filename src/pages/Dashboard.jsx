@@ -62,7 +62,7 @@ const Dashboard = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <StatCard
               title="Total Orders"
-              value="48,652"
+              value="0"
               icon={ShoppingBag}
               trend="up"
               trendValue="+14%"
@@ -70,7 +70,7 @@ const Dashboard = () => {
             />
             <StatCard
               title="Total Customers"
-              value="1,248"
+              value="0"
               icon={Users}
               trend="up"
               trendValue="+8.5%"
@@ -78,7 +78,7 @@ const Dashboard = () => {
             />
             <StatCard
               title="Total Reviews"
-              value="12,486"
+              value="0"
               icon={Star}
               trend="up"
               trendValue="+3.8%"
@@ -86,7 +86,7 @@ const Dashboard = () => {
             />
             <StatCard
               title="Total Revenue"
-              value="$184,839"
+              value="0"
               icon={DollarSign}
               trend="up"
               trendValue="+12.5%"
