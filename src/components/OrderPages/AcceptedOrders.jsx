@@ -15,8 +15,8 @@ const AcceptedOrders = () => {
 
   const { data, refetch } = useGetOrdersQuery({});
   const allOrders = data?.data || [];
-  const orders = allOrders.filter(order => 
-    (order.status === "ACCEPTED" && order.kitchenStatus !== "READY") || 
+  const orders = allOrders.filter(order =>
+    (order.status === "ACCEPTED" && order.kitchenStatus !== "READY") ||
     order.status === "REJECTED"
   );
   console.log("ORDERS:", orders);
@@ -24,7 +24,7 @@ const AcceptedOrders = () => {
 
   const [updateKitchenStatus] = useUpdateKitchenStatusMutation();
   const [updateOrderStatus] = useUpdateOrderStatusMutation();
-  const [updateKitchenStatus] = useUpdateKitchenStatusMutation();
+
   const [loadingId, setLoadingId] = useState(null);
   const [rejectingOrderId, setRejectingOrderId] = useState(null);
   const [rejectReason, setRejectReason] = useState("");

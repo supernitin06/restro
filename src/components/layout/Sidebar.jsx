@@ -64,34 +64,27 @@ const Sidebar = ({ theme = "dark" }) => {
       icon: Truck,
       path: "/delivery-settings",
     },
-   {
-  id: "delivery-partners",
-  label: "Delivery Partners",
-  icon: Bike,
-  hasDropdown: true,
-  subItems: [
     {
-      id: "all-partners",
-      label: "Manage Partners",
-      path: "/delivery-partners", // your existing approved partners page
+      id: "delivery-partners",
+      label: "Delivery Partners",
       icon: Bike,
+      hasDropdown: true,
+      subItems: [
+        {
+          id: "all-partners",
+          label: "Manage Partners",
+          path: "/delivery-partners", // your existing approved partners page
+          icon: Bike,
+        },
+        {
+          id: "pending-partners",
+          label: "Pending Approvals",
+          path: "/pending-delivery-partners", // new pending partners page
+          icon: Clock, // or any other icon
+        },
+      ],
     },
-    {
-      id: "pending-partners",
-      label: "Pending Approvals",
-      path: "/pending-delivery-partners", // new pending partners page
-      icon: Clock, // or any other icon
-    },
-  ],
-},
 
-  {
-  id: "orders",
-  label: "Orders",
-  path: "/orders",
-  icon: ShoppingBag,
-  hasDropdown: true,
-  subItems: [
     {
       id: "orders",
       label: "Orders",
@@ -117,7 +110,6 @@ const Sidebar = ({ theme = "dark" }) => {
           icon: CheckCircle,
           path: "/orders/accepted",
         }
-
       ],
     },
 
