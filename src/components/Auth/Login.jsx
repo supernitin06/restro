@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { showPromiseToast } from "../../utils/toastAlert";
-import restaurantImage from "../../assets/loginimage1.jpg";
+import restaurantImage from "../../assets/image.png";
 import grandmaLogo from "../../assets/grandma.webp";
 import { useLoginMutation } from "../../api/services/authapi";
 import { useNavigate } from "react-router-dom";
-import { FiEye, FiEyeOff } from "react-icons/fi";
+import { FiEye, FiEyeOff, FiMail, FiLock, FiAlertTriangle, FiUser, FiUsers } from "react-icons/fi";
+import { FaCrown } from "react-icons/fa";
 
 const LoginForm = ({ role = "admin", onRoleChange }) => {
   const [formData, setFormData] = useState({
@@ -72,8 +73,6 @@ const LoginForm = ({ role = "admin", onRoleChange }) => {
   return (
     <div style={styles.container} >
       {/* Background Elements */}
-      <div style={styles.backgroundAnimation}></div>
-
       <div style={{
         ...styles.card,
         flexDirection: isMobile ? "column" : "row",
@@ -119,7 +118,7 @@ const LoginForm = ({ role = "admin", onRoleChange }) => {
           <div style={styles.formContent}>
             <div style={styles.header}>
               <div style={styles.welcomeBack}>
-                <div style={styles.welcomeIcon}>👨‍🍳</div>
+                <div style={styles.welcomeIcon}><FiUser /></div>
                 <h1 style={styles.title}>Welcome Back</h1>
               </div>
 
@@ -136,7 +135,7 @@ const LoginForm = ({ role = "admin", onRoleChange }) => {
                   gap: isMobile ? "8px" : "12px"
                 }}
               >
-                <span style={{ ...styles.roleIcon, fontSize: isMobile ? "20px" : "24px" }}>👑</span>
+                <span style={{ ...styles.roleIcon, fontSize: isMobile ? "20px" : "24px" }}><FaCrown /></span>
                 <div>
                   <div style={{ ...styles.roleName, fontSize: isMobile ? "13px" : "14px" }}>Admin</div>
                   <div style={{ ...styles.roleDesc, fontSize: isMobile ? "11px" : "12px" }}>Full Access</div>
@@ -152,7 +151,7 @@ const LoginForm = ({ role = "admin", onRoleChange }) => {
                   gap: isMobile ? "8px" : "12px"
                 }}
               >
-                <span style={{ ...styles.roleIcon, fontSize: isMobile ? "20px" : "24px" }}>👥</span>
+                <span style={{ ...styles.roleIcon, fontSize: isMobile ? "20px" : "24px" }}><FiUsers /></span>
                 <div>
                   <div style={{ ...styles.roleName, fontSize: isMobile ? "13px" : "14px" }}>Sub-Admin</div>
                   <div style={{ ...styles.roleDesc, fontSize: isMobile ? "11px" : "12px" }}>Limited Access</div>
@@ -166,7 +165,7 @@ const LoginForm = ({ role = "admin", onRoleChange }) => {
               <div style={styles.formGroup}>
                 <label style={styles.label}>Email Address</label>
                 <div style={styles.inputContainer}>
-                  <span style={styles.inputIcon}>📧</span>
+                  <span style={styles.inputIcon}><FiMail /></span>
                   <input
                     type="email"
                     name="email"
@@ -187,7 +186,7 @@ const LoginForm = ({ role = "admin", onRoleChange }) => {
               <div style={styles.formGroup}>
                 <label style={styles.label}>Password</label>
                 <div style={styles.inputContainer}>
-                  <span style={styles.inputIcon}>🔒</span>
+                  <span style={styles.inputIcon}><FiLock /></span>
                   <input
                     type={showPassword ? "text" : "password"}
                     name="password"
@@ -227,7 +226,7 @@ const LoginForm = ({ role = "admin", onRoleChange }) => {
               {/* ERROR */}
               {error && (
                 <div style={styles.errorMessage}>
-                  <span style={styles.errorIcon}>⚠️</span>
+                  <span style={styles.errorIcon}><FiAlertTriangle /></span>
                   {error}
                 </div>
               )}
@@ -281,16 +280,6 @@ const styles = {
     padding: "20px",
     position: "relative",
     overflow: "hidden",
-  },
-  backgroundAnimation: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    background: "linear-gradient(45deg, rgba(220, 38, 38, 0.05) 25%, transparent 25%, transparent 50%, rgba(239, 68, 68, 0.05) 50%, rgba(239, 68, 68, 0.05) 75%, transparent 75%, transparent)",
-    backgroundSize: "50px 50px",
-    animation: "move 20s linear infinite",
   },
   card: {
     display: "flex",
@@ -625,13 +614,6 @@ const styles = {
 // Add CSS animations
 if (typeof document !== 'undefined') {
   const styleSheet = document.styleSheets[0];
-  styleSheet.insertRule(`
-    @keyframes move {
-      0% { background-position: 0 0; }
-      100% { background-position: 50px 50px; }
-    }
-  `);
-
   styleSheet.insertRule(`
     @keyframes bounce {
       0%, 100% { transform: translateY(0); }

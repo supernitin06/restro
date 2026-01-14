@@ -1,16 +1,36 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
-import Button from '../ui/Button';
+import { Loader2 } from 'lucide-react';
+import Select from '../ui/Select';
 import { useTheme } from '../../context/ThemeContext';
+import { useGetCategorySalesQuery } from '../../api/services/dashboardApi';
 
 const TopCategories = () => {
   const { theme } = useTheme();
-  const data = [
-    { name: 'Seafood', value: 33, color: '#2563eb' },
-    { name: 'Beverages', value: 25, color: '#eb2528' },
-    { name: 'Dessert', value: 25, color: '#fbbf24' },
-    { name: 'Pizza', value: 17, color: '#10b981' },
-  ];
+  const [selectedPeriod, setSelectedPeriod] = useState('This Month');
+
+  const periodMapping = {
+    "This Week": "weekly",
+    "This Month": "monthly",
+    "This Year": "yearly"
+  };
+
+  const { data: apiData, isLoading, isError } = useGetCategorySalesQuery(
+    periodMapping[selectedPeriod] || "monthly"
+  );
+
+  const COLORS = ['#2563eb', '#eb2528', '#fbbf24', '#10b981', '#8b5cf6', '#ec4899'];
+
+  const chartData = useMemo(() => {
+    if (!apiData?.data) return [];
+    // Assuming API returns array of objects with { category: "Name", sales: 100 } or similar
+    // Adjust 'category' and 'sales' keys based on your actual API response
+    return apiData.data.map((item, index) => ({
+      name: item.category || item.name, 
+      value: item.sales || item.count || item.value,
+      color: COLORS[index % COLORS.length]
+    }));
+  }, [apiData]);
 
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
@@ -33,8 +53,8 @@ const TopCategories = () => {
               className="w-3 h-3 rounded-full transition-transform group-hover:scale-125"
               style={{ backgroundColor: entry.color }}
             ></div>
-            <span className="text-sm font-medium text-primary opacity-80 group-hover:text-primary">
-              {entry.value} <span className="text-primary opacity-60">{data[index].value}%</span>
+            <span className="text-sm font-medium text-primary opacity-80 group-hover:text-primary flex gap-1">
+              {entry.name} <span className="text-primary opacity-60">({entry.value})</span>
             </span>
           </div>
         ))}
@@ -46,36 +66,49 @@ const TopCategories = () => {
     <div className="bg-primary rounded-2xl p-6 shadow-sm border border-white/20 dark:border-gray-700 hover:shadow-md transition-all duration-300">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-xl font-bold text-primary">Top Categories</h3>
-        <Button className="text-sm font-medium text-[#2563eb] hover:text-[#1d4ed8] transition-colors bg-transparent shadow-none p-0 w-auto hover:bg-transparent">
-          This Month ▼
-        </Button>
+        <Select
+          value={selectedPeriod}
+          onChange={(e) => setSelectedPeriod(e.target.value)}
+          options={["This Week", "This Month", "This Year"]}
+          className="w-32"
+        />
       </div>
 
       <div className="h-64">
-        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
-          <PieChart>
-            <Pie
-              data={data}
-              cx="50%"
-              cy="50%"
-              innerRadius={60}
-              outerRadius={90}
-              paddingAngle={5}
-              dataKey="value"
-              stroke={theme === 'dark' ? '#1f2937' : '#fff'}
-            >
-              {data.map((entry, index) => (
+        {isLoading ? (
+          <div className="h-full flex items-center justify-center">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          </div>
+        ) : isError || chartData.length === 0 ? (
+          <div className="h-full flex items-center justify-center text-primary opacity-60">
+            {isError ? "Failed to load data" : "No category data"}
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
+            <PieChart>
+              <Pie
+                data={chartData}
+                cx="50%"
+                cy="50%"
+                innerRadius={60}
+                outerRadius={90}
+                paddingAngle={5}
+                dataKey="value"
+                stroke={theme === 'dark' ? '#1f2937' : '#fff'}
+              >
+                {chartData.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
                   fill={entry.color}
                   className="hover:opacity-80 transition-opacity cursor-pointer"
                 />
               ))}
-            </Pie>
-            <Tooltip content={<CustomTooltip />} />
-            <Legend content={<CustomLegend />} />
-          </PieChart>
-        </ResponsiveContainer>
+              </Pie>
+              <Tooltip content={<CustomTooltip />} />
+              <Legend content={<CustomLegend />} />
+            </PieChart>
+          </ResponsiveContainer>
+        )}
       </div>
     </div>
   );
