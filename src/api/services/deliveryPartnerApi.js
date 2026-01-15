@@ -39,11 +39,11 @@ export const deliveryPartnerApi = baseApi.injectEndpoints({
       }),
       providesTags: ["DeliveryPartner"],
     }),
-     
+
     updateDeliveryPartner: builder.mutation({
-      query: (id) => ({
+      query: ({ id }) => ({
         url: `admin/delivery-partners/${id}/toggle-status`,
-        method: "PUT",
+        method: "PATCH",
       }),
       invalidatesTags: ["DeliveryPartner"],
     }),

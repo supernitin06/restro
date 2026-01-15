@@ -10,7 +10,7 @@ import {
   Loader2,
 } from "lucide-react";
 import Button from "../components/ui/Button";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 import {
   useGetNewDeliveryPartnersQuery,
   useApproveDeliveryPartnerMutation,
@@ -32,20 +32,19 @@ const PendingDeliveryPartners = () => {
   const handleApprove = async (partner) => {
     try {
       await approvePartner(partner._id).unwrap();
-      toast.success(`${partner.name} ko approve kar diya gaya hai!`);
+      toast.success(`${partner.name} approved successfully!`);
       navigate('/delivery-partners');
     } catch (err) {
-      toast.error(err?.data?.message || `${partner.name} ko approve karne mein samasya aayi.`);
+      toast.error(err?.data?.message || `Failed to approve ${partner.name}.`);
     }
   };
 
   const handleReject = async (partner) => {
     try {
       await rejectPartner(partner._id).unwrap();
-      toast.error(`${partner.name} ko reject kar diya gaya hai.`);
-      // Tag invalidation se list automatically update ho jayegi.
+      toast.success(`${partner.name} rejected successfully.`);
     } catch (err) {
-      toast.error(err?.data?.message || `${partner.name} ko reject karne mein samasya aayi.`);
+      toast.error(err?.data?.message || `Failed to reject ${partner.name}.`);
     }
   };
 
@@ -88,8 +87,8 @@ const PendingDeliveryPartners = () => {
                 <div className="relative">
                   <img
                     src={partner.image}
-                  alt={partner.name || 'Partner'}
-                  className="w-16 h-16 rounded-2xl object-cover border-2 border-white shadow bg-gray-200"
+                    alt={partner.name || 'Partner'}
+                    className="w-16 h-16 rounded-2xl object-cover border-2 border-white shadow bg-gray-200"
                   />
                   <span className="absolute -bottom-1 -right-1 w-4 h-4 bg-yellow-400 border-2 border-white rounded-full" />
                 </div>

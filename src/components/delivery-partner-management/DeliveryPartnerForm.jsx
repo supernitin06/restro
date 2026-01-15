@@ -1,6 +1,6 @@
 // DeliveryPartnerForm.jsx
 import React, { useState, useEffect } from "react";
-import { showPromiseToast } from "../../utils/toastAlert";
+import toast from "react-hot-toast";
 import { createPortal } from "react-dom";
 import InputField from "../ui/InputField";
 import Button from "../ui/Button";
@@ -63,7 +63,7 @@ const DeliveryPartnerForm = ({ onClose, partner }) => {
         const updatePayload = { id: partner.partnerId, ...payload };
         if (!updatePayload.password) delete updatePayload.password;
 
-        await showPromiseToast(
+        await toast.promise(
           updatePartner(updatePayload).unwrap(),
           {
             loading: 'Updating partner...',
@@ -72,7 +72,7 @@ const DeliveryPartnerForm = ({ onClose, partner }) => {
           }
         );
       } else {
-        await showPromiseToast(
+        await toast.promise(
           createPartner(payload).unwrap(),
           {
             loading: 'Creating partner...',

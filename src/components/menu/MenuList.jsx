@@ -2,7 +2,9 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { Check, Star, Edit, Trash2, ChevronDown, ChevronUp, ImageOff, X, Package } from "lucide-react";
 import EditMenuModal from "./EditMenuModal";
-import { showConfirmAlert, showPromiseToast } from "../../utils/toastAlert";
+import { showPromiseToast } from "../../utils/toastAlert";
+import ConfirmationModal from "../ui/ConfirmationModal";
+import toast from "react-hot-toast";
 
 import Button from "../ui/Button";
 import Table from "../ui/Table";
@@ -50,6 +52,9 @@ const MenuList = ({ menus, isLoading, isError, error, searchTerm = '', statusFil
   const [editItem, setEditItem] = useState(null);
   const [expandedCategories, setExpandedCategories] = useState({});
   const [deleteMenu] = useDeleteMenuMutation();
+  // Confirmation Modal State
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
   const [updateMenu] = useUpdateMenuMutation();
   const [updateMenuStockStatus] = useUpdateMenuStockStatusMutation();
   // Categories are collapsed by default.
@@ -61,19 +66,28 @@ const MenuList = ({ menus, isLoading, isError, error, searchTerm = '', statusFil
     }));
   };
 
-  const handleDelete = React.useCallback(async (itemId) => {
-    const result = await showConfirmAlert("Are you sure you want to delete this item?", "Delete", "Cancel");
-    if (!result.isConfirmed) return;
+  const handleDeleteClick = (itemId) => {
+    setItemToDelete(itemId);
+    setIsDeleteModalOpen(true);
+  };
 
-    await showPromiseToast(
-      deleteMenu(itemId).unwrap(),
-      {
-        loading: 'Deleting item...',
-        success: 'Item deleted successfully.',
-        error: 'Failed to delete item.'
-      }
-    );
-  }, [deleteMenu]);
+  const confirmDelete = async () => {
+    try {
+      await showPromiseToast(
+        deleteMenu(itemToDelete).unwrap(),
+        {
+          loading: 'Deleting item...',
+          success: 'Item deleted successfully.',
+          error: 'Failed to delete item.'
+        }
+      );
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsDeleteModalOpen(false);
+      setItemToDelete(null);
+    }
+  };
 
   const handleToggleStock = async (item) => {
     console.log(item);
@@ -267,7 +281,7 @@ const MenuList = ({ menus, isLoading, isError, error, searchTerm = '', statusFil
                                       Edit
                                     </Button>
                                     <Button
-                                      onClick={() => handleDelete(item.itemId)}
+                                      onClick={() => handleDeleteClick(item.itemId)}
                                       variant="outline"
                                       className="px-3 text-red-500 border-red-100 h-8 hover:bg-red-50 hover:border-red-200 dark:border-red-900/30 dark:hover:bg-red-900/20"
                                     >
@@ -358,7 +372,7 @@ const MenuList = ({ menus, isLoading, isError, error, searchTerm = '', statusFil
                                       Edit
                                     </Button>
                                     <Button
-                                      onClick={() => handleDelete(item.itemId)}
+                                      onClick={() => handleDeleteClick(item.itemId)}
                                       variant="ghost"
                                       size="sm"
                                       className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
@@ -399,6 +413,16 @@ const MenuList = ({ menus, isLoading, isError, error, searchTerm = '', statusFil
         item={editItem}
         onClose={() => setEditItem(null)}
         onSave={handleEditSave}
+      />
+
+      <ConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={confirmDelete}
+        title="Delete Item?"
+        message="Are you sure you want to delete this menu item? This action cannot be undone."
+        confirmText="Delete"
+        isDangerous={true}
       />
     </div>
   );

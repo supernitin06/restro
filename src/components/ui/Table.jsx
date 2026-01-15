@@ -121,7 +121,7 @@ const Table = ({
                               key={col.key || colIndex}
                               className={`px-6 py-4 whitespace-nowrap ${
                                 colIndex === 0
-                                  ? "sticky left-0 bg-white dark:bg-gray-800 z-30"
+                                  ? "sticky left-0 bg-white dark:bg-gray-800 z-50"
                                   : ""
                               }`}
                             >

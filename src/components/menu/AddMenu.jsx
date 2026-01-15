@@ -255,56 +255,58 @@ const AddMenuItem = () => {
     setShowCategoryDropdown(false);
   };
 
-  /* ✅ SAVE MENU with Base64 Image */
+  /* ✅ SAVE MENU with FormData for Cloudinary Upload */
   const handleSave = async (e) => {
     e.preventDefault();
 
-    if (!restaurantId) {
-      showErrorAlert("Restaurant ID is missing. Please log in again.");
-      return;
-    }
-
-    if (!name || !price || !category) {
-      showErrorAlert("Please fill in all required fields (Name, Price, Category).");
-      return;
+    if (!restaurantId || !name || !price || !category) {
+      return showErrorAlert("Required fields missing");
     }
 
     try {
-      let imagePayload = photo || ""; // ✅ Fix: Ensure image is a string (not null)
-      // Convert file to Base64 before sending
+      const formData = new FormData();
+
+      formData.append("restaurantId", restaurantId);
+      formData.append("restaurant", restaurantId); // Backend expects this too
+      formData.append("category", category);
+      formData.append("name", name);
+      formData.append("description", description);
+      formData.append("basePrice", Number(price));
+      formData.append("foodType", foodType);
+      formData.append("isVeg", isVeg);
+      formData.append("isAvailable", available);
+
+      // ✅ IMAGE
       if (imageFile) {
-        imagePayload = await convertToBase64(imageFile);
+        formData.append("image", imageFile);
       }
 
+      // ✅ ARRAYS
+      formData.append("tags", JSON.stringify(tags));
+      formData.append(
+        "variants",
+        JSON.stringify(variants.map(v => ({ name: v.name, price: Number(v.price) })))
+      );
+      formData.append(
+        "addons",
+        JSON.stringify(addons.map(a => ({ name: a.name, price: Number(a.price) })))
+      );
+
       await showPromiseToast(
-        addMenu({
-          restaurantId,
-          restaurant: restaurantId,
-          category,
-          name,
-          description,
-          basePrice: Number(price),
-          foodType,
-          isVeg,
-          tags,
-          isAvailable: available,
-          variants: variants.map(v => ({ name: v.name, price: Number(v.price) })),
-          addons: addons.map(a => ({ name: a.name, price: Number(a.price) })),
-          image: imagePayload,
-          altText,
-        }).unwrap(),
+        addMenu(formData).unwrap(),
         {
-          loading: 'Saving menu item...',
-          success: t("menuItemSaved"),
-          error: (err) => err?.data?.message || err?.data?.error || "Failed to save menu item"
+          loading: "Saving menu item...",
+          success: "Menu item saved",
+          error: (err) => err?.data?.message || "Failed"
         }
       );
 
       navigate("/menu-management");
     } catch (err) {
-      console.error("Add menu failed", err);
+      console.error("MENU ERROR", err);
     }
   };
+
 
   return (
     <div className="app page">

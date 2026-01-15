@@ -72,18 +72,19 @@ const OrderCard = ({ order, onDelete, onEdit, onUpdateStatus, viewMode }) => {
       icon: ChefHat, // Using ChefHat if available or fallback
       label: 'Ready'
     },
+     ASSIGNED: {
+      bg: 'bg-purple-100 dark:bg-purple-900/30',
+      text: 'text-purple-700 dark:text-purple-400',
+      icon: Bike,
+      label: 'Assigned'
+    },
     OUT_FOR_DELIVERY: {
       bg: 'bg-purple-100 dark:bg-purple-900/30',
       text: 'text-purple-700 dark:text-purple-400',
       icon: Bike,
       label: 'Out For Delivery'
     },
-    ASSIGNED: {
-      bg: 'bg-purple-100 dark:bg-purple-900/30',
-      text: 'text-purple-700 dark:text-purple-400',
-      icon: Bike,
-      label: 'Assigned'
-    },
+   
     PICKED: {
       bg: 'bg-purple-100 dark:bg-purple-900/30',
       text: 'text-purple-700 dark:text-purple-400',

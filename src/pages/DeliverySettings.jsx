@@ -10,7 +10,6 @@ import Button from '../components/ui/Button';
 const DeliverySettings = () => {
     const [isDeliveryEnabled, setIsDeliveryEnabled] = useState(true);
     const [activeTab, setActiveTab] = useState('rules'); // rules | priority
-
     return (
         <div className="page ">
             <div className=" space-y-8">

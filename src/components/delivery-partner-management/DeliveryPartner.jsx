@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { showPromiseToast } from "../../utils/toastAlert";
+import toast from "react-hot-toast";
 import { Phone, MapPin, Truck, Bike, Eye, Info, Edit } from "lucide-react";
 import DeliveryPartnerStatusBadge from "./DeliveryPartnerStatusBadge";
 import Button from "../ui/Button";
@@ -17,7 +17,7 @@ const DeliveryPartner = ({ partners, onViewDetails, onEdit, viewMode = 'grid' })
     const newIsActive = currentStatus !== "Active";
 
     try {
-      await showPromiseToast(
+      await toast.promise(
         updateDeliveryPartner({
           id: partner.partnerId,
           isActive: newIsActive,
@@ -51,7 +51,7 @@ const DeliveryPartner = ({ partners, onViewDetails, onEdit, viewMode = 'grid' })
                 {/* Partner Info */}
                 <div className="md:col-span-3 flex items-center gap-3 min-w-0">
                   <img
-                    src={ `https://resto-grandma.onrender.com/uploads/logo/1767686592739.jpg`}
+                    src={`https://resto-grandma.onrender.com/uploads/logo/1767686592739.jpg`}
                     className="w-11 h-11 rounded-xl object-cover border border-gray-200 dark:border-gray-700"
                     alt={registrationData?.name}
                   />

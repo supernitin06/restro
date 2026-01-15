@@ -15,6 +15,7 @@ export const userApi = baseApi.injectEndpoints({
         ({ url: `admin/users/${id}`, method: "get" }),
       providesTags: ["User"],
     }),
+    
 
     getUserDetails: builder.query({
       query: (id) => ({ url: `admin/users/${id}`, method: "get" }),
@@ -22,6 +23,12 @@ export const userApi = baseApi.injectEndpoints({
     }),
 
     getUserOrders: builder.query({
+      query: (id) => ({ url: `admin/users/${id}/orders`, method: "get" }),
+      providesTags: ["Order"],
+    }),
+
+
+    getUserOrderHistory: builder.query({
       query: (id) => ({ url: `admin/users/${id}/orders`, method: "get" }),
       providesTags: ["Order"],
     }),
@@ -43,5 +50,6 @@ export const {
   useGetUserQuery,
   useGetUserDetailsQuery,
   useGetUserOrdersQuery,
+  useGetUserOrderHistoryQuery,
   useUpdateUserBlockMutation,
 } = userApi;

@@ -13,7 +13,7 @@ const AcceptedOrders = () => {
   const { ordersSocket } = useSockets();
   const navigate = useNavigate();
 
-  const { data, refetch } = useGetOrdersQuery({});
+  const { data, refetch } = useGetOrdersQuery({ status: "ACCEPTED" });
   const allOrders = data?.data || [];
   const orders = allOrders.filter(order =>
     (order.status === "ACCEPTED" && order.kitchenStatus !== "READY") ||

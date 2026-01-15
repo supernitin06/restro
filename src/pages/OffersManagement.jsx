@@ -12,8 +12,17 @@ import {
   useGetOffersQuery,
   usePostOfferMutation,
   useUpdateOfferMutation,
-  useDeleteOfferMutation
+  useDeleteOfferMutation,
 } from "../api/services/offer";
+import {
+  useGetCouponsQuery,
+  useAddCouponMutation,
+  useUpdateCouponMutation,
+  useDeleteCouponMutation,
+  useUpdateCouponStatusMutation,
+} from "../api/services/coupon";
+
+import ConfirmationModal from "../components/ui/ConfirmationModal";
 import toast from "react-hot-toast";
 
 const OffersManagement = () => {
@@ -21,10 +30,18 @@ const OffersManagement = () => {
   const [activeTab, setActiveTab] = useState("offers"); // "offers" or "coupons"
 
   // API Hooks
-  const { data: offersDataApi, isLoading, isError } = useGetOffersQuery();
-  const [createOffer] = usePostOfferMutation(   { refetchOnMountOrArgChange: true }) ;
-  const [updateOffer] = useUpdateOfferMutation(   { refetchOnMountOrArgChange: true });
-  const [deleteOfferApi] = useDeleteOfferMutation(   { refetchOnMountOrArgChange: true });
+  const { data: offersDataApi, isLoading: isLoadingOffers, isError: isErrorOffers } = useGetOffersQuery();
+  const [createOffer] = usePostOfferMutation({ refetchOnMountOrArgChange: true });
+  const [updateOffer] = useUpdateOfferMutation({ refetchOnMountOrArgChange: true });
+  const [deleteOfferApi] = useDeleteOfferMutation({ refetchOnMountOrArgChange: true });
+
+  const { data: couponsDataApi, isLoading: isLoadingCoupons, isError: isErrorCoupons } = useGetCouponsQuery();
+  const [addCoupon] = useAddCouponMutation();
+  const [updateCoupon] = useUpdateCouponMutation();
+  const [updateCouponStatus] = useUpdateCouponStatusMutation();
+  const couponsData = couponsDataApi?.data;
+
+  // API likely returns docs based on pagination param in query
 
   // Transform API Data
   const transformOffer = (apiOffer) => ({
@@ -42,20 +59,19 @@ const OffersManagement = () => {
 
   const offers = offersDataApi?.data?.map(transformOffer) || [];
 
-  const [coupons, setCoupons] = useState(
-    offersData.offersManagement.couponsList.map(normalizeCoupon)
-  );
+  const coupons = couponsData || [];
 
-  // सर्च और फिल्टर
   const [searchText, setSearchText] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
 
-  // मॉडल स्टेट
   const [selectedItem, setSelectedItem] = useState(null);
-  const [modalMode, setModalMode] = useState(""); // add, edit, view
+  const [modalMode, setModalMode] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // फिल्टर लॉजिक (दोनों के लिए एक ही सर्च/फिल्टर यूज कर रहे हैं)
+  // Confirmation Modal State
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState({ id: null, type: null });
+
   const filteredOffers = offers.filter((o) => {
     const matchSearch = o.title?.toLowerCase().includes(searchText.toLowerCase());
     const matchStatus = filterStatus ? o.status === filterStatus.toLowerCase() : true;
@@ -63,12 +79,11 @@ const OffersManagement = () => {
   });
 
   const filteredCoupons = coupons.filter((c) => {
-    const matchSearch = c.code.toLowerCase().includes(searchText.toLowerCase());
+    const matchSearch = c.code?.toLowerCase().includes(searchText.toLowerCase());
     const matchStatus = filterStatus ? c.status === filterStatus.toLowerCase() : true;
     return matchSearch && matchStatus;
   });
 
-  // मॉडल हैंडलर्स
   const openModal = (item, mode) => {
     setSelectedItem(item);
     setModalMode(mode);
@@ -100,9 +115,8 @@ const OffersManagement = () => {
       if (modalMode === "add") {
         await createOffer(payload).unwrap();
         toast.success("Offer added successfully");
-        // Toast handled by API middleware or add here?
       } else {
-        await updateOffer({ id: data.offerId, ...payload }).unwrap(); // Check if updateOffer expects (id, data) or ({id, ...data})
+        await updateOffer({ id: data.offerId, ...payload }).unwrap();
         toast.success("Offer updated successfully");
       }
       closeModal();
@@ -112,30 +126,71 @@ const OffersManagement = () => {
     }
   };
 
-  const saveCoupon = (data) => {
-    if (modalMode === "add") {
-      setCoupons((prev) => [
-        { ...data, couponId: "CUP" + Date.now(), actions: { canEdit: true } },
-        ...prev,
-      ]);
-    } else {
-      setCoupons((prev) => prev.map((c) => (c.couponId === data.couponId ? data : c)));
-    }
-    closeModal();
+  const deleteOffer = (id) => {
+    setItemToDelete({ id, type: 'offer' });
+    setIsDeleteModalOpen(true);
   };
 
-  const deleteOffer = async (id) => {
-    if (!window.confirm("Delete this offer?")) return;
+
+
+
+  const confirmDelete = async () => {
     try {
-      await deleteOfferApi(id).unwrap();
+      if (itemToDelete.type === 'offer') {
+        await deleteOfferApi(itemToDelete.id).unwrap();
+        toast.success("Offer deleted successfully");
+      } else if (itemToDelete.type === 'coupon') {
+        await deleteCouponApi(itemToDelete.id).unwrap();
+        toast.success("Coupon deleted successfully");
+      }
     } catch (error) {
-      console.error("Failed to delete offer:", error);
+      console.error(`Failed to delete ${itemToDelete.type}:`, error);
+      toast.error(`Failed to delete ${itemToDelete.type}`);
+    } finally {
+      setIsDeleteModalOpen(false);
+      setItemToDelete({ id: null, type: null });
     }
   };
 
-  const deleteCoupon = (id) => {
-    if (!window.confirm("Delete this coupon?")) return;
-    setCoupons((prev) => prev.filter((c) => c.couponId !== id));
+  const saveCoupon = async (data) => {
+    try {
+      const payload = {
+        code: data.code,
+        description: data.description,
+        discountType: data.discountType,
+        value: Number(data.discountValue), // Backend expects 'value', not 'discountValue'
+        minOrderValue: Number(data.minOrderAmount), // Backend expects 'minOrderValue'
+        maxDiscountLimit: Number(data.maxDiscountLimit),
+        startDate: data.startDate,
+        expiryDate: data.expiryDate,
+        usageLimit: Number(data.usageLimit),
+        usageLimitPerUser: Number(data.usageLimitPerUser),
+        isActive: data.status === "active",
+      };
+
+      if (modalMode === "add") {
+        await addCoupon(payload).unwrap();
+        toast.success("Coupon added successfully");
+      } else {
+        await updateCoupon({ id: data.id, body: payload }).unwrap();
+        toast.success("Coupon updated successfully");
+      }
+      closeModal();
+    } catch (error) {
+      console.error("Failed to save coupon:", error);
+      toast.error("Failed to save coupon");
+    }
+  };
+
+  const handleToggleCouponStatus = async (id, currentStatus) => {
+    try {
+      const newStatus = currentStatus === 'active' ? false : true;
+      await updateCouponStatus({ id, body: { isActive: newStatus } }).unwrap();
+      toast.success("Coupon status updated successfully");
+    } catch (error) {
+      console.error("Failed to update coupon status:", error);
+      toast.error("Failed to update coupon status");
+    }
   };
 
   return (
@@ -210,6 +265,7 @@ const OffersManagement = () => {
             isOpen={isModalOpen}
             mode={modalMode}
             offer={selectedItem}
+            isLoading={isLoadingOffers}
             onClose={closeModal}
             onSave={saveOffer}
           />
@@ -220,7 +276,11 @@ const OffersManagement = () => {
             coupons={filteredCoupons}
             onView={(c) => openModal(c, "view")}
             onEdit={(c) => openModal(c, "edit")}
-            onDelete={deleteCoupon}
+            isLoading={isLoadingCoupons}
+            onToggleStatus={(id) => {
+              const coupon = coupons.find(c => c.id === id || c._id === id);
+              if (coupon) handleToggleCouponStatus(coupon.id || coupon._id, coupon.status);
+            }}
           />
           <CouponModal
             isOpen={isModalOpen}
@@ -231,6 +291,17 @@ const OffersManagement = () => {
           />
         </>
       )}
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={confirmDelete}
+        title={`Delete ${itemToDelete.type === 'offer' ? 'Offer' : 'Coupon'}?`}
+        message={`Are you sure you want to delete this ${itemToDelete.type}? This action cannot be undone.`}
+        confirmText="Delete"
+        isDangerous={true}
+      />
     </div>
   );
 };

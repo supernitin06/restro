@@ -13,7 +13,14 @@ const OrdersOverview = () => {
 
   // Fetch data from API based on activeTab (weekly/monthly)
   const { data: apiData, isLoading, isError, error } = useGetOrderChartQuery(activeTab.toLowerCase());
-  const chartData = apiData?.data || [];
+
+  const chartData = (apiData?.data || []).map(item => ({
+    name: item.period, // Map 'period' to 'name' for XAxis
+    delivered: item.delivered,
+    pending: item.pending,
+    cancelled: item.cancelled,
+    total: item.total
+  }));
 
   useEffect(() => {
     if (isError) {
@@ -29,8 +36,22 @@ const OrdersOverview = () => {
     if (active && payload && payload.length) {
       return (
         <div className="bg-white dark:bg-gray-800 p-3 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
-          <p className="text-sm font-bold text-gray-800 dark:text-gray-100">{payload[0].payload.name}</p>
-          <p className="text-sm text-gray-600 dark:text-gray-400">Orders: <span className="font-bold text-[#eb2528] dark:text-red-400">{payload[0].value}</span></p>
+          <p className="text-sm font-bold text-gray-800 dark:text-gray-100 mb-2">{payload[0].payload.name}</p>
+          <div className="space-y-1">
+            <p className="text-xs text-green-600 dark:text-green-400 flex justify-between w-32">
+              <span>Delivered:</span> <span className="font-bold">{payload[0]?.payload.delivered || 0}</span>
+            </p>
+            <p className="text-xs text-orange-600 dark:text-orange-400 flex justify-between w-32">
+              <span>Pending:</span> <span className="font-bold">{payload[0]?.payload.pending || 0}</span>
+            </p>
+            <p className="text-xs text-red-600 dark:text-red-400 flex justify-between w-32">
+              <span>Cancelled:</span> <span className="font-bold">{payload[0]?.payload.cancelled || 0}</span>
+            </p>
+            <div className="h-px bg-gray-200 dark:bg-gray-700 my-1" />
+            <p className="text-xs text-gray-600 dark:text-gray-400 flex justify-between w-32">
+              <span>Total:</span> <span className="font-bold">{payload[0]?.payload.total || 0}</span>
+            </p>
+          </div>
         </div>
       );
     }
@@ -76,24 +97,23 @@ const OrdersOverview = () => {
           </div>
         ) : (
           <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
-            <BarChart data={chartData}>
+            <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
               <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
               <XAxis
                 dataKey="name"
                 tick={{ fill: axisColor, fontSize: 12 }}
                 axisLine={{ stroke: gridColor }}
+                label={{ value: 'Period', position: 'insideBottom', offset: -10, fill: axisColor, fontSize: 12 }}
               />
               <YAxis
                 tick={{ fill: axisColor, fontSize: 12 }}
                 axisLine={{ stroke: gridColor }}
+                label={{ value: 'Orders', angle: -90, position: 'insideLeft', offset: 10, fill: axisColor, fontSize: 12 }}
               />
               <Tooltip content={<CustomTooltip />} cursor={{ fill: tooltipCursorColor }} />
-              <Bar
-                dataKey="orders"
-                fill="#eb2528"
-                radius={[8, 8, 0, 0]}
-                maxBarSize={60}
-              />
+              <Bar dataKey="delivered" stackId="a" fill="#10b981" radius={[0, 0, 4, 4]} maxBarSize={60} />
+              <Bar dataKey="pending" stackId="a" fill="#f59e0b" maxBarSize={60} />
+              <Bar dataKey="cancelled" stackId="a" fill="#ef4444" radius={[4, 4, 0, 0]} maxBarSize={60} />
             </BarChart>
           </ResponsiveContainer>
         )}

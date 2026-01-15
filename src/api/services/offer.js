@@ -43,8 +43,16 @@ export const offerApi = baseApi.injectEndpoints({
             }),
             providesTags: ["Offers"],
         }),
+        updateOfferStatus: builder.mutation({
+            query: ({ id, body }) => ({
+                url: `admin/offer/${id}/status`,
+                method: "PATCH",
+                body,
+            }),
+            invalidatesTags: ["Offers"],
+        }),
     }),
 });
 
 
-export const { useGetOffersQuery, usePostOfferMutation, useUpdateOfferMutation, useDeleteOfferMutation, useGetActiveOffersQuery } = offerApi;
+export const { useGetOffersQuery, usePostOfferMutation, useUpdateOfferMutation, useDeleteOfferMutation, useGetActiveOffersQuery, useUpdateOfferStatusMutation } = offerApi;

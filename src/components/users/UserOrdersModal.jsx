@@ -1,11 +1,11 @@
 import React from 'react';
 import { X, Package, Calendar, DollarSign, Clock } from 'lucide-react';
-import { useGetUserOrdersQuery } from '../../api/services/userapi';
+import { useGetUserOrderHistoryQuery } from '../../api/services/userapi';
 import GlassCard from '../ui/GlassCard';
 import Badge from '../ui/Badge';
 
 const UserOrdersModal = ({ userId, onClose }) => {
-    const { data: ordersData, isLoading, isError } = useGetUserOrdersQuery(userId);
+    const { data: ordersData, isLoading, isError } = useGetUserOrderHistoryQuery(userId);
     const orders = ordersData?.data || [];
 
     return (
@@ -67,7 +67,7 @@ const UserOrdersModal = ({ userId, onClose }) => {
                                         <div className="text-right">
                                             <div className="text-xl font-bold text-gray-900 dark:text-white flex items-center justify-end gap-1">
                                                 <span className="text-sm font-normal text-gray-500 dark:text-gray-400">Total:</span>
-                                                ₹{order.totalAmount || order.amount || 0}
+                                                ₹{order.price.itemsTotal || 0}
                                             </div>
                                             <div className="text-sm text-gray-500 dark:text-gray-400">
                                                 {order.items?.length || 0} items

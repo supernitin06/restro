@@ -29,11 +29,12 @@ export const menuApi = baseApi.injectEndpoints({
         }),
 
         addMenu: builder.mutation({
-            query: ({ restaurantId, ...data }) => ({
+            query: (formData) => ({
                 url: "admin/menu",
                 method: "POST",
-                data: { restaurantId, ...data },
-                params: { restaurantId },
+                data: formData, // FormData
+                // header 'Content-Type': 'multipart/form-data' is usually auto-set by browser when body is FormData
+                params: { restaurantId: formData.get('restaurantId') }, // Optional: If backend needs query param too
             }),
             invalidatesTags: ["Menu"],
         }),
