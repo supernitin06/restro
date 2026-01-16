@@ -12,7 +12,7 @@ const OrderCard = ({ order, onDelete, onEdit, onUpdateStatus, viewMode }) => {
   const [showDetails, setShowDetails] = useState(false);
 
   const statusConfig = {
-  
+
     DELIVERED: {
       bg: 'bg-green-100 dark:bg-green-900/30',
       text: 'text-green-700 dark:text-green-400',
@@ -31,14 +31,14 @@ const OrderCard = ({ order, onDelete, onEdit, onUpdateStatus, viewMode }) => {
       icon: XCircle,
       label: 'Rejected'
     },
-    
+
     PREPARING: {
       bg: 'bg-blue-100 dark:bg-blue-900/30',
       text: 'text-blue-700 dark:text-blue-400',
       icon: Clock,
       label: 'Preparing'
     },
-   
+
     PLACED: {
       bg: 'bg-orange-100 dark:bg-orange-900/30',
       text: 'text-orange-700 dark:text-orange-400',
@@ -57,7 +57,7 @@ const OrderCard = ({ order, onDelete, onEdit, onUpdateStatus, viewMode }) => {
       icon: ChefHat, // Using ChefHat if available or fallback
       label: 'Ready'
     },
-     ASSIGNED: {
+    ASSIGNED: {
       bg: 'bg-purple-100 dark:bg-purple-900/30',
       text: 'text-purple-700 dark:text-purple-400',
       icon: Bike,
@@ -69,17 +69,23 @@ const OrderCard = ({ order, onDelete, onEdit, onUpdateStatus, viewMode }) => {
       icon: Bike,
       label: 'Out For Delivery'
     },
-   
+
     PICKED: {
       bg: 'bg-purple-100 dark:bg-purple-900/30',
       text: 'text-purple-700 dark:text-purple-400',
       icon: Bike,
       label: 'Picked Up'
+    },
+    'ON-PROCESS': {
+      bg: 'bg-indigo-100 dark:bg-indigo-900/30',
+      text: 'text-indigo-700 dark:text-indigo-400',
+      icon: Clock,
+      label: 'On Process'
     }
   };
 
-  const config = statusConfig[order.status] || statusConfig['ON-PROCESS'];
-  const StatusIcon = config.icon;
+  const config = statusConfig[order.status] || statusConfig['ON-PROCESS'] || statusConfig['PLACED'];
+  const StatusIcon = config?.icon || Info;
 
   // ============= LIST VIEW =============
   if (viewMode === 'list') {

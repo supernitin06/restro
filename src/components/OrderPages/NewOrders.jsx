@@ -68,42 +68,42 @@ const OrderFlowTable = () => {
       48
     );
 
-   autoTable(doc, {
-  startY: 55,
-  head: [["Item", "Qty", "Total"]],
-  body: invoice.items.map((item) => [
-    item.name,
-    item.quantity,
-    item.total,
-  ]),
-  theme: "grid",
-});
+    autoTable(doc, {
+      startY: 55,
+      head: [["Item", "Qty", "Total"]],
+      body: invoice.items.map((item) => [
+        item.name,
+        item.quantity,
+        item.total,
+      ]),
+      theme: "grid",
+    });
 
-let finalY = doc.lastAutoTable.finalY + 10;
+    let finalY = doc.lastAutoTable.finalY + 10;
 
-doc.text(`Subtotal: ₹${invoice.amount.subTotal}`, 14, finalY);
+    doc.text(`Subtotal: ₹${invoice.amount.subTotal}`, 14, finalY);
 
-if (invoice.amount.tax) {
-  finalY += 6;
-  doc.text(`Tax: ₹${invoice.amount.tax}`, 14, finalY);
-}
+    if (invoice.amount.tax) {
+      finalY += 6;
+      doc.text(`Tax: ₹${invoice.amount.tax}`, 14, finalY);
+    }
 
-if (invoice.amount.deliveryCharge) {
-  finalY += 6;
-  doc.text(
-    `Delivery: ₹${invoice.amount.deliveryCharge}`,
-    14,
-    finalY
-  );
-}
+    if (invoice.amount.deliveryCharge) {
+      finalY += 6;
+      doc.text(
+        `Delivery: ₹${invoice.amount.deliveryCharge}`,
+        14,
+        finalY
+      );
+    }
 
-finalY += 8;
-doc.setFontSize(14);
-doc.text(
-  `Grand Total: ₹${invoice.amount.grandTotal}`,
-  14,
-  finalY
-);
+    finalY += 8;
+    doc.setFontSize(14);
+    doc.text(
+      `Grand Total: ₹${invoice.amount.grandTotal}`,
+      14,
+      finalY
+    );
 
     doc.text(
       `Grand Total: ₹${invoice.amount.grandTotal}`,
@@ -248,16 +248,16 @@ doc.text(
   };
 
   return (
-    <div className="p-6 min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="p-6 min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white">
       {/* HEADER */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4 p-4 bg-white rounded-lg border border-gray-200">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
         {/* Heading */}
         <h1 className="text-3xl font-bold text-red-600 tracking-tight">
           Order Management
         </h1>
 
         {/* Search Box */}
-        <div className="flex items-center w-full md:w-72 bg-gray-50 border border-gray-200 rounded-full px-4 py-2 focus-within:border-dark-400 transition">
+        <div className="flex items-center w-full md:w-72 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-full px-4 py-2 focus-within:border-dark-400 transition">
           <FiSearch size={18} className="text-gray-400 mr-3" />
 
           <input
@@ -265,59 +265,59 @@ doc.text(
             placeholder="Search order / customer / status"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-transparent outline-none text-black-700 placeholder-gray-400"
+            className="w-full bg-transparent outline-none text-gray-700 dark:text-gray-200 placeholder-gray-400"
           />
         </div>
       </div>
 
       {/* TABLE */}
-      <div className="overflow-x-auto bg-white rounded-xl shadow justify-center relative">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-100 text-[10px]">
+      <div className="overflow-x-auto bg-white dark:bg-gray-800 rounded-xl shadow justify-center relative">
+        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead className="bg-gray-100 dark:bg-gray-700 text-[10px]">
             <tr>
-              <th className="sticky left-0 bg-gray-100 z-20 text-center px-4 py-2 text-[10px] font-bold text-gray-500 uppercase">
+              <th className="sticky left-0 bg-gray-100 dark:bg-gray-700 z-20 text-center px-4 py-2 text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
                 S.No
               </th>
 
-              <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 uppercase">
+              <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
                 Order ID
               </th>
-              <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 uppercase">
+              <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
                 Customer
               </th>
-              <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 uppercase">
+              <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
                 Phone
               </th>
-              <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 uppercase">
+              <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
                 Placed On
               </th>
-              <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 uppercase">
+              <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
                 Timeline
               </th>
-              <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 uppercase">
+              <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
                 Current Status
               </th>
-              <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 uppercase">
+              <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
                 Delivery Partner
               </th>
-              <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 uppercase">
+              <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
                 Assigned On
               </th>
-              <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 uppercase">
+              <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200 text-[10px]">
+          <tbody className="divide-y divide-gray-200 dark:divide-gray-700 text-[10px]">
             {currentOrders.map((order, idx) => (
-              <tr key={order._id} className="hover:bg-gray-50">
-                <td className="sticky left-0 bg-white z-10 text-center px-2 py-2 shadow-md">
+              <tr key={order._id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                <td className="sticky left-0 bg-white dark:bg-gray-800 z-10 text-center px-2 py-2 shadow-md dark:shadow-sm dark:shadow-gray-700/50">
                   {(currentPage - 1) * ITEMS_PER_PAGE + idx + 1}
                 </td>
-                <td className="px-4 py-2">{order.orderId}</td>
-                <td className="px-4 py-2">{order.customer.name}</td>
-                <td className="px-4 py-2">{order.customer.phone}</td>
-                <td className="px-4 py-2">
+                <td className="px-4 py-2 text-gray-700 dark:text-gray-300">{order.orderId}</td>
+                <td className="px-4 py-2 text-gray-700 dark:text-gray-300">{order.customer.name}</td>
+                <td className="px-4 py-2 text-gray-700 dark:text-gray-300">{order.customer.phone}</td>
+                <td className="px-4 py-2 text-gray-700 dark:text-gray-300">
                   {new Date(order.createdAt).toLocaleString()}
                 </td>
 
@@ -330,16 +330,15 @@ doc.text(
                     return (
                       <div
                         key={s}
-                        className={`px-2 py-1 text-[10px] rounded font-semibold ${
-                          completed
-                            ? STATUS_COLORS[s]
-                            : "bg-gray-100 text-gray-400"
-                        }`}
+                        className={`px-2 py-1 text-[10px] rounded font-semibold ${completed
+                          ? STATUS_COLORS[s]
+                          : "bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500"
+                          }`}
                         title={
                           order.timestamps?.[s]
                             ? `At: ${new Date(
-                                order.timestamps[s]
-                              ).toLocaleString()}`
+                              order.timestamps[s]
+                            ).toLocaleString()}`
                             : ""
                         }
                       >
@@ -351,15 +350,14 @@ doc.text(
 
                 <td className="px-4 py-2">
                   <span
-                    className={`px-2 py-1 rounded text-[10px] font-semibold ${
-                      STATUS_COLORS[order.status]
-                    }`}
+                    className={`px-2 py-1 rounded text-[10px] font-semibold ${STATUS_COLORS[order.status]
+                      }`}
                   >
                     {order.status}
                   </span>
                 </td>
 
-                <td className="px-4 py-2">
+                <td className="px-4 py-2 text-gray-700 dark:text-gray-300">
                   {order.delivery?.partner ? (
                     <>
                       {order.delivery.partner.name} <br />
@@ -372,7 +370,7 @@ doc.text(
                   )}
                 </td>
 
-                <td className="px-4 py-2">
+                <td className="px-4 py-2 text-gray-700 dark:text-gray-300">
                   {order.delivery?.assignedAt
                     ? new Date(order.delivery.assignedAt).toLocaleString()
                     : "—"}
@@ -478,8 +476,8 @@ doc.text(
       {/* Assign Drawer */}
       {drawerOpen && currentOrder && (
         <>
-          <div className="fixed top-0 right-0 h-full w-96 bg-white shadow-2xl z-50 flex flex-col">
-            <div className="flex justify-between items-center p-5 border-b border-gray-200 bg-white shadow-sm">
+          <div className="fixed top-0 right-0 h-full w-96 bg-white dark:bg-gray-800 shadow-2xl z-50 flex flex-col">
+            <div className="flex justify-between items-center p-5 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm">
               {/* Title with Truck Icon */}
               <h2 className="text-xl font-bold text-red-600 flex items-center gap-2">
                 <FiTruck size={24} className="text-red-600" />
@@ -489,7 +487,7 @@ doc.text(
               {/* Close Button */}
               <button
                 onClick={() => setDrawerOpen(false)}
-                className="flex items-center gap-1 px-3 py-1 rounded-full hover:bg-red-100 text-red-600 transition duration-200"
+                className="flex items-center gap-1 px-3 py-1 rounded-full hover:bg-red-100 dark:hover:bg-red-900/30 text-red-600 transition duration-200"
               >
                 <FiX size={20} />
               </button>
@@ -500,22 +498,21 @@ doc.text(
                 placeholder="Search Partner"
                 value={partnerSearch}
                 onChange={(e) => setPartnerSearch(e.target.value)}
-                className="w-full rounded-4xl px-4 py-2 mb-4 rounded border border-gray-300 focus:outline-none focus:ring-1 focus:border-red-500 transition duration400"
+                className="w-full rounded-4xl px-4 py-2 mb-4 rounded border border-gray-300 dark:border-gray-600 bg-transparent text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-1 focus:border-red-500 transition duration400"
               />
               {filteredPartners.map((p) => (
                 <div
                   key={p._id}
-                  className={`p-3 rounded-lg mb-2 shadow flex justify-between items-center cursor-pointer ${
-                    p.isAvailable === false
-                      ? "bg-red-100 opacity-50 cursor-not-allowed"
-                      : "bg-white hover:bg-gray-50"
-                  }`}
+                  className={`p-3 rounded-lg mb-2 shadow flex justify-between items-center cursor-pointer ${p.isAvailable === false
+                      ? "bg-red-100 dark:bg-red-900/20 opacity-50 cursor-not-allowed"
+                      : "bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
+                    }`}
                   onClick={() => p.isAvailable !== false && assignPartner(p)}
                 >
                   <div>
-                    <div className="font-semibold">{p.name}</div>
-                    <div className="text-[10px] text-gray-500">{p.phone}</div>
-                    <div className="text-[10px] text-gray-400">
+                    <div className="font-semibold text-gray-900 dark:text-gray-100">{p.name}</div>
+                    <div className="text-[10px] text-gray-500 dark:text-gray-400">{p.phone}</div>
+                    <div className="text-[10px] text-gray-400 dark:text-gray-500">
                       {p.vehicleType} {p.isAvailable === false ? "(Busy)" : ""}
                     </div>
                   </div>
@@ -530,111 +527,111 @@ doc.text(
             </div>
           </div>
           <div
-            className="fixed inset-0 bg-black/20 z-40"
+            className="fixed inset-0 bg-black/20 dark:bg-black/50 z-40"
             onClick={() => setDrawerOpen(false)}
           />
         </>
       )}
 
-     {viewingInvoice && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-    <div className="bg-white w-[400px] md:w-[500px] p-6 rounded-2xl shadow-2xl overflow-y-auto max-h-[80vh] animate-slideIn">
+      {viewingInvoice && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 dark:bg-black/60 backdrop-blur-sm">
+          <div className="bg-white dark:bg-gray-800 w-[400px] md:w-[500px] p-6 rounded-2xl shadow-2xl overflow-y-auto max-h-[80vh] animate-slideIn text-gray-900 dark:text-gray-100 h-scrollbar">
 
-      {/* Header */}
-      <div className="mb-4 pb-2 border-b border-gray-200 flex justify-between items-center">
-        <h2 className="text-2xl font-bold bg-gradient-to-r from-red-500 to-pink-500 text-transparent bg-clip-text">
-          Invoice #{viewingInvoice.invoiceNumber}
-        </h2>
-        <button
-          className="text-gray-400 hover:text-gray-600 text-xl"
-          onClick={() => setViewingInvoice(null)}
-        >
-          ✕
-        </button>
-      </div>
+            {/* Header */}
+            <div className="mb-4 pb-2 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-red-500 to-pink-500 text-transparent bg-clip-text">
+                Invoice #{viewingInvoice.invoiceNumber}
+              </h2>
+              <button
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-xl"
+                onClick={() => setViewingInvoice(null)}
+              >
+                ✕
+              </button>
+            </div>
 
-      {/* Customer Details */}
-      <div className="mb-4 text-sm space-y-1">
-        <p><span className="font-semibold">Customer:</span> {viewingInvoice.customerDetails.name}</p>
-        <p><span className="font-semibold">Phone:</span> {viewingInvoice.customerDetails.phone}</p>
-        <p><span className="font-semibold">Address:</span> {viewingInvoice.customerDetails.address}</p>
-        <p>
-          <span className="font-semibold">Payment:</span>{" "}
-          {viewingInvoice.payment.method} ({viewingInvoice.payment.status})
-        </p>
-      </div>
+            {/* Customer Details */}
+            <div className="mb-4 text-sm space-y-1">
+              <p><span className="font-semibold text-gray-700 dark:text-gray-300">Customer:</span> {viewingInvoice.customerDetails.name}</p>
+              <p><span className="font-semibold text-gray-700 dark:text-gray-300">Phone:</span> {viewingInvoice.customerDetails.phone}</p>
+              <p><span className="font-semibold text-gray-700 dark:text-gray-300">Address:</span> {viewingInvoice.customerDetails.address}</p>
+              <p>
+                <span className="font-semibold text-gray-700 dark:text-gray-300">Payment:</span>{" "}
+                {viewingInvoice.payment.method} ({viewingInvoice.payment.status})
+              </p>
+            </div>
 
-      {/* Items Table */}
-      <div className="overflow-x-auto">
-        <table className="w-full border border-gray-200 rounded-lg text-sm">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="py-2 px-3 text-left text-gray-600">Item</th>
-              <th className="py-2 px-3 text-center text-gray-600">Qty</th>
-              <th className="py-2 px-3 text-right text-gray-600">Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            {viewingInvoice.items.map((item, idx) => (
-              <tr key={item._id} className={idx % 2 === 0 ? "bg-gray-50" : "bg-white"}>
-                <td className="py-2 px-3">{item.name}</td>
-                <td className="py-2 px-3 text-center">{item.quantity}</td>
-                <td className="py-2 px-3 text-right">₹{item.total}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            {/* Items Table */}
+            <div className="overflow-x-auto">
+              <table className="w-full border border-gray-200 dark:border-gray-700 rounded-lg text-sm">
+                <thead className="bg-gray-100 dark:bg-gray-700">
+                  <tr>
+                    <th className="py-2 px-3 text-left text-gray-600 dark:text-gray-300">Item</th>
+                    <th className="py-2 px-3 text-center text-gray-600 dark:text-gray-300">Qty</th>
+                    <th className="py-2 px-3 text-right text-gray-600 dark:text-gray-300">Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {viewingInvoice.items.map((item, idx) => (
+                    <tr key={item._id} className={idx % 2 === 0 ? "bg-gray-50 dark:bg-gray-900" : "bg-white dark:bg-gray-800"}>
+                      <td className="py-2 px-3">{item.name}</td>
+                      <td className="py-2 px-3 text-center">{item.quantity}</td>
+                      <td className="py-2 px-3 text-right">₹{item.total}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
 
-      {/* Amount Breakdown */}
-      <div className="mt-4 text-sm space-y-1 border-t pt-3">
-        <div className="flex justify-between">
-          <span>Subtotal</span>
-          <span>₹{viewingInvoice.amount.subTotal}</span>
+            {/* Amount Breakdown */}
+            <div className="mt-4 text-sm space-y-1 border-t border-gray-200 dark:border-gray-700 pt-3">
+              <div className="flex justify-between">
+                <span className="text-gray-600 dark:text-gray-400">Subtotal</span>
+                <span>₹{viewingInvoice.amount.subTotal}</span>
+              </div>
+
+              {viewingInvoice.amount.tax && (
+                <div className="flex justify-between text-gray-600 dark:text-gray-400">
+                  <span>Tax</span>
+                  <span>₹{viewingInvoice.amount.tax}</span>
+                </div>
+              )}
+
+              {viewingInvoice.amount.deliveryCharge && (
+                <div className="flex justify-between text-gray-600 dark:text-gray-400">
+                  <span>Delivery</span>
+                  <span>₹{viewingInvoice.amount.deliveryCharge}</span>
+                </div>
+              )}
+            </div>
+
+            {/* Grand Total */}
+            <div className="mt-3 flex justify-between text-lg font-bold">
+              <span>Grand Total</span>
+              <span className="text-red-500">
+                ₹{viewingInvoice.amount.grandTotal}
+              </span>
+            </div>
+
+            {/* Buttons */}
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
+                onClick={() => setViewingInvoice(null)}
+              >
+                Close
+              </button>
+              <button
+                className="px-4 py-2 rounded-lg text-white bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600"
+                onClick={() => downloadInvoicePDF(viewingInvoice)}
+              >
+                Download PDF
+              </button>
+            </div>
+
+          </div>
         </div>
-
-        {viewingInvoice.amount.tax && (
-          <div className="flex justify-between text-gray-600">
-            <span>Tax</span>
-            <span>₹{viewingInvoice.amount.tax}</span>
-          </div>
-        )}
-
-        {viewingInvoice.amount.deliveryCharge && (
-          <div className="flex justify-between text-gray-600">
-            <span>Delivery</span>
-            <span>₹{viewingInvoice.amount.deliveryCharge}</span>
-          </div>
-        )}
-      </div>
-
-      {/* Grand Total */}
-      <div className="mt-3 flex justify-between text-lg font-bold">
-        <span>Grand Total</span>
-        <span className="text-red-500">
-          ₹{viewingInvoice.amount.grandTotal}
-        </span>
-      </div>
-
-      {/* Buttons */}
-      <div className="mt-6 flex justify-end gap-3">
-        <button
-          className="px-4 py-2 rounded-lg border hover:bg-gray-100"
-          onClick={() => setViewingInvoice(null)}
-        >
-          Close
-        </button>
-        <button
-          className="px-4 py-2 rounded-lg text-white bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600"
-          onClick={() => downloadInvoicePDF(viewingInvoice)}
-        >
-          Download PDF
-        </button>
-      </div>
-
-    </div>
-  </div>
-)}
+      )}
 
     </div>
   );

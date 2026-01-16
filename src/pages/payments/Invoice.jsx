@@ -16,7 +16,7 @@ import { User, Phone, ShoppingBag } from 'lucide-react';
 import FilterBar from '../../components/ui/UserFilters';
 import PaymentModal from '../../components/Payment/PaymentModal';
 import ConfirmationModal from '../../components/ui/ConfirmationModal';
-import { useGetInvoiceQuery, useDeleteInvoiceMutation } from '../../api/services/invoice';
+import { useGetInvoicesQuery, useDeleteInvoiceMutation } from '../../api/services/invoice';
 import { showSuccessAlert, showErrorAlert } from '../../utils/toastAlert';
 
 const Invoice = () => {
@@ -36,7 +36,7 @@ const Invoice = () => {
   });
 
   // API Hooks
-  const { data: invoiceData, isLoading, error } = useGetInvoiceQuery();
+  const { data: invoiceData, isLoading, error } = useGetInvoicesQuery();
   const [deleteInvoice] = useDeleteInvoiceMutation();
 
   // Determine the source list of invoices
