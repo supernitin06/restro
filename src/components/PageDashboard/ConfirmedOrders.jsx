@@ -39,11 +39,11 @@ const ConfirmedOrders = ({ title, orders, icon: Icon, color }) => {
 
     const handleMarkReady = async (orderId) => {
         try {
-            await updateKitchenStatus({ orderId, status: "READY" }).unwrap();
-            showSuccessAlert("Order Ready");
+            await updateKitchenStatus({ orderId, status: "PREPARING" }).unwrap();
+            showSuccessAlert("Order Marked as PREPARING");
         } catch (err) {
             console.error(err);
-            showErrorAlert("Failed to mark as Ready");
+            showErrorAlert("Failed to mark as PREPARING");
         }
     };
 
@@ -53,10 +53,10 @@ const ConfirmedOrders = ({ title, orders, icon: Icon, color }) => {
 
         try {
             await updateOrderStatus({ id: orderId, status: "REJECTED" }).unwrap();
-            showSuccessAlert("Order rejected.");
+            showSuccessAlert("Order Marked as REJECTED");
         } catch (err) {
             console.error(err);
-            showErrorAlert("Failed to reject order");
+            showErrorAlert("Failed to mark as REJECTED");
         }
     };
 
@@ -146,7 +146,7 @@ const ConfirmedOrders = ({ title, orders, icon: Icon, color }) => {
                                         className="flex items-center gap-1.5 px-3 py-2 bg-green-500 hover:bg-green-600 text-white rounded-xl shadow-md shadow-green-200 dark:shadow-none transition-all duration-200 text-xs font-bold"
                                         title="Mark as Ready"
                                     >
-                                        <ChefHat size={14} /> Ready
+                                        <ChefHat size={14} /> PREPARING
                                     </button>
 
                                     <button
