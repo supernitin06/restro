@@ -9,7 +9,7 @@ import {
   useAssignDeliveryMutation,
 } from "../../api/services/orderApi";
 // OrderFlowTable.jsx ke top me
-import { useGenerateInvoiceMutation } from "../../api/services/invoiceApi";
+import { useGenerateInvoiceMutation } from "../../api/services/invoice";
 
 import { useGetDeliveryPartnersQuery } from "../../api/services/deliveryPartnerApi";
 import { useSockets } from "../../context/SocketContext";
