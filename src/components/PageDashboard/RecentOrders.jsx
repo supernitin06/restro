@@ -5,7 +5,6 @@ import Select from '../ui/Select';
 
 const RecentOrders = ({ data = [], loading = false }) => {
   // const [filter, setFilter] = useState('This Week'); // Controlled by parent Dashboard
-
   if (loading) {
     return (
       <div className="bg-primary p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 h-full flex items-center justify-center">

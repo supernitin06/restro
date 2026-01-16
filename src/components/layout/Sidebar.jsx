@@ -21,11 +21,12 @@ import {
   Circle,
   Menu,
   X,
+  
   Clock,
   CheckCircle,
   MessageSquare,
 } from "lucide-react";
-
+import { FiClock } from "react-icons/fi";
 import Button from "../ui/Button";
 import "./sidebar.css";
 
@@ -94,22 +95,22 @@ const Sidebar = ({ theme = "dark" }) => {
       subItems: [
         {
           id: "new-orders",
-          label: "New Orders",
-          icon: Clock,
+          label: "Order Management",
+          icon: FiClock,
           path: "/orders/new",
         },
-        {
-          id: "processing-orders",
-          label: "Processing Orders",
-          icon: Bike,
-          path: "/orders/processing",
-        },
-        {
-          id: "accepted-orders",
-          label: "Accepted Orders",
-          icon: CheckCircle,
-          path: "/orders/accepted",
-        }
+        // {
+        //   id: "processing-orders",
+        //   label: "Processing Orders",
+        //   icon: Bike,
+        //   path: "/orders/processing",
+        // },
+        // {
+        //   id: "accepted-orders",
+        //   label: "Accepted Orders",
+        //   icon: CheckCircle,
+        //   path: "/orders/accepted",
+        // }
       ],
     },
 
