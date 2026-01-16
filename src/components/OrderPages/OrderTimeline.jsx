@@ -73,13 +73,13 @@ const OrderTimeline = ({ currentStatus, timeline = [] }) => {
                             <div
                                 className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all duration-300 z-10 bg-white dark:bg-gray-800
                   ${isCompleted
-                                        ? 'bg-green-500 border-green-500 text-white shadow-lg shadow-green-500/20'
+                                        ? 'border-green-500 text-green-600 dark:bg-green-500 dark:text-white shadow-lg shadow-green-500/20'
                                         : 'border-gray-300 dark:border-gray-600 text-gray-400'
                                     }
                   ${isCurrent ? 'scale-110 ring-4 ring-green-500/20' : ''}
                 `}
                             >
-                                <Icon size={14} className={isCompleted ? 'text-white' : ''} />
+                                <Icon size={14} className={isCompleted ? 'dark:text-white' : ''} />
                             </div>
 
                             {/* Label & Time */}

@@ -35,6 +35,7 @@ const Dashboard = () => {
   const { data: placedData } = useGetOrdersQuery({ status: "PLACED" }, { pollingInterval: 30000 });
   const { data: acceptedData } = useGetOrdersQuery({ status: "ACCEPTED" }, { pollingInterval: 30000 });
   const { data: readyData } = useGetOrdersQuery({ status: "READY" }, { pollingInterval: 30000 });
+  const { data: recentData, isLoading: recentLoading } = useGetOrdersQuery({ page: 1, limit: 5 }, { pollingInterval: 30000 });
 
 
 
@@ -54,6 +55,7 @@ const Dashboard = () => {
   });
 
   const upcomingOrders = (placedData?.data || []).map(transformOrder);
+  const recentOrders = (recentData?.data || []).map(transformOrder);
 
   // Combine Accepted and Ready for the "Confirmed/In-Progress" view
   const confirmedOrders = [
@@ -171,14 +173,7 @@ const Dashboard = () => {
         </section>
 
         {/* ================= RECENT ORDERS ================= */}
-        <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2">
-            <RecentOrders
-            
-            />
-          </div>
-          <TrendingMenu />
-        </section>
+  
 
         {/* ================= REVIEWS & ACTIVITY ================= */}
         <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">

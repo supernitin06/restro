@@ -12,6 +12,9 @@ import Tax from "./Tax";
 import Users from "./Users";
 import Notifications from "./Notifications";
 
+// ✅ BANNER IMPORT
+import Banners from "./Banners";
+
 const Settings = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const tab = searchParams.get("tab") || "general";
@@ -22,14 +25,12 @@ const Settings = () => {
 
   return (
     <>
-
       <div className="bg-primary text-primary px-4 py-4 rounded-lg shadow-sm mb-4">
         <h1 className="text-lg font-bold">Settings</h1>
         <p className="text-xs text-primary">
           Manage restaurant and website settings here.
         </p>
       </div>
-
 
       <SettingsTabs activeTab={tab} setActiveTab={changeTab} />
 
@@ -39,6 +40,10 @@ const Settings = () => {
         {tab === "menu" && <Menu />}
         {tab === "orders" && <Orders />}
         {tab === "payments" && <Payments />}
+
+        {/* ✅ BANNER TAB */}
+        {tab === "banners" && <Banners />}
+
         {tab === "delivery" && <Delivery />}
         {tab === "tax" && <Tax />}
         {tab === "users" && <Users />}

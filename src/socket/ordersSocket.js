@@ -1,7 +1,7 @@
 // src/sockets/ordersSocket.js
 import { io } from "socket.io-client";
 
-export const ordersSocket = io("http://192.168.1.108:5004/orders", {
+export const ordersSocket = io("https://resto-grandma.onrender.com/orders", {
   autoConnect: false,
   transports: ["websocket"],
   reconnection: true,

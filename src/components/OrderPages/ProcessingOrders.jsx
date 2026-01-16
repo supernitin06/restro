@@ -5,141 +5,175 @@ import Button from "../../components/ui/Button";
 import { Bike } from "lucide-react";
 import OrderDetailsModal from "../../components/OrderPages/OrderDetailsModal";
 import { useGetDeliveryPartnersQuery } from "../../api/services/deliveryPartnerApi";
-import { useAssignDeliveryMutation, useGetOrdersQuery } from "../../api/services/orderApi";
+import {
+  useAssignDeliveryMutation,
+  useGetOrdersQuery,
+} from "../../api/services/orderApi";
 import { useSockets } from "../../context/SocketContext";
 
 import ActionButton from "../../components/ui/ActionButton";
 import { Eye, CheckCircle, Truck } from "lucide-react";
 import { showSuccessAlert } from "../../utils/toastAlert";
+import Pagination from "../../components/ui/Pagination";
 
 const ProcessingOrders = () => {
   const [assignDeliveryApi, { isLoading: assigning }] =
     useAssignDeliveryMutation();
   const { ordersSocket } = useSockets();
-    
+
   const { data: partnerApi } = useGetDeliveryPartnersQuery();
   console.log("📋 Delivery partners data:", partnerApi);
   const { data, refetch } = useGetOrdersQuery({});
   const allOrders = data?.data || [];
-  const orders = allOrders.filter(order => 
-    order.status === 'ACCEPTED' || order.status === 'READY' || order.status === 'PREPARING'
+  const orders = allOrders.filter(
+    (order) =>
+      order.status === "ACCEPTED" ||
+      order.status === "READY" ||
+      order.status === "ASSIGNED"
   );
+
   const [partnerSearch, setPartnerSearch] = useState("");
   const [viewingOrder, setViewingOrder] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [currentOrder, setCurrentOrder] = useState(null);
-  const deliveryPartners = React.useMemo(() => {
-  if (!partnerApi?.success) return [];
-  return partnerApi.data; // 👈 FULL DATA
-}, [partnerApi]);
- const filteredPartners = React.useMemo(() => {
-  const term = partnerSearch.toLowerCase().trim();
-  if (!term) return deliveryPartners;
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
-  return deliveryPartners.filter((p) =>
-    p.name?.toLowerCase().includes(term) ||
-    p.city?.toLowerCase().includes(term)
+  const deliveryPartners = React.useMemo(() => {
+    if (!partnerApi?.success) return [];
+    return partnerApi.data;
+  }, [partnerApi]);
+  const filteredPartners = React.useMemo(() => {
+    const term = partnerSearch.toLowerCase().trim();
+    if (!term) return deliveryPartners;
+
+    return deliveryPartners.filter(
+      (p) =>
+        p.name?.toLowerCase().includes(term) ||
+        p.city?.toLowerCase().includes(term)
+    );
+  }, [deliveryPartners, partnerSearch]);
+
+  const totalPages = Math.ceil(orders.length / itemsPerPage);
+  const currentOrders = orders.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
   );
-}, [deliveryPartners, partnerSearch]);
 
   const openDrawer = (order) => {
     console.log("🔍 Opening drawer for order:", order);
     setCurrentOrder(order);
     setDrawerOpen(true);
   };
-const assignPartner = async (partner) => {
-  console.log("🟡 Assign partner function called with:", partner);
+  const assignPartner = async (partner) => {
+    console.log("Assign partner function called with:", partner);
 
-  if (!currentOrder) return;
+    if (!currentOrder) return;
 
-  const payload = {
-    order: {
-      id: currentOrder.id,
-      resId: currentOrder.resId,
-      orderId: currentOrder.orderId,
-      customer: currentOrder.customer,
-      items: currentOrder.items,
-      location: currentOrder.location,
-      status: currentOrder.status,
-    },
-    deliveryPartner: {
-      id: partner._id,
-      name: partner.name,
-      phone: partner.phone,
-      vehicleType: partner.vehicleType,
-    },
-    timestamp: new Date().toISOString(),
-  };
+    const payload = {
+      order: {
+        id: currentOrder.id,
+        resId: currentOrder.resId,
+        orderId: currentOrder.orderId,
+        customer: currentOrder.customer,
+        items: currentOrder.items,
+        location: currentOrder.location,
+        status: currentOrder.status,
+      },
+      deliveryPartner: {
+        id: partner._id,
+        name: partner.name,
+        phone: partner.phone,
+        vehicleType: partner.vehicleType,
+      },
+      timestamp: new Date().toISOString(),
+    };
 
-  console.log("📦 Emitting ASSIGN_DELIVERY:", payload);
+    console.log("Emitting ASSIGN_DELIVERY:", payload);
 
-  // API call first
-  console.log("🚀 Calling assignDelivery API with orderId:", currentOrder.orderId, "partnerId:", partner.id);
-  await assignDeliveryApi({ orderId: currentOrder.orderId, partnerId: partner.id });
-  console.log("✅ Assign API call successful");
+    // API call first
+    console.log(
+      "Calling assignDelivery API with orderId:",
+      currentOrder.orderId,
+      "partnerId:",
+      partner._id
+    );
 
-  // Show success toast with partner name
-  showSuccessAlert(`✅ Successfully assigned to ${partner.name}`);
+    try {
+      await assignDeliveryApi({
+        orderId: currentOrder.orderId,
+        partnerId: partner._id,
+      });
 
-  // Refetch to update the list
-  refetch();
+      if (partner.isAvailable === false) {
+        showSuccessAlert(`⚠️ ${partner.name} is not available.`);
+      } else {
+        showSuccessAlert(`Order successfully assigned to ${partner.name}`);
+      }
 
-  setDrawerOpen(false);
-  setCurrentOrder(null);
-};
+      // Refetch to update the list
+      refetch();
 
-useEffect(() => {
-  if (!ordersSocket) return;
-
-  console.log("🧩 Registering socket listeners");
-
-  const handleRefresh = () => refetch();
-
-  ordersSocket.on("DELIVERY_ASSIGNED", (data) => {
-    console.log("✅ DELIVERY_ASSIGNED:", data);
-    if (data?.deliveryPartner?.name) {
-      showSuccessAlert(`✅ ${data.deliveryPartner.name} is on the way!`);
+      setDrawerOpen(false);
+      setCurrentOrder(null);
+    } catch (err) {
+      console.error("Assign delivery error:", err);
+      showSuccessAlert("❌ Failed to assign delivery partner.");
     }
-    refetch();
-  });
-  ordersSocket.on("ORDER_STATUS_UPDATED", handleRefresh);
-  ordersSocket.on("KITCHEN_STATUS_UPDATED", handleRefresh);
-
-  return () => {
-    console.log("🧹 Removing socket listeners");
-    ordersSocket.off("DELIVERY_ASSIGNED");
-    ordersSocket.off("ORDER_STATUS_UPDATED", handleRefresh);
-    ordersSocket.off("KITCHEN_STATUS_UPDATED", handleRefresh);
   };
-}, [ordersSocket, refetch]);
 
+  useEffect(() => {
+    if (!ordersSocket) return;
 
+    console.log("🧩 Registering socket listeners");
+
+    const handleRefresh = () => refetch();
+
+    ordersSocket.on("DELIVERY_ASSIGNED", (data) => {
+      console.log("DELIVERY_ASSIGNED:", data);
+      if (data?.deliveryPartner?.name) {
+        showSuccessAlert(`${data.deliveryPartner.name} is on the way!`);
+      }
+      refetch();
+    });
+    ordersSocket.on("ORDER_STATUS_UPDATED", handleRefresh);
+    ordersSocket.on("KITCHEN_STATUS_UPDATED", handleRefresh);
+
+    return () => {
+      console.log("🧹 Removing socket listeners");
+      ordersSocket.off("DELIVERY_ASSIGNED");
+      ordersSocket.off("ORDER_STATUS_UPDATED", handleRefresh);
+      ordersSocket.off("KITCHEN_STATUS_UPDATED", handleRefresh);
+    };
+  }, [ordersSocket, refetch]);
 
   const orderActions = [
-    // {
-    //   key: "view",
-    //   label: "View Order",
-    //   icon: Eye,
-    //   color: "blue",
-    //   onClick: (order) => setViewingOrder(order),
-    // },
-    // {
-    //   key: "ready",
-    //   label: "Mark Ready",
-    //   icon: CheckCircle,
-    //   color: "emerald", // same as before
-    //   show: (order) => order.status === "preparing",
-    //   onClick: (order) => updateStatus(order, "ready"),
-    // },
-    // {
-    //   key: "out",
-    //   label: "Out for Delivery",
-    //   icon: Truck,
-    //   color: "amber", // changed from purple → amber
-    //   show: (order) => order.status === "ready",
-    //   onClick: (order) => updateStatus(order, "out_for_delivery"),
-    // },
+    {
+      key: "view",
+      label: "View Order",
+      icon: Eye,
+      color: "blue",
+      onClick: (order) => setViewingOrder(order),
+    },
+    {
+      key: "prepare",
+      label: "Mark Preparing",
+      icon: CheckCircle,
+      color: "amber",
+      show: (order) => order.status === "ACCEPTED",
+      onClick: (order) => updateStatus(order, "PREPARING"),
+    },
+    {
+      key: "ready",
+      label: "Mark Ready",
+      icon: CheckCircle,
+      color: "emerald",
+      show: (order) => order.status === "PREPARING",
+      onClick: (order) => updateStatus(order, "READY"),
+    },
+    // Assign delivery button handled in Delivery Partner column
   ];
+
   const columns = [
     {
       header: "Order ID",
@@ -249,25 +283,71 @@ useEffect(() => {
         </span>
       ),
     },
+
     {
       header: "Delivery Partner",
+      render: (order) => {
+        const partner = order.delivery?.partner;
+
+        return (
+          <div className="flex items-center gap-2">
+            {partner ? (
+              <>
+                <Bike size={16} className="text-purple-500" />
+                <div className="flex flex-col">
+                  <span className="text-sm font-medium">{partner.name}</span>
+                  <span className="text-xs text-gray-500">{partner.phone}</span>
+                  <span className="text-xs text-gray-400">
+                    {partner.vehicleType} •{" "}
+                    {partner.isAvailable === false ? (
+                      <span className="text-red-500 font-semibold">Busy</span>
+                    ) : (
+                      <span className="text-green-600 font-semibold">
+                        Available
+                      </span>
+                    )}
+                  </span>
+                </div>
+              </>
+            ) : order.status === "READY" ? (
+              <Button
+                size="sm"
+                variant="primary"
+                onClick={() => openDrawer(order)}
+              >
+                Assign
+              </Button>
+            ) : (
+              <span className="text-xs text-gray-400">—</span>
+            )}
+          </div>
+        );
+      },
+    },
+
+    {
+      header: "Assigned At",
+      render: (order) =>
+        order.delivery?.assignedAt ? (
+          <div className="text-xs text-gray-600">
+            <div>
+              {new Date(order.delivery.assignedAt).toLocaleDateString()}
+            </div>
+            <div>
+              {new Date(order.delivery.assignedAt).toLocaleTimeString()}
+            </div>
+          </div>
+        ) : (
+          <span className="text-xs text-gray-400">—</span>
+        ),
+    },
+
+    {
+      header: "Status",
       render: (order) => (
-        <div className="flex items-center gap-2">
-          {order.delivery ? (
-            <>
-              <Bike size={16} className="text-purple-500" />
-              <span className="text-sm font-medium">{order.delivery.partner?.name || 'Assigned'}</span>
-            </>
-          ) : (
-            <Button
-              size="sm"
-              variant="primary"
-              onClick={() => openDrawer(order)}
-            >
-              Assign
-            </Button>
-          )}
-        </div>
+        <span className="px-2 py-1 rounded text-xs font-semibold bg-blue-100 text-blue-700">
+          {order.status}
+        </span>
       ),
     },
 
@@ -308,8 +388,17 @@ useEffect(() => {
       ) : (
         <div className="bg-primary shadow-2xl rounded-xl p-6">
           <div className="overflow-x-auto">
-            <Table columns={columns} data={orders} />
+            <Table columns={columns} data={currentOrders} />
           </div>
+          {totalPages > 1 && (
+            <div className="mt-4 space-x-2 justify-center">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+              />
+            </div>
+          )}
         </div>
       )}
 
@@ -353,21 +442,37 @@ useEffect(() => {
               </div>
             ) : (
               filteredPartners.map((partner) => (
-               <div
-  key={partner._id}
-  className="flex justify-between items-center p-4 bg-white rounded-2xl shadow-md"
-  onClick={() => assignPartner(partner)}
->
-  <div className="flex flex-col">
-    <span className="font-semibold text-lg">{partner.name}</span>
-    <span className="text-sm text-gray-500">{partner.phone}</span>
-    <span className="text-xs text-gray-400">
-      {partner.vehicleType} • {partner.isOnline ? "🟢 Online" : "🔴 Offline"}
-    </span>
-  </div>
-  <Bike className="text-red-500" />
-</div>
-
+                <div
+                  key={partner._id}
+                  className={`flex justify-between items-center p-4 rounded-2xl shadow-md transition-colors ${
+                    partner.isAvailable === false
+                      ? "bg-red-100 dark:bg-red-900/20 cursor-not-allowed opacity-70"
+                      : "bg-white dark:bg-gray-800 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700"
+                  }`}
+                  onClick={() =>
+                    partner.isAvailable !== false && assignPartner(partner)
+                  }
+                >
+                  <div className="flex flex-col">
+                    <span className="font-semibold text-lg">
+                      {partner.name}
+                    </span>
+                    <span className="text-sm text-gray-500">
+                      {partner.phone}
+                    </span>
+                    <span className="text-xs text-gray-400">
+                      {partner.vehicleType} •{" "}
+                      {partner.isAvailable === false ? (
+                        <span className="text-red-500 font-semibold">Busy</span>
+                      ) : (
+                        <span className="text-green-600 font-semibold">
+                          Available
+                        </span>
+                      )}
+                    </span>
+                  </div>
+                  <Bike className="text-red-500" />
+                </div>
               ))
             )}
           </div>
