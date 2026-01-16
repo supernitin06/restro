@@ -1,5 +1,6 @@
 // DeliveryPartnerForm.jsx
 import React, { useState, useEffect } from "react";
+import toast from "react-hot-toast";
 import { createPortal } from "react-dom";
 import InputField from "../ui/InputField";
 import Button from "../ui/Button";
@@ -9,10 +10,10 @@ import { useCreateDeliveryPartnerMutation, useUpdateDeliveryPartnerMutation } fr
 const DeliveryPartnerForm = ({ onClose, partner }) => {
   const [createPartner, { isLoading: isCreating, isSuccess: isCreateSuccess, isError: isCreateError, error: createError }] = useCreateDeliveryPartnerMutation();
   const [updatePartner, { isLoading: isUpdating, isSuccess: isUpdateSuccess, isError: isUpdateError, error: updateError }] = useUpdateDeliveryPartnerMutation();
-  
+
   const isLoading = isCreating || isUpdating;
   const error = createError || updateError;
-  
+
   const [serverError, setServerError] = useState(null);
 
   const [formData, setFormData] = useState({
@@ -39,17 +40,7 @@ const DeliveryPartnerForm = ({ onClose, partner }) => {
     }
   }, [partner]);
 
-  useEffect(() => {
-    if (isCreateSuccess || isUpdateSuccess) {
-      onClose();
-    }
-    if (isCreateError || isUpdateError) {
-      // Extract and display the server's error message
-      const errorMessage = error?.data?.message || "An unexpected error occurred. Please try again.";
-      setServerError(errorMessage);
-      console.error("Failed to save partner:", error);
-    }
-  }, [isCreateSuccess, isUpdateSuccess, isCreateError, isUpdateError, onClose, error]);
+  // Removed useEffect for error/success handling as toast handles it now
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -66,13 +57,33 @@ const DeliveryPartnerForm = ({ onClose, partner }) => {
     e.preventDefault();
     setServerError(null); // Reset error on new submission
     const { image, ...payload } = formData;
-    
-    if (partner) {
-      const updatePayload = { id: partner.partnerId, ...payload };
-      if (!updatePayload.password) delete updatePayload.password;
-      await updatePartner(updatePayload);
-    } else {
-      await createPartner(payload);
+
+    try {
+      if (partner) {
+        const updatePayload = { id: partner.partnerId, ...payload };
+        if (!updatePayload.password) delete updatePayload.password;
+
+        await toast.promise(
+          updatePartner(updatePayload).unwrap(),
+          {
+            loading: 'Updating partner...',
+            success: 'Partner updated successfully!',
+            error: (err) => err?.data?.message || "Failed to update partner"
+          }
+        );
+      } else {
+        await toast.promise(
+          createPartner(payload).unwrap(),
+          {
+            loading: 'Creating partner...',
+            success: 'Partner created successfully!',
+            error: (err) => err?.data?.message || "Failed to create partner"
+          }
+        );
+      }
+      onClose();
+    } catch (err) {
+      console.error("Operation failed", err);
     }
   };
 
@@ -103,11 +114,11 @@ const DeliveryPartnerForm = ({ onClose, partner }) => {
           <div className="flex justify-center">
             <label className="relative w-24 h-24 rounded-full border-2 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center cursor-pointer hover:border-primary transition">
               {formData.image ? (
-                <img src={URL.createObjectURL(formData.image)} alt="Preview" className="w-full h-full rounded-full object-cover"/>
+                <img src={URL.createObjectURL(formData.image)} alt="Preview" className="w-full h-full rounded-full object-cover" />
               ) : (
                 <span className="text-xs text-gray-500 dark:text-gray-400 text-center">Upload Photo</span>
               )}
-              <input type="file" name="image" accept="image/*" onChange={handleChange} className="hidden"/>
+              <input type="file" name="image" accept="image/*" onChange={handleChange} className="hidden" />
             </label>
           </div>
 

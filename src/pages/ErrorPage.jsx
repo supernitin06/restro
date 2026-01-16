@@ -6,9 +6,11 @@ export default function ErrorPage() {
 
   return (
 
+
     <div className="relative min-h-screen flex items-center justify-center bg-slate-100 px-4">
 
       {/* White Blur Layer */}
+      
       <div className="absolute inset-0 bg-white/60 backdrop-blur-2xl"></div>
       
       {/* Card */}
@@ -21,7 +23,7 @@ export default function ErrorPage() {
 
         {/* Title */}
         <h1 className="text-3xl font-bold text-slate-900 mb-2">
-          Oops! Something went wrong
+          404
         </h1>
 
         {/* Description */}

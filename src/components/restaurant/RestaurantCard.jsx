@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Edit, Trash2, Eye, MapPin, MoreVertical, CheckCircle, XCircle } from "lucide-react";
+import { Edit, Trash2, Eye, MapPin, MoreVertical, CheckCircle, XCircle, Star } from "lucide-react";
 import Button from "../ui/Button";
 import GlassCard from "../ui/GlassCard";
 
@@ -17,6 +17,14 @@ const RestaurantCard = ({
   const restaurantId = restaurant._id;
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
+  // Helper to construct image URL
+  const getImageUrl = (logo) => {
+    if (!logo) return "https://placehold.co/600x400?text=No+Logo";
+    if (logo.startsWith("http")) return logo;
+    // Serve from the production 'uploads' directory
+    return `https://resto-grandma.onrender.com/uploads/${logo}`;
+  };
+
   return (
     <>
       <GlassCard className="group relative h-full flex flex-col overflow-hidden transition-all duration-500 hover:shadow-2xl hover:shadow-primary/5 hover:-translate-y-1 bg-white/60 dark:bg-gray-800/60">
@@ -27,7 +35,7 @@ const RestaurantCard = ({
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent z-10" />
 
           <img
-            src={restaurant.logo || "/placeholder.jpg"}
+            src={getImageUrl(restaurant.logo)}
             alt={restaurant.name}
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
             onError={(e) => { e.target.src = "https://placehold.co/600x400?text=No+Image"; }}
@@ -71,12 +79,28 @@ const RestaurantCard = ({
             <h2 className="text-xl font-bold text-white mb-0.5 drop-shadow-md truncate">
               {restaurant.name || "Unnamed"}
             </h2>
-            {restaurant.address && (
-              <div className="flex items-center gap-1 text-gray-300 text-xs">
-                <MapPin size={12} className="shrink-0" />
-                <span className="truncate">{restaurant.address.street || restaurant.address.city || "Location N/A"}</span>
-              </div>
-            )}
+
+            <div className="flex flex-col gap-1">
+              {/* Address/Location */}
+              {(restaurant.address || restaurant.location) && (
+                <div className="flex items-center gap-1 text-gray-300 text-xs">
+                  <MapPin size={12} className="shrink-0" />
+                  <span className="truncate">
+                    {restaurant.address?.street || restaurant.address?.city ||
+                      (restaurant.location?.coordinates ? "Location Coordinates Set" : "Location N/A")}
+                  </span>
+                </div>
+              )}
+
+              {/* Ratings */}
+              {restaurant.ratings && (
+                <div className="flex items-center gap-1 text-yellow-400 text-xs font-semibold">
+                  <Star size={12} className="fill-yellow-400" />
+                  <span>{restaurant.ratings.average || 0}</span>
+                  <span className="text-gray-400 font-normal">({restaurant.ratings.totalReviews || 0} reviews)</span>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 

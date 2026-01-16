@@ -14,6 +14,7 @@ import {
   useUpdateRestaurantMutation,
   useDeleteRestaurantMutation,
 } from "../api/services/resturentsapi";
+
 function RestaurantManagement() {
   // ===== RTK Query Hooks =====
   const { data, isLoading, isError, refetch } = useGetRestaurantsQuery();
@@ -103,12 +104,12 @@ function RestaurantManagement() {
   const handleCloseModal = () => setSelectedRestaurantId(null);
   const restaurantColumns = [
     { header: "Name", key: "name" },
-    { header: "Brand", key: "brandName" },
+    { header: "Rating", key: "ratingSummary" },
     {
       header: "Status",
       key: "isActive",
       render: (row) =>
-        row.isActive === true || row.isActive === "active"
+        (row.isActive === true || row.isActive === "active")
           ? "Approved"
           : "Suspended",
     },

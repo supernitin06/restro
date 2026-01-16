@@ -1,5 +1,6 @@
 import React from "react";
 import { ShoppingBag, Users, Star, DollarSign, Clock, CheckCircle } from "lucide-react";
+import Select from "../components/ui/Select";
 
 import StatCard from "../components/ui/StatCard";
 import RevenueChart from "../components/PageDashboard/RevenueChart";
@@ -11,27 +12,57 @@ import TrendingMenu from "../components/PageDashboard/TrendingMenu";
 import CustomerReviews from "../components/PageDashboard/CustomerReviews";
 import RecentActivity from "../components/PageDashboard/RecentActivity";
 import Footer from "../components/PageDashboard/Footer";
-import OrderSummaryCard from "../components/PageDashboard/OrderSummaryCard";
+import UpcomingOrders from "../components/PageDashboard/UpcomingOrders";
+import ConfirmedOrders from "../components/PageDashboard/ConfirmedOrders";
+import { useGetOrdersQuery } from "../api/services/orderApi";
+import { format } from "date-fns"; // Ensure date-fns is installed or use native
 
 const Dashboard = () => {
-  // Dummy data for new cards
-  // Orders that have just been placed and are waiting for admin confirmation
-  const upcomingOrders = [
-    { id: 'ORD001', customer: 'Aman Verma', amount: 415, time: '11:30 AM', status: 'placed' },
-    { id: 'ORD007', customer: 'Anjali Sharma', amount: 180, time: '12:15 PM', status: 'placed' },
-    { id: 'ORD009', customer: 'Suresh Gupta', amount: 250, time: '12:30 PM', status: 'placed' },
-    { id: 'ORD010', customer: 'Priya Jain', amount: 600, time: '12:35 PM', status: 'placed' },
-  ];
+  const [filterType, setFilterType] = React.useState('Month');
 
-  // Orders that have been confirmed by the admin and are now being processed
+  const getPeriodParams = (type) => {
+    switch (type) {
+      case 'Week': return 'week';
+      case 'Month': return 'month';
+      case 'Year': return 'year';
+      default: return 'month';
+    }
+  };
+
+
+
+  // Fetch Real Data
+  const { data: placedData } = useGetOrdersQuery({ status: "PLACED" }, { pollingInterval: 30000 });
+  const { data: acceptedData } = useGetOrdersQuery({ status: "ACCEPTED" }, { pollingInterval: 30000 });
+  const { data: readyData } = useGetOrdersQuery({ status: "READY" }, { pollingInterval: 30000 });
+  const { data: recentData, isLoading: recentLoading } = useGetOrdersQuery({ page: 1, limit: 5 }, { pollingInterval: 30000 });
+
+
+
+  const transformOrder = (order) => ({
+    id: order.orderId || order.customOrderId || order._id, // Visual ID "ORD-..."
+    orderId: order._id, // API ID
+    customer: order.customer?.name || "Guest",
+    amount: order.price?.grandTotal || 0,
+    time: order.createdAt || "Just Now",
+    status: order.status,
+    items: (order.items || []).map(item => ({
+      name: item.name,
+      quantity: item.quantity,
+      price: item.finalItemPrice || item.basePrice || 0
+    })),
+    deliveryBoy: order.deliveryPartner || null // If populated in future
+  });
+
+  const upcomingOrders = (placedData?.data || []).map(transformOrder);
+  const recentOrders = (recentData?.data || []).map(transformOrder);
+
+  // Combine Accepted and Ready for the "Confirmed/In-Progress" view
   const confirmedOrders = [
-    { id: 'ORD002', customer: 'Neha Singh', amount: 330, time: '11:45 AM', status: 'preparing', deliveryBoy: { id: 'DB01', name: 'Ravi Kumar' } },
-    { id: 'ORD003', customer: 'Rohit Kumar', amount: 390, time: '12:05 PM', status: 'packing', deliveryBoy: null },
-    { id: 'ORD008', customer: 'Vikram Singh', amount: 550, time: '12:20 PM', status: 'preparing', deliveryBoy: { id: 'DB02', name: 'Sunil Verma' } },
-    { id: 'ORD004', customer: 'Pooja Mehta', amount: 260, time: '12:25 PM', status: 'confirmed', deliveryBoy: null },
-    { id: 'ORD005', customer: 'Arjun Malik', amount: 480, time: '12:40 PM', status: 'confirmed', deliveryBoy: null },
-  ];
+    ...(acceptedData?.data || []),
+  ].map(transformOrder);
 
+  // Delivery Boys (Mock for now, or fetch if API exists)
   const deliveryBoys = [
     { id: 'DB01', name: 'Ravi Kumar' },
     { id: 'DB02', name: 'Sunil Verma' },
@@ -39,9 +70,9 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen page-background">
+    <div className="min-h-screen page">
       {/* Page Container */}
-      <div className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8 pt-6 pb-10 space-y-8">
+      <div className="mx-auto px-4 md:px-6 lg:px-8 pt-6 pb-10 space-y-8">
 
         {/* ================= HEADER ================= */}
         <div className="flex bg-primary flex-col md:flex-row justify-between items-start md:items-center bg-white dark:bg-gray-800 p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
@@ -53,6 +84,18 @@ const Dashboard = () => {
               Welcome back! Here's what's happening today.
             </p>
           </div>
+          <div className="mt-4 md:mt-0">
+            <Select
+              value={filterType}
+              onChange={(e) => setFilterType(e.target.value)}
+              options={[
+                { value: 'Week', label: 'Last Week' },
+                { value: 'Month', label: 'Last Month' },
+                { value: 'Year', label: 'Last Year' }
+              ]}
+              className="w-40"
+            />
+          </div>
 
         </div>
 
@@ -61,7 +104,7 @@ const Dashboard = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <StatCard
               title="Total Orders"
-              value="48,652"
+              value="0"
               icon={ShoppingBag}
               trend="up"
               trendValue="+14%"
@@ -69,7 +112,7 @@ const Dashboard = () => {
             />
             <StatCard
               title="Total Customers"
-              value="1,248"
+              value="0"
               icon={Users}
               trend="up"
               trendValue="+8.5%"
@@ -77,7 +120,7 @@ const Dashboard = () => {
             />
             <StatCard
               title="Total Reviews"
-              value="12,486"
+              value="0"
               icon={Star}
               trend="up"
               trendValue="+3.8%"
@@ -85,7 +128,7 @@ const Dashboard = () => {
             />
             <StatCard
               title="Total Revenue"
-              value="$184,839"
+              value="0"
               icon={DollarSign}
               trend="up"
               trendValue="+12.5%"
@@ -96,14 +139,14 @@ const Dashboard = () => {
 
         {/* ================= UPCOMING & CONFIRMED ORDERS ================= */}
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <OrderSummaryCard
+          <UpcomingOrders
             title="Upcoming Orders"
             orders={upcomingOrders}
             icon={Clock}
             color="orange"
             type="upcoming"
           />
-          <OrderSummaryCard
+          <ConfirmedOrders
             title="Confirmed Orders"
             orders={confirmedOrders}
             icon={CheckCircle}
@@ -130,12 +173,7 @@ const Dashboard = () => {
         </section>
 
         {/* ================= RECENT ORDERS ================= */}
-        <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2">
-            <RecentOrders />
-          </div>
-          <TrendingMenu />
-        </section>
+  
 
         {/* ================= REVIEWS & ACTIVITY ================= */}
         <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">

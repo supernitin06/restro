@@ -3,8 +3,11 @@ import { Tag, Percent, DollarSign, Calendar, Eye, Edit, Trash2 } from "lucide-re
 import Badge from "../ui/Badge";
 import Table from "../ui/Table";
 import { FiEye, FiEdit, FiTrash2 } from "react-icons/fi";
+import { useUpdateOfferStatusMutation } from "../../api/services/offer";
+import toast from "react-hot-toast";
 
-const OffersTable = ({ offers = [], onView, onEdit, onDelete }) => {
+const OffersTable = ({ offers = [], onView, onEdit, onDelete , isLoading}) => {
+  const [updateOfferStatus , isLoadingUpdate] = useUpdateOfferStatusMutation({ refetchOnMountOrArgChange: true }) ;
 
   const tableActions = [
     {
@@ -12,23 +15,40 @@ const OffersTable = ({ offers = [], onView, onEdit, onDelete }) => {
       label: 'View Details',
       icon: Eye,
       color: 'blue',
-      onClick: (item) => console.log('View', item), // Placeholder
+      onClick: (item) => onView(item),
     },
     {
       key: 'edit',
-      label: 'Edit Permissions',
+      label: 'Edit Offer',
       icon: Edit,
       color: 'purple',
-      onClick: () => navigate('/sub-admin/assign'),
+      onClick: (item) => onEdit(item),
     },
     {
       key: 'delete',
-      label: 'Delete Admin',
+      label: 'Delete Offer',
       icon: Trash2,
       color: 'rose',
-      onClick: (item) => handleDelete(item.id),
+      onClick: (item) => onDelete(item.offerId),
     },
   ];
+
+  const onToggleStatus = async (coupon) => {
+    try {
+      const newStatus = coupon.status === 'active' ? 'inactive' : 'active'
+      const isActive = newStatus === 'active';
+
+      await updateOfferStatus({
+        id: coupon.id || coupon._id || coupon.offerId, // Handle various ID fields
+        body: { isActive }
+      }).unwrap();
+      toast.success("Offer status updated successfully"); 
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to update offer status"); 
+    }
+  };
+
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 cursor-pointer">
@@ -44,6 +64,7 @@ const OffersTable = ({ offers = [], onView, onEdit, onDelete }) => {
           <div className="text-gray-600 dark:text-gray-400 text-sm mb-4">
             Showing {offers.length} of {offers.length} offers
           </div>
+          {isLoading && <p>Loading...</p>}
           <Table
             data={offers}
             columns={[
@@ -86,7 +107,24 @@ const OffersTable = ({ offers = [], onView, onEdit, onDelete }) => {
                   </span>
                 )
               },
-              { header: "Status", key: "status", render: (offer) => <Badge>{offer.status}</Badge> },
+              {
+                header: "Status", key: "status", render: (coupon) => (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent row click
+                      onToggleStatus(coupon);
+                    }}
+                    className="hover:scale-105 transition-transform"
+                    title="Toggle Status"
+                  >
+                    <Badge type={coupon.status || 'inactive'}>
+                      
+                      {(coupon.status || 'inactive').charAt(0).toUpperCase() +
+                        (coupon.status || 'inactive').slice(1)}
+                    </Badge>
+                  </button>
+                )
+              },
               {
                 header: "Validity", key: "validity", render: (offer) => (
                   <div className="flex items-center gap-2 text-sm text-gray-400">

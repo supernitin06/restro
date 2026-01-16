@@ -4,6 +4,8 @@ import Button from "../ui/Button";
 const EMPTY_FORM = {
   offerId: "",
   title: "",
+  description: "",
+  image: "",
   discountType: "percentage", // या "flat"
   discountValue: "",
   minOrderValue: "",
@@ -54,8 +56,26 @@ const OfferModal = ({ isOpen, mode, offer, onClose, onSave }) => {
               value={formData.title || ""}
               onChange={handleChange}
               disabled={isView}
-              className="input"
+              className="input col-span-2"
               placeholder="Offer Title"
+            />
+
+            <textarea
+              name="description"
+              value={formData.description || ""}
+              onChange={handleChange}
+              disabled={isView}
+              className="input col-span-2 min-h-[80px]"
+              placeholder="Description"
+            />
+
+            <input
+              name="image"
+              type="file"
+              onChange={handleChange}
+              disabled={isView}
+              className="input col-span-2"
+              placeholder="Image URL"
             />
 
             <select

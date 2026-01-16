@@ -19,12 +19,22 @@ export const menuApi = baseApi.injectEndpoints({
             providesTags: ["Menu"],
         }),
 
+        updateMenuStockStatus: builder.mutation({
+            query: ({ id, ...payload }) => ({
+                url: `admin/menu/${id}/inStock`,
+                method: "PUT",
+                data: payload,
+            }),
+            invalidatesTags: ["Menu"],
+        }),
+
         addMenu: builder.mutation({
-            query: ({ restaurantId, ...data }) => ({
+            query: (formData) => ({
                 url: "admin/menu",
                 method: "POST",
-                data: { restaurantId, ...data },
-                params: { restaurantId },
+                data: formData, // FormData
+                // header 'Content-Type': 'multipart/form-data' is usually auto-set by browser when body is FormData
+                params: { restaurantId: formData.get('restaurantId') }, // Optional: If backend needs query param too
             }),
             invalidatesTags: ["Menu"],
         }),
@@ -57,13 +67,14 @@ export const menuApi = baseApi.injectEndpoints({
         }),
 
         addCategory: builder.mutation({
-            query: ({ restaurantId, ...data }) => ({
-                url: `admin/cat/${restaurantId}`,
+            query: (data) => ({
+                url: `admin/cat`,
                 method: "POST",
                 data,
             }),
             invalidatesTags: ["Categories"],
         }),
+
 
         updateCategory: builder.mutation({
             query: ({ id, payload }) => ({
@@ -98,4 +109,5 @@ export const {
     useUpdateCategoryMutation,
     useToggleCategoryMutation,
     useAddMenuMutation,
+    useUpdateMenuStockStatusMutation,
 } = menuApi;

@@ -81,7 +81,7 @@ const ActionButtons = ({
           </button>
 
           <div className="
-            absolute right-0 mt-1 min-w-30
+            absolute right-0 mt-1 -top-10 min-w-30
             bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl
             shadow-lg
             opacity-0 invisible group-hover:opacity-100 group-hover:visible
@@ -103,9 +103,9 @@ const ActionButtons = ({
                     }
                   }}
                   disabled={isDisabled}
-                  className={`w-full px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg flex items-center gap-2 ${
+                  className={`w-full px-3 py-2 z-50 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg flex items-center gap-2 ${
                     isDisabled ? 'opacity-50 cursor-not-allowed' : ''
-                  }`}
+                  }`} 
                 >
                   {Icon && <Icon className="w-4 h-4" />}
                   {label}

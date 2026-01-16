@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import toast from "react-hot-toast";
 import { Phone, MapPin, Truck, Bike, Eye, Info, Edit } from "lucide-react";
 import DeliveryPartnerStatusBadge from "./DeliveryPartnerStatusBadge";
 import Button from "../ui/Button";
@@ -16,10 +17,17 @@ const DeliveryPartner = ({ partners, onViewDetails, onEdit, viewMode = 'grid' })
     const newIsActive = currentStatus !== "Active";
 
     try {
-      await updateDeliveryPartner({
-        id: partner.partnerId,
-        isActive: newIsActive,
-      }).unwrap();
+      await toast.promise(
+        updateDeliveryPartner({
+          id: partner.partnerId,
+          isActive: newIsActive,
+        }).unwrap(),
+        {
+          loading: 'Updating status...',
+          success: `Partner ${newIsActive ? 'activated' : 'deactivated'}!`,
+          error: 'Failed to update status'
+        }
+      );
     } catch (error) {
       console.error("Failed to update status:", error);
     }
@@ -43,7 +51,7 @@ const DeliveryPartner = ({ partners, onViewDetails, onEdit, viewMode = 'grid' })
                 {/* Partner Info */}
                 <div className="md:col-span-3 flex items-center gap-3 min-w-0">
                   <img
-                    src={registrationData?.image || `https://api.dicebear.com/7.x/avataaars/svg?seed=${partnerId}`}
+                    src={`https://resto-grandma.onrender.com/uploads/logo/1767686592739.jpg`}
                     className="w-11 h-11 rounded-xl object-cover border border-gray-200 dark:border-gray-700"
                     alt={registrationData?.name}
                   />
@@ -151,7 +159,7 @@ const DeliveryPartner = ({ partners, onViewDetails, onEdit, viewMode = 'grid' })
                   <img
                     src={
                       registrationData?.image ||
-                      `https://api.dicebear.com/7.x/avataaars/svg?seed=${partnerId}`
+                      `https://resto-grandma.onrender.com/api/v1/admin/uploads/logo/1767686592739.jpg`
                     }
                     className="w-16 h-16 rounded-2xl object-cover border-4 border-white dark:border-gray-800 shadow-lg bg-white dark:bg-gray-700"
                     alt={registrationData?.name}

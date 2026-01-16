@@ -1,11 +1,11 @@
+// src/components/Navbar/Navbar.jsx
 import React, { useState, useRef, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-
 import { logout } from "../../api/services/authSlice";
-
+import { useSockets } from "../../context/SocketContext";
 import fallbackImg from "../../assets/fallback.png";
-
+import notificationSound from "../../assets/mixkit-correct-answer-tone-2870.wav";
 import {
   Bell,
   MessageSquare,
@@ -17,7 +17,6 @@ import {
   ShieldCheck,
   Mail,
 } from "lucide-react";
-
 import ThemeToggle from "./ThemeToggle";
 import InputField from "../ui/InputField";
 import NotificationDropdown from "./NavbarCom/NotificationDropdown";
@@ -29,70 +28,62 @@ const Navbar = ({ toggleSidebar }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
-
+  /* ----------------------------------------------------------------
+     CONSUME CONTEXT (Notifications & Sockets)
+  ---------------------------------------------------------------- */
+  const { notifications, setNotifications } = useSockets();
+  const [messages, setMessages] = useState([]);
+  const [gifts, setGifts] = useState([]);
   const profileRef = useRef(null);
   const notificationRef = useRef(null);
   const messagesRef = useRef(null);
   const giftsRef = useRef(null);
-
   const [openProfile, setOpenProfile] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isMessagesOpen, setIsMessagesOpen] = useState(false);
   const [isGiftsOpen, setIsGiftsOpen] = useState(false);
   const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
 
-  const [notifications, setNotifications] = useState([]);
-  const [messages, setMessages] = useState([]);
-  const [gifts, setGifts] = useState([]);
+  // Sound Notification Logic
+  const prevNotificationCount = useRef(notifications.length);
 
-  // /* ---------------- SOCKET LISTENERS ---------------- */
-  // useEffect(() => {
-  //   if (!user) return;
+  useEffect(() => {
+    if (notifications.length > prevNotificationCount.current) {
+      const audio = new Audio(notificationSound);
+      audio.play().catch((err) => console.log("Audio play failed:", err));
+    }
+    prevNotificationCount.current = notifications.length;
+  }, [notifications]);
 
-  //   socket.connect();
-  //   socket.emit("register-user", { userId: user._id });
+  /* =====================================================
+     SOCKET EVENTS + ROOM JOIN
+  ===================================================== */
 
-  //   socket.on("notification", (data) => {
-  //     setNotifications((prev) => [data, ...prev]);
-  //   });
 
-  //   socket.on("message", (data) => {
-  //     setMessages((prev) => [data, ...prev]);
-  //   });
-
-  //   return () => {
-  //     socket.off("notification");
-  //     socket.off("message");
-  //   };
-  // }, [user]);
-
-  /* ---------------- CLICK OUTSIDE ---------------- */
+  /* =====================================================
+     CLICK OUTSIDE HANDLER
+  ===================================================== */
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (profileRef.current && !profileRef.current.contains(e.target)) {
+      if (profileRef.current && !profileRef.current.contains(e.target))
         setOpenProfile(false);
-      }
-      if (notificationRef.current && !notificationRef.current.contains(e.target)) {
+      if (notificationRef.current && !notificationRef.current.contains(e.target))
         setIsNotificationsOpen(false);
-      }
-      if (messagesRef.current && !messagesRef.current.contains(e.target)) {
+      if (messagesRef.current && !messagesRef.current.contains(e.target))
         setIsMessagesOpen(false);
-      }
-      if (giftsRef.current && !giftsRef.current.contains(e.target)) {
+      if (giftsRef.current && !giftsRef.current.contains(e.target))
         setIsGiftsOpen(false);
-      }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  /* ---------------- ACTIONS ---------------- */
-  const handleLogout = () => {
-    dispatch(logout());
-  };
 
+  /* =====================================================
+     ACTIONS
+  ===================================================== */
+  const handleLogout = () => dispatch(logout());
   const handleSettings = () => navigate("/settings");
 
   if (!user) return null;
@@ -100,7 +91,6 @@ const Navbar = ({ toggleSidebar }) => {
   return (
     <div className="sticky top-0 z-40 w-full backdrop-blur bg-white/80 dark:bg-gray-900/80 border-b">
       <div className="px-6 py-4 flex items-center justify-between gap-4">
-
         {/* LEFT */}
         <div className="flex items-center gap-4 flex-1">
           <button onClick={toggleSidebar} className="lg:hidden p-2 rounded-lg">
@@ -122,7 +112,6 @@ const Navbar = ({ toggleSidebar }) => {
         <div className="flex items-center gap-3">
           <ThemeToggle />
 
-          {/* Notifications */}
           <div ref={notificationRef} className="relative">
             <IconButton
               icon={<Bell />}
@@ -136,20 +125,15 @@ const Navbar = ({ toggleSidebar }) => {
             />
           </div>
 
-          {/* Messages */}
           <div ref={messagesRef} className="relative">
             <IconButton
               icon={<MessageSquare />}
               count={messages.filter((m) => m.unread).length}
               onClick={() => setIsMessagesOpen(!isMessagesOpen)}
             />
-            <MessagesDropdown
-              isOpen={isMessagesOpen}
-              messages={messages}
-            />
+            <MessagesDropdown isOpen={isMessagesOpen} messages={messages} />
           </div>
 
-          {/* Gifts */}
           <div ref={giftsRef} className="relative">
             <IconButton
               icon={<Gift />}
@@ -165,18 +149,13 @@ const Navbar = ({ toggleSidebar }) => {
 
           <div className="h-8 w-px bg-gray-300 mx-2" />
 
-          {/* PROFILE */}
           <div ref={profileRef} className="relative">
-            <div
+            <img
               onClick={() => setOpenProfile(!openProfile)}
-              className="flex items-center gap-3 cursor-pointer"
-            >
-              <img
-                src={user.avatar || fallbackImg}
-                className="w-10 h-10 rounded-full border"
-                alt={user.name}
-              />
-            </div>
+              src={user.avatar || fallbackImg}
+              className="w-10 h-10 rounded-full border cursor-pointer"
+              alt={user.name}
+            />
 
             {openProfile && (
               <AdminProfilePopup
@@ -197,23 +176,21 @@ const Navbar = ({ toggleSidebar }) => {
   );
 };
 
-/* ---------------- SMALL COMPONENTS ---------------- */
-
+/* ================= SMALL COMPONENTS ================= */
 const IconButton = ({ icon, count, onClick }) => (
   <button
     onClick={onClick}
-    className="relative p-2.5 rounded-xl text-gray-500 hover:text-primary hover:bg-primary/10 transition-all duration-200"
+    className="relative p-2.5 rounded-xl hover:bg-primary/10"
   >
     {React.cloneElement(icon, { className: "w-5 h-5" })}
     {count > 0 && (
-      <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full ring-2 ring-white dark:ring-gray-900 animate-pulse" />
+      <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full" />
     )}
   </button>
 );
 
 const AdminProfilePopup = ({ user, handleLogout, handleSettings }) => (
   <div className="absolute right-0 mt-4 w-80 rounded-3xl bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border border-gray-100 dark:border-gray-800 shadow-2xl overflow-hidden ring-1 ring-black/5 animate-in fade-in zoom-in-95 duration-200 origin-top-right z-50">
-
     {/* Header Section */}
     <div className="relative p-6 pb-8 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent">
       <div className="flex items-center gap-4">

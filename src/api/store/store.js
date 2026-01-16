@@ -6,6 +6,8 @@ import { menuApi } from "../services/menuApi";
 import { userApi } from "../services/userapi";
 import { restaurantApi } from "../services/resturentsapi";
 import { deliveryPartnerApi } from "../services/deliveryPartnerApi";
+import { bannerApi } from "../services/bannerApi";
+
 export const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -15,12 +17,14 @@ export const store = configureStore({
     [restaurantApi.reducerPath]: restaurantApi.reducer,
     [menuApi.reducerPath]: menuApi.reducer,
     [deliveryPartnerApi.reducerPath]: deliveryPartnerApi.reducer,
+    [bannerApi.reducerPath]: bannerApi.reducer,
+
   },
 
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: false,
-    }).concat(baseApi.middleware, orderApi.middleware, userApi.middleware, restaurantApi.middleware, deliveryPartnerApi.middleware),
+    }).concat(baseApi.middleware, orderApi.middleware, userApi.middleware, restaurantApi.middleware, deliveryPartnerApi.middleware,  bannerApi.middleware),
 
 
 

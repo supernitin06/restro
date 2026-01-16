@@ -21,6 +21,9 @@ import {
   Circle,
   Menu,
   X,
+  Clock,
+  CheckCircle,
+  MessageSquare,
 } from "lucide-react";
 
 import Button from "../ui/Button";
@@ -65,31 +68,68 @@ const Sidebar = ({ theme = "dark" }) => {
       id: "delivery-partners",
       label: "Delivery Partners",
       icon: Bike,
-      path: "/delivery-partners",
+      hasDropdown: true,
+      subItems: [
+        {
+          id: "all-partners",
+          label: "Manage Partners",
+          path: "/delivery-partners", // your existing approved partners page
+          icon: Bike,
+        },
+        {
+          id: "pending-partners",
+          label: "Pending Approvals",
+          path: "/pending-delivery-partners", // new pending partners page
+          icon: Clock, // or any other icon
+        },
+      ],
     },
+
     {
       id: "orders",
       label: "Orders",
-      icon: ShoppingBag,
       path: "/orders",
-    },
-    {
-      id:"menu_items",
-      label:"Menu",
-      icon:UtensilsCrossed,
-      hasDropdown:true,
-      subItems:[
+      icon: ShoppingBag,
+      hasDropdown: true,
+      subItems: [
         {
-          id:"menu-management",
-          label:"Menu Management",
-          icon:UtensilsCrossed,
-          path:"/menu-management"
+          id: "new-orders",
+          label: "New Orders",
+          icon: Clock,
+          path: "/orders/new",
         },
         {
-          id:"add-menu",
-          label:"Add Menu",
-          icon:UtensilsCrossed,
-          path:"/menu-management/add"
+          id: "processing-orders",
+          label: "Processing Orders",
+          icon: Bike,
+          path: "/orders/processing",
+        },
+        {
+          id: "accepted-orders",
+          label: "Accepted Orders",
+          icon: CheckCircle,
+          path: "/orders/accepted",
+        }
+      ],
+    },
+
+    {
+      id: "menu_items",
+      label: "Menu",
+      icon: UtensilsCrossed,
+      hasDropdown: true,
+      subItems: [
+        {
+          id: "menu-management",
+          label: "Menu Management",
+          icon: UtensilsCrossed,
+          path: "/menu-management"
+        },
+        {
+          id: "add-menu",
+          label: "Add Menu",
+          icon: UtensilsCrossed,
+          path: "/menu-management/add"
         }
       ]
 
@@ -152,6 +192,12 @@ const Sidebar = ({ theme = "dark" }) => {
           icon: Shield,
         },
       ],
+    },
+    {
+      id: "reviews",
+      label: "Reviews",
+      icon: MessageSquare,
+      path: "/reviews",
     },
     {
       id: "support",

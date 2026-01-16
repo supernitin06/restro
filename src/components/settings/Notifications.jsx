@@ -3,7 +3,7 @@ import Button from "../../components/ui/Button";
 import emailIcon from "../../assets/email.png";
 import smsIcon from "../../assets/sms.png";
 import whatsappIcon from "../../assets/whatsapp.png";
-import "./Notification.css";
+import "./notification.css";
 
 const Notifications = () => {
   const [selectedMethods, setSelectedMethods] = useState(["Email"]);
@@ -45,9 +45,8 @@ const Notifications = () => {
         {notificationMethods.map((method) => (
           <div
             key={method.name}
-            className={`notification-card ${
-              selectedMethods.includes(method.name) ? "active" : ""
-            }`}
+            className={`notification-card ${selectedMethods.includes(method.name) ? "active" : ""
+              }`}
             onClick={() => toggleMethod(method.name)}
           >
             <img src={method.icon} alt={method.name} className="notification-icon" />

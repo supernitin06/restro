@@ -9,7 +9,7 @@ import InputField from "../ui/InputField";
 import Textarea from "../ui/Textarea";
 // import Select from "../ui/Select";
 import Modal from "../ui/Modal";
-import { showSuccessAlert, showErrorAlert } from "../../utils/sweetAlert";
+import { showSuccessAlert, showErrorAlert, showPromiseToast } from "../../utils/toastAlert";
 import {
   useGetCategoriesQuery,
   useAddCategoryMutation,
@@ -73,10 +73,13 @@ const AddMenuItem = () => {
 
   // Category Modal States
   const [newCategoryName, setNewCategoryName] = useState("");
+  const [newCategoryDescription, setNewCategoryDescription] = useState("");
+  const [newCategoryFoodType, setNewCategoryFoodType] = useState("VEG");
   const [newCategoryOrder, setNewCategoryOrder] = useState(1);
   const [showAddCategory, setShowAddCategory] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+  const [categoryImage, setCategoryImage] = useState(null);
 
   // Item Details States
   const [name, setName] = useState("");
@@ -153,53 +156,94 @@ const AddMenuItem = () => {
     }
   };
 
+  // ✅ Category Image Handler
+  const handleCategoryImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setCategoryImage(file);
+    }
+  };
+
   /* ✅ Category Handlers */
   const handleAddCategory = async () => {
     if (!newCategoryName.trim()) return;
     if (!restaurantId) return showErrorAlert("Restaurant ID missing.");
 
     try {
-      const result = await addCategory({
-        restaurantId,
-        name: newCategoryName,
-        order: newCategoryOrder,
-      }).unwrap();
+      const formData = new FormData();
+      formData.append("restaurantId", restaurantId);
+      formData.append("name", newCategoryName);
+      formData.append("description", newCategoryDescription);
+      formData.append("foodType", newCategoryFoodType);
+      if (categoryImage) {
+        formData.append("image", categoryImage);
+      }
 
-      showSuccessAlert("Category added!");
+      // Debug: Log FormData entries to verify file format
+      for (let [key, value] of formData.entries()) {
+        console.log(`FormData ${key}:`, value);
+      }
+
+      const result = await showPromiseToast(
+        addCategory(formData).unwrap(),
+        {
+          loading: 'Adding category...',
+          success: 'Category added!',
+          error: (err) => err?.data?.message || "Failed to add category."
+        }
+      );
+
       await refetchCategories();
-      setCategory(result._id);
+      if (result && result._id) {
+        setCategory(result._id);
+      }
       setNewCategoryName("");
+      setNewCategoryDescription("");
+      setNewCategoryFoodType("VEG"); // Reset
+      setCategoryImage(null);
       setShowAddCategory(false);
     } catch (err) {
-      showErrorAlert(err?.data?.message || "Failed to add category.");
+      console.error(err);
     }
   };
 
   const handleUpdateCategory = async () => {
     if (!newCategoryName.trim() || !editingCategory) return;
     try {
-      await updateCategory({
-        id: editingCategory._id,
-        payload: { name: newCategoryName, order: newCategoryOrder },
-      }).unwrap();
-      showSuccessAlert("Category updated!");
+      await showPromiseToast(
+        updateCategory({
+          id: editingCategory._id,
+          payload: { name: newCategoryName, order: newCategoryOrder },
+        }).unwrap(),
+        {
+          loading: 'Updating category...',
+          success: 'Category updated!',
+          error: "Failed to update category"
+        }
+      );
       await refetchCategories();
       setEditingCategory(null);
       setShowAddCategory(false);
     } catch (err) {
-      showErrorAlert("Failed to update category");
+      console.error(err);
     }
   };
 
   const handleDeleteCategory = async (id) => {
     if (!window.confirm("Delete this category?")) return;
     try {
-      await toggleCategory(id).unwrap();
-      showSuccessAlert("Category deleted!");
+      await showPromiseToast(
+        toggleCategory(id).unwrap(),
+        {
+          loading: 'Deleting category...',
+          success: 'Category deleted!',
+          error: 'Failed to delete category'
+        }
+      );
       await refetchCategories();
       if (category === id) setCategory(categories[0]?._id || "");
     } catch (err) {
-      showErrorAlert("Failed to delete category");
+      console.error(err);
     }
   };
 
@@ -211,53 +255,58 @@ const AddMenuItem = () => {
     setShowCategoryDropdown(false);
   };
 
-  /* ✅ SAVE MENU with Base64 Image */
+  /* ✅ SAVE MENU with FormData for Cloudinary Upload */
   const handleSave = async (e) => {
     e.preventDefault();
 
-    if (!restaurantId) {
-      showErrorAlert("Restaurant ID is missing. Please log in again.");
-      return;
-    }
-
-    if (!name || !price || !category) {
-      showErrorAlert("Please fill in all required fields (Name, Price, Category).");
-      return;
+    if (!restaurantId || !name || !price || !category) {
+      return showErrorAlert("Required fields missing");
     }
 
     try {
-      let imagePayload = photo || ""; // ✅ Fix: Ensure image is a string (not null)
-      // Convert file to Base64 before sending
+      const formData = new FormData();
+
+      formData.append("restaurantId", restaurantId);
+      formData.append("restaurant", restaurantId); // Backend expects this too
+      formData.append("category", category);
+      formData.append("name", name);
+      formData.append("description", description);
+      formData.append("basePrice", Number(price));
+      formData.append("foodType", foodType);
+      formData.append("isVeg", isVeg);
+      formData.append("isAvailable", available);
+
+      // ✅ IMAGE
       if (imageFile) {
-        imagePayload = await convertToBase64(imageFile);
+        formData.append("image", imageFile);
       }
 
-      await addMenu({
-        restaurantId,
-        restaurant: restaurantId,
-        category,
-        name,
-        description,
-        basePrice: Number(price),
-        foodType,
-        isVeg,
-        tags,
-        isAvailable: available,
-        variants: variants.map(v => ({ name: v.name, price: Number(v.price) })),
-        addons: addons.map(a => ({ name: a.name, price: Number(a.price) })),
-        image: imagePayload,
-        altText,
-      }).unwrap();
+      // ✅ ARRAYS
+      formData.append("tags", JSON.stringify(tags));
+      formData.append(
+        "variants",
+        JSON.stringify(variants.map(v => ({ name: v.name, price: Number(v.price) })))
+      );
+      formData.append(
+        "addons",
+        JSON.stringify(addons.map(a => ({ name: a.name, price: Number(a.price) })))
+      );
 
-      showSuccessAlert(t("menuItemSaved"));
+      await showPromiseToast(
+        addMenu(formData).unwrap(),
+        {
+          loading: "Saving menu item...",
+          success: "Menu item saved",
+          error: (err) => err?.data?.message || "Failed"
+        }
+      );
+
       navigate("/menu-management");
     } catch (err) {
-      console.error("Add menu failed", err);
-      // ✅ Fix: Show specific validation error from server
-      const errorMessage = err?.data?.message || err?.data?.error || "Failed to save menu item";
-      showErrorAlert(errorMessage);
+      console.error("MENU ERROR", err);
     }
   };
+
 
   return (
     <div className="app page">
@@ -626,7 +675,7 @@ const AddMenuItem = () => {
         {/* Add/Edit Category Modal */}
         {showAddCategory && (
           <Modal
-            onClose={() => { setShowAddCategory(false); setEditingCategory(null); setNewCategoryName(""); }}
+            onClose={() => { setShowAddCategory(false); setEditingCategory(null); setNewCategoryName(""); setNewCategoryDescription(""); setNewCategoryFoodType("VEG"); setCategoryImage(null); }}
             title={editingCategory ? "Edit Category" : "Create New Category"}
           >
             <div className="space-y-4 p-1">
@@ -636,13 +685,44 @@ const AddMenuItem = () => {
                 onChange={(e) => setNewCategoryName(e.target.value)}
                 placeholder="e.g. Starters, Main Course"
               />
-              <InputField
-                label="Display Order"
-                type="number"
-                value={newCategoryOrder}
-                onChange={(e) => setNewCategoryOrder(parseInt(e.target.value))}
-                placeholder="1"
-              />
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
+                <Textarea
+                  value={newCategoryDescription}
+                  onChange={(e) => setNewCategoryDescription(e.target.value)}
+                  rows={2}
+                  placeholder="Short description..."
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Food Type</label>
+                <div className="flex gap-4">
+                  <label className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-all ${newCategoryFoodType === 'VEG' ? 'border-green-500 bg-green-50 dark:bg-green-900/20' : 'border-gray-200 dark:border-gray-600'}`}>
+                    <input type="radio" className="hidden" checked={newCategoryFoodType === "VEG"} onChange={() => setNewCategoryFoodType("VEG")} />
+                    <div className="w-3 h-3 border border-green-600 flex items-center justify-center rounded-sm"><div className="w-1.5 h-1.5 bg-green-600 rounded-full"></div></div>
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-200">Veg</span>
+                  </label>
+
+                  <label className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-all ${newCategoryFoodType === 'NON_VEG' ? 'border-red-500 bg-red-50 dark:bg-red-900/20' : 'border-gray-200 dark:border-gray-600'}`}>
+                    <input type="radio" className="hidden" checked={newCategoryFoodType === "NON_VEG"} onChange={() => setNewCategoryFoodType("NON_VEG")} />
+                    <div className="w-3 h-3 border border-red-600 flex items-center justify-center rounded-sm"><div className="w-1.5 h-1.5 bg-red-600 rounded-full"></div></div>
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-200">Non-Veg</span>
+                  </label>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Category Image</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleCategoryImageUpload}
+                  className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                />
+                {categoryImage && <p className="text-xs text-green-600">Image selected: {categoryImage.name}</p>}
+              </div>
+
               <div className="flex gap-3 justify-end mt-6">
                 <Button onClick={() => setShowAddCategory(false)} variant="outline">
                   Cancel

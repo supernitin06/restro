@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { Plus, Loader2, Eye, Edit, Trash2, CheckCircle, XCircle, Clock, Bike, CreditCard } from 'lucide-react';
-import OrderCard from '../components/OrderPages/OderCards';
+import AllOrderCards from '../components/OrderPages/OderCards';
 import OrderFormModal from '../components/OrderPages/OrderForm';
 import OrderFilters from '../components/OrderPages/OrderFilters';
 import OrderDetailsModal from '../components/OrderPages/OrderDetailsModal';
@@ -35,7 +35,7 @@ const Orders = () => {
       page: currentPage,
       limit: itemsPerPage,
       search: searchQuery,
-      status: filters.status === "all" ? undefined : filters.status,
+      status: filters.status === "all" ? undefined : (filters.status === "rejected" ? "REJECTED" : filters.status.toUpperCase()),
     },
     {
       skip: !authToken, // Do not run query if user is not logged in
@@ -53,7 +53,7 @@ const Orders = () => {
     if (address) {
       if (typeof address === 'string') formattedAddress = address;
       else if (typeof address === 'object') {
-        formattedAddress = `${address.street || address.addressLine || ''}, ${address.city || ''} ${address.zipCode || address.pincode || ''}`;
+        formattedAddress = `${address.addressLine || ''}, ${address.city || ''} ${address.pincode || ''}`;
       }
     }
 
@@ -61,32 +61,46 @@ const Orders = () => {
       id: apiOrder._id,
       date: new Date(apiOrder.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
       time: new Date(apiOrder.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-      customer: apiOrder.userName || apiOrder.customer?.name || 'Unknown',
-      customerPhone: apiOrder.userMobile || apiOrder.customer?.phone || 'N/A',
+
+      customer: apiOrder.customer?.name || 'Unknown',
+      customerPhone: apiOrder.customer?.phone || 'N/A',
       customerAddress: formattedAddress,
-      orderId: apiOrder.orderId ? (apiOrder.orderId.startsWith('#') ? apiOrder.orderId : `#${apiOrder.orderId}`) : `#${apiOrder._id.slice(-6).toUpperCase()}`,
-      status: apiOrder.status?.toLowerCase() || 'pending', // Ensure lowercase for UI matching
-      type: apiOrder.deliveryType ? (apiOrder.deliveryType.charAt(0).toUpperCase() + apiOrder.deliveryType.slice(1)) : 'Delivery',
-      table: '', // Not provided in API
+
+      orderId: apiOrder.orderId ? (apiOrder.orderId.startsWith('ORD') ? `#${apiOrder.orderId.split('-')[1]}` : apiOrder.orderId) : `#${apiOrder._id.slice(-6).toUpperCase()}`,
+      fullOrderId: apiOrder.orderId,
+      status: apiOrder.status || 'PENDING',
+      type: apiOrder.source === 'web' ? 'Delivery' : 'Dine-in',
+
       paymentMethod: apiOrder.payment?.method || 'N/A',
+      paymentStatus: apiOrder.payment?.status || 'PENDING',
+
       restaurant: {
-        name: apiOrder.restaurantName || 'Restaurant',
-        address: '', 
-        phone: '',
-        email: ''
+        id: apiOrder.restaurant,
+        branch: apiOrder.branch
       },
-      deliveryPartner: null, // Not provided in API
+
+      deliveryPartner: apiOrder.delivery?.partner ? {
+        id: apiOrder.delivery.partner._id,
+        name: apiOrder.delivery.partner.name,
+        phone: apiOrder.delivery.partner.phone,
+        assignedAt: apiOrder.delivery.assignedAt
+      } : null,
+
       items: (apiOrder.items || []).map((item, idx) => ({
-        id: item.menuItem || item.itemId || idx,
+        id: item.itemId || idx,
         name: item.name,
         quantity: item.quantity,
-        price: item.price || item.finalItemPrice || 0,
-        image: '🍽️' // Placeholder emoji
+        price: item.finalItemPrice || 0,
+        addons: item.addons || []
       })),
-      subtotal: apiOrder.subtotal || apiOrder.price?.itemsTotal || 0,
-      deliveryFee: apiOrder.deliveryCharge || apiOrder.price?.deliveryFee || 0,
-      tax: apiOrder.tax || apiOrder.price?.tax || 0,
-      total: apiOrder.grandTotal || apiOrder.price?.grandTotal || 0
+
+      timeline: apiOrder.timeline || [], // Pass timeline for the visualization
+
+      // Price details
+      subtotal: apiOrder.price?.itemsTotal || 0,
+      deliveryFee: apiOrder.price?.deliveryFee || 0,
+      tax: apiOrder.price?.tax || 0,
+      total: apiOrder.price?.grandTotal || 0
     };
   };
 
@@ -109,13 +123,13 @@ const Orders = () => {
     setCurrentPage(1);
   };
 
-  
-  const filteredOrders = orders; 
 
-  const totalPages = apiResponse?.meta?.total 
-    ? Math.ceil(apiResponse.meta.total / itemsPerPage) 
+  const filteredOrders = orders;
+
+  const totalPages = apiResponse?.meta?.total
+    ? Math.ceil(apiResponse.meta.total / itemsPerPage)
     : 1;
-  
+
   // If using server-side pagination, currentOrders is just the fetched orders
   const currentOrders = orders;
 
@@ -128,7 +142,7 @@ const Orders = () => {
       orderId: `#ORDER${orders.length + 24}`,
       date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
       time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-      restaurant: orders[0]?.restaurant || { name: 'Default' }, 
+      restaurant: orders[0]?.restaurant || { name: 'Default' },
       subtotal: newOrder.total,
       deliveryFee: newOrder.type === 'Delivery' ? 5.00 : 0,
       tax: newOrder.total * 0.08,
@@ -163,17 +177,21 @@ const Orders = () => {
   // Helper for status colors in Table
   const getStatusBadge = (status) => {
     const styles = {
-      completed: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-      delivered: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-      cancelled: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-      'on-process': 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-      preparing: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-      confirmed: 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400',
-      placed: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
-      assigned: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
-      picked: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
+      COMPLETED: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+      DELIVERED: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+      CANCELLED: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+      REJECTED: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+      'ON-PROCESS': 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+      PREPARING: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+      CONFIRMED: 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400',
+      PLACED: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
+      ACCEPTED: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400',
+      ASSIGNED: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
+      PICKED: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
+      READY: 'bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400',
+      OUT_FOR_DELIVERY: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400'
     };
-    const style = styles[status] || styles['on-process'];
+    const style = styles[status] || styles['ON-PROCESS'];
     return (
       <span className={`px-2.5 py-1 rounded-lg text-xs font-bold capitalize ${style}`}>
         {status}
@@ -203,23 +221,39 @@ const Orders = () => {
         </div>
       )
     },
+
     {
       header: 'Items',
       render: (order) => (
-        <div className="flex flex-col gap-1 min-w-[160px]">
+        <div className="flex flex-col gap-1 min-w-[120px]">
           {order.items.slice(0, 2).map((item, idx) => (
-            <div key={idx} className="flex justify-between items-center text-xs">
-              <span className="text-gray-700 dark:text-gray-300 truncate max-w-[120px]" title={item.name}>{item.name}</span>
-              <span className="font-semibold bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded text-gray-800 dark:text-gray-200">x{item.quantity}</span>
-            </div>
+            <span key={idx} className="text-gray-700 dark:text-gray-300 text-xs truncate" title={item.name}>
+              {item.name}
+            </span>
           ))}
           {order.items.length > 2 && (
-            <span className="text-xs text-primary font-medium cursor-pointer hover:underline" onClick={() => setViewingOrder(order)}>
-              +{order.items.length - 2} more items
+            <span
+              className="text-xs text-primary font-medium cursor-pointer hover:underline"
+              onClick={() => setViewingOrder(order)}
+            >
+              +{order.items.length - 2} more
             </span>
           )}
         </div>
-      )
+      ),
+    },
+    {
+      header: 'Quantity',
+      render: (order) => (
+        <div className="flex flex-col gap-1 min-w-[60px]">
+          {order.items.slice(0, 2).map((item, idx) => (
+            <span key={idx} className="text-gray-800 dark:text-gray-200 text-xs">
+              {item.quantity}
+            </span>
+          ))}
+          {order.items.length > 2 && <span className="text-xs text-gray-500">{/* placeholder */}</span>}
+        </div>
+      ),
     },
     {
       header: 'Details',
@@ -241,25 +275,50 @@ const Orders = () => {
       render: (order) => getStatusBadge(order.status)
     },
     {
-      header: 'Payment & Delivery',
+      header: 'Payment',
       render: (order) => (
-        <div>
+        <div className="text-xs">
+          {/* Total Amount */}
           <div className="flex items-center gap-1.5 text-sm font-bold text-gray-800 dark:text-gray-200">
             ${order.total.toFixed(2)}
           </div>
+
+          {/* Payment Method */}
           <div className="text-xs text-gray-500 mt-1 flex items-center gap-1.5">
             <CreditCard size={13} className="text-green-500" />
             {order.paymentMethod}
           </div>
-          {order.deliveryPartner && (
-            <div className="text-xs text-gray-500 mt-1 flex items-center gap-1.5">
+        </div>
+      )
+    },
+    {
+      header: 'Delivery Partner',
+      render: (order) => (
+        <div className="text-xs">
+          {order.deliveryPartner ? (
+            <div className="flex flex-col gap-0.5">
+              <div className="flex items-center gap-1.5">
+                <Bike size={13} className="text-purple-500" />
+                <span className="font-medium">{order.deliveryPartner.name}</span>
+              </div>
+              <div className="flex items-center gap-2 ml-5">
+                <span className="text-gray-400">📞 {order.deliveryPartner.phone}</span>
+                <span className="text-gray-400">
+                  🕒 Assigned: {new Date(order.deliveryPartner.assignedAt).toLocaleString()}
+                </span>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center gap-1.5 text-red-500">
               <Bike size={13} className="text-purple-500" />
-              {order.deliveryPartner.name}
+              Not Assigned
             </div>
           )}
         </div>
       )
     },
+
+
     {
       header: 'Actions',
       render: (order) => (
@@ -270,12 +329,12 @@ const Orders = () => {
           <button onClick={() => setEditingOrder(order)} className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-gray-600 dark:text-gray-300 transition-colors" title="Edit">
             <Edit size={16} />
           </button>
-          {order.status === 'on-process' && (
+          {['PLACED', 'ACCEPTED', 'PREPARING', 'READY', 'OUT_FOR_DELIVERY', 'ON-PROCESS'].includes(order.status) && (
             <>
-              <button onClick={() => handleUpdateStatus(order.id, 'completed')} className="p-1.5 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg text-green-600 dark:text-green-400 transition-colors" title="Complete">
+              <button onClick={() => handleUpdateStatus(order.id, 'COMPLETED')} className="p-1.5 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg text-green-600 dark:text-green-400 transition-colors" title="Complete">
                 <CheckCircle size={16} />
               </button>
-              <button onClick={() => handleUpdateStatus(order.id, 'cancelled')} className="p-1.5 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg text-red-600 dark:text-red-400 transition-colors" title="Cancel">
+              <button onClick={() => handleUpdateStatus(order.id, 'CANCELLED')} className="p-1.5 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg text-red-600 dark:text-red-400 transition-colors" title="Cancel">
                 <XCircle size={16} />
               </button>
             </>
@@ -348,16 +407,16 @@ const Orders = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-            {currentOrders.map(order => (
-              <OrderCard
-                key={order.id}
-                order={order}
-                onDelete={handleDeleteOrder}
-                onEdit={() => setEditingOrder(order)}
-                onUpdateStatus={handleUpdateStatus}
-                viewMode={viewMode}
-              />
-            ))}
+              {currentOrders.map(order => (
+                <AllOrderCards
+                  key={order.id}
+                  order={order}
+                  onDelete={handleDeleteOrder}
+                  onEdit={() => setEditingOrder(order)}
+                  onUpdateStatus={handleUpdateStatus}
+                  viewMode={viewMode}
+                />
+              ))}
             </div>
           )
         )}

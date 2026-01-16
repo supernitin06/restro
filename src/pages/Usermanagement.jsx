@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from "react";
+import { showPromiseToast } from "../utils/toastAlert";
 import FiltersBar from "../components/ui/UserFilters";
 import UserModal from "../components/users/UserModal";
 import UserOrdersModal from "../components/users/UserOrdersModal";
@@ -12,6 +13,9 @@ import Badge from "../components/ui/Badge";
 import Pagination from "../components/ui/Pagination";
 import { useNavigate } from "react-router-dom";
 
+
+import ConfirmationModal from "../components/ui/ConfirmationModal";
+import toast from "react-hot-toast";
 
 const UserManagement = () => {
   const navigate = useNavigate();
@@ -28,6 +32,10 @@ const UserManagement = () => {
   const [activeOrdersUserId, setActiveOrdersUserId] = useState(null);
 
   const { data: userDetail, isLoading: userDetailLoading, isError: userDetailError } = useGetUserDetailsQuery(selectedUser, { skip: !selectedUser });
+
+  // Confirmation Modal State
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
 
   console.log("data of user", userDetail);
   // -------------------- Hooks (always called) --------------------
@@ -67,10 +75,10 @@ const UserManagement = () => {
     },
     {
       key: 'delete',
-      label: 'Delete Admin',
+      label: 'Delete User',
       icon: Trash2,
       color: 'rose',
-      onClick: (item) => handleDelete(item.id),
+      onClick: (item) => handleDelete(item._id),
     },
   ];
 
@@ -98,12 +106,37 @@ const UserManagement = () => {
   const inactiveUsers = users.filter(u => u.isBlocked).length;
 
   // -------------------- Handlers --------------------
-  const handleBlockToggle = (user) => {
-    console.log("user", user);
-    updateUserBlock({
-      id: user._id,
-      body: { isBlocked: !user.isBlocked },
-    });
+  // -------------------- Handlers --------------------
+  const handleBlockToggle = async (user) => {
+    try {
+      await updateUserBlock({
+        id: user._id,
+        body: { isBlocked: !user.isBlocked },
+      }).unwrap();
+      toast.success(`User ${!user.isBlocked ? 'blocked' : 'unblocked'} successfully!`);
+    } catch (error) {
+      console.error("Failed to update user status:", error);
+      toast.error('Failed to update user status');
+    }
+  };
+
+  const handleDelete = (userId) => {
+    setUserToDelete(userId);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    try {
+      // TODO: Wire up useDeleteUserMutation when available
+      console.log("Deleting user (placeholder):", userToDelete);
+      toast.success("User deleted successfully (Placeholder)");
+    } catch (error) {
+      console.error("Failed to delete user:", error);
+      toast.error("Failed to delete user");
+    } finally {
+      setIsDeleteModalOpen(false);
+      setUserToDelete(null);
+    }
   };
 
   const handleActiveToggle = (user) => {
@@ -236,6 +269,16 @@ const UserManagement = () => {
           }}
         />
       )}
+
+      <ConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={confirmDelete}
+        title="Delete User?"
+        message="Are you sure you want to delete this user? This action cannot be undone."
+        confirmText="Delete"
+        isDangerous={true}
+      />
 
       <div className="relative z-10">
         {isLoading && <div>Loading users...</div>}
