@@ -42,6 +42,9 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
       if (!restaurantSocket.connected) restaurantSocket.connect();
     };
 
+    // Debug Connection Logs
+
+
     connectSockets();
 
     // console.log("🔌 Connecting sockets...");
@@ -49,10 +52,37 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
     /* =============================
        2️⃣ Event Handlers
     ============================== */
-    // const onConnected = () => console.log("✅ Socket connected");
-    // const onJoinedRoom = (data) => console.log("🏠 Joined restaurant room:", data);
-    const onConnected = () => { }; // Silence logs
-    const onJoinedRoom = () => { }; // Silence logs
+
+    // Named handlers for cleanup
+    const onMainConnect = () => console.log("✅ Main Socket Connected:", mainSocket.id);
+    const onMainDisconnect = (reason) => console.log("❌ Main Socket Disconnected:", reason);
+    const onMainError = (err) => console.error("⚠️ Main Socket Connection Error:", err.message);
+
+    const onOrdersConnect = () => console.log("✅ Orders Socket Connected:", ordersSocket.id);
+    const onOrdersDisconnect = (reason) => console.log("❌ Orders Socket Disconnected:", reason);
+    const onOrdersError = (err) => console.error("⚠️ Orders Socket Connection Error:", err.message);
+
+    const onRestConnect = () => console.log("✅ Restaurant Socket Connected:", restaurantSocket.id);
+    const onRestDisconnect = (reason) => console.log("❌ Restaurant Socket Disconnected:", reason);
+    const onRestError = (err) => console.error("⚠️ Restaurant Socket Connection Error:", err.message);
+
+    // Attach Listeners
+    mainSocket.on("connect", onMainConnect);
+    mainSocket.on("disconnect", onMainDisconnect);
+    mainSocket.on("connect_error", onMainError);
+
+    ordersSocket.on("connect", onOrdersConnect);
+    ordersSocket.on("disconnect", onOrdersDisconnect);
+    ordersSocket.on("connect_error", onOrdersError);
+
+    restaurantSocket.on("connect", onRestConnect);
+    restaurantSocket.on("disconnect", onRestDisconnect);
+    restaurantSocket.on("connect_error", onRestError);
+
+    const onJoinedRoom = () => {
+
+      console.log("🏠 Joined restaurant room");
+     }; // Silence logs
 
     const onNewOrder = (payload) => {
       // console.log("🆕 NEW_ORDER received:", payload);
@@ -95,9 +125,8 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
     };
 
     /* =============================
-       3️⃣ Attach Listeners
+       3️⃣ Attach Listeners (Specific to logic)
     ============================== */
-    ordersSocket.on("connect", onConnected);
     ordersSocket.on("JOINED_RESTAURANT_ROOM", onJoinedRoom);
     ordersSocket.on("NEW_ORDER", onNewOrder);
 
@@ -130,7 +159,20 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
        🧹 CLEANUP (VERY IMPORTANT)
     ============================== */
     return () => {
-      ordersSocket.off("connect", onConnected);
+      // Remove debug listeners
+      mainSocket.off("connect", onMainConnect);
+      mainSocket.off("disconnect", onMainDisconnect);
+      mainSocket.off("connect_error", onMainError);
+
+      ordersSocket.off("connect", onOrdersConnect);
+      ordersSocket.off("disconnect", onOrdersDisconnect);
+      ordersSocket.off("connect_error", onOrdersError);
+
+      restaurantSocket.off("connect", onRestConnect);
+      restaurantSocket.off("disconnect", onRestDisconnect);
+      restaurantSocket.off("connect_error", onRestError);
+
+      // Remove logic listeners
       ordersSocket.off("JOINED_RESTAURANT_ROOM", onJoinedRoom);
       ordersSocket.off("NEW_ORDER", onNewOrder);
       ordersSocket.off("ORDER_STATUS_UPDATED", onOrderStatusUpdated);
