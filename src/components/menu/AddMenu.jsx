@@ -388,7 +388,7 @@ const AddMenuItem = () => {
                             </div>
                           ))}
                           <div
-                            className="p-3 text-center text-blue-600 font-medium cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 border-t"
+                            className="p-3 sticky bottom-0 bg-primary z-30 text-center text-blue-600 font-medium cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 border-t"
                             onClick={() => { setEditingCategory(null); setNewCategoryName(""); setShowAddCategory(true); }}
                           >
                             + Create New Category
