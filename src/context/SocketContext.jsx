@@ -32,24 +32,30 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
     mainSocket.auth = { token: authToken };
     ordersSocket.auth = { token: authToken };
     restaurantSocket.auth = { token: authToken };
-    mainSocket.on("CONNECTION_ESTABLISHED", (data) => console.log("🔌 Connection established", data));
 
+    // Debug only
+    // mainSocket.on("CONNECTION_ESTABLISHED", (data) => console.log("🔌 Connection established", data));
 
-    mainSocket.connect();
-    ordersSocket.connect();
-    restaurantSocket.connect();
+    const connectSockets = () => {
+      if (!mainSocket.connected) mainSocket.connect();
+      if (!ordersSocket.connected) ordersSocket.connect();
+      if (!restaurantSocket.connected) restaurantSocket.connect();
+    };
 
-    console.log("🔌 Connecting sockets...");
+    connectSockets();
+
+    // console.log("🔌 Connecting sockets...");
 
     /* =============================
        2️⃣ Event Handlers
     ============================== */
-    const onConnected = () => console.log("✅ Socket connected");
-
-    const onJoinedRoom = (data) => console.log("🏠 Joined restaurant room:", data);
+    // const onConnected = () => console.log("✅ Socket connected");
+    // const onJoinedRoom = (data) => console.log("🏠 Joined restaurant room:", data);
+    const onConnected = () => { }; // Silence logs
+    const onJoinedRoom = () => { }; // Silence logs
 
     const onNewOrder = (payload) => {
-      console.log("🆕 NEW_ORDER received:", payload);
+      // console.log("🆕 NEW_ORDER received:", payload);
       const orderData = payload?.data || payload;
       if (!orderData?.orderId) return;
 
@@ -127,6 +133,7 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
       ordersSocket.off("connect", onConnected);
       ordersSocket.off("JOINED_RESTAURANT_ROOM", onJoinedRoom);
       ordersSocket.off("NEW_ORDER", onNewOrder);
+      ordersSocket.off("ORDER_STATUS_UPDATED", onOrderStatusUpdated);
 
       mainSocket.disconnect();
       ordersSocket.disconnect();

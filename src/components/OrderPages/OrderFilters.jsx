@@ -26,14 +26,11 @@ const OrderFilters = ({
           options: [
             { value: "all", label: "All Status" },
             { value: "placed", label: "Placed" },
-            { value: "confirmed", label: "Confirmed" },
             { value: "preparing", label: "Preparing" },
-            { value: "on-process", label: "Processing" },
+            { value: "ready", label: "Ready" },
             { value: "assigned", label: "Assigned" },
             { value: "picked", label: "Picked Up" },
             { value: "delivered", label: "Delivered" },
-            { value: "completed", label: "Completed" },
-            { value: "cancelled", label: "Cancelled" },
             { value: "rejected", label: "Rejected" },
           ]
         }

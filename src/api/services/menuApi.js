@@ -85,10 +85,10 @@ export const menuApi = baseApi.injectEndpoints({
             invalidatesTags: ["Categories"],
         }),
 
-        toggleCategory: builder.mutation({
+        deleteCategory: builder.mutation({
             query: (id) => ({
                 url: `admin/cat/${id}`,
-                method: "PUT",
+                method: "DELETE",
                 data: { isActive: false },
             }),
             invalidatesTags: ["Categories"],
@@ -107,7 +107,7 @@ export const {
     useGetCategoriesQuery,
     useAddCategoryMutation,
     useUpdateCategoryMutation,
-    useToggleCategoryMutation,
+    useDeleteCategoryMutation,
     useAddMenuMutation,
     useUpdateMenuStockStatusMutation,
 } = menuApi;

@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Eye,
-  Edit,
   Trash2,
   Mail,
   Download,
   Printer,
   FileText,
   CheckCircle,
+  Edit
 } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import Table from '../../components/ui/Table';
@@ -15,11 +15,18 @@ import Badge from '../../components/ui/Badge';
 import { User, Phone, ShoppingBag } from 'lucide-react';
 import FilterBar from '../../components/ui/UserFilters';
 import PaymentModal from '../../components/Payment/PaymentModal';
+import ConfirmationModal from '../../components/ui/ConfirmationModal';
+import { useGetInvoiceQuery, useDeleteInvoiceMutation } from '../../api/services/invoice';
+import { showSuccessAlert, showErrorAlert } from '../../utils/toastAlert';
 
-const Invoice = () => { 
+const Invoice = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState('view');
   const [selectedInvoice, setSelectedInvoice] = useState(null);
+
+  // Confirmation Modal State
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+  const [invoiceToDelete, setInvoiceToDelete] = useState(null);
 
   const [filterValues, setFilterValues] = useState({
     status: 'all',
@@ -28,78 +35,56 @@ const Invoice = () => {
     search: ''
   });
 
-  const [invoices, setInvoices] = useState([
-    {
-      id: 'INV-001',
-      name: 'John Doe',
-      email: 'john@example.com',
-      phone: '+1 (555) 123-4567',
-      membership: 'premium',
-      totalOrders: 15,
-      status: 'paid',
-      amount: '$299.99',
-      date: '2024-01-15',
-      method: 'Credit Card',
-      invoice: 'INV-001',
-      dueDate: '2024-02-15',
-      currency: 'USD'
-    },
-    {
-      id: 'INV-002',
-      name: 'Jane Smith',
-      email: 'jane@example.com',
-      phone: '+1 (555) 987-6543',
-      membership: 'enterprise',
-      totalOrders: 8,
-      status: 'pending',
-      amount: '$599.99',
-      date: '2024-01-16',
-      method: 'Bank Transfer',
-      invoice: 'INV-002',
-      dueDate: '2024-02-16',
-      currency: 'USD'
-    },
-    {
-      id: 'INV-003',
-      name: 'Bob Wilson',
-      email: 'bob@example.com',
-      phone: '+1 (555) 456-7890',
-      membership: 'basic',
-      totalOrders: 5,
-      status: 'overdue',
-      amount: '$149.99',
-      date: '2023-12-15',
-      method: 'PayPal',
-      invoice: 'INV-003',
-      dueDate: '2024-01-15',
-      currency: 'USD'
-    },
-    {
-      id: 'INV-004',
-      name: 'Alice Johnson',
-      email: 'alice@example.com',
-      phone: '+1 (555) 789-0123',
-      membership: 'premium',
-      totalOrders: 22,
-      status: 'paid',
-      amount: '$899.99',
-      date: '2024-01-10',
-      method: 'Credit Card',
-      invoice: 'INV-004',
-      dueDate: '2024-02-10',
-      currency: 'USD'
+  // API Hooks
+  const { data: invoiceData, isLoading, error } = useGetInvoiceQuery();
+  const [deleteInvoice] = useDeleteInvoiceMutation();
+
+  // Determine the source list of invoices
+  const rawInvoices = useMemo(() => invoiceData?.data || [], [invoiceData]);
+
+  // Derive filtered invoices using useMemo
+  const filteredInvoices = useMemo(() => {
+    let filtered = [...rawInvoices];
+
+    // Filter by status (Payment Status)
+    if (filterValues.status && filterValues.status !== 'all') {
+      filtered = filtered.filter(inv => inv.payment?.status === filterValues.status);
     }
-  ]);
 
-  const [filteredInvoices, setFilteredInvoices] = useState(invoices);
+    // Filter by payment method
+    if (filterValues.method && filterValues.method !== 'all') {
+      filtered = filtered.filter(inv =>
+        inv.payment?.method?.toLowerCase() === filterValues.method.toLowerCase()
+      );
+    }
 
-  // Update filtered invoices when original invoices change
-  React.useEffect(() => {
-    applyFilters(filterValues);
-  }, [invoices]);
+    // Search by customer name or invoice ID
+    if (filterValues.search) {
+      const searchTerm = filterValues.search.toLowerCase();
+      filtered = filtered.filter(inv =>
+        inv.customerDetails?.name?.toLowerCase().includes(searchTerm) ||
+        inv.invoiceNumber?.toLowerCase().includes(searchTerm)
+      );
+    }
+    return filtered;
+  }, [rawInvoices, filterValues]);
+
+  // Map invoice data to PaymentModal format
+  const mapInvoiceToModalData = (inv) => ({
+    id: inv._id,
+    customerName: inv.customerDetails?.name || 'N/A',
+    customerEmail: inv.customerDetails?.email || '',
+    amount: inv.amount?.grandTotal || 0,
+    currency: 'INR',
+    paymentMethod: inv.payment?.method?.toLowerCase() || 'cash',
+    status: inv.payment?.status?.toLowerCase() || 'pending',
+    date: inv.invoiceDate ? new Date(inv.createdAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+    description: `Invoice #${inv.invoiceNumber}`,
+    transactionId: inv.invoiceNumber
+  });
 
   const handleViewInvoice = (invoice) => {
-    setSelectedInvoice(invoice);
+    setSelectedInvoice(mapInvoiceToModalData(invoice));
     setModalMode('view');
     setModalOpen(true);
   };
@@ -111,52 +96,31 @@ const Invoice = () => {
   };
 
   const handleModalSubmit = (data) => {
-    if (modalMode === 'create') {
-      const newInvoice = {
-        ...data,
-        id: `INV-${String(invoices.length + 1).padStart(3, '0')}`,
-        invoice: `INV-${String(invoices.length + 1).padStart(3, '0')}`,
-        name: data.customerName || data.name || 'New Customer',
-        email: data.email || 'customer@example.com',
-        phone: data.phone || '+1 (555) 000-0000',
-        membership: data.membership || 'basic',
-        totalOrders: 1,
-        method: data.method || 'Credit Card',
-        amount: data.amount ? `$${parseFloat(data.amount).toFixed(2)}` : '$0.00',
-        date: data.date || new Date().toISOString().split('T')[0],
-        dueDate: data.dueDate || new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString().split('T')[0],
-        currency: 'USD',
-        status: data.status || 'draft'
-      };
-      setInvoices([...invoices, newInvoice]);
-    } else if (modalMode === 'edit') {
-      setInvoices(invoices.map(inv =>
-        inv.id === data.id ? {
-          ...inv,
-          ...data,
-          name: data.customerName || data.name || inv.name,
-          email: data.email || inv.email
-        } : inv
-      ));
-    }
+    console.log("Modal submit", data);
     setModalOpen(false);
   };
 
-  const handleDeleteInvoice = (id) => {
-    if (window.confirm('Are you sure you want to delete this invoice?')) {
-      setInvoices(invoices.filter(inv => inv.id !== id));
+  const initiateDeleteInvoice = (id) => {
+    setInvoiceToDelete(id);
+    setConfirmModalOpen(true);
+  };
+
+  const confirmDeleteInvoice = async () => {
+    if (!invoiceToDelete) return;
+
+    try {
+      await deleteInvoice(invoiceToDelete).unwrap();
+      showSuccessAlert('Invoice deleted successfully');
+      setConfirmModalOpen(false);
+      setInvoiceToDelete(null);
+    } catch (err) {
+      showErrorAlert('Failed to delete invoice');
+      console.error(err);
     }
   };
 
   const handleSendInvoice = (invoice) => {
-    alert(`Invoice ${invoice.id} sent to ${invoice.email}`);
-  };
-
-  const handleMarkAsPaid = (id) => {
-    setInvoices(invoices.map(inv =>
-      inv.id === id ? { ...inv, status: 'paid' } : inv
-    ));
-    alert(`Invoice ${id} marked as paid`);
+    alert(`Invoice ${invoice.invoiceNumber} sent`);
   };
 
   // Define actions for invoices table
@@ -172,147 +136,42 @@ const Invoice = () => {
       show: true
     },
     {
-      key: 'send',
-      label: 'Send Invoice',
-      icon: Mail,
-      onClick: (invoice) => {
-        handleSendInvoice(invoice);
-      },
-      color: 'purple',
-      show: true
-    },
-    {
-      key: 'mark-paid',
-      label: 'Mark as Paid',
-      icon: CheckCircle,
-      onClick: (invoice) => {
-        if (invoice.status !== 'paid') {
-          handleMarkAsPaid(invoice.id);
-        }
-      },
-      color: 'green',
-      disabled: (invoice) => invoice.status === 'paid',
-      show: true
-    },
-    {
-      key: 'download',
-      label: 'Download PDF',
-      icon: Download,
-      onClick: (invoice) => {
-        alert(`Downloading invoice ${invoice.id} as PDF`);
-      },
-      color: 'emerald',
-      show: false
-    },
-    {
-      key: 'print',
-      label: 'Print',
-      icon: Printer,
-      onClick: (invoice) => {
-        alert(`Printing invoice ${invoice.id}`);
-      },
-      color: 'cyan',
-      show: false
-    },
-    {
-      key: 'edit',
-      label: 'Edit',
-      icon: Edit,
-      onClick: (invoice) => {
-        setSelectedInvoice(invoice);
-        setModalMode('edit');
-        setModalOpen(true);
-      },
-      color: 'yellow',
-      show: false
-    },
-    {
       key: 'delete',
       label: 'Delete',
       icon: Trash2,
       onClick: (invoice) => {
-        handleDeleteInvoice(invoice.id);
+        initiateDeleteInvoice(invoice._id);
       },
       color: 'rose',
-      show: false
+      show: true
     }
   ];
 
-  // Handle filter changes
-  const applyFilters = (filters) => {
-    let filtered = [...invoices];
-
-    // Filter by status
-    if (filters.status && filters.status !== 'all') {
-      filtered = filtered.filter(inv => inv.status === filters.status);
-    }
-
-    // Filter by membership type
-    if (filters.membership && filters.membership !== 'all') {
-      filtered = filtered.filter(inv => inv.membership === filters.membership);
-    }
-
-    // Filter by payment method
-    if (filters.method && filters.method !== 'all') {
-      filtered = filtered.filter(inv =>
-        inv.method.toLowerCase() === filters.method.toLowerCase()
-      );
-    }
-
-    // Search by customer name, email, or invoice ID
-    if (filters.search) {
-      const searchTerm = filters.search.toLowerCase();
-      filtered = filtered.filter(inv =>
-        inv.name.toLowerCase().includes(searchTerm) ||
-        inv.email.toLowerCase().includes(searchTerm) ||
-        inv.id.toLowerCase().includes(searchTerm)
-      );
-    }
-
-    setFilteredInvoices(filtered);
-  };
-
   const onFilterChange = (key, value) => {
-    const newFilters = { ...filterValues, [key]: value };
-    setFilterValues(newFilters);
-    applyFilters(newFilters);
+    setFilterValues(prev => ({ ...prev, [key]: value }));
   };
 
   const handleClearFilters = () => {
-    const defaultFilters = {
+    setFilterValues({
       status: 'all',
       membership: 'all',
       method: 'all',
       search: ''
-    };
-    setFilterValues(defaultFilters);
-    applyFilters(defaultFilters);
-  };
-
-  // Handle status toggle
-  const handleToggleStatus = (id) => {
-    const statusMap = {
-      'draft': 'pending',
-      'pending': 'paid',
-      'paid': 'overdue',
-      'overdue': 'draft'
-    };
-
-    setInvoices(invoices.map(invoice =>
-      invoice.id === id
-        ? {
-          ...invoice,
-          status: statusMap[invoice.status] || 'draft'
-        }
-        : invoice
-    ));
+    });
   };
 
   // Calculate summary stats
   const totalAmount = filteredInvoices.reduce((sum, inv) => {
-    const amount = parseFloat(inv.amount?.replace('$', '') || 0);
-    return sum + amount;
+    return sum + (inv.amount?.grandTotal || 0);
   }, 0);
+
+  if (isLoading) {
+    return <div className="p-8 text-center">Loading invoices...</div>;
+  }
+
+  if (error) {
+    return <div className="p-8 text-center text-red-500">Error loading invoices</div>;
+  }
 
   return (
     <div className="min-h-screen page space-y-8">
@@ -341,7 +200,7 @@ const Invoice = () => {
         <FilterBar
           search={{
             value: filterValues.search,
-            placeholder: "Search by name, email or invoice ID...",
+            placeholder: "Search by name, invoice ID...",
             onChange: (val) => onFilterChange('search', val)
           }}
           filters={[
@@ -350,20 +209,9 @@ const Invoice = () => {
               value: filterValues.status,
               options: [
                 { value: 'all', label: 'All Status' },
-                { value: 'paid', label: 'Paid' },
-                { value: 'pending', label: 'Pending' },
-                { value: 'overdue', label: 'Overdue' },
-                { value: 'draft', label: 'Draft' }
-              ]
-            },
-            {
-              key: 'membership',
-              value: filterValues.membership,
-              options: [
-                { value: 'all', label: 'All Memberships' },
-                { value: 'premium', label: 'Premium' },
-                { value: 'enterprise', label: 'Enterprise' },
-                { value: 'basic', label: 'Basic' }
+                { value: 'PAID', label: 'Paid' },
+                { value: 'PENDING', label: 'Pending' },
+                { value: 'FAILED', label: 'Failed' }
               ]
             },
             {
@@ -371,9 +219,9 @@ const Invoice = () => {
               value: filterValues.method,
               options: [
                 { value: 'all', label: 'All Methods' },
-                { value: 'Credit Card', label: 'Credit Card' },
-                { value: 'PayPal', label: 'PayPal' },
-                { value: 'Bank Transfer', label: 'Bank Transfer' }
+                { value: 'UPI', label: 'UPI' },
+                { value: 'CASH', label: 'Cash' },
+                { value: 'CARD', label: 'Card' }
               ]
             }
           ]}
@@ -387,7 +235,7 @@ const Invoice = () => {
         <div className="p-4 border-b border-gray-100 dark:border-gray-700">
           <h2 className="text-xl font-bold text-gray-900 dark:text-white">All Invoices</h2>
           <p className="text-gray-600 dark:text-gray-400 text-sm">
-            Showing {filteredInvoices.length} invoices • Total: ${totalAmount.toFixed(2)}
+            Showing {filteredInvoices.length} invoices • Total: ₹{totalAmount.toFixed(2)}
           </p>
         </div>
         <div className="p-4">
@@ -403,10 +251,8 @@ const Invoice = () => {
                       <User className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <p className="font-medium text-gray-900 dark:text-white">{invoice.name}</p>
-                      {invoice.invoice && (
-                        <p className="text-xs text-gray-500">#{invoice.invoice}</p>
-                      )}
+                      <p className="font-medium text-gray-900 dark:text-white">{invoice.customerDetails?.name || 'N/A'}</p>
+                      <p className="text-xs text-gray-500">#{invoice.invoiceNumber}</p>
                     </div>
                   </div>
                 ),
@@ -416,7 +262,7 @@ const Invoice = () => {
                 key: "amount",
                 render: (invoice) => (
                   <span className="font-semibold text-gray-900 dark:text-white">
-                    {invoice.amount}
+                    ₹{invoice.amount?.grandTotal || 0}
                   </span>
                 ),
               },
@@ -425,52 +271,33 @@ const Invoice = () => {
                 key: "date",
                 render: (invoice) => (
                   <span className="text-sm text-gray-500 dark:text-gray-400">
-                    {new Date(invoice.date).toLocaleDateString()}
+                    {invoice.createdAt ? new Date(invoice.createdAt).toLocaleDateString() : 'N/A'}
                   </span>
                 ),
               },
               {
                 header: "Method",
                 key: "method",
-                render: (invoice) => <Badge>{invoice.method}</Badge>,
+                render: (invoice) => <Badge>{invoice.payment?.method || 'N/A'}</Badge>,
               },
               {
                 header: "Contact",
                 key: "contact",
                 render: (invoice) => (
                   <div className="space-y-1">
-                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-                      <Mail className="w-4 h-4 text-blue-500" />
-                      {invoice.email}
-                    </div>
-                    {invoice.phone && (
+                    {invoice.customerDetails?.phone && (
                       <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
                         <Phone className="w-4 h-4 text-green-500" />
-                        {invoice.phone}
+                        {invoice.customerDetails.phone}
                       </div>
                     )}
                   </div>
                 ),
               },
               {
-                header: "Membership",
-                key: "membership",
-                render: (invoice) => <Badge>{invoice.membership}</Badge>,
-              },
-              {
-                header: "Stats",
-                key: "stats",
-                render: (invoice) => (
-                  <div className="flex items-center gap-2">
-                    <ShoppingBag className="w-4 h-4 text-pink-600" />
-                    <span className="font-medium">{invoice.totalOrders || 0} orders</span>
-                  </div>
-                ),
-              },
-              {
                 header: "Status",
                 key: "status",
-                render: (invoice) => <Badge>{invoice.status}</Badge>,
+                render: (invoice) => <Badge>{invoice.payment?.status || 'PENDING'}</Badge>,
               },
             ]}
             actions={invoiceActions}
@@ -486,6 +313,18 @@ const Invoice = () => {
         onSubmit={handleModalSubmit}
         paymentData={selectedInvoice}
         mode={modalMode}
+      />
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={confirmModalOpen}
+        onClose={() => setConfirmModalOpen(false)}
+        onConfirm={confirmDeleteInvoice}
+        title="Delete Invoice"
+        message="Are you sure you want to delete this invoice? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        isDangerous={true}
       />
     </div>
   );

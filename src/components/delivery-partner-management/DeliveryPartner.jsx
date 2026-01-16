@@ -51,7 +51,7 @@ const DeliveryPartner = ({ partners, onViewDetails, onEdit, viewMode = 'grid' })
                 {/* Partner Info */}
                 <div className="md:col-span-3 flex items-center gap-3 min-w-0">
                   <img
-                    src={`https://resto-grandma.onrender.com/uploads/logo/1767686592739.jpg`}
+                    src={`${import.meta.env.VITE_SOCKET_URL}/uploads/logo/1767686592739.jpg`}
                     className="w-11 h-11 rounded-xl object-cover border border-gray-200 dark:border-gray-700"
                     alt={registrationData?.name}
                   />
@@ -159,7 +159,7 @@ const DeliveryPartner = ({ partners, onViewDetails, onEdit, viewMode = 'grid' })
                   <img
                     src={
                       registrationData?.image ||
-                      `https://resto-grandma.onrender.com/api/v1/admin/uploads/logo/1767686592739.jpg`
+                      `${import.meta.env.VITE_API_URL}admin/uploads/logo/1767686592739.jpg`
                     }
                     className="w-16 h-16 rounded-2xl object-cover border-4 border-white dark:border-gray-800 shadow-lg bg-white dark:bg-gray-700"
                     alt={registrationData?.name}

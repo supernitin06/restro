@@ -14,8 +14,8 @@ import {
   useGetCategoriesQuery,
   useAddCategoryMutation,
   useUpdateCategoryMutation,
-  useToggleCategoryMutation,
   useAddMenuMutation,
+  useDeleteCategoryMutation
 } from "../../api/services/menuApi";
 
 //  const params = useParams();
@@ -62,7 +62,7 @@ const AddMenuItem = () => {
 
   const [addCategory] = useAddCategoryMutation();
   const [updateCategory] = useUpdateCategoryMutation();
-  const [toggleCategory] = useToggleCategoryMutation();
+  const [deleteCategory] = useDeleteCategoryMutation();
   const [addMenu] = useAddMenuMutation();
 
   const categories = categoriesData?.data || [];
@@ -233,7 +233,7 @@ const AddMenuItem = () => {
     if (!window.confirm("Delete this category?")) return;
     try {
       await showPromiseToast(
-        toggleCategory(id).unwrap(),
+        deleteCategory(id).unwrap(),
         {
           loading: 'Deleting category...',
           success: 'Category deleted!',

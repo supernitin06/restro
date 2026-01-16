@@ -12,12 +12,7 @@ const OrderCard = ({ order, onDelete, onEdit, onUpdateStatus, viewMode }) => {
   const [showDetails, setShowDetails] = useState(false);
 
   const statusConfig = {
-    COMPLETED: {
-      bg: 'bg-green-100 dark:bg-green-900/30',
-      text: 'text-green-700 dark:text-green-400',
-      icon: CheckCircle,
-      label: 'Completed'
-    },
+  
     DELIVERED: {
       bg: 'bg-green-100 dark:bg-green-900/30',
       text: 'text-green-700 dark:text-green-400',
@@ -36,24 +31,14 @@ const OrderCard = ({ order, onDelete, onEdit, onUpdateStatus, viewMode }) => {
       icon: XCircle,
       label: 'Rejected'
     },
-    'ON-PROCESS': { // Fallback/default
-      bg: 'bg-blue-100 dark:bg-blue-900/30',
-      text: 'text-blue-700 dark:text-blue-400',
-      icon: Clock,
-      label: 'Processing'
-    },
+    
     PREPARING: {
       bg: 'bg-blue-100 dark:bg-blue-900/30',
       text: 'text-blue-700 dark:text-blue-400',
       icon: Clock,
       label: 'Preparing'
     },
-    CONFIRMED: {
-      bg: 'bg-cyan-100 dark:bg-cyan-900/30',
-      text: 'text-cyan-700 dark:text-cyan-400',
-      icon: CheckCircle,
-      label: 'Confirmed'
-    },
+   
     PLACED: {
       bg: 'bg-orange-100 dark:bg-orange-900/30',
       text: 'text-orange-700 dark:text-orange-400',

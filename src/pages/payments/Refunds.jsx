@@ -1,25 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Eye,
-  Edit,
-  Trash2,
-  CheckCircle,
-  XCircle,
   RefreshCw,
   Download,
-  Mail
 } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import Table from '../../components/ui/Table';
 import Badge from '../../components/ui/Badge';
-import { User, Phone, ShoppingBag } from 'lucide-react';
 import PaymentModal from '../../components/Payment/PaymentModal';
-import refundsData from '../../assets/json/PaymentData/refunds.json';
 import { useNavigate } from 'react-router-dom';
+import { useGetRefundPaymentsQuery } from '../../api/services/payments';
+
 const Refunds = () => {
   const navigate = useNavigate();
-  const [refunds, setRefunds] = useState(refundsData);
-  const [filteredRefunds, setFilteredRefunds] = useState(refundsData);
+  const { data: refundResponse, isLoading: refundLoading } = useGetRefundPaymentsQuery();
+
+  // Memoize raw data to prevent unnecessary re-computations
+  const rawRefunds = useMemo(() => refundResponse?.data || [], [refundResponse]);
+
   const [selectedRefund, setSelectedRefund] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState('view');
@@ -38,33 +36,37 @@ const Refunds = () => {
   };
 
   const handleModalSubmit = (data) => {
-    if (modalMode === 'create') {
-      const newRefund = {
-        ...data,
-        id: `REF-${String(refunds.length + 1).padStart(3, '0')}`,
-        date: new Date().toISOString().split('T')[0],
-        refundDate: new Date().toISOString().split('T')[0],
-        name: data.customerName || data.name,
-        email: data.email || 'customer@example.com',
-        phone: data.phone || '+1 (555) 000-0000',
-        membership: 'basic',
-        totalOrders: 1,
-        method: data.method || 'Credit Card',
-        invoice: `INV-${String(refunds.length + 100).padStart(3, '0')}`,
-        transactionId: data.transactionId || `TXN-${String(refunds.length + 100).padStart(3, '0')}`
-      };
-      const updatedRefunds = [...refunds, newRefund];
-      setRefunds(updatedRefunds);
-      setFilteredRefunds(updatedRefunds);
-    } else if (modalMode === 'edit' && selectedRefund) {
-      const updatedRefunds = refunds.map(r =>
-        r.id === selectedRefund.id ? { ...r, ...data } : r
-      );
-      setRefunds(updatedRefunds);
-      setFilteredRefunds(updatedRefunds);
-    }
+    console.log("Submit", data);
     setIsModalOpen(false);
   };
+
+  // Derive filtered refunds
+  const filteredRefunds = useMemo(() => {
+    let filtered = [...rawRefunds];
+
+    // Filter by status
+    if (filterValues.status && filterValues.status !== 'all') {
+      filtered = filtered.filter(r => r.status?.toUpperCase() === filterValues.status.toUpperCase());
+    }
+
+    // Filter by refund method
+    if (filterValues.method && filterValues.method !== 'all') {
+      filtered = filtered.filter(r =>
+        (r.refundMethod || r.method || '').toLowerCase().includes(filterValues.method.toLowerCase())
+      );
+    }
+
+    // Search
+    if (filterValues.search) {
+      const searchTerm = filterValues.search.toLowerCase();
+      filtered = filtered.filter(r =>
+        (r.userId?.name || r.name || '').toLowerCase().includes(searchTerm) ||
+        (r.reason || '').toLowerCase().includes(searchTerm) ||
+        (r._id || '').toLowerCase().includes(searchTerm)
+      );
+    }
+    return filtered;
+  }, [rawRefunds, filterValues]);
 
   // Define actions for refunds table
   const refundActions = [
@@ -73,7 +75,12 @@ const Refunds = () => {
       label: 'View Details',
       icon: Eye,
       onClick: (refund) => {
-        setSelectedRefund(refund);
+        setSelectedRefund({
+          ...refund,
+          customerName: refund.userId?.name || refund.name,
+          amount: refund.amount?.payable || refund.amount,
+          // Map other fields as needed for modal
+        });
         setModalMode('view');
         setIsModalOpen(true);
       },
@@ -81,153 +88,40 @@ const Refunds = () => {
       show: true
     },
     {
-      key: 'approve',
-      label: 'Approve Refund',
-      icon: CheckCircle,
-      onClick: (refund) => {
-        if (refund.status !== 'completed') {
-          const updatedRefunds = refunds.map(r =>
-            r.id === refund.id ? { ...r, status: 'completed' } : r
-          );
-          setRefunds(updatedRefunds);
-          setFilteredRefunds(updatedRefunds);
-          alert(`Refund ${refund.id} approved`);
-        }
-      },
-      color: 'green',
-      disabled: (refund) => refund.status === 'completed',
-      show: true
-    },
-    {
       key: 'download',
       label: 'Download Details',
       icon: Download,
-      onClick: (refund) => {
-        alert(`Downloading refund details for ${refund.id}`);
-      },
+      onClick: () => alert('Download feature coming soon'),
       color: 'emerald',
       show: true
-    },
-    {
-      key: 'edit',
-      label: 'Edit',
-      icon: Edit,
-      onClick: (refund) => {
-        setSelectedRefund(refund);
-        setModalMode('edit');
-        setIsModalOpen(true);
-      },
-      color: 'yellow',
-      show: false
-    },
-    {
-      key: 'reject',
-      label: 'Reject Refund',
-      icon: XCircle,
-      onClick: (refund) => {
-        if (window.confirm(`Reject refund ${refund.id}?`)) {
-          const updatedRefunds = refunds.map(r =>
-            r.id === refund.id ? { ...r, status: 'failed' } : r
-          );
-          setRefunds(updatedRefunds);
-          setFilteredRefunds(updatedRefunds);
-        }
-      },
-      color: 'red',
-      disabled: (refund) => refund.status === 'failed',
-      show: false
-    },
-    {
-      key: 'delete',
-      label: 'Delete',
-      icon: Trash2,
-      onClick: (refund) => {
-        if (confirm(`Delete refund ${refund.id}?`)) {
-          const updatedRefunds = refunds.filter(r => r.id !== refund.id);
-          setRefunds(updatedRefunds);
-          setFilteredRefunds(updatedRefunds);
-        }
-      },
-      color: 'rose',
-      show: false
     }
   ];
 
-  // Handle filter changes
-  const applyFilters = (filters) => {
-    let filtered = [...refunds];
-
-    // Filter by status
-    if (filters.status && filters.status !== 'all') {
-      filtered = filtered.filter(r => r.status === filters.status);
-    }
-
-    // Filter by membership type
-    if (filters.membership && filters.membership !== 'all') {
-      filtered = filtered.filter(r => r.membership === filters.membership);
-    }
-
-    // Filter by refund method
-    if (filters.method && filters.method !== 'all') {
-      filtered = filtered.filter(r =>
-        r.refundMethod?.toLowerCase().includes(filters.method.toLowerCase()) ||
-        r.method.toLowerCase() === filters.method.toLowerCase()
-      );
-    }
-
-    // Search
-    if (filters.search) {
-      const searchTerm = filters.search.toLowerCase();
-      filtered = filtered.filter(r =>
-        r.name.toLowerCase().includes(searchTerm) ||
-        r.email.toLowerCase().includes(searchTerm) ||
-        r.id.toLowerCase().includes(searchTerm)
-      );
-    }
-
-    setFilteredRefunds(filtered);
-  };
-
   const onFilterChange = (key, value) => {
-    const newFilters = { ...filterValues, [key]: value };
-    setFilterValues(newFilters);
-    applyFilters(newFilters);
+    setFilterValues(prev => ({ ...prev, [key]: value }));
   };
 
   const handleClearFilters = () => {
-    const defaultFilters = {
+    setFilterValues({
       status: 'all',
       membership: 'all',
       method: 'all',
       search: ''
-    };
-    setFilterValues(defaultFilters);
-    applyFilters(defaultFilters);
+    });
   };
 
-  // Handle status toggle
-  const handleToggleStatus = (id) => {
-    const updatedRefunds = refunds.map(refund =>
-      refund.id === id
-        ? {
-          ...refund,
-          status: refund.status === 'completed' ? 'pending' : 'completed'
-        }
-        : refund
-    );
-
-    setRefunds(updatedRefunds);
-    setFilteredRefunds(updatedRefunds);
-  };
-
-  // Calculate total amount
+  // Calculate stats
   const totalAmount = filteredRefunds.reduce((sum, r) => {
-    const amount = parseFloat(r.amount?.replace('$', '') || 0);
-    return sum + amount;
+    const val = typeof r.amount === 'object' ? (r.amount.payable || r.amount.total || 0) : (r.amount || 0);
+    return sum + Number(val);
   }, 0);
 
-  const completedRefunds = filteredRefunds.filter(r => r.status === 'completed').length;
-  const pendingRefunds = filteredRefunds.filter(r => r.status === 'pending').length;
+  const completedRefunds = filteredRefunds.filter(r => r.status === 'COMPLETED').length;
+  const pendingRefunds = filteredRefunds.filter(r => r.status === 'PENDING').length;
+
+  if (refundLoading) {
+    return <div className="p-8 text-center">Loading refunds...</div>;
+  }
 
   return (
     <div className="min-h-screen page space-y-8">
@@ -251,22 +145,16 @@ const Refunds = () => {
         </Button>
       </div>
 
-      {/* Filter Bar */}
-
-
       {/* Refunds Table */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 cursor-pointer">
         {filteredRefunds.length === 0 ? (
           <div className="text-center py-8">
             <p className="text-gray-500 dark:text-gray-400">No refunds found.</p>
-            <p className="text-gray-500 dark:text-gray-400 text-sm mt-2">
-              Total refunds in system: {refunds.length}
-            </p>
           </div>
         ) : (
           <>
             <div className="text-gray-600 dark:text-gray-400 text-sm mb-4">
-              Showing {filteredRefunds.length} of {refunds.length} refunds
+              Showing {filteredRefunds.length} of {rawRefunds.length} refunds • Total: ₹{totalAmount.toFixed(2)}
             </div>
             <Table
               data={filteredRefunds}
@@ -280,9 +168,11 @@ const Refunds = () => {
                         <User className="w-5 h-5 text-white" />
                       </div>
                       <div>
-                        <p className="font-medium text-gray-900 dark:text-white">{refund.name || refund.customerName}</p>
-                        {refund.invoice && (
-                          <p className="text-xs text-gray-500">#{refund.invoice}</p>
+                        <p className="font-medium text-gray-900 dark:text-white">
+                          {refund.userId?.name || refund.name || 'N/A'}
+                        </p>
+                        {refund.orderId && (
+                          <p className="text-xs text-gray-500">Ord: {refund.orderId?.orderId || refund.orderId}</p>
                         )}
                       </div>
                     </div>
@@ -293,7 +183,7 @@ const Refunds = () => {
                   key: "amount",
                   render: (refund) => (
                     <span className="font-semibold text-gray-900 dark:text-white">
-                      {refund.amount}
+                      ₹{typeof refund.amount === 'object' ? (refund.amount.payable || 0).toFixed(2) : Number(refund.amount || 0).toFixed(2)}
                     </span>
                   ),
                 },
@@ -302,52 +192,26 @@ const Refunds = () => {
                   key: "date",
                   render: (refund) => (
                     <span className="text-sm text-gray-500 dark:text-gray-400">
-                      {new Date(refund.date || refund.refundDate).toLocaleDateString()}
+                      {new Date(refund.createdAt || refund.date).toLocaleDateString()}
                     </span>
                   ),
                 },
                 {
                   header: "Method",
                   key: "method",
-                  render: (refund) => <Badge>{refund.method || refund.refundMethod}</Badge>,
-                },
-                {
-                  header: "Contact",
-                  key: "contact",
-                  render: (refund) => (
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-                        <Mail className="w-4 h-4 text-blue-500" />
-                        {refund.email}
-                      </div>
-                      {refund.phone && (
-                        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-                          <Phone className="w-4 h-4 text-green-500" />
-                          {refund.phone}
-                        </div>
-                      )}
-                    </div>
-                  ),
-                },
-                {
-                  header: "Membership",
-                  key: "membership",
-                  render: (refund) => <Badge>{refund.membership}</Badge>,
-                },
-                {
-                  header: "Stats",
-                  key: "stats",
-                  render: (refund) => (
-                    <div className="flex items-center gap-2">
-                      <ShoppingBag className="w-4 h-4 text-pink-600" />
-                      <span className="font-medium">{refund.totalOrders || 0} orders</span>
-                    </div>
-                  ),
+                  render: (refund) => <Badge>{refund.refundMethod || refund.method || 'N/A'}</Badge>,
                 },
                 {
                   header: "Status",
                   key: "status",
-                  render: (refund) => <Badge>{refund.status}</Badge>,
+                  render: (refund) => (
+                    <Badge variant={
+                      refund.status === 'COMPLETED' ? 'success' :
+                        refund.status === 'PENDING' ? 'warning' : 'danger'
+                    }>
+                      {refund.status || 'PENDING'}
+                    </Badge>
+                  ),
                 },
               ]}
               actions={refundActions}

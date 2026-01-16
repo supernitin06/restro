@@ -3,6 +3,15 @@ import { baseApi } from "./baseApi";
 
 const dashboardApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
+        getdashboardStats : builder.query({
+            query : () => ({
+                url : `admin/dashboard/stats`,
+                method : "GET",
+            }),
+            providesTags : ["Dashboard"]
+        }),
+
+
         getAnalytics: builder.query({
             query: ({ params }) => ({
                 url: `admin/dashboard/analytics?period=${params}`,
@@ -28,7 +37,9 @@ const dashboardApi = baseApi.injectEndpoints({
             providesTags: ["Dashboard"],
         }),
 
+
+
     })
 })
 
-export const { useGetAnalyticsQuery, useGetDashboardOrdersQuery, useGetOdersaleQuery } = dashboardApi;
+export const { useGetAnalyticsQuery, useGetDashboardOrdersQuery, useGetOdersaleQuery, useGetdashboardStatsQuery } = dashboardApi;

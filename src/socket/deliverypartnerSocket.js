@@ -1,7 +1,7 @@
 // src/sockets/ordersSocket.js
 import { io } from "socket.io-client";
 
-export const ordersSocket = io("https://resto-grandma.onrender.com/delivery-partner", {
+export const ordersSocket = io(`${import.meta.env.VITE_SOCKET_URL}/delivery-partner`, {
   autoConnect: false,
   transports: ["websocket"],
   reconnection: true,

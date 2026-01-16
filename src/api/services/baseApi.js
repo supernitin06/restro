@@ -4,7 +4,7 @@ import { logout } from "../services/authSlice";
 
 /* ---------------- AXIOS INSTANCE ---------------- */
 const axiosInstance = axios.create({
-  baseURL: "https://resto-grandma.onrender.com/api/v1/",
+  baseURL: import.meta.env.VITE_API_URL,
   // baseURL: "http://192.168.1.108:5004/api/v1/",
 
   headers: {
@@ -57,4 +57,5 @@ export const baseApi = createApi({
   baseQuery: axiosBaseQuery(),
   tagTypes: ["Auth", "User", "Order", "Menu", "Category", "Dashboard", "Restaurant", "DeliveryPartner", "Banner"],
   endpoints: () => ({}),
+  refetchOnMountOrArgChange: true,
 });

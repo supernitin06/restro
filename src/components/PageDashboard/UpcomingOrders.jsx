@@ -11,7 +11,7 @@ const UpcomingOrders = ({ title, orders, icon: Icon, color }) => {
     const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
 
     // API Mutation
-    const [updateOrderStatus] = useUpdateOrderStatusMutation();
+    const [updateOrderStatus] = useUpdateOrderStatusMutation({refetchOnMountOrArgChange: true});
     const navigate = useNavigate();
 
     const colorClasses = {

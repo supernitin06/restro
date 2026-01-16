@@ -20,9 +20,9 @@ const RestaurantCard = ({
   // Helper to construct image URL
   const getImageUrl = (logo) => {
     if (!logo) return "https://placehold.co/600x400?text=No+Logo";
-    if (logo.startsWith("http")) return logo;
+    if (logo.startsWith("https")) return logo;
     // Serve from the production 'uploads' directory
-    return `https://resto-grandma.onrender.com/uploads/${logo}`;
+    return `${import.meta.env.VITE_SOCKET_URL}/uploads/${logo}`;
   };
 
   return (

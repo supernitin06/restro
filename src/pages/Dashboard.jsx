@@ -7,15 +7,13 @@ import RevenueChart from "../components/PageDashboard/RevenueChart";
 import TopCategories from "../components/PageDashboard/TopCategories";
 import OrdersOverview from "../components/PageDashboard/OrdersOverview";
 import OrderTypes from "../components/PageDashboard/OrderTypes";
-import RecentOrders from "../components/PageDashboard/RecentOrders";
-import TrendingMenu from "../components/PageDashboard/TrendingMenu";
 import CustomerReviews from "../components/PageDashboard/CustomerReviews";
 import RecentActivity from "../components/PageDashboard/RecentActivity";
 import Footer from "../components/PageDashboard/Footer";
 import UpcomingOrders from "../components/PageDashboard/UpcomingOrders";
 import ConfirmedOrders from "../components/PageDashboard/ConfirmedOrders";
 import { useGetOrdersQuery } from "../api/services/orderApi";
-import { format } from "date-fns"; // Ensure date-fns is installed or use native
+import { useGetdashboardStatsQuery } from "../api/services/dashboard";
 
 const Dashboard = () => {
   const [filterType, setFilterType] = React.useState('Month');
@@ -36,7 +34,7 @@ const Dashboard = () => {
   const { data: acceptedData } = useGetOrdersQuery({ status: "ACCEPTED" }, { pollingInterval: 30000 });
   const { data: readyData } = useGetOrdersQuery({ status: "READY" }, { pollingInterval: 30000 });
   const { data: recentData, isLoading: recentLoading } = useGetOrdersQuery({ page: 1, limit: 5 }, { pollingInterval: 30000 });
-
+  const { data: statsData } = useGetdashboardStatsQuery({ pollingInterval: 30000 });
 
 
   const transformOrder = (order) => ({
@@ -104,7 +102,7 @@ const Dashboard = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <StatCard
               title="Total Orders"
-              value="0"
+              value={statsData?.data?.totalOrders || 0}
               icon={ShoppingBag}
               trend="up"
               trendValue="+14%"
@@ -112,23 +110,23 @@ const Dashboard = () => {
             />
             <StatCard
               title="Total Customers"
-              value="0"
+              value={statsData?.data?.totalCustomers || 0}
               icon={Users}
               trend="up"
               trendValue="+8.5%"
               color="blue"
             />
             <StatCard
-              title="Total Reviews"
-              value="0"
+              title="Total Cancelled"
+              value={statsData?.data?.totalCancelled || 0}
               icon={Star}
-              trend="up"
-              trendValue="+3.8%"
+              trend="down"
+              trendValue="-2.5%"
               color="yellow"
             />
             <StatCard
               title="Total Revenue"
-              value="0"
+              value={`₹${statsData?.data?.totalRevenue || 0}`}
               icon={DollarSign}
               trend="up"
               trendValue="+12.5%"
@@ -173,7 +171,7 @@ const Dashboard = () => {
         </section>
 
         {/* ================= RECENT ORDERS ================= */}
-  
+
 
         {/* ================= REVIEWS & ACTIVITY ================= */}
         <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
