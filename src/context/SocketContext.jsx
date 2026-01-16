@@ -79,9 +79,9 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
     restaurantSocket.on("disconnect", onRestDisconnect);
     restaurantSocket.on("connect_error", onRestError);
 
-    const onJoinedRoom = () => {
+    const onJoinedRoom = (data) => {
 
-      console.log("🏠 Joined restaurant room");
+      console.log("🏠 Joined restaurant room", data);
      }; // Silence logs
 
     const onNewOrder = (payload) => {
