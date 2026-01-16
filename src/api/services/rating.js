@@ -4,10 +4,9 @@ export const ratingApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
         // ================= RATING =================
         getRatings: builder.query({
-            query: (restaurantId) => ({
+            query: () => ({
                 url: "rating",
                 method: "GET",
-                params: { restaurantId },
             }),
             providesTags: ["Rating"],
         }),
