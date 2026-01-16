@@ -4,23 +4,26 @@ import { useSockets } from "../../context/SocketContext";
 import { useNavigate } from "react-router-dom";
 import {
   useGetOrdersQuery,
-  useUpdateOrderStatusMutation,
   useUpdateKitchenStatusMutation,
+  useUpdateOrderStatusMutation,
 } from "../../api/services/orderApi";
 import { showSuccessAlert, showErrorAlert } from "../../utils/toastAlert";
+import Pagination from "../../components/ui/Pagination";
 
 const AcceptedOrders = () => {
   const { ordersSocket } = useSockets();
   const navigate = useNavigate();
 
-  const { data, refetch } = useGetOrdersQuery({ status: "ACCEPTED" });
+  const { data, refetch } = useGetOrdersQuery({
+   
+    refetchOnMountOrArgChange: true,
+  });
   const allOrders = data?.data || [];
-  const orders = allOrders.filter(order =>
-    (order.status === "ACCEPTED" && order.kitchenStatus !== "READY") ||
-    order.status === "REJECTED"
+  const orders = allOrders.filter(
+    (order) =>
+      order.status === "ACCEPTED" || order.status === "PREPARING"
   );
   console.log("ORDERS:", orders);
-
 
   const [updateKitchenStatus] = useUpdateKitchenStatusMutation();
   const [updateOrderStatus] = useUpdateOrderStatusMutation();
@@ -28,6 +31,15 @@ const AcceptedOrders = () => {
   const [loadingId, setLoadingId] = useState(null);
   const [rejectingOrderId, setRejectingOrderId] = useState(null);
   const [rejectReason, setRejectReason] = useState("");
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 9;
+
+  const totalPages = Math.ceil(orders.length / itemsPerPage);
+  const currentOrders = orders.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   // 🔌 Socket: refresh
   useEffect(() => {
@@ -46,6 +58,33 @@ const AcceptedOrders = () => {
     };
   }, [ordersSocket, refetch]);
 
+
+  const handlePrepare = async (orderId) => {
+
+     try {
+      setLoadingId(orderId);
+
+      await updateKitchenStatus({
+        orderId: orderId,
+        status: "PREPARING",
+      }).unwrap();
+
+      showSuccessAlert("Order moved to Processing!");
+      refetch();
+
+    // Move to Processing page
+    } catch (err) {
+      console.error("READY ERROR:", err);
+      showErrorAlert("Failed to update kitchen status");
+    } finally {
+      setLoadingId(null);
+    }
+
+  };
+
+
+
+  
   // ✅ Ready → move to Processing page
   const handleReady = async (orderId) => {
     try {
@@ -55,7 +94,6 @@ const AcceptedOrders = () => {
         orderId: orderId,
         status: "READY",
       }).unwrap();
-
 
       showSuccessAlert("Order moved to Processing!");
       refetch();
@@ -72,7 +110,11 @@ const AcceptedOrders = () => {
   const handleReject = async (orderId, reason) => {
     try {
       setLoadingId(orderId);
-      await updateOrderStatus({ id: orderId, status: "REJECTED", message: reason }).unwrap();
+      await updateOrderStatus({
+        id: orderId,
+        status: "REJECTED",
+        message: reason,
+      }).unwrap();
       showSuccessAlert("Order Rejected and customer notified");
       refetch();
       setRejectingOrderId(null);
@@ -92,11 +134,13 @@ const AcceptedOrders = () => {
       </h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        {orders.map((order) => (
+        {currentOrders.map((order) => (
           <OrderCard
             key={order.orderId}
             order={order}
-            isProcessing={loadingId === order.orderId}
+            onPrepare={() => handlePrepare(order.orderId)}
+            isButtonVisible={true} // show footer buttons
+          
             onReady={() => handleReady(order.orderId)}
             onReject={() => handleReject(order.orderId)}
           />
@@ -108,6 +152,16 @@ const AcceptedOrders = () => {
           </div>
         )}
       </div>
+
+      {orders.length > itemsPerPage && (
+        <div className="mt-8 flex justify-center">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+        </div>
+      )}
     </div>
   );
 };

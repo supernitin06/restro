@@ -10,6 +10,10 @@ const SettingsTabs = ({ activeTab, setActiveTab }) => {
     { key: "menu", label: "Menu" },
     { key: "orders", label: "Orders" },
     { key: "payments", label: "Payments" },
+
+    // ✅ NEW BANNER TAB
+    { key: "banners", label: "Banners" },
+
     { key: "delivery", label: "Delivery" },
     { key: "tax", label: "Tax" },
     { key: "users", label: "Users" },
@@ -22,7 +26,7 @@ const SettingsTabs = ({ activeTab, setActiveTab }) => {
   );
 
   return (
-    <div className="card ">
+    <div className="card">
       {/* Search Input */}
       <input
         type="text"

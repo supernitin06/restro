@@ -22,12 +22,13 @@ const TopCategories = () => {
   const COLORS = ['#2563eb', '#eb2528', '#fbbf24', '#10b981', '#8b5cf6', '#ec4899'];
 
   const chartData = useMemo(() => {
+    console.log("Category Sales Data:", apiData);
     if (!apiData?.data) return [];
     // Assuming API returns array of objects with { category: "Name", sales: 100 } or similar
     // Adjust 'category' and 'sales' keys based on your actual API response
     return apiData.data.map((item, index) => ({
-      name: item.category || item.name, 
-      value: item.sales || item.count || item.value,
+      name: item.category || item.name || item._id || "Unknown", 
+      value: item.totalSales || item.sales || item.count || item.value || 0,
       color: COLORS[index % COLORS.length]
     }));
   }, [apiData]);
@@ -54,7 +55,7 @@ const TopCategories = () => {
               style={{ backgroundColor: entry.color }}
             ></div>
             <span className="text-sm font-medium text-primary opacity-80 group-hover:text-primary flex gap-1">
-              {entry.name} <span className="text-primary opacity-60">({entry.value})</span>
+              {entry.name} <span className="text-primary opacity-60"></span>
             </span>
           </div>
         ))}

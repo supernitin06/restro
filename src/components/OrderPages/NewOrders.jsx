@@ -6,11 +6,12 @@ import {
   useUpdateOrderStatusMutation,
   useGetOrdersQuery,
 } from "../../api/services/orderApi";
+import Pagination from "../../components/ui/Pagination";
 
 
 const NewOrders = () => {
   const { ordersSocket } = useSockets();
-  const { data, refetch } = useGetOrdersQuery({});
+  const { data, refetch } = useGetOrdersQuery({refetchOnMountOrArgChange: true});
   const allOrders = data?.data || [];
   const orders = allOrders.filter(
     (order) => order.status === "PLACED" || order.status === "REJECTED"
@@ -19,6 +20,14 @@ const NewOrders = () => {
   const [updateStatus] = useUpdateOrderStatusMutation();
 
   const [processingOrderId, setProcessingOrderId] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 9;
+
+  const totalPages = Math.ceil(orders.length / itemsPerPage);
+  const currentOrders = orders.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   useEffect(() => {
     if (!ordersSocket) return;
@@ -69,7 +78,7 @@ const NewOrders = () => {
 
       {/* ===== ORDERS GRID ===== */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-        {orders.map((order) => (
+        {currentOrders.map((order) => (
           <OrderCard
             key={order.orderId}
             order={order}
@@ -85,6 +94,16 @@ const NewOrders = () => {
           </div>
         )}
       </div>
+
+      {orders.length > itemsPerPage && (
+        <div className="mt-8 flex justify-center">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+        </div>
+      )}
     </div>
   );
 };
