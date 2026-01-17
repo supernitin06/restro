@@ -130,8 +130,8 @@ const PaymentDashboard = () => {
                   >
                     <div className="flex items-center gap-4">
                       <div className={`p-2 rounded-full ${transaction.status === 'COMPLETED' ? 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400' :
-                          transaction.status === 'PENDING' ? 'bg-yellow-100 text-yellow-600 dark:bg-yellow-900/30 dark:text-yellow-400' :
-                            'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400'
+                        transaction.status === 'PENDING' ? 'bg-yellow-100 text-yellow-600 dark:bg-yellow-900/30 dark:text-yellow-400' :
+                          'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400'
                         }`}>
                         {transaction.status === 'COMPLETED' ? <Activity className="w-4 h-4" /> : <Clock className="w-4 h-4" />}
                       </div>
@@ -149,8 +149,8 @@ const PaymentDashboard = () => {
                         ₹{transaction.amount?.payable?.toFixed(2) || '0.00'}
                       </p>
                       <p className={`text-xs font-medium ${transaction.status === 'COMPLETED' ? 'text-green-600 dark:text-green-400' :
-                          transaction.status === 'PENDING' ? 'text-yellow-600 dark:text-yellow-400' :
-                            'text-red-600 dark:text-red-400'
+                        transaction.status === 'PENDING' ? 'text-yellow-600 dark:text-yellow-400' :
+                          'text-red-600 dark:text-red-400'
                         }`}>
                         {transaction.status}
                       </p>
