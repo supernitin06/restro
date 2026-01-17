@@ -116,14 +116,20 @@ const OrderFlowTable = () => {
   // ===== SOCKET AUTO REFRESH =====
   useEffect(() => {
     if (!ordersSocket) return;
-    const refresh = () => refetch();
+    const refresh = (data) => {
+      console.log("🔄 Socket Event Received - Refetching Orders...", data);
+      refetch();
+    };
     ordersSocket.on("ORDER_STATUS_UPDATED", refresh);
     ordersSocket.on("KITCHEN_STATUS_UPDATED", refresh);
     ordersSocket.on("DELIVERY_ASSIGNED", refresh);
+    ordersSocket.on("NEW_ORDER", refresh); // 👈 Added NEW_ORDER listener
+
     return () => {
       ordersSocket.off("ORDER_STATUS_UPDATED", refresh);
       ordersSocket.off("KITCHEN_STATUS_UPDATED", refresh);
       ordersSocket.off("DELIVERY_ASSIGNED", refresh);
+      ordersSocket.off("NEW_ORDER", refresh);
     };
   }, [ordersSocket, refetch]);
 
@@ -504,8 +510,8 @@ const OrderFlowTable = () => {
                 <div
                   key={p._id}
                   className={`p-3 rounded-lg mb-2 shadow flex justify-between items-center cursor-pointer ${p.isAvailable === false
-                      ? "bg-red-100 dark:bg-red-900/20 opacity-50 cursor-not-allowed"
-                      : "bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
+                    ? "bg-red-100 dark:bg-red-900/20 opacity-50 cursor-not-allowed"
+                    : "bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
                     }`}
                   onClick={() => p.isAvailable !== false && assignPartner(p)}
                 >
