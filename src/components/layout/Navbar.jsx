@@ -31,6 +31,7 @@ const Navbar = ({ toggleSidebar }) => {
   /* ----------------------------------------------------------------
      CONSUME CONTEXT (Notifications & Sockets)
   ---------------------------------------------------------------- */
+
   const { notifications, setNotifications } = useSockets();
   const [messages, setMessages] = useState([]);
   const [gifts, setGifts] = useState([]);
@@ -49,6 +50,7 @@ const Navbar = ({ toggleSidebar }) => {
   const prevNotificationCount = useRef(notifications.length);
 
   useEffect(() => {
+    console.log("🔔 Navbar Notifications:", notifications);
     if (notifications.length > prevNotificationCount.current) {
       const audio = new Audio(notificationSound);
       audio.play().catch((err) => console.log("Audio play failed:", err));
@@ -60,7 +62,6 @@ const Navbar = ({ toggleSidebar }) => {
      SOCKET EVENTS + ROOM JOIN
   ===================================================== */
 
-
   /* =====================================================
      CLICK OUTSIDE HANDLER
   ===================================================== */
@@ -68,8 +69,8 @@ const Navbar = ({ toggleSidebar }) => {
     const handleClickOutside = (e) => {
       if (profileRef.current && !profileRef.current.contains(e.target))
         setOpenProfile(false);
-      if (notificationRef.current && !notificationRef.current.contains(e.target))
-        setIsNotificationsOpen(false);
+      // Notification dropdown ab Portal aur Backdrop use kar raha hai, 
+      // isliye yahan check karne ki zaroorat nahi hai.
       if (messagesRef.current && !messagesRef.current.contains(e.target))
         setIsMessagesOpen(false);
       if (giftsRef.current && !giftsRef.current.contains(e.target))
@@ -78,7 +79,6 @@ const Navbar = ({ toggleSidebar }) => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
 
   /* =====================================================
      ACTIONS
@@ -121,6 +121,8 @@ const Navbar = ({ toggleSidebar }) => {
             <NotificationDropdown
               isOpen={isNotificationsOpen}
               notifications={notifications}
+              setNotifications={setNotifications}
+              onClose={() => setIsNotificationsOpen(false)}
               onClearAll={() => setNotifications([])}
             />
           </div>
@@ -251,8 +253,14 @@ const InfoRow = ({ icon, text, label }) => (
       {React.cloneElement(icon, { className: "w-4 h-4" })}
     </div>
     <div className="flex-1 min-w-0">
-      {label && <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wider mb-0.5">{label}</p>}
-      <p className="text-sm font-medium text-gray-700 dark:text-gray-200 truncate">{text}</p>
+      {label && (
+        <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wider mb-0.5">
+          {label}
+        </p>
+      )}
+      <p className="text-sm font-medium text-gray-700 dark:text-gray-200 truncate">
+        {text}
+      </p>
     </div>
   </div>
 );
@@ -261,25 +269,37 @@ const ActionItem = ({ icon, label, description, danger, onClick }) => (
   <button
     onClick={onClick}
     className={`w-full flex items-center gap-3 p-2.5 rounded-xl transition-all duration-200 group text-left
-      ${danger
-        ? "hover:bg-red-50 dark:hover:bg-red-900/10"
-        : "hover:bg-gray-50 dark:hover:bg-gray-800"
+      ${
+        danger
+          ? "hover:bg-red-50 dark:hover:bg-red-900/10"
+          : "hover:bg-gray-50 dark:hover:bg-gray-800"
       }`}
   >
-    <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors
-      ${danger
-        ? "bg-red-50 text-red-500 dark:bg-red-900/20 group-hover:bg-red-100 dark:group-hover:bg-red-900/40"
-        : "bg-gray-100 text-gray-500 dark:bg-gray-800 group-hover:bg-primary/10 group-hover:text-primary"
-      }`}>
+    <div
+      className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors
+      ${
+        danger
+          ? "bg-red-50 text-red-500 dark:bg-red-900/20 group-hover:bg-red-100 dark:group-hover:bg-red-900/40"
+          : "bg-gray-100 text-gray-500 dark:bg-gray-800 group-hover:bg-primary/10 group-hover:text-primary"
+      }`}
+    >
       {React.cloneElement(icon, { className: "w-4 h-4" })}
     </div>
 
     <div className="flex-1">
-      <p className={`text-sm font-medium ${danger ? "text-red-600 dark:text-red-400" : "text-gray-700 dark:text-gray-200 group-hover:text-gray-900 dark:group-hover:text-white"}`}>
+      <p
+        className={`text-sm font-medium ${
+          danger
+            ? "text-red-600 dark:text-red-400"
+            : "text-gray-700 dark:text-gray-200 group-hover:text-gray-900 dark:group-hover:text-white"
+        }`}
+      >
         {label}
       </p>
       {description && (
-        <p className={`text-xs ${danger ? "text-red-400/70" : "text-gray-400"}`}>
+        <p
+          className={`text-xs ${danger ? "text-red-400/70" : "text-gray-400"}`}
+        >
           {description}
         </p>
       )}

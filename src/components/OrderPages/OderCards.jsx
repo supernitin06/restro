@@ -141,6 +141,7 @@ const OrderCard = ({ order, onDelete, onEdit, onUpdateStatus, viewMode }) => {
 
               {/* 4. Time & Total (Span 2) */}
               <div className="md:col-span-2 text-right">
+                
                 <div className="text-base font-bold text-primary">
                   ${order.total.toFixed(2)}
                 </div>
@@ -300,7 +301,7 @@ const OrderCard = ({ order, onDelete, onEdit, onUpdateStatus, viewMode }) => {
               Total Amount
             </span>
             <span className="text-2xl font-bold text-primary">
-              ${order.total.toFixed(2)}
+              Rs. {order.total.toFixed(2)}
             </span>
           </div>
 

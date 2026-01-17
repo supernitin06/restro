@@ -7,66 +7,94 @@ import toast from "react-hot-toast";
 const SocketContext = createContext(null);
 
 export const SocketProvider = ({ children, authToken, restaurantId }) => {
+  console.log(" SocketProvider render", { authToken, restaurantId });
+
   const [newOrders, setNewOrders] = React.useState(() => {
     try {
       const stored = localStorage.getItem("NEW_ORDERS");
+      console.log(" Loaded NEW_ORDERS from storage:", stored);
       return stored ? JSON.parse(stored) : [];
-    } catch {
+    } catch (e) {
+      console.error(" Failed to parse NEW_ORDERS", e);
       return [];
     }
   });
 
   const [notifications, setNotifications] = React.useState([]);
 
-  // Persist orders
+  /* =============================
+     Persist Orders
+  ============================== */
   useEffect(() => {
+    console.log("Persisting newOrders to localStorage", newOrders);
     localStorage.setItem("NEW_ORDERS", JSON.stringify(newOrders));
   }, [newOrders]);
 
   useEffect(() => {
-    if (!authToken) return;
+    console.log("Socket useEffect triggered");
+
+    if (!authToken) {
+      console.warn("authToken missing, sockets not connecting");
+      return;
+    }
 
     /* =============================
-       1️⃣ Attach auth token & Connect
+       1 Attach auth token & Connect
     ============================== */
+    console.log(" Attaching auth token to sockets");
+
     mainSocket.auth = { token: authToken };
     ordersSocket.auth = { token: authToken };
     restaurantSocket.auth = { token: authToken };
 
-    // Debug only
-    // mainSocket.on("CONNECTION_ESTABLISHED", (data) => console.log("🔌 Connection established", data));
-
     const connectSockets = () => {
+      console.log(" Connecting sockets...");
       if (!mainSocket.connected) mainSocket.connect();
       if (!ordersSocket.connected) ordersSocket.connect();
       if (!restaurantSocket.connected) restaurantSocket.connect();
     };
 
-    // Debug Connection Logs
-
-
     connectSockets();
 
-    // console.log("🔌 Connecting sockets...");
+    /* =============================
+        DEBUG: Listen to ALL events
+    ============================== */
+    mainSocket.onAny((event, ...args) => {
+      console.log(` [MainSocket] ${event}`, args);
+    });
+
+    ordersSocket.onAny((event, ...args) => {
+      console.log(` [OrdersSocket] ${event}`, args);
+    });
+
+    restaurantSocket.onAny((event, ...args) => {
+      console.log(` [RestaurantSocket] ${event}`, args);
+    });
 
     /* =============================
-       2️⃣ Event Handlers
+       Connection Handlers
     ============================== */
+    const onMainConnect = () =>
+      console.log(" Main Socket Connected:", mainSocket.id);
+    const onMainDisconnect = (reason) =>
+      console.warn(" Main Socket Disconnected:", reason);
+    const onMainError = (err) =>
+      console.error(" Main Socket Error:", err.message);
 
-    // Named handlers for cleanup
-    const onMainConnect = () => console.log("✅ Main Socket Connected:", mainSocket.id);
-    const onMainDisconnect = (reason) => console.log("❌ Main Socket Disconnected:", reason);
-    const onMainError = (err) => console.error("⚠️ Main Socket Connection Error:", err.message);
+    const onOrdersConnect = () =>
+      console.log(" Orders Socket Connected:", ordersSocket.id);
+    const onOrdersDisconnect = (reason) =>
+      console.warn(" Orders Socket Disconnected:", reason);
+    const onOrdersError = (err) =>
+      console.error("Orders Socket Error:", err.message);
 
-    const onOrdersConnect = () => console.log("✅ Orders Socket Connected:", ordersSocket.id);
-    const onOrdersDisconnect = (reason) => console.log("❌ Orders Socket Disconnected:", reason);
-    const onOrdersError = (err) => console.error("⚠️ Orders Socket Connection Error:", err.message);
+    const onRestConnect = () =>
+      console.log("Restaurant Socket Connected:", restaurantSocket.id);
+    const onRestDisconnect = (reason) =>
+      console.warn(" Restaurant Socket Disconnected:", reason);
+    const onRestError = (err) =>
+      console.error(" Restaurant Socket Error:", err.message);
 
-    const onRestConnect = () => console.log("✅ Restaurant Socket Connected:", restaurantSocket.id);
-    const onRestDisconnect = (reason) => console.log("❌ Restaurant Socket Disconnected:", reason);
-    const onRestError = (err) => console.error("⚠️ Restaurant Socket Connection Error:", err.message);
-
-    // Attach Listeners
     mainSocket.on("connect", onMainConnect);
     mainSocket.on("disconnect", onMainDisconnect);
     mainSocket.on("connect_error", onMainError);
@@ -79,15 +107,21 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
     restaurantSocket.on("disconnect", onRestDisconnect);
     restaurantSocket.on("connect_error", onRestError);
 
+    /* =============================
+       Business Logic Handlers
+    ============================== */
     const onJoinedRoom = (data) => {
-
-      console.log("🏠 Joined restaurant room", data);
-     }; // Silence logs
+      console.log(" JOINED_RESTAURANT_ROOM", data);
+    };
 
     const onNewOrder = (payload) => {
-      // console.log("🆕 NEW_ORDER received:", payload);
+      console.log(" NEW_ORDER raw payload:", payload);
+
       const orderData = payload?.data || payload;
-      if (!orderData?.orderId) return;
+      if (!orderData?.orderId) {
+        console.warn("NEW_ORDER missing orderId", orderData);
+        return;
+      }
 
       const newOrder = {
         ...orderData,
@@ -104,62 +138,232 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
         receivedAt: new Date().toISOString(),
       };
 
-      // Update Orders List (Prevent Duplicates)
+      console.log("Processed newOrder:", newOrder);
+
       setNewOrders((prev) => {
-        if (prev.some((o) => o.orderId === newOrder.orderId)) return prev;
+        if (prev.some((o) => o.orderId === newOrder.orderId)) {
+          console.log(" Duplicate order ignored:", newOrder.orderId);
+          return prev;
+        }
         return [newOrder, ...prev];
       });
-      // Add Notification
+
+      setNotifications((prev) => {
+        console.log(" Adding NEW_ORDER notification");
+        return [
+          {
+            id: Date.now(),
+            title: "New Order",
+            message: `Order #${newOrder.customOrderId} received`,
+            type: "order",
+            read: false,
+            time: new Date().toISOString(),
+            orderId: newOrder.orderId,
+          },
+          ...prev,
+        ];
+      });
+
+      toast.success(`New Order #${newOrder.customOrderId} received!`);
+    };
+
+    // const onUserRegistered = (data) => {
+    //   console.log(" USER_REGISTER_SUCCESSFULLY:", data);
+
+    //   toast.success(`${data?.name || "A new user"} has registered!`);
+
+    //   setNotifications((prev) => {
+    //     console.log(" Adding USER notification");
+    //     return [
+    //       {
+    //         id: Date.now(),
+    //         title: "New User",
+    //         message: `${data?.name || "A new user"} has registered.`,
+    //         type: "user",
+    //         read: false,
+    //         time: new Date().toLocaleTimeString([], {
+    //           hour: "2-digit",
+    //           minute: "2-digit",
+    //         }),
+    //       },
+    //       ...prev,
+    //     ];
+    //   });
+    // };
+
+    const onUserRegistered = (data) => {
+      console.log(" USER_REGISTER_SUCCESSFULLY FULL DATA:", data);
+
+      const userName =
+        data?.name || data?.user?.name || data?.data?.name || "New User";
+
+      console.log(" Extracted User Name:", userName);
+
+      toast.success(`${userName} has registered!`);
+
       setNotifications((prev) => [
         {
           id: Date.now(),
-          title: "New Order",
-          message: `Order #${newOrder.customOrderId} received`,
-          type: "success",
+          title: "New User Registered",
+          message: `${userName} has registered successfully.`,
+          type: "user",
           read: false,
-          time: new Date().toISOString(),
-          orderId: newOrder.orderId
+          time: new Date().toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+        },
+        ...prev,
+      ]);
+    };
+
+    const onOrderStatusUpdated = (data) => {
+      console.log("ORDER_STATUS_UPDATED:", data);
+    };
+
+    // const onOrderPickedUp = (data) => {
+    //   console.log("ORDER_PICKED_UP:", data);
+
+    //   const orderId = data?.customOrderId || data?.orderId || "";
+
+    //   toast.success(`Order #${orderId} Picked Up Successfully`);
+
+    //   setNotifications((prev) => {
+    //     console.log("Adding PICKED_UP notification");
+    //     return [
+    //       {
+    //         id: Date.now(),
+    //         title: "Order Picked Up",
+    //         message: `Order #${orderId} is out for delivery.`,
+    //         type: "delivery",
+    //         read: false,
+    //         time: new Date().toLocaleTimeString([], {
+    //           hour: "2-digit",
+    //           minute: "2-digit",
+    //         }),
+    //         orderId: data?.orderId,
+    //       },
+    //       ...prev,
+    //     ];
+    //   });
+    // };
+
+    const onOrderPickedUp = (data) => {
+      console.log(" ORDER_PICKED_UP FULL DATA:", data);
+
+      const orderId = data?.customOrderId || data?.orderId || "";
+
+      const partnerName =
+        data?.deliveryPartner?.name ||
+        data?.pickedBy?.name ||
+        data?.partner?.name ||
+        "Delivery Partner";
+
+      console.log(" Extracted Delivery Partner:", partnerName);
+
+      toast.success(`Order #${orderId} picked up by ${partnerName}`);
+
+      setNotifications((prev) => [
+        {
+          id: Date.now(),
+          title: "Order Picked Up",
+          message: `Order #${orderId} picked up by ${partnerName}`,
+          type: "delivery",
+          read: false,
+          time: new Date().toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+          orderId: data?.orderId,
+        },
+        ...prev,
+      ]);
+    };
+
+    // const onOrderDelivered = (data) => {
+    //   console.log("ORDER_DELIVERED_BY_PARTNER:", data);
+
+    //   const orderId = data?.customOrderId || data?.orderId || "";
+
+    //   toast.success(`Order #${orderId} Delivered Successfully`);
+
+    //   setNotifications((prev) => {
+    //     console.log(" Adding DELIVERED notification");
+    //     return [
+    //       {
+    //         id: Date.now(),
+    //         title: "Order Delivered",
+    //         message: `Order #${orderId} has been delivered.`,
+    //         type: "delivery",
+    //         read: false,
+    //         time: new Date().toLocaleTimeString([], {
+    //           hour: "2-digit",
+    //           minute: "2-digit",
+    //         }),
+    //         orderId: data?.orderId,
+    //       },
+    //       ...prev,
+    //     ];
+    //   });
+    // };
+
+    const onOrderDelivered = (data) => {
+      console.log(" ORDER_DELIVERED_BY_PARTNER FULL DATA:", data);
+
+      const orderId = data?.customOrderId || data?.orderId || "";
+
+      const deliveredBy =
+        data?.deliveryPartner?.name ||
+        data?.deliveredBy?.name ||
+        data?.partner?.name ||
+        "Delivery Partner";
+
+      console.log(" Extracted Delivered By:", deliveredBy);
+
+      toast.success(`Order #${orderId} delivered by ${deliveredBy}`);
+
+      setNotifications((prev) => [
+        {
+          id: Date.now(),
+          title: "Order Delivered",
+          message: `Order #${orderId} delivered by ${deliveredBy}`,
+          type: "delivery",
+          status: "delivered", // use this for GREEN color
+          read: false,
+          time: new Date().toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+          orderId: data?.orderId,
         },
         ...prev,
       ]);
     };
 
     /* =============================
-       3️⃣ Attach Listeners (Specific to logic)
+       Attach Listeners
     ============================== */
+    console.log(" Attaching socket listeners");
+
     ordersSocket.on("JOINED_RESTAURANT_ROOM", onJoinedRoom);
     ordersSocket.on("NEW_ORDER", onNewOrder);
+    ordersSocket.on("USER_REGISTER_SUCCESSFULLY", onUserRegistered);
+    mainSocket.on("USER_REGISTER_SUCCESSFULLY", onUserRegistered);
+    ordersSocket.on("ORDER_STATUS_UPDATED", onOrderStatusUpdated);
+    ordersSocket.on("ORDER_PICKED_UP", onOrderPickedUp);
+    ordersSocket.on("ORDER_DELIVERED_BY_PARTNER", onOrderDelivered);
 
-    // Join Room
     if (restaurantId) {
+      console.log(" Emitting JOIN_RESTAURANT_ROOM", restaurantId);
       ordersSocket.emit("JOIN_RESTAURANT_ROOM", { restaurantId });
     }
 
-
-
     /* =============================
-       5️⃣ Order status updates
-    ============================== */
-    const onOrderStatusUpdated = (data) => {
-      console.log("🔄 ORDER_STATUS_UPDATED:", data);
-    };
-
-
-
-    ordersSocket.on("ORDER_STATUS_UPDATED", onOrderStatusUpdated);
-    ordersSocket.on("ORDER_PICKED_UP", (data) => {
-      console.log("✅ ORDER_PICKED_UP:", data);
-      toast.success("Order Picked Up Successfully");
-
-    });
-
-
-
-    /* =============================
-       🧹 CLEANUP (VERY IMPORTANT)
+       CLEANUP
     ============================== */
     return () => {
-      // Remove debug listeners
+      console.log("Cleaning up socket listeners & disconnecting");
+
       mainSocket.off("connect", onMainConnect);
       mainSocket.off("disconnect", onMainDisconnect);
       mainSocket.off("connect_error", onMainError);
@@ -172,10 +376,17 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
       restaurantSocket.off("disconnect", onRestDisconnect);
       restaurantSocket.off("connect_error", onRestError);
 
-      // Remove logic listeners
       ordersSocket.off("JOINED_RESTAURANT_ROOM", onJoinedRoom);
       ordersSocket.off("NEW_ORDER", onNewOrder);
+      ordersSocket.off("USER_REGISTER_SUCCESSFULLY", onUserRegistered);
+      mainSocket.off("USER_REGISTER_SUCCESSFULLY", onUserRegistered);
       ordersSocket.off("ORDER_STATUS_UPDATED", onOrderStatusUpdated);
+      ordersSocket.off("ORDER_PICKED_UP", onOrderPickedUp);
+      ordersSocket.off("ORDER_DELIVERED_BY_PARTNER", onOrderDelivered);
+
+      mainSocket.offAny();
+      ordersSocket.offAny();
+      restaurantSocket.offAny();
 
       mainSocket.disconnect();
       ordersSocket.disconnect();
@@ -192,7 +403,7 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
         newOrders,
         setNewOrders,
         notifications,
-        setNotifications
+        setNotifications,
       }}
     >
       {children}
