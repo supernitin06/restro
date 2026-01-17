@@ -119,7 +119,7 @@ const ConfirmedOrders = ({ title, orders, icon: Icon, color }) => {
                                     </span>
                                 </div>
                                 <div className="text-right">
-                                    <span className={`text-xl font-extrabold ${classes.text} tracking-tight`}>${(order.amount || 0).toFixed(2)}</span>
+                                    <span className={`text-xl font-extrabold ${classes.text} tracking-tight`}>Rs. {(order.amount || 0).toFixed(2)}</span>
                                 </div>
                             </div>
 

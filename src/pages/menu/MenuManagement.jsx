@@ -1,4 +1,4 @@
-// src/pages/menu/MenuManagement.jsx
+
 import React, { useState, useMemo, useEffect } from "react";
 import { useSelector } from "react-redux";
 import MenuList from "../../components/menu/MenuList";
@@ -58,6 +58,7 @@ const MenuManagement = () => {
   const [viewType, setViewType] = useState('list');
   const user = useSelector((state) => state.auth.user);
   const [restaurantId, setRestaurantId] = useState(null);
+  
 
   const handleFilterChange = (key, value) => {
     setFilters(prev => ({ ...prev, [key]: value }));
@@ -82,7 +83,8 @@ const MenuManagement = () => {
   const menus = useMemo(() => (
     data?.data ? transformItemsData(data.data).menus : []
   ), [data]);
-
+ 
+  
   return (
     <div className="app page">
       <div className="mx-auto">

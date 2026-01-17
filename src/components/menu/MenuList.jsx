@@ -1,6 +1,16 @@
 // src/components/menu/MenuList.jsx - PREMIUM VERSION
 import React, { useEffect, useState, useMemo } from "react";
-import { Check, Star, Edit, Trash2, ChevronDown, ChevronUp, ImageOff, X, Package } from "lucide-react";
+import {
+  Check,
+  Star,
+  Edit,
+  Trash2,
+  ChevronDown,
+  ChevronUp,
+  ImageOff,
+  X,
+  Package,
+} from "lucide-react";
 import EditMenuModal from "./EditMenuModal";
 import { showPromiseToast } from "../../utils/toastAlert";
 import ConfirmationModal from "../ui/ConfirmationModal";
@@ -12,13 +22,22 @@ import {
   useDeleteMenuMutation,
   useUpdateMenuMutation,
   useUpdateMenuStockStatusMutation,
+  useToggleCategoryStatusMutation,
 } from "../../api/services/menuApi";
 
 // ===== REUSABLE COMPONENTS =====
 
 const VegNonVegIcon = ({ isVeg }) => (
-  <div className={`w-5 h-5 flex items-center justify-center border-2 rounded-sm ${isVeg ? 'border-green-600' : 'border-red-600'} shadow-sm`}>
-    <div className={`w-2.5 h-2.5 rounded-full ${isVeg ? 'bg-green-600' : 'bg-red-600'}`}></div>
+  <div
+    className={`w-5 h-5 flex items-center justify-center border-2 rounded-sm ${
+      isVeg ? "border-green-600" : "border-red-600"
+    } shadow-sm`}
+  >
+    <div
+      className={`w-2.5 h-2.5 rounded-full ${
+        isVeg ? "bg-green-600" : "bg-red-600"
+      }`}
+    ></div>
   </div>
 );
 
@@ -31,26 +50,47 @@ const BestsellerTag = () => (
 
 const ToggleSwitch = ({ checked, onChange, label }) => (
   <button
-    onClick={(e) => { e.stopPropagation(); onChange(); }}
+    onClick={(e) => {
+      e.stopPropagation();
+      onChange();
+    }}
     className={`flex items-center gap-2 group`}
     title={label}
   >
-    <div className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${checked ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'
-      }`}>
+    <div
+      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+        checked ? "bg-green-500" : "bg-red-500"
+      }`}
+    >
       <span
-        className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${checked ? 'translate-x-6' : 'translate-x-1'
-          }`}
+        className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+          checked ? "translate-x-6" : "translate-x-1"
+        }`}
       />
     </div>
-    {label && <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{label}</span>}
+    {label && (
+      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+        {label}
+      </span>
+    )}
   </button>
 );
 
 // ===== MAIN COMPONENT =====
 
-const MenuList = ({ menus, isLoading, isError, error, searchTerm = '', statusFilter = 'all', viewType = 'list' }) => {
+const MenuList = ({
+  menus,
+  isLoading,
+  isError,
+  error,
+  searchTerm = "",
+  statusFilter = "all",
+  viewType = "list",
+}) => {
   const [editItem, setEditItem] = useState(null);
   const [expandedCategories, setExpandedCategories] = useState({});
+  const [toggleCategoryStatus] = useToggleCategoryStatusMutation();
+
   const [deleteMenu] = useDeleteMenuMutation();
   // Confirmation Modal State
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -60,10 +100,38 @@ const MenuList = ({ menus, isLoading, isError, error, searchTerm = '', statusFil
   // Categories are collapsed by default.
 
   const toggleCategory = (categoryId) => {
-    setExpandedCategories(prev => ({
+    setExpandedCategories((prev) => ({
       ...prev,
-      [categoryId]: !prev[categoryId]
+      [categoryId]: !prev[categoryId],
     }));
+  };
+
+  const handleCategoryToggle = async (category) => {
+    // Determine next status
+    const nextStatus = category.status === "active" ? "inactive" : "active";
+
+    console.log("Toggling category:", category.categoryId, "to", nextStatus);
+
+    try {
+      // Call API
+      const res = await toggleCategoryStatus({
+        categoryId: category.categoryId,
+        status: nextStatus,
+      }).unwrap();
+
+      console.log("API Response:", res);
+
+      // Update local UI immediately
+      category.status = nextStatus;
+
+      // Trigger re-render
+      setExpandedCategories((prev) => ({
+        ...prev,
+        [category.categoryId]: prev[category.categoryId] || true,
+      }));
+    } catch (err) {
+      console.error("Category toggle failed:", err);
+    }
   };
 
   const handleDeleteClick = (itemId) => {
@@ -73,14 +141,11 @@ const MenuList = ({ menus, isLoading, isError, error, searchTerm = '', statusFil
 
   const confirmDelete = async () => {
     try {
-      await showPromiseToast(
-        deleteMenu(itemToDelete).unwrap(),
-        {
-          loading: 'Deleting item...',
-          success: 'Item deleted successfully.',
-          error: 'Failed to delete item.'
-        }
-      );
+      await showPromiseToast(deleteMenu(itemToDelete).unwrap(), {
+        loading: "Deleting item...",
+        success: "Item deleted successfully.",
+        error: "Failed to delete item.",
+      });
     } catch (error) {
       console.error(error);
     } finally {
@@ -92,47 +157,61 @@ const MenuList = ({ menus, isLoading, isError, error, searchTerm = '', statusFil
   const handleToggleStock = async (item) => {
     console.log(item);
     await showPromiseToast(
-      updateMenuStockStatus({ id: item.itemId, inStock: !item.inStock }).unwrap(),
+      updateMenuStockStatus({
+        id: item.itemId,
+        inStock: !item.inStock,
+      }).unwrap(),
       {
-        loading: 'Updating stock...',
-        success: `Item marked as ${!item.inStock ? 'In Stock' : 'Out of Stock'}`,
-        error: 'Failed to update stock.'
+        loading: "Updating stock...",
+        success: `Item marked as ${
+          !item.inStock ? "In Stock" : "Out of Stock"
+        }`,
+        error: "Failed to update stock.",
       }
     );
   };
 
-  const handleEditSave = React.useCallback(async (updatedItem) => {
-    await updateMenu({
-      id: updatedItem.itemId,
-      payload: {
-        name: updatedItem.name,
-        basePrice: updatedItem.price,
-        isAvailable: updatedItem.available,
-      },
-    });
-    setEditItem(null);
-  }, [updateMenu]);
+  const handleEditSave = React.useCallback(
+    async (updatedItem) => {
+      await updateMenu({
+        id: updatedItem.itemId,
+        payload: {
+          name: updatedItem.name,
+          basePrice: updatedItem.price,
+          isAvailable: updatedItem.available,
+        },
+      });
+      setEditItem(null);
+    },
+    [updateMenu]
+  );
 
   // Memoize filtering logic
   const filteredMenus = useMemo(() => {
     if (!menus) return [];
-    return menus.map(menu => {
-      const filteredCategories = menu.categories.map(category => {
-        const filteredSubCategories = category.subCategories.map(subCat => {
-          const filteredItems = subCat.items.filter(item => {
-            const name = item.name || '';
-            const matchesSearch = name.toLowerCase().includes(searchTerm.toLowerCase());
-            const matchesStatus =
-              statusFilter === 'all' ||
-              (statusFilter === 'available' && item.available) ||
-              (statusFilter === 'unavailable' && !item.available) ||
-              (statusFilter === 'bestseller' && item.bestseller);
-            return matchesSearch && matchesStatus;
-          });
-          return { ...subCat, items: filteredItems };
-        }).filter(subCat => subCat.items.length > 0);
-        return { ...category, subCategories: filteredSubCategories };
-      }).filter(category => category.subCategories.length > 0);
+    return menus.map((menu) => {
+      const filteredCategories = menu.categories
+        .map((category) => {
+          const filteredSubCategories = category.subCategories
+            .map((subCat) => {
+              const filteredItems = subCat.items.filter((item) => {
+                const name = item.name || "";
+                const matchesSearch = name
+                  .toLowerCase()
+                  .includes(searchTerm.toLowerCase());
+                const matchesStatus =
+                  statusFilter === "all" ||
+                  (statusFilter === "available" && item.available) ||
+                  (statusFilter === "unavailable" && !item.available) ||
+                  (statusFilter === "bestseller" && item.bestseller);
+                return matchesSearch && matchesStatus;
+              });
+              return { ...subCat, items: filteredItems };
+            })
+            .filter((subCat) => subCat.items.length > 0);
+          return { ...category, subCategories: filteredSubCategories };
+        })
+        .filter((category) => category.subCategories.length > 0);
       return { ...menu, categories: filteredCategories };
     });
   }, [menus, searchTerm, statusFilter]);
@@ -144,7 +223,9 @@ const MenuList = ({ menus, isLoading, isError, error, searchTerm = '', statusFil
           <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-200 dark:border-blue-900"></div>
           <div className="animate-spin rounded-full h-16 w-16 border-4 border-t-blue-600 dark:border-t-blue-400 absolute top-0 left-0"></div>
         </div>
-        <p className="text-gray-600 dark:text-gray-400 font-medium">Loading menu items...</p>
+        <p className="text-gray-600 dark:text-gray-400 font-medium">
+          Loading menu items...
+        </p>
       </div>
     );
   }
@@ -157,8 +238,12 @@ const MenuList = ({ menus, isLoading, isError, error, searchTerm = '', statusFil
             <X className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h3 className="font-bold text-xl text-red-800 dark:text-red-300 mb-2">Error Loading Menu</h3>
-            <p className="text-red-600 dark:text-red-400">{error?.data?.message || "Unknown error occurred"}</p>
+            <h3 className="font-bold text-xl text-red-800 dark:text-red-300 mb-2">
+              Error Loading Menu
+            </h3>
+            <p className="text-red-600 dark:text-red-400">
+              {error?.data?.message || "Unknown error occurred"}
+            </p>
           </div>
         </div>
       </div>
@@ -170,7 +255,10 @@ const MenuList = ({ menus, isLoading, isError, error, searchTerm = '', statusFil
       {/* Menu Categories */}
       {filteredMenus.map((menu) =>
         menu.categories.map((category) => (
-          <div key={category.categoryId} className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden border-2 border-gray-100 dark:border-gray-700 hover:shadow-2xl transition-all duration-300">
+          <div
+            key={category.categoryId}
+            className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden border-2 border-gray-100 dark:border-gray-700 hover:shadow-2xl transition-all duration-300"
+          >
             {/* Category Header */}
             <div
               className="flex justify-between items-center px-6 py-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
@@ -178,14 +266,20 @@ const MenuList = ({ menus, isLoading, isError, error, searchTerm = '', statusFil
             >
               <div className="flex items-center gap-4">
                 <div>
-                  <h2 className="text-xl font-bold text-gray-900 dark:text-white">{category.name}</h2>
+                  <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                    {category.name}
+                  </h2>
                   <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                    {category.subCategories.reduce((total, sub) => total + sub.items.length, 0)} items in this category
+                    {category.subCategories.reduce(
+                      (total, sub) => total + sub.items.length,
+                      0
+                    )}{" "}
+                    items in this category
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-4">
+              {/* <div className="flex items-center gap-4">
                 {category.status === 'active' && (
                   <span className="relative flex h-3 w-3" title="Active">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
@@ -193,6 +287,29 @@ const MenuList = ({ menus, isLoading, isError, error, searchTerm = '', statusFil
                   </span>
                 )}
                 <div className={`p-2 rounded-full bg-gray-100 dark:bg-gray-700/60 transition-transform duration-300 ${expandedCategories[category.categoryId] ? 'rotate-180' : ''}`}>
+                  <ChevronDown className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                </div>
+              </div> */}
+              <div className="flex items-center gap-4">
+                {/* CATEGORY ENABLE / DISABLE TOGGLE */}
+                <ToggleSwitch
+                  checked={category.status === "active"}
+                  onChange={() => handleCategoryToggle(category)}
+                  label={category.status === "active" ? "Enabled" : "Disabled"}
+                />
+
+                {category.status === "active" && (
+                  <span className="relative flex h-3 w-3" title="Active">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                  </span>
+                )}
+
+                <div
+                  className={`p-2 rounded-full bg-gray-100 dark:bg-gray-700/60 transition-transform duration-300 ${
+                    expandedCategories[category.categoryId] ? "rotate-180" : ""
+                  }`}
+                >
                   <ChevronDown className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                 </div>
               </div>
@@ -214,23 +331,29 @@ const MenuList = ({ menus, isLoading, isError, error, searchTerm = '', statusFil
 
                     {/* Menu Items */}
                     <div className="px-6 py-4">
-                      {viewType === 'grid' ? (
+                      {viewType === "grid" ? (
                         /* ===== GRID VIEW - PREMIUM ===== */
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                           {subCat.items.map((item) => (
                             <div
                               key={item.itemId}
-                              className={`group bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl transition-all duration-300 ${!item.inStock ? 'opacity-60 grayscale' : ''}`}
+                              className={`group bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl transition-all duration-300 ${
+                                !item.inStock ? "opacity-60 grayscale" : ""
+                              }`}
                             >
                               {/* Image Container */}
                               <div className="relative h-48 overflow-hidden">
                                 <img
-                                  src={item.image || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80"}
+                                  src={
+                                    item.image ||
+                                    "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80"
+                                  }
                                   alt={item.name}
                                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                                   onError={(e) => {
                                     e.target.onerror = null;
-                                    e.target.src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80';
+                                    e.target.src =
+                                      "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80";
                                   }}
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60"></div>
@@ -245,7 +368,9 @@ const MenuList = ({ menus, isLoading, isError, error, searchTerm = '', statusFil
                                 )}
 
                                 <div className="absolute bottom-3 left-3 right-3 flex justify-between items-end text-white">
-                                  <div className="font-bold text-xl drop-shadow-md">₹{item.price}</div>
+                                  <div className="font-bold text-xl drop-shadow-md">
+                                    ₹{item.price}
+                                  </div>
                                   {!item.inStock && (
                                     <span className="bg-red-500/90 text-white text-xs px-2 py-1 rounded-md font-bold uppercase tracking-wider backdrop-blur-sm">
                                       Sold Out
@@ -281,7 +406,9 @@ const MenuList = ({ menus, isLoading, isError, error, searchTerm = '', statusFil
                                       Edit
                                     </Button>
                                     <Button
-                                      onClick={() => handleDeleteClick(item.itemId)}
+                                      onClick={() =>
+                                        handleDeleteClick(item.itemId)
+                                      }
                                       variant="outline"
                                       className="px-3 text-red-500 border-red-100 h-8 hover:bg-red-50 hover:border-red-200 dark:border-red-900/30 dark:hover:bg-red-900/20"
                                     >
@@ -304,12 +431,18 @@ const MenuList = ({ menus, isLoading, isError, error, searchTerm = '', statusFil
                               {/* Item Image */}
                               <div className="relative w-full sm:w-32 h-32 flex-shrink-0 rounded-lg overflow-hidden">
                                 <img
-                                  src={item.image || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80"}
+                                  src={
+                                    item.image ||
+                                    "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80"
+                                  }
                                   alt={item.name}
-                                  className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${!item.inStock ? 'grayscale' : ''}`}
+                                  className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${
+                                    !item.inStock ? "grayscale" : ""
+                                  }`}
                                   onError={(e) => {
                                     e.target.onerror = null;
-                                    e.target.src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80';
+                                    e.target.src =
+                                      "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80";
                                   }}
                                 />
                                 {item.bestseller && (
@@ -344,7 +477,8 @@ const MenuList = ({ menus, isLoading, isError, error, searchTerm = '', statusFil
                                   </div>
 
                                   <p className="mt-2 text-sm text-gray-500 dark:text-gray-400 line-clamp-2 max-w-2xl">
-                                    {item.description || "No description available for this delicious item."}
+                                    {item.description ||
+                                      "No description available for this delicious item."}
                                   </p>
                                 </div>
 
@@ -353,7 +487,11 @@ const MenuList = ({ menus, isLoading, isError, error, searchTerm = '', statusFil
                                     <ToggleSwitch
                                       checked={item.inStock}
                                       onChange={() => handleToggleStock(item)}
-                                      label={item.inStock ? 'In Stock' : 'Out of Stock'}
+                                      label={
+                                        item.inStock
+                                          ? "In Stock"
+                                          : "Out of Stock"
+                                      }
                                     />
                                     {item.bestseller && (
                                       <span className="text-xs font-bold px-2.5 py-1 rounded-md bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-900/20 dark:border-amber-800">
@@ -372,7 +510,9 @@ const MenuList = ({ menus, isLoading, isError, error, searchTerm = '', statusFil
                                       Edit
                                     </Button>
                                     <Button
-                                      onClick={() => handleDeleteClick(item.itemId)}
+                                      onClick={() =>
+                                        handleDeleteClick(item.itemId)
+                                      }
                                       variant="ghost"
                                       size="sm"
                                       className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
@@ -393,9 +533,12 @@ const MenuList = ({ menus, isLoading, isError, error, searchTerm = '', statusFil
                           <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
                             <Package className="w-8 h-8 text-gray-400" />
                           </div>
-                          <h3 className="text-lg font-bold text-gray-900 dark:text-white">No items found</h3>
+                          <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                            No items found
+                          </h3>
                           <p className="text-gray-500 dark:text-gray-400 text-center max-w-sm mt-1">
-                            This category appears to be empty. Add some items to populate your menu.
+                            This category appears to be empty. Add some items to
+                            populate your menu.
                           </p>
                         </div>
                       )}

@@ -4,12 +4,12 @@ import { baseApi } from "./baseApi";
 const paymentsApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
         getPaymentsstats: builder.query({
-            query: () => ({ url: `admin/dashboard/payment-stats`,
+            query: () => ({ url: `admin/dashboard/payments/analytics`,
                  method: "get" }),
             providesTags: ["Payments"],
         }),
         getRecentPayments: builder.query({
-            query: () => ({ url: `admin/dashboard/transactions/recent`,
+            query: () => ({ url: `admin/dashboard/payments/recent`,
                  method: "get" }),
             providesTags: ["Payments"],
         }),
