@@ -44,9 +44,7 @@ const CustomerReviews = () => {
     });
   }, [ratingsData]);
 
-  if (isLoading) {
-    return <div className="p-6 text-center text-gray-500">Loading reviews...</div>;
-  }
+
 
   const checkScroll = () => {
     if (scrollRef.current) {
@@ -77,6 +75,10 @@ const CustomerReviews = () => {
       };
     }
   }, []);
+
+  if (isLoading) {
+    return <div className="p-6 text-center text-gray-500">Loading reviews...</div>;
+  }
 
   return (
     <div className="bg-primary rounded-2xl p-6 shadow-sm border border-white/20 dark:border-gray-700">
