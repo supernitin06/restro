@@ -304,6 +304,12 @@ const OrderFlowTable = () => {
                 Current Status
               </th>
               <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
+                Amount
+              </th>
+              <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
+                Payment
+              </th>
+              <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
                 Delivery Partner
               </th>
               <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
@@ -361,6 +367,17 @@ const OrderFlowTable = () => {
                   >
                     {order.status}
                   </span>
+                </td>
+
+                <td className="px-4 py-2 text-gray-700 dark:text-gray-300 font-bold">
+                  ₹{order.price?.grandTotal}
+                </td>
+
+                <td className="px-4 py-2 text-gray-700 dark:text-gray-300">
+                  <div className="font-semibold text-[10px]">{order.payment?.method}</div>
+                  <div className={`text-[9px] font-bold ${order.payment?.status === 'PAID' ? 'text-green-600' : 'text-orange-500'}`}>
+                    {order.payment?.status}
+                  </div>
                 </td>
 
                 <td className="px-4 py-2 text-gray-700 dark:text-gray-300">
