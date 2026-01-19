@@ -5,10 +5,12 @@ import { useUpdateKitchenStatusMutation, useUpdateOrderStatusMutation } from '..
 import { showSuccessAlert, showErrorAlert, showConfirmAlert } from '../../utils/toastAlert';
 
 const ConfirmedOrders = ({ title, orders, icon: Icon, color }) => {
+    
     const [expandedOrderId, setExpandedOrderId] = useState(null);
 
     // Mutations
     const [updateKitchenStatus] = useUpdateKitchenStatusMutation();
+
     const [updateOrderStatus] = useUpdateOrderStatusMutation(); // For Reject if needed
 
     const navigate = useNavigate();
@@ -16,22 +18,31 @@ const ConfirmedOrders = ({ title, orders, icon: Icon, color }) => {
     const colorClasses = {
         orange: {
             bg: 'bg-orange-50 dark:bg-orange-900/20',
+
             text: 'text-orange-600 dark:text-orange-400',
+
             iconBg: 'bg-orange-100 dark:bg-orange-900/30',
         },
         blue: {
             bg: 'bg-blue-50 dark:bg-blue-900/20',
+
             text: 'text-blue-600 dark:text-blue-400',
+
             iconBg: 'bg-blue-100 dark:bg-blue-900/30',
         },
     };
 
     const statusStyles = {
         placed: 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300',
+
         preparing: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
+
         packing: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300',
+
         confirmed: 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/40 dark:text-cyan-300',
+
         cooking: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300',
+
         ready: 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300'
     };
 
@@ -119,7 +130,7 @@ const ConfirmedOrders = ({ title, orders, icon: Icon, color }) => {
                                     </span>
                                 </div>
                                 <div className="text-right">
-                                    <span className={`text-xl font-extrabold ${classes.text} tracking-tight`}>Rs. {(order.amount || 0).toFixed(2)}</span>
+                                    <span className={`text-xl font-extrabold ${classes.text} tracking-tight`}>₹{(order.amount || 0).toFixed(2)}</span>
                                 </div>
                             </div>
 
@@ -169,7 +180,7 @@ const ConfirmedOrders = ({ title, orders, icon: Icon, color }) => {
                                                     <span className="font-bold text-gray-400 dark:text-gray-500">{item.quantity}x</span>
                                                     <span>{item.name}</span>
                                                 </div>
-                                                <span className="font-medium">${item.price}</span>
+                                                <span className="font-medium">₹{item.price}</span>
                                             </li>
                                         ))}
                                     </ul>
@@ -184,7 +195,7 @@ const ConfirmedOrders = ({ title, orders, icon: Icon, color }) => {
             <div className="p-4 bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm border-t border-gray-100/50 dark:border-gray-800/50">
                 <button
                     onClick={() => navigate('/orders')}
-                    className="group relative w-full py-3 rounded-xl text-sm font-bold text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-white overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 bg-gray-50 dark:bg-gray-800 hover:bg-white dark:hover:bg-primary"
+                    className="group relative w-full py-3 rounded-xl text-sm font-bold text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-white overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 bg-gray-100 dark:bg-gray-800 hover:bg-white dark:hover:bg-gray-700"
                 >
                     <span className="relative z-10 flex items-center justify-center gap-2">
                         View All Orders
