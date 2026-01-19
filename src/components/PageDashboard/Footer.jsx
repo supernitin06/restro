@@ -25,7 +25,7 @@ const Footer = () => {
           {/* Copyright */}
           <div className="text-sm text-gray-600 dark:text-gray-400">
             Copyright © {currentYear}{' '}
-            <span className="font-semibold text-gray-800 dark:text-gray-200">Peterdraw</span>
+            <span className="font-semibold text-gray-800 dark:text-gray-200">BITMAX</span>
           </div>
 
           {/* Links */}

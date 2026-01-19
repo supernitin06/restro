@@ -130,7 +130,7 @@ const UpcomingOrders = ({ title, orders, icon: Icon, color }) => {
                                     </span>
                                 </div>
                                 <div className="text-right">
-                                    <span className={`text-xl font-extrabold ${classes.text} tracking-tight`}>Rs. {(order.amount || 0).toFixed(2)}</span>
+                                    <span className={`text-xl font-extrabold ${classes.text} tracking-tight`}>₹{(order.amount || 0).toFixed(2)}</span>
                                 </div>
                             </div>
 
@@ -170,7 +170,7 @@ const UpcomingOrders = ({ title, orders, icon: Icon, color }) => {
                                                     <span className="font-bold text-gray-400 dark:text-gray-500">{item.quantity}x</span>
                                                     <span>{item.name}</span>
                                                 </div>
-                                                <span className="font-medium">${item.price}</span>
+                                                <span className="font-medium">₹{item.price}</span>
                                             </li>
                                         ))}
                                     </ul>
@@ -185,7 +185,7 @@ const UpcomingOrders = ({ title, orders, icon: Icon, color }) => {
             <div className="p-4 bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm border-t border-gray-100/50 dark:border-gray-800/50">
                 <button
                     onClick={() => navigate('/orders')}
-                    className="group relative w-full py-3 rounded-xl text-sm font-bold text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-white overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 bg-gray-50 dark:bg-gray-800 hover:bg-white dark:hover:bg-primary"
+                    className="group relative w-full py-3 rounded-xl text-sm font-bold text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-white overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 bg-gray-100 dark:bg-gray-800 hover:bg-white dark:hover:bg-gray-700"
                 >
                     <span className="relative z-10 flex items-center justify-center gap-2">
                         View All Orders

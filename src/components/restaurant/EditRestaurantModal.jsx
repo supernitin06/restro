@@ -12,10 +12,10 @@ const EditRestaurantModal = ({
 
   return (
     /* OVERLAY (white + blur) */
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/70 backdrop-blur-md p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
       
       {/* MODAL */}
-      <div className="w-full max-w-md rounded-2xl bg-white shadow-2xl overflow-hidden animate-fadeIn">
+      <div className="w-full max-w-md rounded-2xl bg-white dark:bg-gray-800 shadow-2xl overflow-hidden animate-fadeIn border border-gray-200 dark:border-gray-700">
 
         {/* HEADER */}
         <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
@@ -29,7 +29,7 @@ const EditRestaurantModal = ({
         </div>
 
         {/* BODY */}
-        <div className="p-6 space-y-4 bg-gray-50">
+        <div className="p-6 space-y-4 bg-gray-50 dark:bg-gray-900">
 
           <InputField
             label="Restaurant Name"
@@ -60,7 +60,7 @@ const EditRestaurantModal = ({
           />
 
           {/* ACTIONS */}
-          <div className="flex gap-3 pt-4 border-t border-gray-200">
+          <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
             <Button className="flex-1" onClick={onSave}>
               Save Changes
             </Button>

@@ -1,293 +1,143 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   Eye,
   Download,
   RefreshCw,
   Mail,
   Trash2,
-  Edit,
-  Printer,
-  Share2,
-  FileText
+  User,
+  Phone,
 } from 'lucide-react';
 import Table from "../../components/ui/Table";
 import Badge from "../../components/ui/Badge";
-import { User,  Phone, ShoppingBag } from "lucide-react";
 import PaymentModal from "../../components/Payment/PaymentModal";
-import transactionsData from "../../assets/json/PaymentData/transactions.json";
+import { useGetRecentPaymentsQuery } from "../../api/services/payments";
+import Button from "../../components/ui/Button";
+import Pagination from "../../components/ui/Pagination";
 
 const Transactions = () => {
-  const [transactions, setTransactions] = useState([]);
-  const [filteredTransactions, setFilteredTransactions] = useState([]);
+  const { data: transactionsResponse, isLoading, isError } = useGetRecentPaymentsQuery();
+
+  const rawTransactions = useMemo(() => transactionsResponse?.data || [], [transactionsResponse]);
+
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [paymentStats, setPaymentStats] = useState([]);
+  const [filterValues, setFilterValues] = useState({
+    status: 'all',
+    method: 'all',
+    search: ''
+  });
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
-  // Debug: Check initial data
+  // Reset to first page when filters change
   useEffect(() => {
-    console.log("Initial transactionsData:", transactionsData);
-    console.log("Number of transactions:", transactionsData.length);
+    setCurrentPage(1);
+  }, [filterValues]);
 
-    setTransactions(transactionsData);
-    setFilteredTransactions(transactionsData);
-  }, []);
-
-  // Calculate payment stats whenever filtered transactions change
-  useEffect(() => {
-    console.log("Filtered transactions updated:", filteredTransactions.length);
-    calculatePaymentStats(filteredTransactions);
-  }, [filteredTransactions]);
-
-  const calculatePaymentStats = (data) => {
-    console.log("Calculating stats for:", data.length, "transactions");
-
-    if (!data || data.length === 0) {
-      console.log("No data to calculate stats");
-      setPaymentStats([]);
-      return;
-    }
-
-    // Calculate stats
-    const totalRevenue = data.reduce((sum, t) => {
-      const amount = parseFloat(t.amount?.replace('$', '') || 0);
-      return sum + amount;
-    }, 0);
-
-    const completedTransactions = data.filter(t => t.status === 'completed').length;
-    const pendingTransactions = data.filter(t => t.status === 'pending').length;
-    const failedTransactions = data.filter(t => t.status === 'failed').length;
-    const totalTransactions = data.length;
-
-    const avgTransaction = totalRevenue / totalTransactions || 0;
-    const successRate = totalTransactions > 0 ? (completedTransactions / totalTransactions) * 100 : 0;
-
-    console.log("Calculated stats:", {
-      totalRevenue,
-      totalTransactions,
-      successRate,
-      avgTransaction,
-      completedTransactions,
-      pendingTransactions,
-      failedTransactions
-    });
-
-    // Create stats array
-    const stats = [
-      {
-        title: 'Total Revenue',
-        value: `$${totalRevenue.toFixed(2)}`,
-        change: totalRevenue > 45000 ? '+20.1%' : '-5.2%',
-        changeType: totalRevenue > 45000 ? 'increase' : 'decrease',
-        icon: 'dollar-sign'
-      },
-      {
-        title: 'Total Transactions',
-        value: totalTransactions.toString(),
-        change: totalTransactions > 2300 ? '+180' : '-50',
-        changeType: totalTransactions > 2300 ? 'increase' : 'decrease',
-        icon: 'credit-card'
-      },
-      {
-        title: 'Success Rate',
-        value: `${successRate.toFixed(1)}%`,
-        change: successRate > 95 ? '+1.2%' : '-0.5%',
-        changeType: successRate > 95 ? 'increase' : 'decrease',
-        icon: 'check-circle'
-      },
-      {
-        title: 'Avg. Transaction',
-        value: `$${avgTransaction.toFixed(2)}`,
-        change: avgTransaction > 80 ? '+5.3%' : '-2.3%',
-        changeType: avgTransaction > 80 ? 'increase' : 'decrease',
-        icon: 'percent'
-      }
-    ];
-
-    console.log("Stats array:", stats);
-    setPaymentStats(stats);
-  };
-
-  // ... (rest of the paymentActions array remains the same)
   const paymentActions = [
     {
       key: 'view',
       label: 'View Details',
       icon: Eye,
       onClick: (transaction) => {
-        setSelectedTransaction(transaction);
+        // Map API data to flat structure expected by PaymentModal
+        setSelectedTransaction({
+          ...transaction,
+          id: transaction.paymentId || transaction._id,
+          customerName: transaction.userId?.name || transaction.orderId?.customer?.name || 'N/A',
+          customerEmail: transaction.userId?.email || 'N/A',
+          customerPhone: transaction.userId?.mobile || transaction.orderId?.customer?.phone || 'N/A',
+          amount: transaction.amount?.payable || 0,
+          date: transaction.createdAt,
+          invoice: transaction.orderId?.orderId,
+          paymentMethod: transaction.method,
+          currency: transaction.currency,
+          status: transaction.status,
+          description: `Order #${transaction.orderId?.orderId || 'N/A'}`
+        });
         setIsModalOpen(true);
       },
       color: 'blue',
       show: true
     },
-    {
-      key: 'download',
-      label: 'Download Invoice',
-      icon: Download,
-      onClick: (transaction) => {
-        console.log('Download invoice for:', transaction);
-        alert(`Downloading invoice: ${transaction.invoice}`);
-      },
-      color: 'emerald',
-      show: true
-    },
-    {
-      key: 'refund',
-      label: 'Process Refund',
-      icon: RefreshCw,
-      onClick: (transaction) => {
-        console.log('Process refund for:', transaction);
-        showInfoAlert(`Processing refund for ${transaction.name}`);
-      },
-      color: 'amber',
-      disabled: (transaction) => transaction.status !== 'completed',
-      show: true
-    },
-    {
-      key: 'receipt',
-      label: 'Resend Receipt',
-      icon: Mail,
-      onClick: (transaction) => {
-        console.log('Resend receipt for:', transaction);
-        alert(`Resending receipt to ${transaction.email}`);
-      },
-      color: 'purple',
-      show: true
-    },
-    {
-      key: 'print',
-      label: 'Print Receipt',
-      icon: Printer,
-      onClick: (transaction) => {
-        console.log('Print receipt for:', transaction);
-        alert(`Printing receipt for ${transaction.name}`);
-      },
-      color: 'cyan',
-      show: false
-    },
-    {
-      key: 'share',
-      label: 'Share',
-      icon: Share2,
-      onClick: (transaction) => {
-        console.log('Share transaction:', transaction);
-        alert(`Sharing ${transaction.invoice}`);
-      },
-      color: 'blue',
-      show: false
-    },
-    {
-      key: 'edit',
-      label: 'Edit',
-      icon: Edit,
-      onClick: (transaction) => {
-        console.log('Edit transaction:', transaction);
-        alert(`Editing ${transaction.invoice}`);
-      },
-      color: 'emerald',
-      show: false
-    },
-    {
-      key: 'delete',
-      label: 'Delete',
-      icon: Trash2,
-      onClick: (transaction) => {
-        console.log('Delete transaction:', transaction);
-        if (confirm(`Are you sure you want to delete ${transaction.invoice}?`)) {
-          setTransactions(prev => prev.filter(t => t.id !== transaction.id));
-          setFilteredTransactions(prev => prev.filter(t => t.id !== transaction.id));
-        }
-      },
-      color: 'rose',
-      show: false
-    },
-    {
-      key: 'report',
-      label: 'Generate Report',
-      icon: FileText,
-      onClick: (transaction) => {
-        console.log('Generate report for:', transaction);
-        alert(`Generating report for ${transaction.invoice}`);
-      },
-      color: 'purple',
-      show: false
-    }
+
+    // {
+    //   key: 'download',
+    //   label: 'Download Invoice',
+    //   icon: Download,
+    //   onClick: (transaction) => {
+    //     alert(`Download for ${transaction.paymentId} coming soon`);
+    //   },
+    //   color: 'emerald',
+    //   show: true
+    // },
+    // {
+    //   key: 'refund',
+    //   label: 'Process Refund',
+    //   icon: RefreshCw,
+    //   onClick: (transaction) => {
+    //     alert(`Refunding for ${transaction.paymentId} coming soon`);
+    //   },
+    //   color: 'amber',
+    //   disabled: (transaction) => transaction.status !== 'COMPLETED',
+    //   show: true
+    // },
+    // {
+    //   key: 'send-receipt',
+    //   label: 'Send Receipt',
+    //   icon: Mail,
+    //   onClick: (transaction) => {
+    //     alert(`Sending receipt to ${transaction.userId?.email || 'N/A'}`);
+    //   },
+    //   color: 'purple',
+    //   show: true
+    // },
+    // {
+    //   key: 'delete',
+    //   label: 'Delete',
+    //   icon: Trash2,
+    //   onClick: (transaction) => {
+    //     alert(`Deleting ${transaction.paymentId} coming soon`);
+    //   },
+    //   color: 'rose',
+    //   show: true
+    // }
   ];
 
   // Handle filter changes
-  const handleFilterChange = (filters) => {
-    console.log("Filters changed:", filters);
-
-    let filtered = [...transactions];
+  const filteredTransactions = useMemo(() => {
+    let filtered = [...rawTransactions];
 
     // Filter by status
-    if (filters.status && filters.status !== 'all') {
-      filtered = filtered.filter(t => t.status === filters.status);
-    }
-
-    // Filter by membership type
-    if (filters.membership && filters.membership !== 'all') {
-      filtered = filtered.filter(t => t.membership === filters.membership);
+    if (filterValues.status && filterValues.status !== 'all') {
+      filtered = filtered.filter(t => t.status?.toUpperCase() === filterValues.status.toUpperCase());
     }
 
     // Filter by payment method
-    if (filters.method && filters.method !== 'all') {
+    if (filterValues.method && filterValues.method !== 'all') {
       filtered = filtered.filter(t =>
-        t.method.toLowerCase() === filters.method.toLowerCase()
+        t.method?.toLowerCase() === filterValues.method.toLowerCase()
       );
     }
 
     // Search by customer name or email
-    if (filters.search) {
-      const searchTerm = filters.search.toLowerCase();
+    if (filterValues.search) {
+      const searchTerm = filterValues.search.toLowerCase();
       filtered = filtered.filter(t =>
-        t.name.toLowerCase().includes(searchTerm) ||
-        t.email.toLowerCase().includes(searchTerm) ||
-        t.invoice.toLowerCase().includes(searchTerm)
+        (t.userId?.name || '').toLowerCase().includes(searchTerm) ||
+        (t.paymentId || '').toLowerCase().includes(searchTerm) ||
+        (t.orderId?.orderId || '').toLowerCase().includes(searchTerm)
       );
     }
+    return filtered;
+  }, [rawTransactions, filterValues]);
 
-    console.log("Filtered results:", filtered.length);
-    setFilteredTransactions(filtered);
-  };
-
-  // Handle status toggle
-  const handleToggleStatus = (id) => {
-    setTransactions(prev => prev.map(transaction =>
-      transaction.id === id
-        ? {
-          ...transaction,
-          status: transaction.status === 'completed' ? 'pending' : 'completed'
-        }
-        : transaction
-    ));
-
-    setFilteredTransactions(prev => prev.map(transaction =>
-      transaction.id === id
-        ? {
-          ...transaction,
-          status: transaction.status === 'completed' ? 'pending' : 'completed'
-        }
-        : transaction
-    ));
-  };
-
-  // Temporary debug display
-  const renderDebugStats = () => {
-    if (paymentStats.length === 0) {
-      return (
-        <div className="mb-6 p-4 bg-red-900/20 border border-red-500/30 rounded-lg">
-          <p className="text-red-300">No stats data available. Check console for details.</p>
-          <p className="text-red-400 text-sm">
-            Transactions loaded: {transactions.length} |
-            Filtered: {filteredTransactions.length}
-          </p>
-        </div>
-      );
-    }
-
-    return null;
-  };
+  // Pagination logic
+  const paginatedTransactions = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredTransactions.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredTransactions, currentPage]);
 
   return (
     <div className="min-h-screen page  space-y-8">
@@ -301,32 +151,31 @@ const Transactions = () => {
             Track and manage all restaurant payments
           </p>
         </div>
+        <Button variant="secondary">Export Data</Button>
       </div>
 
-      {/* Stats Section
-      {paymentStats.length > 0 && (
-        <div className="mb-6">
-          <StatCard paymentStats={paymentStats} />
-        </div>
-      )} */}
-
+      {/* TODO: Add FilterBar component here if needed */}
 
       {/* Transactions Table */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4">
-        {filteredTransactions.length === 0 ? (
+        {isLoading ? (
+          <div className="text-center py-8">Loading transactions...</div>
+        ) : isError ? (
+          <div className="text-center py-8 text-red-500">Failed to load transactions.</div>
+        ) : filteredTransactions.length === 0 ? (
           <div className="text-center py-8">
             <p className="text-gray-500 dark:text-gray-400">No transactions found.</p>
             <p className="text-gray-500 dark:text-gray-400 text-sm mt-2">
-              Total transactions in system: {transactions.length}
+              Total transactions in system: {rawTransactions.length}
             </p>
           </div>
         ) : (
           <>
             <div className="text-gray-600 dark:text-gray-400 text-sm mb-4">
-              Showing {filteredTransactions.length} of {transactions.length} transactions
+              Showing {filteredTransactions.length} of {rawTransactions.length} transactions
             </div>
             <Table
-              data={filteredTransactions}
+              data={paginatedTransactions}
               columns={[
                 {
                   header: "Customer",
@@ -337,9 +186,11 @@ const Transactions = () => {
                         <User className="w-5 h-5 text-white" />
                       </div>
                       <div>
-                        <p className="font-medium text-gray-900 dark:text-white">{transaction.name}</p>
-                        {transaction.invoice && (
-                          <p className="text-xs text-gray-500">#{transaction.invoice}</p>
+                        <p className="font-medium text-gray-900 dark:text-white">
+                          {transaction.userId?.name || transaction.orderId?.customer?.name || 'N/A'}
+                        </p>
+                        {transaction.paymentId && (
+                          <p className="text-xs text-gray-500">#{transaction.paymentId}</p>
                         )}
                       </div>
                     </div>
@@ -350,7 +201,7 @@ const Transactions = () => {
                   key: "amount",
                   render: (transaction) => (
                     <span className="font-semibold text-gray-900 dark:text-white">
-                      {transaction.amount}
+                      ₹{Number(transaction.amount?.payable || 0).toFixed(2)}
                     </span>
                   ),
                 },
@@ -359,7 +210,7 @@ const Transactions = () => {
                   key: "date",
                   render: (transaction) => (
                     <span className="text-sm text-gray-500 dark:text-gray-400">
-                      {new Date(transaction.date).toLocaleDateString()}
+                      {new Date(transaction.createdAt).toLocaleDateString()}
                     </span>
                   ),
                 },
@@ -368,48 +219,45 @@ const Transactions = () => {
                   key: "method",
                   render: (transaction) => <Badge>{transaction.method}</Badge>,
                 },
-                {
-                  header: "Contact",
-                  key: "contact",
-                  render: (transaction) => (
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-                        <Mail className="w-4 h-4 text-blue-500" />
-                        {transaction.email}
-                      </div>
-                      {transaction.phone && (
-                        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-                          <Phone className="w-4 h-4 text-green-500" />
-                          {transaction.phone}
-                        </div>
-                      )}
-                    </div>
-                  ),
-                },
-                {
-                  header: "Membership",
-                  key: "membership",
-                  render: (transaction) => <Badge>{transaction.membership}</Badge>,
-                },
-                {
-                  header: "Stats",
-                  key: "stats",
-                  render: (transaction) => (
-                    <div className="flex items-center gap-2">
-                      <ShoppingBag className="w-4 h-4 text-pink-600" />
-                      <span className="font-medium">{transaction.totalOrders || 0} orders</span>
-                    </div>
-                  ),
-                },
+                // {
+                //   header: "Contact",
+                //   key: "contact",
+                //   render: (transaction) => (
+                //     <div className="space-y-1">
+                //       <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                //         <Mail className="w-4 h-4 text-blue-500" />
+                //         {transaction.userId?.email || 'N/A'}
+                //       </div>
+                //       {(transaction.userId?.mobile || transaction.orderId?.customer?.phone) && (
+                //         <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                //           <Phone className="w-4 h-4 text-green-500" />
+                //           {transaction.userId?.mobile || transaction.orderId?.customer?.phone}
+                //         </div>
+                //       )}
+                //     </div>
+                //   ),
+                // },
                 {
                   header: "Status",
                   key: "status",
-                  render: (transaction) => <Badge>{transaction.status}</Badge>,
+                  render: (transaction) => (
+                    <Badge variant={
+                      transaction.status === 'COMPLETED' ? 'success' :
+                        transaction.status === 'PENDING' ? 'warning' : 'danger'
+                    }>{transaction.status || 'N/A'}</Badge>
+                  ),
                 },
               ]}
               actions={paymentActions}
               title="Transactions"
             />
+            {filteredTransactions.length > itemsPerPage && (
+              <Pagination
+                currentPage={currentPage}
+                totalPages={Math.ceil(filteredTransactions.length / itemsPerPage)}
+                onPageChange={setCurrentPage}
+              />
+            )}
           </>
         )}
       </div>
@@ -418,7 +266,8 @@ const Transactions = () => {
       <PaymentModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        transaction={selectedTransaction}
+        paymentData={selectedTransaction}
+        mode="view"
       />
     </div>
   );

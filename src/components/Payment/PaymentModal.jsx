@@ -1,4 +1,4 @@
-// src/admin/payments/components/PaymentModal.jsx
+
 import React, { useState, useEffect } from 'react';
 import InputField from '../ui/InputField';
 import {
@@ -17,7 +17,7 @@ import {
   FaBan
 } from 'react-icons/fa';
 import { BsBank } from 'react-icons/bs';
-import { SiBitcoin, SiPaypal } from 'react-icons/si';
+import { SiBitcoin, SiPaypal, SiRazorpay } from 'react-icons/si';
 
 const PaymentModal = ({ isOpen, onClose, onSubmit, paymentData, mode = 'view' }) => {
   const [formData, setFormData] = useState({
@@ -25,15 +25,44 @@ const PaymentModal = ({ isOpen, onClose, onSubmit, paymentData, mode = 'view' })
     customerName: paymentData?.customerName || '',
     customerEmail: paymentData?.customerEmail || '',
     amount: paymentData?.amount || '',
-    currency: paymentData?.currency || 'USD',
-    paymentMethod: paymentData?.paymentMethod || 'credit_card',
-    status: paymentData?.status || 'pending',
+    currency: paymentData?.currency || 'INR',
+    paymentMethod: 'credit_card',
+    status: 'pending',
     date: paymentData?.date || new Date().toISOString().split('T')[0],
     description: paymentData?.description || '',
     transactionId: paymentData?.transactionId || `TXN${Date.now()}`
   });
 
   const [errors, setErrors] = useState({});
+
+  // Update form data when paymentData changes
+  useEffect(() => {
+    if (isOpen) {
+      const rawMethod = (paymentData?.paymentMethod || 'upi').toLowerCase();
+      const finalMethod = rawMethod === 'cod' ? 'cash' : rawMethod;
+
+      setFormData({
+        id: paymentData?.id || '',
+        customerName: paymentData?.customerName || '',
+        customerEmail: paymentData?.customerEmail || '',
+        amount: paymentData?.amount || '',
+        currency: paymentData?.currency || 'INR',
+        paymentMethod: finalMethod,
+        status: paymentData?.status ? paymentData.status.toLowerCase() : 'pending',
+        date: (() => {
+          try {
+            if (!paymentData?.date) return new Date().toISOString().split('T')[0];
+            const d = new Date(paymentData.date);
+            return isNaN(d.getTime()) ? new Date().toISOString().split('T')[0] : d.toISOString().split('T')[0];
+          } catch (e) {
+            return new Date().toISOString().split('T')[0];
+          }
+        })(),
+        description: paymentData?.description || '',
+        transactionId: paymentData?.transactionId || paymentData?.paymentId || `TXN${Date.now()}`
+      });
+    }
+  }, [paymentData, isOpen]);
 
   // Prevent body scroll when modal is open
   useEffect(() => {
@@ -137,6 +166,7 @@ const PaymentModal = ({ isOpen, onClose, onSubmit, paymentData, mode = 'view' })
       case 'paypal': return <SiPaypal className="text-lg text-blue-600" />;
       case 'bank_transfer': return <BsBank className="text-lg" />;
       case 'crypto': return <SiBitcoin className="text-lg text-orange-500" />;
+      case 'upi': return <SiRazorpay className="text-lg text-blue-500" />;
       case 'cash': return <FaDollarSign className="text-lg" />;
       default: return <FaCreditCard className="text-lg" />;
     }
@@ -147,8 +177,9 @@ const PaymentModal = ({ isOpen, onClose, onSubmit, paymentData, mode = 'view' })
       case 'USD': return '$';
       case 'EUR': return '€';
       case 'GBP': return '£';
+      case 'INR': return '₹';
       case 'JPY': return '¥';
-      default: return '$';
+      default: return '₹';
     }
   };
 
@@ -229,7 +260,7 @@ const PaymentModal = ({ isOpen, onClose, onSubmit, paymentData, mode = 'view' })
                       />
 
                       {/* Customer Email */}
-                      <InputField
+                      {/* <InputField
                         label="Customer Email"
                         name="customerEmail"
                         type="email"
@@ -240,7 +271,7 @@ const PaymentModal = ({ isOpen, onClose, onSubmit, paymentData, mode = 'view' })
                         required={mode !== 'view'}
                         disabled={mode === 'view'}
                         startIcon={<FaEnvelope className="text-gray-400" />}
-                      />
+                      /> */}
 
                       {/* Amount */}
                       <InputField
@@ -279,6 +310,7 @@ const PaymentModal = ({ isOpen, onClose, onSubmit, paymentData, mode = 'view' })
                             disabled={mode === 'view'}
                             className="w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white pl-11 pr-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 dark:focus:ring-indigo-400/10 hover:border-gray-300 dark:hover:border-gray-600 transition-all duration-200 ease-in-out outline-none text-sm font-medium shadow-sm disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-gray-100 dark:disabled:bg-gray-900 appearance-none"
                           >
+                            <option value="INR">🇮🇳 INR (₹)</option>
                             <option value="USD">🇺🇸 USD ($)</option>
                             <option value="EUR">🇪🇺 EUR (€)</option>
                             <option value="GBP">🇬🇧 GBP (£)</option>
@@ -303,11 +335,12 @@ const PaymentModal = ({ isOpen, onClose, onSubmit, paymentData, mode = 'view' })
                             disabled={mode === 'view'}
                             className="w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white pl-11 pr-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 dark:focus:ring-indigo-400/10 hover:border-gray-300 dark:hover:border-gray-600 transition-all duration-200 ease-in-out outline-none text-sm font-medium shadow-sm disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-gray-100 dark:disabled:bg-gray-900 appearance-none"
                           >
+                            <option value="upi">UPI</option>
+                            <option value="cash">Cash (COD)</option>
                             <option value="credit_card">Credit Card</option>
                             <option value="paypal">PayPal</option>
                             <option value="bank_transfer">Bank Transfer</option>
                             <option value="crypto">Cryptocurrency</option>
-                            <option value="cash">Cash</option>
                           </select>
                         </div>
                       </div>
