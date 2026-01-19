@@ -2,24 +2,24 @@
 
 :root {
 
-  --bg-page: #f9fafb;
-  --bg-main: #ffffff;
-  --bg-card: #ffffff;
-  --bg-hover: #e5e7eb;
-  --bg-sidebar: #0f5474;
+    --bg-page: #f9fafb;
+    --bg-main: #ffffff;
+    --bg-card: #ffffff;
+    --bg-hover: #e5e7eb;
+    --bg-sidebar: #0f5474;
 
-  --text-main: #000000;
-  --text-muted: #6b7280;
-  --text-sidebar: #ffffff;
+    --text-main: #000000;
+    --text-muted: #6b7280;
+    --text-sidebar: #ffffff;
 
-  --primary: #f91616;
+    --primary: #f91616;
 
 
-  --primary-hover: #dc2626;
+    --primary-hover: #dc2626;
 
-  --border: #d1d5db;
-  --border-sidebar: rgba(255, 255, 255, 0.1);
-  --focus-ring: rgba(37, 99, 235, 0.4);
+    --border: #d1d5db;
+    --border-sidebar: rgba(255, 255, 255, 0.1);
+    --focus-ring: rgba(37, 99, 235, 0.4);
 
 }
 
@@ -28,43 +28,44 @@
 
 .dark {
 
-  --bg-page: #0a182f;
-  --bg-main: #1E2939;
-  --bg-card: #1E2939;
-  --bg-hover: #0f172a;
-  --bg-sidebar: #19262d;
+    --bg-page: #0a182f;
+    --bg-main: #1E2939;
+    --bg-card: #1E2939;
+    --bg-hover: #0f172a;
+    --bg-sidebar: #19262d;
 
-  --text-main: #bebebe;
-  --text-muted: #9ca3af;
-  --text-sidebar: #f9fafb;
+    --text-main: #bebebe;
+    --text-muted: #9ca3af;
+    --text-sidebar: #f9fafb;
 
 
-  --primary: #f91616;
+    --primary: #f91616;
 
-  --primary-hover: #ea0c0c;
+    --primary-hover: #ea0c0c;
 
-  --border: #1f2937;
-  --border-sidebar: rgba(255, 255, 255, 0.1);
-  --focus-ring: rgba(249, 115, 22, 0.7);
+    --border: #1f2937;
+    --border-sidebar: rgba(255, 255, 255, 0.1);
+    --focus-ring: rgba(249, 115, 22, 0.7);
 }
 
 
 /* ========= GLOBAL UI CLASSES ========= */
 
 .highlight {
-  color: var(--primary);
+    color: var(--primary);
 }
 
 .highlight-bg {
-  background-color: var(--primary);
-  color: white;
+    background-color: var(--primary);
+    color: white;
 }
 
 
 /* App wrapper (attach via className="app") */
 .app {
-  min-height: 100vh;
+    min-height: 100vh;
 }
+
 /* App wrapper (attach via className="app") */
 
 .app {
@@ -86,12 +87,15 @@
 
 .page {
     min-height: 100vh;
-    padding: 1rem;
+    padding: 1px;
+    padding-bottom: 2.5rem;
+    background-color: var(--bg-page);
 }
 
 @media (min-width: 768px) {
     .page {
         padding: 1.5rem;
+        padding-bottom: 2.5rem;
     }
 }
 
@@ -100,14 +104,6 @@
         padding: 2rem;
         padding-bottom: 2.5rem;
     }
-}
-
-.page {
-    min-height: 100vh;
-    /* padding: 1rem; */
-    padding: 1rem;
-    padding-bottom: 2.5rem;
-    background-color: var(--bg-page);
 }
 
 .page-background {
@@ -140,7 +136,7 @@
 /* Elevated card (for dashboards, glass effects etc.) */
 
 .card-elevated {
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 
@@ -171,8 +167,8 @@
 }
 
 .bg-gradient-sidebar {
-  background: linear-gradient(135deg, var(--primary), #f8a071);
-  color: #ffffff;
+    background: linear-gradient(135deg, var(--primary), #f8a071);
+    color: #ffffff;
 }
 
 
@@ -197,10 +193,10 @@
 /* Cards */
 
 .card {
-  background-color: var(--bg-card);
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  border-radius: 0.5rem;
-  padding: 1rem;
+    background-color: var(--bg-card);
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    border-radius: 0.5rem;
+    padding: 1rem;
 }
 
 .btn-ghost {
@@ -227,12 +223,12 @@
 /* Inputs */
 
 .input {
-  background-color: var(--bg-page);
-  color: var(--text-main);
-  border: 1px solid var(--border);
-  padding: 0.5rem 0.75rem;
-  border-radius: 8px;
-  transition: all 0.2s ease;
+    background-color: var(--bg-page);
+    color: var(--text-main);
+    border: 1px solid var(--border);
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
 
 }
 

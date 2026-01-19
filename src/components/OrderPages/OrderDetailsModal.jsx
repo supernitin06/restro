@@ -250,7 +250,7 @@ const OrderDetailsModal = ({ order, onClose }) => {
               {/* Right: Payment & Summary (3 Cols) */}
               <div className="lg:col-span-3 space-y-4">
                 <div className="bg-primary rounded-xl shadow-md border border-indigo-100 overflow-hidden">
-                  <div className="p-4 bg-gradient-to-br from-indigo-600 to-indigo-700 text-white">
+                  <div className="p-4 itext-white">
                     <h3 className="text-sm font-bold flex items-center gap-2 opacity-90">
                       <FiDollarSign className="text-indigo-200" /> Payment Info
                     </h3>

@@ -2,20 +2,20 @@ import React, { useState } from "react";
 import { Home, Bike, Clock, Package, Ban, Loader2 } from "lucide-react";
 import { useGetAnalyticsQuery } from "../../api/services/dashboard";
 import Select from "../ui/Select";
- 
+
 const OrderTypes = () => {
   const [filter, setFilter] = useState("month");
- 
+
   const { data: analyticsData, isLoading, isFetching } = useGetAnalyticsQuery(
     { params: filter },
     { refetchOnMountOrArgChange: true }
   );
- 
+
   // 🔹 Backend response
   const overview = analyticsData?.data?.ordersOverview || {};
- 
+
   const total = overview.total || 0;
- 
+
   // 🔹 Convert backend object → UI array
   const data = [
     {
@@ -66,15 +66,15 @@ const OrderTypes = () => {
       bgColor: "bg-red-100",
     },
   ];
- 
+
   return (
     <div className="bg-primary rounded-2xl p-6 shadow-sm border border-white/20 dark:border-gray-700">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
         <div className="flex items-center gap-2">
           <h3 className="text-xl font-bold text-primary">Order Status</h3>
           {(isLoading || isFetching) && <Loader2 className="w-4 h-4 animate-spin text-primary" />}
         </div>
- 
+
         <Select
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
@@ -83,15 +83,15 @@ const OrderTypes = () => {
             { value: "month", label: "This Month" },
             { value: "year", label: "This Year" },
           ]}
-          className="w-32"
+          className="w-full sm:w-32"
           selectClassName="py-1 px-3 text-xs"
         />
       </div>
- 
+
       <div className="space-y-5">
         {data.map((item) => {
           const IconComponent = item.icon;
- 
+
           return (
             <div key={item.id} className="group">
               <div className="flex items-center justify-between mb-2">
@@ -104,17 +104,17 @@ const OrderTypes = () => {
                       style={{ color: item.color }}
                     />
                   </div>
- 
+
                   <span className="font-semibold text-primary">
                     {item.type}
                   </span>
                 </div>
- 
+
                 <p className="text-sm font-bold text-primary">
                   {item.orders}
                 </p>
               </div>
- 
+
               <div className="relative w-full h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
                 <div
                   className="absolute top-0 left-0 h-full rounded-full transition-all duration-500 ease-out"
@@ -124,7 +124,7 @@ const OrderTypes = () => {
                   }}
                 />
               </div>
- 
+
               <div className="flex justify-end mt-1">
                 <span className="text-xs font-medium text-primary opacity-60">
                   {item.percentage}%
@@ -137,5 +137,5 @@ const OrderTypes = () => {
     </div>
   );
 };
- 
+
 export default OrderTypes;

@@ -27,7 +27,7 @@ const TopCategories = () => {
     // Assuming API returns array of objects with { category: "Name", sales: 100 } or similar
     // Adjust 'category' and 'sales' keys based on your actual API response
     return apiData.data.map((item, index) => ({
-      name: item.category || item.name || item._id || "Unknown", 
+      name: item.category || item.name || item._id || "Unknown",
       value: item.totalSales || item.sales || item.count || item.value || 0,
       color: COLORS[index % COLORS.length]
     }));
@@ -65,14 +65,16 @@ const TopCategories = () => {
 
   return (
     <div className="bg-primary rounded-2xl p-6 shadow-sm border border-white/20 dark:border-gray-700 hover:shadow-md transition-all duration-300">
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
         <h3 className="text-xl font-bold text-primary">Top Categories</h3>
-        <Select
-          value={selectedPeriod}
-          onChange={(e) => setSelectedPeriod(e.target.value)}
-          options={["This Week", "This Month", "This Year"]}
-          className="w-32"
-        />
+        <div className="w-full sm:w-auto">
+          <Select
+            value={selectedPeriod}
+            onChange={(e) => setSelectedPeriod(e.target.value)}
+            options={["This Week", "This Month", "This Year"]}
+            className="w-full sm:w-32"
+          />
+        </div>
       </div>
 
       <div className="h-64">
@@ -98,12 +100,12 @@ const TopCategories = () => {
                 stroke={theme === 'dark' ? '#1f2937' : '#fff'}
               >
                 {chartData.map((entry, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={entry.color}
-                  className="hover:opacity-80 transition-opacity cursor-pointer"
-                />
-              ))}
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={entry.color}
+                    className="hover:opacity-80 transition-opacity cursor-pointer"
+                  />
+                ))}
               </Pie>
               <Tooltip content={<CustomTooltip />} />
               <Legend content={<CustomLegend />} />

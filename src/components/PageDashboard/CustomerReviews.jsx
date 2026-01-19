@@ -82,7 +82,7 @@ const CustomerReviews = () => {
 
   return (
     <div className="bg-primary rounded-2xl p-6 shadow-sm border border-white/20 dark:border-gray-700">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
         <h3 className="text-xl font-bold text-primary">Customer Reviews</h3>
         <Button
           onClick={() => navigate('/reviews')}
@@ -113,7 +113,7 @@ const CustomerReviews = () => {
             {reviews.map((review) => (
               <div
                 key={review.id}
-                className="w-[45%] flex-shrink-0 card rounded-2xl p-6 border border-gray-100 dark:border-gray-700 hover:shadow-md transition-all duration-300 group"
+                className="w-full sm:w-[45%] flex-shrink-0 card rounded-2xl p-6 border border-gray-100 dark:border-gray-700 hover:shadow-md transition-all duration-300 group"
               >
                 <div className="flex items-start gap-4 mb-4">
                   <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${review.gradient} dark:from-gray-600 dark:via-gray-700 dark:to-gray-800 flex items-center justify-center text-4xl shadow-sm group-hover:scale-110 transition-transform`}>

@@ -82,7 +82,7 @@ const Dashboard = () => {
               Welcome back! Here's what's happening today.
             </p>
           </div>
-          <div className="mt-4 md:mt-0">
+          {/* <div className="mt-4 md:mt-0">
             <Select
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
@@ -93,7 +93,7 @@ const Dashboard = () => {
               ]}
               className="w-40"
             />
-          </div>
+          </div> */}
 
         </div>
 

@@ -65,8 +65,8 @@ const RevenueChart = () => {
 
   return (
     <div className="bg-primary rounded-2xl p-6 shadow-sm border border-white/20 dark:border-gray-700">
-      <div className="flex items-center justify-between mb-6">
-        <div>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+        <div className="w-full sm:w-auto">
           <h3 className="text-xl font-bold text-primary mb-1">Total Revenue</h3>
           <div className="flex items-center gap-3">
             <p className="flex items-center gap-1 text-3xl font-bold text-primary">
@@ -80,12 +80,14 @@ const RevenueChart = () => {
             </div>
           </div>
         </div>
-        <Select
-          value={selectedPeriod}
-          onChange={(e) => setSelectedPeriod(e.target.value)}
-          options={["Last 6 Months", "Last 3 Months", "Last Month", "This Year"]}
-          className="w-40"
-        />
+        <div className="w-full sm:w-auto">
+          <Select
+            value={selectedPeriod}
+            onChange={(e) => setSelectedPeriod(e.target.value)}
+            options={["Last 6 Months", "Last 3 Months", "Last Month", "This Year"]}
+            className="w-full sm:w-40"
+          />
+        </div>
       </div>
 
       <div className="h-64">
