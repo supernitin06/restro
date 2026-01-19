@@ -2,55 +2,49 @@ import React, { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import Button from '../ui/Button';
+import { useGetRatingsQuery } from '../../api/services/rating';
+
 
 const CustomerReviews = () => {
   const scrollRef = useRef(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
   const navigate = useNavigate();
+  const { data: ratingsData, isLoading } = useGetRatingsQuery();
 
-  const reviews = [
-    {
-      id: 1,
-      dishName: 'Classic Italian Penne',
-      review: 'This pasta is divine! The flavors are prominent, creating a rich, savory, unforgettable taste. Highly recommended for pasta lovers!',
-      reviewer: 'Sarah M.',
-      date: 'Oct 12, 2035',
-      rating: 5,
-      image: '🍝',
-      gradient: 'from-orange-100 to-orange-50'
-    },
-    {
-      id: 2,
-      dishName: 'Smokey Supreme Pizza',
-      review: 'Crispy crust, generous cheese, and the perfect balance of spice in the pepperoni. A classic pizza done right, and one of the best I\'ve had!',
-      reviewer: 'Michael R.',
-      date: 'Oct 15, 2035',
-      rating: 4.5,
-      image: '🍕',
-      gradient: 'from-red-100 to-red-50'
-    },
-    {
-      id: 3,
-      dishName: 'Classic Cheeseburger',
-      review: 'Juicy, perfectly cooked patty with fresh ingredients. The cheese was melted to perfection. Best burger in town!',
-      reviewer: 'Jessica L.',
-      date: 'Oct 18, 2035',
-      rating: 5,
-      image: '🍔',
-      gradient: 'from-yellow-100 to-yellow-50'
-    },
-    {
-      id: 4,
-      dishName: 'Sashimi Sushi Roll',
-      review: 'Fresh and delicious! The fish quality is exceptional and the presentation is beautiful. Will definitely order again.',
-      reviewer: 'David K.',
-      date: 'Oct 20, 2035',
-      rating: 5,
-      image: '🍣',
-      gradient: 'from-blue-100 to-blue-50'
-    }
-  ];
+  const reviews = React.useMemo(() => {
+    if (!ratingsData?.data?.ratings) return [];
+
+    return ratingsData.data.ratings.map((r, index) => {
+      // Generate deterministic gradient/emoji based on index or id to keep it consistent
+      const gradients = [
+        'from-orange-100 to-orange-50',
+        'from-red-100 to-red-50',
+        'from-yellow-100 to-yellow-50',
+        'from-blue-100 to-blue-50',
+        'from-purple-100 to-purple-50',
+        'from-green-100 to-green-50'
+      ];
+      const emojis = ['🍝', '🍕', '🍔', '🍣', '🥗', '🍰'];
+
+      return {
+        id: r._id,
+        dishName: "Dining Experience", // Generic since API seems to be order-level or doesn't explicitly return dish name here
+        review: r.comment || "No comment provided.",
+        reviewer: r.rater?.userId?.name || r.rater?.userId?.displayName || "Valued Customer",
+        date: new Date(r.createdAt).toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric'
+        }),
+        rating: r.rating?.overall || 0,
+        image: emojis[index % emojis.length],
+        gradient: gradients[index % gradients.length]
+      };
+    });
+  }, [ratingsData]);
+
+
 
   const checkScroll = () => {
     if (scrollRef.current) {
@@ -81,6 +75,10 @@ const CustomerReviews = () => {
       };
     }
   }, []);
+
+  if (isLoading) {
+    return <div className="p-6 text-center text-gray-500">Loading reviews...</div>;
+  }
 
   return (
     <div className="bg-primary rounded-2xl p-6 shadow-sm border border-white/20 dark:border-gray-700">

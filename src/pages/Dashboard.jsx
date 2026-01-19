@@ -70,7 +70,7 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen page">
       {/* Page Container */}
-      <div className="mx-auto px-4 md:px-6 lg:px-8 pt-6 pb-10 space-y-8">
+      <div className="mx-auto   space-y-8">
 
         {/* ================= HEADER ================= */}
         <div className="flex bg-primary flex-col md:flex-row justify-between items-start md:items-center bg-white dark:bg-gray-800 p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">

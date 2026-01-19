@@ -14,8 +14,7 @@ const AcceptedOrders = () => {
   const { ordersSocket } = useSockets();
   const navigate = useNavigate();
 
-  const { data, refetch } = useGetOrdersQuery({
-   
+  const { data, refetch } = useGetOrdersQuery({}, {
     refetchOnMountOrArgChange: true,
   });
   const allOrders = data?.data || [];
@@ -61,7 +60,7 @@ const AcceptedOrders = () => {
 
   const handlePrepare = async (orderId) => {
 
-     try {
+    try {
       setLoadingId(orderId);
 
       await updateKitchenStatus({
@@ -72,7 +71,7 @@ const AcceptedOrders = () => {
       showSuccessAlert("Order moved to Processing!");
       refetch();
 
-    // Move to Processing page
+      // Move to Processing page
     } catch (err) {
       console.error("READY ERROR:", err);
       showErrorAlert("Failed to update kitchen status");
@@ -84,7 +83,7 @@ const AcceptedOrders = () => {
 
 
 
-  
+
   // ✅ Ready → move to Processing page
   const handleReady = async (orderId) => {
     try {
@@ -140,7 +139,7 @@ const AcceptedOrders = () => {
             order={order}
             onPrepare={() => handlePrepare(order.orderId)}
             isButtonVisible={true} // show footer buttons
-          
+
             onReady={() => handleReady(order.orderId)}
             onReject={() => handleReject(order.orderId)}
           />
