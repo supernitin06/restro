@@ -89,7 +89,7 @@ const Navbar = ({ toggleSidebar }) => {
   if (!user) return null;
 
   return (
-    <div className="sticky top-0 z-[80] w-full backdrop-blur bg-white/80 dark:bg-gray-900/80 border-b">
+    <div className="sticky top-0 z-[40] w-full backdrop-blur bg-white/80 dark:bg-gray-900/80 border-b">
       <div className="px-6 py-4 flex items-center justify-between gap-4">
         {/* LEFT */}
         <div className="flex items-center gap-4 flex-1">
