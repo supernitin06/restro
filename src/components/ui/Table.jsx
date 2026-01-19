@@ -17,8 +17,8 @@ const Table = ({
   const displayColumns = hasActionsColumn
     ? columns
     : actions.length > 0
-    ? [...columns, { header: "Actions", key: "actions" }]
-    : columns;
+      ? [...columns, { header: "Actions", key: "actions" }]
+      : columns;
 
   return (
     <div
@@ -42,16 +42,15 @@ const Table = ({
 
       <div className="overflow-x-auto overflow-y-auto">
         <table className="min-w-full">
-          <thead className="bg-primary z-40 sticky top-0">
+          <thead className="bg-primary z-30 sticky top-0">
             <tr>
               {displayColumns.map((col, index) => (
                 <th
                   key={col.key || index}
-                  className={`px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider ${
-                    index === 0
+                  className={`px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider ${index === 0
                       ? "sticky z-40 left-0 bg-primary "
                       : ""
-                  }`}
+                    }`}
                 >
                   {(() => {
                     const header = col.header || col.label;
@@ -111,19 +110,18 @@ const Table = ({
                       if (col.render && typeof col.render === 'function') {
                         const renderResult = col.render(row);
                         // Ensure we're rendering valid React elements
-                        if (React.isValidElement(renderResult) || 
-                            typeof renderResult === 'string' || 
-                            typeof renderResult === 'number' ||
-                            renderResult === null ||
-                            renderResult === undefined) {
+                        if (React.isValidElement(renderResult) ||
+                          typeof renderResult === 'string' ||
+                          typeof renderResult === 'number' ||
+                          renderResult === null ||
+                          renderResult === undefined) {
                           return (
                             <td
                               key={col.key || colIndex}
-                              className={`px-6 py-4 whitespace-nowrap ${
-                                colIndex === 0
-                                  ? "sticky left-0 bg-white dark:bg-gray-800 z-50"
+                              className={`px-6 py-4 whitespace-nowrap ${colIndex === 0
+                                  ? "sticky left-0 bg-white dark:bg-gray-800 z-20"
                                   : ""
-                              }`}
+                                }`}
                             >
                               {renderResult}
                             </td>
@@ -133,11 +131,10 @@ const Table = ({
                         return (
                           <td
                             key={col.key || colIndex}
-                            className={`px-6 py-4 whitespace-nowrap ${
-                              colIndex === 0
-                                ? "sticky left-0 bg-white dark:bg-gray-800 z-30"
+                            className={`px-6 py-4 whitespace-nowrap ${colIndex === 0
+                                ? "sticky left-0 bg-white dark:bg-gray-800 z-20"
                                 : ""
-                            }`}
+                              }`}
                           >
                             {String(renderResult)}
                           </td>
@@ -150,11 +147,10 @@ const Table = ({
                         return (
                           <td
                             key={col.key || colIndex}
-                            className={`px-6 py-4 whitespace-nowrap ${
-                              colIndex === 0
-                                ? "sticky left-0 bg-white dark:bg-gray-800 z-30"
+                            className={`px-6 py-4 whitespace-nowrap ${colIndex === 0
+                                ? "sticky left-0 bg-white dark:bg-gray-800 z-20"
                                 : ""
-                            }`}
+                              }`}
                           >
                             {cellValue !== undefined && cellValue !== null
                               ? String(cellValue)
@@ -167,11 +163,10 @@ const Table = ({
                       return (
                         <td
                           key={colIndex}
-                          className={`px-6 py-4 whitespace-nowrap ${
-                            colIndex === 0
-                              ? "sticky left-0 bg-white dark:bg-gray-800 z-30"
+                          className={`px-6 py-4 whitespace-nowrap ${colIndex === 0
+                              ? "sticky left-0 bg-white dark:bg-gray-800 z-20"
                               : ""
-                          }`}
+                            }`}
                         >
                           -
                         </td>

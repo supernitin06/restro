@@ -29,14 +29,12 @@ import {
 
 const VegNonVegIcon = ({ isVeg }) => (
   <div
-    className={`w-5 h-5 flex items-center justify-center border-2 rounded-sm ${
-      isVeg ? "border-green-600" : "border-red-600"
-    } shadow-sm`}
+    className={`w-5 h-5 flex items-center justify-center border-2 rounded-sm ${isVeg ? "border-green-600" : "border-red-600"
+      } shadow-sm`}
   >
     <div
-      className={`w-2.5 h-2.5 rounded-full ${
-        isVeg ? "bg-green-600" : "bg-red-600"
-      }`}
+      className={`w-2.5 h-2.5 rounded-full ${isVeg ? "bg-green-600" : "bg-red-600"
+        }`}
     ></div>
   </div>
 );
@@ -58,14 +56,12 @@ const ToggleSwitch = ({ checked, onChange, label }) => (
     title={label}
   >
     <div
-      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-        checked ? "bg-green-500" : "bg-red-500"
-      }`}
+      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${checked ? "bg-green-500" : "bg-red-500"
+        }`}
     >
       <span
-        className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
-          checked ? "translate-x-6" : "translate-x-1"
-        }`}
+        className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${checked ? "translate-x-6" : "translate-x-1"
+          }`}
       />
     </div>
     {label && (
@@ -97,7 +93,8 @@ const MenuList = ({
   const [itemToDelete, setItemToDelete] = useState(null);
   const [updateMenu] = useUpdateMenuMutation();
   const [updateMenuStockStatus] = useUpdateMenuStockStatusMutation();
-  // Categories are collapsed by default.
+
+
 
   const toggleCategory = (categoryId) => {
     setExpandedCategories((prev) => ({
@@ -163,9 +160,8 @@ const MenuList = ({
       }).unwrap(),
       {
         loading: "Updating stock...",
-        success: `Item marked as ${
-          !item.inStock ? "In Stock" : "Out of Stock"
-        }`,
+        success: `Item marked as ${!item.inStock ? "In Stock" : "Out of Stock"
+          }`,
         error: "Failed to update stock.",
       }
     );
@@ -306,9 +302,8 @@ const MenuList = ({
                 )}
 
                 <div
-                  className={`p-2 rounded-full bg-gray-100 dark:bg-gray-700/60 transition-transform duration-300 ${
-                    expandedCategories[category.categoryId] ? "rotate-180" : ""
-                  }`}
+                  className={`p-2 rounded-full bg-gray-100 dark:bg-gray-700/60 transition-transform duration-300 ${expandedCategories[category.categoryId] ? "rotate-180" : ""
+                    }`}
                 >
                   <ChevronDown className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                 </div>
@@ -337,9 +332,8 @@ const MenuList = ({
                           {subCat.items.map((item) => (
                             <div
                               key={item.itemId}
-                              className={`group bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl transition-all duration-300 ${
-                                !item.inStock ? "opacity-60 grayscale" : ""
-                              }`}
+                              className={`group bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl transition-all duration-300 ${!item.inStock ? "opacity-60 grayscale" : ""
+                                }`}
                             >
                               {/* Image Container */}
                               <div className="relative h-48 overflow-hidden">
@@ -436,9 +430,8 @@ const MenuList = ({
                                     "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80"
                                   }
                                   alt={item.name}
-                                  className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${
-                                    !item.inStock ? "grayscale" : ""
-                                  }`}
+                                  className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${!item.inStock ? "grayscale" : ""
+                                    }`}
                                   onError={(e) => {
                                     e.target.onerror = null;
                                     e.target.src =

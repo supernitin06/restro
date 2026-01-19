@@ -97,8 +97,12 @@ const Orders = () => {
       timeline: apiOrder.timeline || [], // Pass timeline for the visualization
 
       // Price details
-      subtotal: apiOrder.price?.itemsTotal || 0,
+      price: apiOrder.price || {},
+      // Price details
+      itemsTotal: apiOrder.price?.itemsTotal || 0,
       deliveryFee: apiOrder.price?.deliveryFee || 0,
+      discount: apiOrder.price?.discount || 0,
+      grandTotal: apiOrder.price?.grandTotal || 0,
       tax: apiOrder.price?.tax || 0,
       total: apiOrder.price?.grandTotal || 0
     };

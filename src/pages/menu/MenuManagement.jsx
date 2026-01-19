@@ -9,45 +9,58 @@ import { useNavigate } from "react-router-dom";
 import MenuStats from "../../components/menu/MenuStats";
 import { useGetMenusQuery } from "../../api/services/menuApi";
 
-const transformItemsData = (items) => {
-  if (!Array.isArray(items)) return { menus: [] };
+const mapItem = (item) => ({
+  itemId: item._id,
+  name: item.name,
+  image: item.image,
+  price: item.basePrice,
+  discountPrice: null,
+  available: item.isAvailable,
+  veg: item.isVeg || item.foodType === 'VEG',
+  bestseller: item.tags?.includes('BEST_SELLER') || false,
+  description: item.description,
+  inStock: item.inStock,
+  ...item
+});
 
-  const categoriesMap = {};
+const transformItemsData = (apiData) => {
+  if (!apiData) return { menus: [] };
 
-  items.forEach(item => {
-    const cat = item.category || item.categoryId || { _id: 'uncategorized', name: 'Uncategorized' };
-    const catId = cat._id || 'uncategorized';
+  const categories = [];
 
-    if (!categoriesMap[catId]) {
-      categoriesMap[catId] = {
-        categoryId: catId,
-        name: cat.name || 'Uncategorized',
-        status: 'active',
+  // 1. Process structured categories
+  if (apiData.categories && Array.isArray(apiData.categories)) {
+    apiData.categories.forEach(cat => {
+      categories.push({
+        categoryId: cat._id,
+        name: cat.name,
+        status: cat.isActive !== false ? 'active' : 'inactive', // Default to active if undefined
+        description: cat.description,
         subCategories: [{
-          subCategoryId: `${catId}_sub`,
-          name: cat.name || 'Uncategorized',
-          items: []
+          subCategoryId: cat._id,
+          name: cat.name,
+          items: (cat.items || []).map(mapItem)
         }]
-      };
-    }
-
-    categoriesMap[catId].subCategories[0].items.push({
-      itemId: item._id,
-      name: item.name,
-      image: item.image,
-      price: item.basePrice,
-      discountPrice: null,
-      available: item.isAvailable,
-      veg: item.isVeg,
-      bestseller: item.tags?.includes('BEST_SELLER') || false,
-      ...item
+      });
     });
-  });
+  }
+
+  // 2. Process uncategorized items
+  if (apiData.uncategorized && Array.isArray(apiData.uncategorized) && apiData.uncategorized.length > 0) {
+    categories.push({
+      categoryId: 'uncategorized',
+      name: 'Uncategorized',
+      status: 'active',
+      subCategories: [{
+        subCategoryId: 'uncategorized_main',
+        name: 'Others',
+        items: apiData.uncategorized.map(mapItem)
+      }]
+    });
+  }
 
   return {
-    menus: [{
-      categories: Object.values(categoriesMap)
-    }]
+    menus: [{ categories }]
   };
 };
 
@@ -58,7 +71,7 @@ const MenuManagement = () => {
   const [viewType, setViewType] = useState('list');
   const user = useSelector((state) => state.auth.user);
   const [restaurantId, setRestaurantId] = useState(null);
-  
+
 
   const handleFilterChange = (key, value) => {
     setFilters(prev => ({ ...prev, [key]: value }));
@@ -77,14 +90,14 @@ const MenuManagement = () => {
 
   const { data, isLoading, isError, error } = useGetMenusQuery(
     { restaurantId },
-    { skip: !restaurantId }
+    { skip: !restaurantId, refetchOnMountOrArgChange: true }
   );
 
   const menus = useMemo(() => (
     data?.data ? transformItemsData(data.data).menus : []
   ), [data]);
- 
-  
+
+
   return (
     <div className="app page">
       <div className="mx-auto">

@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { FiX, FiTruck } from "react-icons/fi";
@@ -32,18 +32,25 @@ const STATUS_COLORS = {
 const OrderFlowTable = () => {
   const { data, refetch } = useGetOrdersQuery({
     page: 1,
-    limit: 10000, // 🔹 Fetch all orders
+    limit: 5000,
     refetchOnMountOrArgChange: true,
   });
 
   const { data: partnersData } = useGetDeliveryPartnersQuery();
+
   const { ordersSocket } = useSockets();
   const ITEMS_PER_PAGE = 20;
 
-  const [updateStatus] = useUpdateOrderStatusMutation();
-  const [updateKitchenStatus] = useUpdateKitchenStatusMutation();
-  const [assignDelivery] = useAssignDeliveryMutation();
-  const [generateInvoice] = useGenerateInvoiceMutation();
+  const [updateStatus, { isLoading: updateStatusLoading }] = useUpdateOrderStatusMutation();
+  const [updateKitchenStatus, { isLoading: updateKitchenStatusLoading }] = useUpdateKitchenStatusMutation();
+  const [assignDelivery, { isLoading: assignDeliveryLoading }] = useAssignDeliveryMutation();
+  const [generateInvoice, { isLoading: generateInvoiceLoading }] = useGenerateInvoiceMutation();
+
+  // Local state for tracking which specific action is loading on which ID
+  const [loadingAction, setLoadingAction] = useState({ id: null, type: null });
+  // Use a Set to track processing orders to allow parallel actions on DIFFERENT orders
+  // but strictly lock SAME order actions
+  const processingOrdersRef = useRef(new Set());
 
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
@@ -191,45 +198,71 @@ const OrderFlowTable = () => {
 
   // ===== STATUS ACTIONS =====
   const handleAccept = async (orderId) => {
+    if (processingOrdersRef.current.has(orderId)) return;
+    processingOrdersRef.current.add(orderId);
+    setLoadingAction({ id: orderId, type: 'ACCEPT' });
+
     try {
       await updateStatus({ id: orderId, status: "ACCEPTED" }).unwrap();
       showSuccessAlert("Order Accepted");
-      refetch();
+      // Await refetch to ensure UI updates before re-enabling interactions
+      await refetch();
     } catch (err) {
       console.error("handleAccept Error:", err);
       showErrorAlert(err?.data?.message || "Failed to accept order");
+    } finally {
+      processingOrdersRef.current.delete(orderId);
+      setLoadingAction({ id: null, type: null });
     }
   };
   const handleReject = async (orderId) => {
+    if (processingOrdersRef.current.has(orderId)) return;
+    processingOrdersRef.current.add(orderId);
+    setLoadingAction({ id: orderId, type: 'REJECT' });
     try {
       await updateStatus({ id: orderId, status: "REJECTED" }).unwrap();
       showSuccessAlert("Order Rejected");
-      refetch();
+      await refetch();
     } catch (err) {
       console.error("handleReject Error:", err);
       showErrorAlert(err?.data?.message || "Failed to reject order");
+    } finally {
+      processingOrdersRef.current.delete(orderId);
+      setLoadingAction({ id: null, type: null });
     }
   };
   const handlePrepare = async (orderId) => {
+    if (processingOrdersRef.current.has(orderId)) return;
+    processingOrdersRef.current.add(orderId);
+    setLoadingAction({ id: orderId, type: 'PREPARE' });
     try {
       await updateKitchenStatus({ orderId, status: "PREPARING" }).unwrap();
       showSuccessAlert("Order Preparing");
-      refetch();
+      await refetch();
     } catch (err) {
       console.error("handlePrepare Error:", err);
       showErrorAlert(err?.data?.message || "Failed to update status");
+    } finally {
+      processingOrdersRef.current.delete(orderId);
+      setLoadingAction({ id: null, type: null });
     }
   };
   const handleReady = async (orderId) => {
+    if (processingOrdersRef.current.has(orderId)) return;
+    processingOrdersRef.current.add(orderId);
+    setLoadingAction({ id: orderId, type: 'READY' });
     try {
       // Also update the main status to READY so it can be assigned
       await updateKitchenStatus({ orderId, status: "READY" }).unwrap();
       console.log("handleReady Success ready");
       showSuccessAlert("Order is Ready for assignment!");
-      refetch();
+      await refetch();
     } catch (err) {
       console.error("handleReady Error:", err);
       showErrorAlert(err?.data?.message || "Failed to mark order as Ready");
+    } finally {
+      processingOrdersRef.current.delete(orderId);
+      setLoadingAction({ id: null, type: null });
     }
   };
   const handleAssign = (order) => {
@@ -237,7 +270,9 @@ const OrderFlowTable = () => {
     setDrawerOpen(true);
   };
   const assignPartner = async (partner) => {
-    if (!currentOrder) return;
+    if (!currentOrder || processingOrdersRef.current.has(currentOrder)) return;
+    processingOrdersRef.current.add(currentOrder);
+    setLoadingAction({ id: currentOrder, type: 'ASSIGN' });
     try {
       await assignDelivery({
         orderId: currentOrder,
@@ -246,12 +281,27 @@ const OrderFlowTable = () => {
       showSuccessAlert(`Assigned ${partner.name}`);
       setDrawerOpen(false);
       setCurrentOrder(null);
-      refetch();
+      await refetch();
     } catch (err) {
       console.error("assignPartner Error:", err);
       showErrorAlert(err?.data?.message || "Failed to assign partner");
+    } finally {
+      if (currentOrder) processingOrdersRef.current.delete(currentOrder);
+      setLoadingAction({ id: null, type: null });
     }
   };
+
+  const handleGenerateInvoiceProtected = async (orderId) => {
+    if (processingOrdersRef.current.has(orderId)) return;
+    processingOrdersRef.current.add(orderId);
+    setLoadingAction({ id: orderId, type: 'INVOICE' });
+    try {
+      await handleGenerateInvoice(orderId);
+    } finally {
+      processingOrdersRef.current.delete(orderId);
+      setLoadingAction({ id: null, type: null });
+    }
+  }
 
   return (
     <div className="p-6 min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white">
@@ -406,6 +456,7 @@ const OrderFlowTable = () => {
                       <Button
                         size="sm"
                         variant="success"
+                        disabled={loadingAction.id === order._id}
                         onClick={() => handleAccept(order._id)}
                       >
                         Accept
@@ -413,6 +464,7 @@ const OrderFlowTable = () => {
                       <Button
                         size="sm"
                         variant="danger"
+                        disabled={loadingAction.id === order._id}
                         onClick={() => handleReject(order._id)}
                       >
                         Reject
@@ -423,6 +475,7 @@ const OrderFlowTable = () => {
                     <Button
                       size="sm"
                       variant="primary"
+                      disabled={loadingAction.id === order.orderId}
                       onClick={() => handlePrepare(order.orderId)}
                     >
                       Prepare
@@ -432,6 +485,7 @@ const OrderFlowTable = () => {
                     <Button
                       size="sm"
                       variant="success"
+                      disabled={loadingAction.id === order.orderId}
                       onClick={() => handleReady(order.orderId)}
                     >
                       Ready
@@ -441,6 +495,7 @@ const OrderFlowTable = () => {
                     <Button
                       size="sm"
                       variant="primary"
+                      disabled={loadingAction.id === order.orderId && loadingAction.type === 'ASSIGN'}
                       onClick={() => handleAssign(order.orderId)}
                     >
                       Assign
@@ -449,6 +504,7 @@ const OrderFlowTable = () => {
                   <Button
                     size="sm"
                     variant="secondary"
+                    disabled={false}
                     onClick={() => setViewingOrder(order)}
                   >
                     View
@@ -457,7 +513,8 @@ const OrderFlowTable = () => {
                     <Button
                       size="sm"
                       variant="warning"
-                      onClick={() => handleGenerateInvoice(order._id)}
+                      disabled={loadingAction.id === order._id}
+                      onClick={() => handleGenerateInvoiceProtected(order._id)}
                       className="bg-orange-500"
                     >
                       Generate Invoice
@@ -531,6 +588,7 @@ const OrderFlowTable = () => {
                     : "bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
                     }`}
                   onClick={() => p.isAvailable !== false && assignPartner(p)}
+
                 >
                   <div>
                     <div className="font-semibold text-gray-900 dark:text-gray-100">{p.name}</div>

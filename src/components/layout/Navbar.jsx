@@ -89,7 +89,7 @@ const Navbar = ({ toggleSidebar }) => {
   if (!user) return null;
 
   return (
-    <div className="sticky top-0 z-40 w-full backdrop-blur bg-white/80 dark:bg-gray-900/80 border-b">
+    <div className="sticky top-0 z-[80] w-full backdrop-blur bg-white/80 dark:bg-gray-900/80 border-b">
       <div className="px-6 py-4 flex items-center justify-between gap-4">
         {/* LEFT */}
         <div className="flex items-center gap-4 flex-1">
@@ -192,7 +192,7 @@ const IconButton = ({ icon, count, onClick }) => (
 );
 
 const AdminProfilePopup = ({ user, handleLogout, handleSettings }) => (
-  <div className="absolute right-0 mt-4 w-80 rounded-3xl bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border border-gray-100 dark:border-gray-800 shadow-2xl overflow-hidden ring-1 ring-black/5 animate-in fade-in zoom-in-95 duration-200 origin-top-right z-50">
+  <div className="absolute right-0 mt-4 w-80 rounded-3xl bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border border-gray-100 dark:border-gray-800 shadow-2xl overflow-hidden ring-1 ring-black/5 animate-in fade-in zoom-in-95 duration-200 origin-top-right z-[81]">
     {/* Header Section */}
     <div className="relative p-6 pb-8 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent">
       <div className="flex items-center gap-4">
@@ -269,30 +269,27 @@ const ActionItem = ({ icon, label, description, danger, onClick }) => (
   <button
     onClick={onClick}
     className={`w-full flex items-center gap-3 p-2.5 rounded-xl transition-all duration-200 group text-left
-      ${
-        danger
-          ? "hover:bg-red-50 dark:hover:bg-red-900/10"
-          : "hover:bg-gray-50 dark:hover:bg-gray-800"
+      ${danger
+        ? "hover:bg-red-50 dark:hover:bg-red-900/10"
+        : "hover:bg-gray-50 dark:hover:bg-gray-800"
       }`}
   >
     <div
       className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors
-      ${
-        danger
+      ${danger
           ? "bg-red-50 text-red-500 dark:bg-red-900/20 group-hover:bg-red-100 dark:group-hover:bg-red-900/40"
           : "bg-gray-100 text-gray-500 dark:bg-gray-800 group-hover:bg-primary/10 group-hover:text-primary"
-      }`}
+        }`}
     >
       {React.cloneElement(icon, { className: "w-4 h-4" })}
     </div>
 
     <div className="flex-1">
       <p
-        className={`text-sm font-medium ${
-          danger
+        className={`text-sm font-medium ${danger
             ? "text-red-600 dark:text-red-400"
             : "text-gray-700 dark:text-gray-200 group-hover:text-gray-900 dark:group-hover:text-white"
-        }`}
+          }`}
       >
         {label}
       </p>

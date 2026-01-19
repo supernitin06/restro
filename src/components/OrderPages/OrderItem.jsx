@@ -18,7 +18,7 @@ const OrderItem = ({ item }) => {
         </div>
       </div>
       <span className="font-bold text-primary text-xs">
-        ${(item.price * item.quantity).toFixed(2)}
+        Rs. {item.finalItemPrice || item.price || 0}
       </span>
     </div>
   );

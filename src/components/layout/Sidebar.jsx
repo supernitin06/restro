@@ -21,7 +21,7 @@ import {
   Circle,
   Menu,
   X,
-  
+
   Clock,
   CheckCircle,
   MessageSquare,
@@ -259,7 +259,7 @@ const Sidebar = ({ theme = "dark" }) => {
       {/* Mobile Toggle Button */}
       <button
         onClick={() => setIsMobileOpen(!isMobileOpen)}
-        className={`lg:hidden fixed top-4 left-4 z-50 p-2 bg-white dark:bg-gray-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 ${isMobileOpen ? "hidden" : "block"}`}
+        className={`lg:hidden fixed top-4 left-4 z-[100] p-2 bg-white dark:bg-gray-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 ${isMobileOpen ? "hidden" : "block"}`}
         aria-label="Toggle menu"
       >
         <Menu size={24} className="text-gray-700 dark:text-gray-300" />
@@ -268,7 +268,7 @@ const Sidebar = ({ theme = "dark" }) => {
       {/* Mobile Overlay */}
       {isMobileOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          className="fixed inset-0 bg-black/50 z-[90] lg:hidden"
           onClick={() => setIsMobileOpen(false)}
         />
       )}
@@ -276,10 +276,10 @@ const Sidebar = ({ theme = "dark" }) => {
       <div className={` h-screen sidebar-wrapper`}>
         <div
           className={`
-            fixed lg:static top-0 left-0 z-50 h-full bg-sidebar border-r border-sidebar
+            fixed lg:static top-0 left-0 z-[100] h-full bg-sidebar border-r border-sidebar
             transition-transform duration-300 ease-in-out
             ${isMobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
-            ${isCollapsed ? "lg:w-20" : "lg:w-64"} w-64
+            ${isCollapsed ? "lg:w-20 w-20" : "lg:w-64 w-64"}
             shadow-xl lg:shadow-none
           `}
         >
@@ -300,7 +300,7 @@ const Sidebar = ({ theme = "dark" }) => {
             </div>
             <button
               onClick={() => setIsCollapsed(!isCollapsed)}
-              className={`hidden ${isCollapsed ? "lg:hidden" : "lg:flex"} absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 items-center justify-center z-50 border border-sidebar rounded-full shadow-md text-sidebar`}>
+              className={`hidden ${isCollapsed ? "hidden" : "lg:flex"} absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 items-center justify-center z-[101] border border-sidebar rounded-full shadow-md text-sidebar transition-transform duration-200 hover:scale-110`}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="14"
@@ -318,7 +318,7 @@ const Sidebar = ({ theme = "dark" }) => {
 
 
             {/* Mobile Close Button */}
-            {isMobileOpen && (
+            {isMobileOpen && !isCollapsed && (
               <button
                 onClick={() => setIsMobileOpen(false)}
                 className="lg:hidden absolute right-4 top-1/2 -translate-y-1/2 p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"

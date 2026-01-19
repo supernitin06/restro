@@ -7,10 +7,9 @@ export const menuApi = baseApi.injectEndpoints({
     // ================= MENU =================
     getMenus: builder.query({
       query: ({ restaurantId, categoryId, search, status }) => ({
-        url: "admin/menu",
+        url: `admin/menu/restaurant/${restaurantId}`,
         method: "GET",
         params: {
-          restaurantId,
           categoryId,
           search: search || undefined,
           status: status !== "all" ? status : undefined,
@@ -43,7 +42,7 @@ export const menuApi = baseApi.injectEndpoints({
     updateMenuStockStatus: builder.mutation({
       query: ({ id, inStock }) => ({
         url: `admin/menu/${id}/inStock`,
-        method: "PUT",
+        method: "PATCH",
         data: { inStock },
       }),
       invalidatesTags: ["Menu"],
@@ -60,9 +59,8 @@ export const menuApi = baseApi.injectEndpoints({
     // ================= CATEGORY =================
     getCategories: builder.query({
       query: (restaurantId) => ({
-        url: "admin/cat",
+        url: `admin/cat/restaurant/${restaurantId}`,
         method: "GET",
-        params: { restaurantId },
       }),
       providesTags: ["Categories"],
     }),

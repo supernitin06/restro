@@ -10,7 +10,7 @@ import OrderTimeline from './OrderTimeline';
 
 const OrderCard = ({ order, onDelete, onEdit, onUpdateStatus, viewMode }) => {
   const [showDetails, setShowDetails] = useState(false);
-
+  console.log(order.discount);
   const statusConfig = {
 
     DELIVERED: {
@@ -141,9 +141,9 @@ const OrderCard = ({ order, onDelete, onEdit, onUpdateStatus, viewMode }) => {
 
               {/* 4. Time & Total (Span 2) */}
               <div className="md:col-span-2 text-right">
-                
+
                 <div className="text-base font-bold text-primary">
-                  ${order.total.toFixed(2)}
+                  Rs. {order.price?.grandTotal?.toFixed(2) || order.total?.toFixed(2)}
                 </div>
                 <div className="flex items-center justify-end gap-1.5 text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                   <Clock size={12} />
@@ -295,48 +295,39 @@ const OrderCard = ({ order, onDelete, onEdit, onUpdateStatus, viewMode }) => {
         </div>
 
         {/* Footer */}
-        <div className="px-4 py-2 bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-800 dark:to-gray-700 border-t border-gray-100 dark:border-gray-700">
-          <div className="flex justify-between items-center mb-3">
-            <span className="text-sm text-gray-700 dark:text-gray-300 font-semibold">
-              Total Amount
-            </span>
-            <span className="text-2xl font-bold text-primary">
-              Rs. {order.total.toFixed(2)}
-            </span>
-          </div>
-
-          {/* Status Action Buttons */}
-          {['PLACED', 'ACCEPTED', 'PREPARING', 'READY', 'OUT_FOR_DELIVERY', 'ON-PROCESS'].includes(order.status) ? (
-            <div className="flex gap-2 mb-3">
-              <Button
-                variant="success"
-                onClick={(e) => { e.stopPropagation(); onUpdateStatus(order.id, 'COMPLETED'); }}
-                className="flex-1 py-2 text-sm flex items-center justify-center gap-1.5"
-              >
-                <CheckCircle size={16} />
-                Complete
-              </Button>
-              <Button
-                variant="danger"
-                onClick={(e) => { e.stopPropagation(); onUpdateStatus(order.id, 'CANCELLED'); }}
-                className="flex-1 py-2 text-sm flex items-center justify-center gap-1.5"
-              >
-                <XCircle size={16} />
-                Cancel
-              </Button>
+        <div className="px-4 py-3 bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-800 dark:to-gray-700 border-t border-gray-100 dark:border-gray-700 text-xs">
+          {/* Price Breakdown */}
+          {order.price && (
+            <div className="space-y-1 mb-2 border-b border-gray-200 dark:border-gray-600 pb-2">
+              <div className="flex justify-between text-gray-600 dark:text-gray-400">
+                <span>Item Total</span>
+                <span>Rs. {order.itemsTotal?.toFixed(2) || '0.00'}</span>
+              </div>
+              <div className="flex justify-between text-gray-600 dark:text-gray-400">
+                <span>Tax Charge</span>
+                <span>Rs. {order.tax?.toFixed(2) || '0.00'}</span>
+              </div>
+              <div className="flex justify-between text-gray-600 dark:text-gray-400">
+                <span>Delivery Charge</span>
+                <span>Rs. {order.deliveryFee?.toFixed(2) || '0.00'}</span>
+              </div>
+              {order.discount > 0 && (
+                <div className="flex justify-between text-green-600 dark:text-green-400">
+                  <span>Discount</span>
+                  <span>- Rs. {order.discount?.toFixed(2)}</span>
+                </div>
+              )}
             </div>
-          ) : (
-            // Optional: Add a View Details button for other statuses if needed, or keep empty
-            null
           )}
 
-          {/* <button
-            onClick={() => setShowDetails(true)}
-            className="w-full btn btn-primary flex items-center justify-center gap-2"
-          >
-            <Eye size={16} />
-            View Full Details
-          </button> */}
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-gray-700 dark:text-gray-300 font-bold">
+              Grand Total
+            </span>
+            <span className="text-xl font-bold text-primary">
+              Rs. {order.grandTotal?.toFixed(2) || '0.00'}
+            </span>
+          </div>
         </div>
       </Card>
 

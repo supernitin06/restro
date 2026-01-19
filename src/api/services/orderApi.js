@@ -17,9 +17,9 @@ export const orderApi = baseApi.injectEndpoints({
       query: ({ orderId, partnerId }) => ({
         url: `admin/delivery-partners/order/${orderId}/assign`,
         method: "PATCH",
-        body: { deliveryPartnerId: partnerId },
+        body: { partnerId: partnerId },
       }),
-      invalidatesTags: ["Order"], // optional
+      invalidatesTags: ["Order", "DeliveryPartner"], // optional
     }),
 
 
@@ -45,14 +45,7 @@ export const orderApi = baseApi.injectEndpoints({
     }),
 
     // 🔹 ASSIGN DELIVERY PARTNER
-    assignDelivery: builder.mutation({
-      query: ({ orderId, partnerId }) => ({
-        url: `admin/delivery-partners/order/${orderId}/assign`,
-        method: "PATCH",
-        body: { partnerId: partnerId },
-      }),
-      invalidatesTags: ["Order"],
-    }),
+
   }),
 
   overrideExisting: false,

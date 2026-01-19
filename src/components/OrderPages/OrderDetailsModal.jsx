@@ -83,7 +83,7 @@ const OrderDetailsModal = ({ order, onClose }) => {
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
         <div
           ref={modalRef}
-          className="bg-primary w-full max-w-6xl rounded-2xl shadow-2xl max-h-[90vh] overflow-hidden flex flex-col"
+          className="bg-primary w-full max-w-5xl rounded-2xl shadow-2xl max-h-[70vh] overflow-hidden flex flex-col"
         >
           {/* Header */}
           <div className="flex justify-between items-center px-6 py-4 bg-indigo-600 text-white shrink-0">
