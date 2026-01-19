@@ -58,16 +58,16 @@ const RecentActivity = () => {
                 </div>
 
                 <div className="flex-1">
-                  <div className="flex items-start justify-between mb-1">
+                  <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-1 gap-1">
                     <div>
-                      <h4 className="font-bold text-primary text-sm">
+                      <h4 className="font-bold text-primary text-sm flex flex-wrap items-center gap-2">
                         {activity.user}
-                        <span className="ml-2 text-xs font-medium text-primary opacity-60 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded-full">
+                        <span className="text-xs font-medium text-primary opacity-60 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded-full">
                           {activity.role}
                         </span>
                       </h4>
                     </div>
-                    <span className="text-xs text-primary opacity-50">{activity.time}</span>
+                    <span className="text-xs text-primary opacity-50 whitespace-nowrap">{activity.time}</span>
                   </div>
 
                   <p className="text-sm text-primary opacity-70">

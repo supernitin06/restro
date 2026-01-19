@@ -11,7 +11,7 @@ const UpcomingOrders = ({ title, orders, icon: Icon, color }) => {
     const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
 
     // API Mutation
-    const [updateOrderStatus] = useUpdateOrderStatusMutation({refetchOnMountOrArgChange: true});
+    const [updateOrderStatus] = useUpdateOrderStatusMutation({ refetchOnMountOrArgChange: true });
     const navigate = useNavigate();
 
     const colorClasses = {
@@ -118,7 +118,7 @@ const UpcomingOrders = ({ title, orders, icon: Icon, color }) => {
                         <div
                             key={order.orderId} // Use Mongo ID key
                             style={{ animationDelay: `${index * 50}ms` }}
-                            className="relative p-5 rounded-2xl bg-white dark:bg-gray-800/40 border border-gray-100 dark:border-gray-700/50 hover:border-gray-300 dark:hover:border-gray-500 hover:shadow-lg dark:hover:shadow-black/20 transition-all duration-300 bg-gradient-to-br from-transparent to-gray-50/50 dark:to-gray-800/30 animate-in slide-in-from-bottom-2 fill-mode-backwards"
+                            className="relative p-4 sm:p-5 rounded-2xl bg-white dark:bg-gray-800/40 border border-gray-100 dark:border-gray-700/50 hover:border-gray-300 dark:hover:border-gray-500 hover:shadow-lg dark:hover:shadow-black/20 transition-all duration-300 bg-gradient-to-br from-transparent to-gray-50/50 dark:to-gray-800/30 animate-in slide-in-from-bottom-2 fill-mode-backwards"
                         >
                             <div className="flex justify-between items-start mb-4">
                                 <div className="flex items-center gap-3">

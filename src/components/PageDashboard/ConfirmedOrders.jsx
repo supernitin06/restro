@@ -107,7 +107,7 @@ const ConfirmedOrders = ({ title, orders, icon: Icon, color }) => {
                         <div
                             key={order.orderId}
                             style={{ animationDelay: `${index * 50}ms` }}
-                            className="relative p-5 rounded-2xl bg-white dark:bg-gray-800/40 border border-gray-100 dark:border-gray-700/50 hover:border-gray-300 dark:hover:border-gray-500 hover:shadow-lg dark:hover:shadow-black/20 transition-all duration-300 bg-gradient-to-br from-transparent to-gray-50/50 dark:to-gray-800/30 animate-in slide-in-from-bottom-2 fill-mode-backwards"
+                            className="relative p-4 sm:p-5 rounded-2xl bg-white dark:bg-gray-800/40 border border-gray-100 dark:border-gray-700/50 hover:border-gray-300 dark:hover:border-gray-500 hover:shadow-lg dark:hover:shadow-black/20 transition-all duration-300 bg-gradient-to-br from-transparent to-gray-50/50 dark:to-gray-800/30 animate-in slide-in-from-bottom-2 fill-mode-backwards"
                         >
                             <div className="flex justify-between items-start mb-4">
                                 <div className="flex items-center gap-3">
@@ -123,8 +123,8 @@ const ConfirmedOrders = ({ title, orders, icon: Icon, color }) => {
                                 </div>
                             </div>
 
-                            <div className="flex justify-between items-end">
-                                <div className="flex-1">
+                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-3 sm:gap-0">
+                                <div className="flex-1 w-full sm:w-auto">
                                     <p className="text-base font-bold text-gray-800 dark:text-gray-100 mb-1 leading-none">{order.customer}</p>
                                     <div className="flex items-center gap-2 text-xs font-medium text-gray-500 dark:text-gray-400 mt-1">
                                         <span>{order.time}</span>
@@ -139,7 +139,7 @@ const ConfirmedOrders = ({ title, orders, icon: Icon, color }) => {
                                     </div>
                                 </div>
 
-                                <div className="flex items-center gap-2 pl-2">
+                                <div className="flex items-center gap-2 w-full sm:w-auto justify-end sm:pl-2">
                                     {/* Action Buttons */}
                                     <button
                                         onClick={() => handleMarkReady(order.orderId)}
