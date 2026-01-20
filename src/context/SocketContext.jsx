@@ -12,7 +12,6 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
   const [newOrders, setNewOrders] = React.useState(() => {
     try {
       const stored = localStorage.getItem("NEW_ORDERS");
-      console.log(" Loaded NEW_ORDERS from storage:", stored);
       return stored ? JSON.parse(stored) : [];
     } catch (e) {
       console.error(" Failed to parse NEW_ORDERS", e);
@@ -26,7 +25,6 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
      Persist Orders
   ============================== */
   useEffect(() => {
-    console.log("Persisting newOrders to localStorage", newOrders);
     localStorage.setItem("NEW_ORDERS", JSON.stringify(newOrders));
   }, [newOrders]);
 

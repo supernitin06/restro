@@ -10,6 +10,8 @@ const NotificationDrawer = ({
   onClose,
   onClearAll,
 }) => {
+
+  console.log("ye heb  bc " , notifications);
   const [updateOrderStatus] = useUpdateOrderStatusMutation();
   
   // ✅ Get refetch function to refresh OrderFlowTable
@@ -158,7 +160,7 @@ const NotificationDrawer = ({
                     </div>
                     
                     <p className="text-sm text-gray-600 dark:text-gray-300 mt-1 leading-relaxed">
-                      {item.message}
+                      {item.orderId}
                     </p>
 
                     {(item.type === "order" || item.type === "success") && (

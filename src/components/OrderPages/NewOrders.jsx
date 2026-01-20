@@ -19,6 +19,8 @@ import Button from "../../components/ui/Button";
 import { showSuccessAlert, showErrorAlert } from "../../utils/toastAlert";
 import { Bike } from "lucide-react";
 import { FiSearch } from "react-icons/fi";
+import TrackOrder from "./TrackOrder";
+import TrackOrderButton from "./TrackOrderButton";
 
 const STATUS_FLOW = ["PLACED", "ACCEPTED", "PREPARING", "READY", "ASSIGNED"];
 const STATUS_COLORS = {
@@ -34,9 +36,11 @@ const OrderFlowTable = () => {
     page: 1,
     limit: 5000,
     refetchOnMountOrArgChange: true,
+  }, {
+    refetchOnFocus: true,
   });
 
-  const { data: partnersData } = useGetDeliveryPartnersQuery();
+  const { data: partnersData, isLoading: partnersLoading, refetch: partnersRefetch } = useGetDeliveryPartnersQuery();
 
   const { ordersSocket } = useSockets();
   const ITEMS_PER_PAGE = 20;
@@ -46,10 +50,8 @@ const OrderFlowTable = () => {
   const [assignDelivery, { isLoading: assignDeliveryLoading }] = useAssignDeliveryMutation();
   const [generateInvoice, { isLoading: generateInvoiceLoading }] = useGenerateInvoiceMutation();
 
-  // Local state for tracking which specific action is loading on which ID
   const [loadingAction, setLoadingAction] = useState({ id: null, type: null });
-  // Use a Set to track processing orders to allow parallel actions on DIFFERENT orders
-  // but strictly lock SAME order actions
+
   const processingOrdersRef = useRef(new Set());
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -59,6 +61,9 @@ const OrderFlowTable = () => {
   const [currentOrder, setCurrentOrder] = useState(null);
   const [partnerSearch, setPartnerSearch] = useState("");
   const [viewingInvoice, setViewingInvoice] = useState(null);
+  const [trackOrder, setTrackOrder] = useState(false);
+  const [orderId, setOrderId] = useState(null);
+
   const allOrders = data?.data || [];
   const deliveryPartners = partnersData?.data || [];
   const downloadInvoicePDF = (invoice) => {
@@ -120,6 +125,13 @@ const OrderFlowTable = () => {
     doc.save(`Invoice-${invoice.invoiceNumber}.pdf`);
   };
 
+  // 
+
+
+
+
+
+
   // ===== SOCKET AUTO REFRESH =====
   useEffect(() => {
     if (!ordersSocket) return;
@@ -131,12 +143,16 @@ const OrderFlowTable = () => {
     ordersSocket.on("KITCHEN_STATUS_UPDATED", refresh);
     ordersSocket.on("DELIVERY_ASSIGNED", refresh);
     ordersSocket.on("NEW_ORDER", refresh); // 👈 Added NEW_ORDER listener
+    ordersSocket.on("ORDER_PICKED_UP", refresh); // Added for track order
+    ordersSocket.on("ORDER_DELIVERED_BY_PARTNER", refresh); // Added for completion
 
     return () => {
       ordersSocket.off("ORDER_STATUS_UPDATED", refresh);
       ordersSocket.off("KITCHEN_STATUS_UPDATED", refresh);
       ordersSocket.off("DELIVERY_ASSIGNED", refresh);
       ordersSocket.off("NEW_ORDER", refresh);
+      ordersSocket.off("ORDER_PICKED_UP", refresh);
+      ordersSocket.off("ORDER_DELIVERED_BY_PARTNER", refresh);
     };
   }, [ordersSocket, refetch]);
 
@@ -330,42 +346,45 @@ const OrderFlowTable = () => {
       <div className="overflow-x-auto bg-white dark:bg-gray-800 rounded-xl shadow justify-center relative">
         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
           <thead className="bg-gray-100 dark:bg-gray-700 text-[10px]">
-            <tr>
-              <th className="sticky left-0 bg-gray-100 dark:bg-gray-700 z-20 text-center px-4 py-2 text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
+            <tr className="">
+              <th className="sticky left-0 bg-gray-100 dark:bg-gray-700 z-20 text-center px-8 py-2 text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
                 S.No
               </th>
 
-              <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
+              <th className="px-8 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
                 Order ID
               </th>
-              <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
+              <th className="px-8 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
                 Customer
               </th>
-              <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
+              <th className="px-8 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
                 Phone
               </th>
-              <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
+              <th className="px-8 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
                 Placed On
               </th>
-              <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
+              <th className="px-8 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
                 Timeline
               </th>
-              <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
+              <th className="px-8 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
                 Current Status
               </th>
-              <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
+              <th className="px-8 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
                 Amount
               </th>
-              <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
+              <th className="px-8 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
                 Payment
               </th>
-              <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
+              <th className="px-8 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
                 Delivery Partner
               </th>
-              <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
+              <th className="px-8 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
                 Assigned On
               </th>
-              <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
+              <th className="px-8 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
+                Track Order
+              </th>
+              <th className="px-8 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
                 Actions
               </th>
             </tr>
@@ -376,15 +395,15 @@ const OrderFlowTable = () => {
                 <td className="sticky left-0 bg-white dark:bg-gray-800 z-10 text-center px-2 py-2 shadow-md dark:shadow-sm dark:shadow-gray-700/50">
                   {(currentPage - 1) * ITEMS_PER_PAGE + idx + 1}
                 </td>
-                <td className="px-4 py-2 text-gray-700 dark:text-gray-300">{order.orderId}</td>
-                <td className="px-4 py-2 text-gray-700 dark:text-gray-300">{order.customer.name}</td>
-                <td className="px-4 py-2 text-gray-700 dark:text-gray-300">{order.customer.phone}</td>
-                <td className="px-4 py-2 text-gray-700 dark:text-gray-300">
+                <td className="px-8 py-2 text-gray-700 dark:text-gray-300">{order.orderId}</td>
+                <td className="px-8 py-2 text-gray-700 dark:text-gray-300">{order.customer.name}</td>
+                <td className="px-8 py-2 text-gray-700 dark:text-gray-300">{order.customer.phone}</td>
+                <td className="px-8 py-2 text-gray-700 dark:text-gray-300">
                   {new Date(order.createdAt).toLocaleString()}
                 </td>
 
                 {/* Timeline */}
-                <td className="px-4 py-2 flex gap-1 items-center">
+                <td className="px-8 py-2 flex gap-1 items-center">
                   {STATUS_FLOW.map((s) => {
                     const completed =
                       STATUS_FLOW.indexOf(order.status) >=
@@ -410,7 +429,7 @@ const OrderFlowTable = () => {
                   })}
                 </td>
 
-                <td className="px-4 py-2">
+                <td className="px-8 py-2">
                   <span
                     className={`px-2 py-1 rounded text-[10px] font-semibold ${STATUS_COLORS[order.status]
                       }`}
@@ -419,18 +438,18 @@ const OrderFlowTable = () => {
                   </span>
                 </td>
 
-                <td className="px-4 py-2 text-gray-700 dark:text-gray-300 font-bold">
+                <td className="px-8 py-2 text-gray-700 dark:text-gray-300 font-bold">
                   ₹{order.price?.grandTotal}
                 </td>
 
-                <td className="px-4 py-2 text-gray-700 dark:text-gray-300">
+                <td className="px-8 py-2 text-gray-700 dark:text-gray-300">
                   <div className="font-semibold text-[10px]">{order.payment?.method}</div>
                   <div className={`text-[9px] font-bold ${order.payment?.status === 'PAID' ? 'text-green-600' : 'text-orange-500'}`}>
                     {order.payment?.status}
                   </div>
                 </td>
 
-                <td className="px-4 py-2 text-gray-700 dark:text-gray-300">
+                <td className="px-8 py-2 text-gray-700 dark:text-gray-300">
                   {order.delivery?.partner ? (
                     <>
                       {order.delivery.partner.name} <br />
@@ -443,14 +462,28 @@ const OrderFlowTable = () => {
                   )}
                 </td>
 
-                <td className="px-4 py-2 text-gray-700 dark:text-gray-300">
+                <td className="px-8 py-2 text-gray-700 dark:text-gray-300">
                   {order.delivery?.assignedAt
                     ? new Date(order.delivery.assignedAt).toLocaleString()
                     : "—"}
                 </td>
+                <td className="px-8 py-2 text-gray-700 dark:text-gray-300">
+                  {order.status === "DELIVERED" ? (
+                    "Already Delivered"
+                  ) : (
+                    <TrackOrderButton
+                      order={order}
+                      onClick={(o) => {
+                        setOrderId(o.orderId);
+                        setTrackOrder(true);
+                      }}
+                    />
+                  )}
+                </td>
+
 
                 {/* Actions */}
-                <td className="px-4 py-2 flex flex-col gap-1">
+                <td className="px-8 py-2 flex flex-col gap-1">
                   {order.status === "PLACED" && (
                     <div className="flex gap-1">
                       <Button
@@ -496,7 +529,10 @@ const OrderFlowTable = () => {
                       size="sm"
                       variant="primary"
                       disabled={loadingAction.id === order.orderId && loadingAction.type === 'ASSIGN'}
-                      onClick={() => handleAssign(order.orderId)}
+                      onClick={() => {
+                        partnersRefetch();
+                        handleAssign(order.orderId)
+                      }}
                     >
                       Assign
                     </Button>
@@ -551,6 +587,11 @@ const OrderFlowTable = () => {
           order={viewingOrder}
           onClose={() => setViewingOrder(null)}
         />
+      )}
+
+      {/* Track Order Modal */}
+      {trackOrder && (
+        <TrackOrder orderId={orderId} onClose={() => setTrackOrder(false)} />
       )}
 
       {/* Assign Drawer */}
@@ -709,6 +750,8 @@ const OrderFlowTable = () => {
                 Download PDF
               </button>
             </div>
+
+
 
           </div>
         </div>

@@ -34,6 +34,7 @@ const DeliveryPartnerManagement = () => {
   useEffect(() => {
     if (apiResponse?.success && apiResponse?.data) {
       const normalizedData = apiResponse.data.map((p) => ({
+       
         partnerId: p._id,
         listView: {
           name: p.name,
@@ -52,7 +53,7 @@ const DeliveryPartnerManagement = () => {
           email: p.email || "",
           cityArea: "N/A",
           vehicleType: p.vehicleType,
-          image: null,
+          image: p.profileImage,
         },
         orderHistory: [],
       }));
