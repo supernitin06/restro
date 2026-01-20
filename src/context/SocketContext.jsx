@@ -114,6 +114,26 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
       console.log(" JOINED_RESTAURANT_ROOM", data);
     };
 
+    // ✅ Helper to remove notification globally
+    const removeNotification = (data) => {
+      const payload = data?.data || data?.order || data;
+      if (!payload) return;
+
+      // Collect all possible IDs (MongoID and ReadableID)
+      const possibleIds = [payload._id, payload.id, payload.orderId].filter(Boolean);
+      
+      if (possibleIds.length === 0) return;
+
+      setNotifications((prev) => {
+        // Filter out if EITHER orderId OR mongoId matches
+        return prev.filter((n) => {
+          const matchReadable = possibleIds.includes(n.orderId);
+          const matchMongo = n.mongoId && possibleIds.includes(n.mongoId);
+          return !(matchReadable || matchMongo);
+        });
+      });
+    };
+
     const onNewOrder = (payload) => {
       console.log(" NEW_ORDER raw payload:", payload);
 
@@ -154,17 +174,19 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
           {
             id: Date.now(),
             title: "New Order",
-            message: `Order #${newOrder.customOrderId} received`,
+            message: `Order #${newOrder.orderId} received`,
             type: "order",
             read: false,
             time: new Date().toISOString(),
             orderId: newOrder.orderId,
+            mongoId: newOrder._id, // ✅ Store MongoID for better matching
           },
           ...prev,
         ];
       });
+      
 
-      toast.success(`New Order #${newOrder.customOrderId} received!`);
+      toast.success(`New Order #${newOrder.orderId} received!`);
     };
 
     // const onUserRegistered = (data) => {
@@ -219,6 +241,7 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
 
     const onOrderStatusUpdated = (data) => {
       console.log("ORDER_STATUS_UPDATED:", data);
+      removeNotification(data); // ✅ Remove notification on update
     };
 
     // const onOrderPickedUp = (data) => {
@@ -350,6 +373,8 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
     ordersSocket.on("USER_REGISTER_SUCCESSFULLY", onUserRegistered);
     mainSocket.on("USER_REGISTER_SUCCESSFULLY", onUserRegistered);
     ordersSocket.on("ORDER_STATUS_UPDATED", onOrderStatusUpdated);
+    ordersSocket.on("ORDER_ACCEPTED", removeNotification); // ✅ Listen for explicit accept
+    ordersSocket.on("ORDER_REJECTED", removeNotification); // ✅ Listen for explicit reject
     ordersSocket.on("ORDER_PICKED_UP", onOrderPickedUp);
     ordersSocket.on("ORDER_DELIVERED_BY_PARTNER", onOrderDelivered);
 
@@ -381,6 +406,8 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
       ordersSocket.off("USER_REGISTER_SUCCESSFULLY", onUserRegistered);
       mainSocket.off("USER_REGISTER_SUCCESSFULLY", onUserRegistered);
       ordersSocket.off("ORDER_STATUS_UPDATED", onOrderStatusUpdated);
+      ordersSocket.off("ORDER_ACCEPTED", removeNotification);
+      ordersSocket.off("ORDER_REJECTED", removeNotification);
       ordersSocket.off("ORDER_PICKED_UP", onOrderPickedUp);
       ordersSocket.off("ORDER_DELIVERED_BY_PARTNER", onOrderDelivered);
 

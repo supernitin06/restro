@@ -1,7 +1,7 @@
 import React from "react";
 import { createPortal } from "react-dom";
 import { Check, X, Clock, Bell, User, Truck, Trash2 } from "lucide-react";
-import { useUpdateOrderStatusMutation, useGetOrdersQuery } from "../../../api/services/orderApi"; // ✅ import refetch
+import { useUpdateOrderStatusMutation, useGetOrdersQuery } from "../../../api/services/orderApi"; 
 
 const NotificationDrawer = ({
   isOpen,
@@ -12,8 +12,11 @@ const NotificationDrawer = ({
 }) => {
   const [updateOrderStatus] = useUpdateOrderStatusMutation();
   
-  // ✅ Get refetch function to refresh OrderFlowTable
-  const { refetch: refetchOrders } = useGetOrdersQuery();
+  // Get refetch function to refresh OrderFlowTable
+  const { refetch: refetchOrders } = useGetOrdersQuery({
+    page: 1,
+    limit: 5000,
+  });
 
   const handleAction = async (orderId, action) => {
     if (!orderId) return;
@@ -29,7 +32,7 @@ const NotificationDrawer = ({
         prev.filter((n) => n.orderId !== orderId)
       );
 
-      // ✅ Refresh OrderFlowTable
+      // Refresh OrderFlowTable
       refetchOrders(); 
     } catch (err) {
       console.error(err);
@@ -158,7 +161,7 @@ const NotificationDrawer = ({
                     </div>
                     
                     <p className="text-sm text-gray-600 dark:text-gray-300 mt-1 leading-relaxed">
-                      {item.message}
+                      {item.message ? `Order #${item.orderId}` : item.message}
                     </p>
 
                     {(item.type === "order" || item.type === "success") && (
