@@ -1,8 +1,6 @@
-// DeliveryPartnerManagement.jsx
 import React, { useState, useEffect, useMemo } from "react";
 import { Loader2, UserPlus } from "lucide-react";
 import { useGetDeliveryPartnersQuery } from "../api/services/deliveryPartnerApi";
-
 import DeliveryPartner from "../components/delivery-partner-management/DeliveryPartner";
 import DeliveryPartnerDetailsModal from "../components/delivery-partner-management/DeliveryPartnerDetailsModal";
 import DeliveryPartnerForm from "../components/delivery-partner-management/DeliveryPartnerForm";
@@ -10,8 +8,6 @@ import DeliveryPartnerSearchFilter from "../components/delivery-partner-manageme
 import Pagination from "../components/ui/Pagination";
 import Button from "../components/ui/Button";
 import { toast } from "react-toastify";
-
-// TODO: Implement these API calls in your service
 // import { approvePartnerApi, rejectPartnerApi } from "../api/services/deliveryPartnerApprovalApi";
 
 const DeliveryPartnerManagement = () => {
