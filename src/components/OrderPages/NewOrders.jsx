@@ -300,6 +300,21 @@ const OrderFlowTable = () => {
       await refetch();
     } catch (err) {
       console.error("assignPartner Error:", err);
+      // Attempt to verify if it actually succeeded despite the error (e.g. timeout)
+      try {
+        const { data: freshData } = await refetch();
+        const updatedOrder = freshData?.data?.find(o => o.orderId === currentOrder);
+
+        if (updatedOrder && updatedOrder.status === 'ASSIGNED') {
+          showSuccessAlert(`Assigned ${partner.name}`);
+          setDrawerOpen(false);
+          setCurrentOrder(null);
+          return;
+        }
+      } catch (e) {
+        console.error("Verification refetch failed", e);
+      }
+
       showErrorAlert(err?.data?.message || "Failed to assign partner");
     } finally {
       if (currentOrder) processingOrdersRef.current.delete(currentOrder);

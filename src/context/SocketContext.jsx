@@ -375,7 +375,7 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
     ordersSocket.on("ORDER_REJECTED", removeNotification); // ✅ Listen for explicit reject
     ordersSocket.on("ORDER_PICKED_UP", onOrderPickedUp);
     ordersSocket.on("ORDER_DELIVERED_BY_PARTNER", onOrderDelivered);
-
+    
     if (restaurantId) {
       console.log(" Emitting JOIN_RESTAURANT_ROOM", restaurantId);
       ordersSocket.emit("JOIN_RESTAURANT_ROOM", { restaurantId });
