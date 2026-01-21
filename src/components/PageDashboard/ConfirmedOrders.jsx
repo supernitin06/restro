@@ -18,31 +18,22 @@ const ConfirmedOrders = ({ title, orders, icon: Icon, color }) => {
     const colorClasses = {
         orange: {
             bg: 'bg-orange-50 dark:bg-orange-900/20',
-
             text: 'text-orange-600 dark:text-orange-400',
-
             iconBg: 'bg-orange-100 dark:bg-orange-900/30',
         },
         blue: {
             bg: 'bg-blue-50 dark:bg-blue-900/20',
-
             text: 'text-blue-600 dark:text-blue-400',
-
             iconBg: 'bg-blue-100 dark:bg-blue-900/30',
         },
     };
 
     const statusStyles = {
         placed: 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300',
-
         preparing: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
-
         packing: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300',
-
         confirmed: 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/40 dark:text-cyan-300',
-
         cooking: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300',
-
         ready: 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300'
     };
 
