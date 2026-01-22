@@ -1,6 +1,8 @@
 // pages/SubAdmin.jsx
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from "react-hot-toast";
+
 import {
   UserPlus,
   Shield,
@@ -26,126 +28,143 @@ import Input from '../components/ui/InputField';
 import ActionButtons from '../components/ui/UserAction';
 import Select from '../components/ui/Select';
 import Table from '../components/ui/Table';
+import {
+  useGetSubAdminsQuery,
+  useDeleteAdminMutation,
+  useToggleAdminStatusMutation,
+  useCreateSubAdminMutation,
+} from "../api/services/adminApi";
+
 
 const SubAdmin = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
 
-  // Sample sub-admin data
-  const [subAdmins, setSubAdmins] = useState([
-    {
-      id: 1,
-      name: 'Rajesh Kumar',
-      email: 'rajesh@swaad.com',
-      phone: '+91 98765 43210',
-      role: 'Senior Admin',
-      status: 'active',
-      permissions: ['View Orders', 'Manage Users', 'Manage Restaurants', 'View Reports'],
-      createdAt: '15 Jan 2024',
-      lastActive: '2 hours ago'
-    },
-    {
-      id: 2,
-      name: 'Priya Sharma',
-      email: 'priya@swaad.com',
-      phone: '+91 98765 43211',
-      role: 'Support Admin',
-      status: 'active',
-      permissions: ['View Orders', 'Handle Refunds', 'View Users'],
-      createdAt: '20 Jan 2024',
-      lastActive: '1 day ago'
-    },
-    {
-      id: 3,
-      name: 'Amit Verma',
-      email: 'amit@swaad.com',
-      phone: '+91 98765 43212',
-      role: 'Order Manager',
-      status: 'inactive',
-      permissions: ['View Orders', 'Assign Delivery', 'Mark Delivered'],
-      createdAt: '10 Feb 2024',
-      lastActive: '5 days ago'
-    },
-    {
-      id: 4,
-      name: 'Sunita Singh',
-      email: 'sunita@swaad.com',
-      phone: '+91 98765 43213',
-      role: 'Financial Admin',
-      status: 'active',
-      permissions: ['View Payments', 'Handle Refunds', 'View Reports'],
-      createdAt: '01 Mar 2024',
-      lastActive: '8 hours ago'
-    },
-    {
-      id: 5,
-      name: 'Vikram Rathore',
-      email: 'vikram@swaad.com',
-      phone: '+91 98765 43214',
-      role: 'Restaurant Manager',
-      status: 'inactive',
-      permissions: ['View Restaurants', 'Manage Restaurants', 'Edit Commission'],
-      createdAt: '15 Mar 2024',
-      lastActive: '1 week ago'
-    },
-    {
-      id: 6,
-      name: 'Anjali Desai',
-      email: 'anjali@swaad.com',
-      phone: '+91 98765 43215',
-      role: 'Support Admin',
-      status: 'active',
-      permissions: ['View Orders', 'Handle Refunds'],
-      createdAt: '22 Mar 2024',
-      lastActive: '30 minutes ago'
-    }
-  ]);
+  const { data, isLoading, isError, refetch } = useGetSubAdminsQuery();
 
-  const stats = [
+
+  // Optimize: Normalize data from API
+  const subAdmins = useMemo(() => {
+    if (!data?.data) return [];
+    return data.data.map((admin) => {
+      // Transform permissions object to array for display
+      const permissionsList = [];
+      if (admin.permissions) {
+        Object.entries(admin.permissions).forEach(([key, value]) => {
+          // If value is boolean true (e.g. dashboard: true)
+          if (value === true) {
+            permissionsList.push(key.charAt(0).toUpperCase() + key.slice(1));
+          } 
+          // If value is object (e.g. orders: { view: true })
+          else if (typeof value === 'object' && value !== null) {
+            if (Object.values(value).some((v) => v === true)) {
+              permissionsList.push(key.charAt(0).toUpperCase() + key.slice(1));
+            }
+          }
+        });
+      }
+
+      return {
+        id: admin._id,
+        name: admin.name || "Unknown",
+        email: admin.email || "No Email",
+        phone: admin.phone || "N/A",
+        role: admin.role ? admin.role.replace(/_/g, " ") : "Sub-Admin",
+        status: admin.isActive ? "active" : "inactive",
+        isActive: admin.isActive,
+        permissions: permissionsList,
+        createdAt: admin.createdAt ? new Date(admin.createdAt).toLocaleDateString() : "N/A",
+        lastActive: admin.lastLogin ? new Date(admin.lastLogin).toLocaleString() : "Never",
+        image: admin.image,
+      };
+    });
+  }, [data]);
+
+  const stats = useMemo(() => [
     {
       title: 'Total Sub-Admins',
       value: subAdmins.length,
       icon: Users,
-      trendValue: '+2 this month',
+      trendValue: 'Total Registered',
       color: 'blue'
     },
     {
       title: 'Active Admins',
       value: subAdmins.filter(a => a.status === 'active').length,
       icon: CheckCircle,
-      trendValue: 'All online',
+      trendValue: 'Currently Active',
       color: 'green'
     },
     {
       title: 'Inactive Admins',
       value: subAdmins.filter(a => a.status === 'inactive').length,
       icon: XCircle,
-      trendValue: 'Needs attention',
+      trendValue: 'Suspended/Inactive',
       color: 'red'
     }
-  ];
+  ], [subAdmins]);
 
-  const filteredAdmins = subAdmins.filter(admin => {
-    const matchesSearch = admin.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      admin.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = filterStatus === 'all' || admin.status === filterStatus;
-    return matchesSearch && matchesFilter;
-  });
+  const filteredAdmins = useMemo(() => {
+    return subAdmins.filter((admin) => {
+      const matchesSearch =
+        admin.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        admin.email.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesFilter =
+        filterStatus === "all" || admin.status === filterStatus;
+      return matchesSearch && matchesFilter;
+    });
+  }, [subAdmins, searchTerm, filterStatus]);
 
-  const handleStatusToggle = (id) => {
-    setSubAdmins(subAdmins.map(admin =>
-      admin.id === id
-        ? { ...admin, status: admin.status === 'active' ? 'inactive' : 'active' }
-        : admin
-    ));
-  };
+const [toggleStatus] = useToggleAdminStatusMutation();
 
-  const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this sub-admin?')) {
-      setSubAdmins(subAdmins.filter(admin => admin.id !== id));
-    }
-  };
+// const handleStatusToggle = async (id) => {
+//   try {
+//     await toggleStatus({ id }).unwrap();
+
+//   } catch (err) {
+//     console.error(err);
+//   }
+// };
+const handleStatusToggle = async (id) => {
+  const toastId = toast.loading("Updating status...");
+
+  try {
+    await toggleStatus({ id }).unwrap();
+
+    toast.success("Status updated successfully", {
+      id: toastId,
+    });
+
+    // THIS IS IMPORTANT
+    refetch();
+
+  } catch (err) {
+    console.error(err);
+
+    toast.error(
+      err?.data?.message || "Failed to update status",
+      { id: toastId }
+    );
+  }
+};
+
+
+
+
+
+const [deleteAdmin] = useDeleteAdminMutation();
+
+const handleDelete = async (id) => {
+  if (!window.confirm("Are you sure?")) return;
+
+  try {
+    await deleteAdmin(id).unwrap();
+  } catch (err) {
+    console.error(err);
+  }
+};
+
 
   const tableActions = [
     {
@@ -254,6 +273,8 @@ const columns = [
 
 
   return (
+
+    
     <div className="page">
       <div className=" mx-auto">
         {/* Header */}
@@ -410,11 +431,16 @@ const columns = [
                     <div>
                       <span className="text-xs text-muted font-medium block mb-2">Permissions</span>
                       <div className="flex flex-wrap gap-1.5">
-                        {admin.permissions.slice(0, 2).map((perm, idx) => (
-                          <span key={idx} className="px-2.5 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-md text-xs font-semibold">
-                            {perm}
-                          </span>
-                        ))}
+                      {Array.isArray(admin.permissions) &&
+  admin.permissions.slice(0, 2).map((perm, idx) => (
+    <span
+      key={idx}
+      className="px-2.5 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-md text-xs font-semibold"
+    >
+      {perm}
+    </span>
+))}
+
                         {admin.permissions.length > 2 && (
                           <span className="px-2.5 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md text-xs font-semibold">
                             +{admin.permissions.length - 2}
