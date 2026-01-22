@@ -1,8 +1,11 @@
 import React from "react";
 import InputField from "../../components/ui/InputField";
 import Button from "../../components/ui/Button";
+// import {useUpdateRestaurantDetailMutation} from '../../api/services/resturentsapi'
 
 const Profile = () => {
+
+  
   return (
     <div className="card space-y-6">
       <div>

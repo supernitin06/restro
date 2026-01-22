@@ -458,7 +458,7 @@ const OrderFlowTable = () => {
                 </td>
 
                 <td className="px-8 py-2 text-gray-700 dark:text-gray-300">
-                  <div className="font-semibold text-[10px]">{order.payment?.method}</div>
+                  <div className="font-semibold text-[10px]">{order.payment?.type}</div>
                   <div className={`text-[9px] font-bold ${order.payment?.status === 'PAID' ? 'text-green-600' : 'text-orange-500'}`}>
                     {order.payment?.status}
                   </div>

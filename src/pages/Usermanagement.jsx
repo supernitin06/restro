@@ -66,20 +66,7 @@ const UserManagement = () => {
         setShowOrdersModal(true);
       },
     },
-    {
-      key: 'edit',
-      label: 'Edit Permissions',
-      icon: Edit,
-      color: 'purple',
-      onClick: () => navigate('/sub-admin/assign'),
-    },
-    {
-      key: 'delete',
-      label: 'Delete User',
-      icon: Trash2,
-      color: 'rose',
-      onClick: (item) => handleDelete(item._id),
-    },
+  
   ];
 
   // -------------------- Data processing --------------------

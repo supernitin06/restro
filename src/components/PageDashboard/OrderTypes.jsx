@@ -68,7 +68,7 @@ const OrderTypes = () => {
   ];
 
   return (
-    <div className="bg-primary rounded-2xl p-6 shadow-sm border border-white/20 dark:border-gray-700">
+    <div className="bg-primary max-h-[400px] overflow-y-auto rounded-2xl p-6 shadow-sm border border-white/20 dark:border-gray-700">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
         <div className="flex items-center gap-2">
           <h3 className="text-xl font-bold text-primary">Order Status</h3>
