@@ -14,7 +14,7 @@ const axiosInstance = axios.create({
 /* ---------------- AXIOS BASE QUERY ---------------- */
 const axiosBaseQuery =
   () =>
-    async ({ url, method, data, body, params, headers }, api) => {
+    async ({ url, method, data, body, params, headers, admin, SubAdmin,Notification }, api) => {
       try {
         const state = api.getState();
         const token = state?.auth?.authToken;

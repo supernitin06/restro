@@ -8,9 +8,7 @@ import {
   useUpdateKitchenStatusMutation,
   useAssignDeliveryMutation,
 } from "../../api/services/orderApi";
-// OrderFlowTable.jsx ke top me
 import { useGenerateInvoiceMutation } from "../../api/services/invoice";
-
 import { useGetDeliveryPartnersQuery } from "../../api/services/deliveryPartnerApi";
 import { useSockets } from "../../context/SocketContext";
 import Pagination from "../../components/ui/Pagination";
@@ -45,10 +43,14 @@ const OrderFlowTable = () => {
   const { ordersSocket } = useSockets();
   const ITEMS_PER_PAGE = 20;
 
-  const [updateStatus, { isLoading: updateStatusLoading }] = useUpdateOrderStatusMutation();
-  const [updateKitchenStatus, { isLoading: updateKitchenStatusLoading }] = useUpdateKitchenStatusMutation();
-  const [assignDelivery, { isLoading: assignDeliveryLoading }] = useAssignDeliveryMutation();
-  const [generateInvoice, { isLoading: generateInvoiceLoading }] = useGenerateInvoiceMutation();
+  const [updateStatus, { isLoading: updateStatusLoading }] =
+    useUpdateOrderStatusMutation();
+  const [updateKitchenStatus, { isLoading: updateKitchenStatusLoading }] =
+    useUpdateKitchenStatusMutation();
+  const [assignDelivery, { isLoading: assignDeliveryLoading }] =
+    useAssignDeliveryMutation();
+  const [generateInvoice, { isLoading: generateInvoiceLoading }] =
+    useGenerateInvoiceMutation();
 
   const [loadingAction, setLoadingAction] = useState({ id: null, type: null });
 
@@ -77,17 +79,13 @@ const OrderFlowTable = () => {
     doc.text(
       `Payment: ${invoice.payment.method} (${invoice.payment.status})`,
       14,
-      48
+      48,
     );
 
     autoTable(doc, {
       startY: 55,
       head: [["Item", "Qty", "Total"]],
-      body: invoice.items.map((item) => [
-        item.name,
-        item.quantity,
-        item.total,
-      ]),
+      body: invoice.items.map((item) => [item.name, item.quantity, item.total]),
       theme: "grid",
     });
 
@@ -102,25 +100,17 @@ const OrderFlowTable = () => {
 
     if (invoice.amount.deliveryCharge) {
       finalY += 6;
-      doc.text(
-        `Delivery: ₹${invoice.amount.deliveryCharge}`,
-        14,
-        finalY
-      );
+      doc.text(`Delivery: ₹${invoice.amount.deliveryCharge}`, 14, finalY);
     }
 
     finalY += 8;
     doc.setFontSize(14);
-    doc.text(
-      `Grand Total: ₹${invoice.amount.grandTotal}`,
-      14,
-      finalY
-    );
+    doc.text(`Grand Total: ₹${invoice.amount.grandTotal}`, 14, finalY);
 
     doc.text(
       `Grand Total: ₹${invoice.amount.grandTotal}`,
       14,
-      doc.lastAutoTable.finalY + 10
+      doc.lastAutoTable.finalY + 10,
     );
     doc.save(`Invoice-${invoice.invoiceNumber}.pdf`);
   };
@@ -172,14 +162,14 @@ const OrderFlowTable = () => {
         o.orderId.toLowerCase().includes(term) ||
         o.customer.name.toLowerCase().includes(term) ||
         o.customer.phone.includes(term) ||
-        o.status.toLowerCase().includes(term)
+        o.status.toLowerCase().includes(term),
     );
   }, [allOrders, searchTerm]);
 
   // ===== SORTED =====
   const sortedOrders = useMemo(() => {
     return [...filteredOrders].sort(
-      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
     );
   }, [filteredOrders]);
 
@@ -187,7 +177,7 @@ const OrderFlowTable = () => {
   const totalPages = Math.ceil(sortedOrders.length / ITEMS_PER_PAGE);
   const currentOrders = sortedOrders.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
+    currentPage * ITEMS_PER_PAGE,
   );
 
   const handleGenerateInvoice = async (orderId) => {
@@ -208,7 +198,7 @@ const OrderFlowTable = () => {
     return deliveryPartners.filter(
       (p) =>
         p.name.toLowerCase().includes(term) ||
-        p.city?.toLowerCase().includes(term)
+        p.city?.toLowerCase().includes(term),
     );
   }, [deliveryPartners, partnerSearch]);
 
@@ -216,7 +206,7 @@ const OrderFlowTable = () => {
   const handleAccept = async (orderId) => {
     if (processingOrdersRef.current.has(orderId)) return;
     processingOrdersRef.current.add(orderId);
-    setLoadingAction({ id: orderId, type: 'ACCEPT' });
+    setLoadingAction({ id: orderId, type: "ACCEPT" });
 
     try {
       await updateStatus({ id: orderId, status: "ACCEPTED" }).unwrap();
@@ -234,7 +224,7 @@ const OrderFlowTable = () => {
   const handleReject = async (orderId) => {
     if (processingOrdersRef.current.has(orderId)) return;
     processingOrdersRef.current.add(orderId);
-    setLoadingAction({ id: orderId, type: 'REJECT' });
+    setLoadingAction({ id: orderId, type: "REJECT" });
     try {
       await updateStatus({ id: orderId, status: "REJECTED" }).unwrap();
       showSuccessAlert("Order Rejected");
@@ -250,7 +240,7 @@ const OrderFlowTable = () => {
   const handlePrepare = async (orderId) => {
     if (processingOrdersRef.current.has(orderId)) return;
     processingOrdersRef.current.add(orderId);
-    setLoadingAction({ id: orderId, type: 'PREPARE' });
+    setLoadingAction({ id: orderId, type: "PREPARE" });
     try {
       await updateKitchenStatus({ orderId, status: "PREPARING" }).unwrap();
       showSuccessAlert("Order Preparing");
@@ -266,7 +256,7 @@ const OrderFlowTable = () => {
   const handleReady = async (orderId) => {
     if (processingOrdersRef.current.has(orderId)) return;
     processingOrdersRef.current.add(orderId);
-    setLoadingAction({ id: orderId, type: 'READY' });
+    setLoadingAction({ id: orderId, type: "READY" });
     try {
       // Also update the main status to READY so it can be assigned
       await updateKitchenStatus({ orderId, status: "READY" }).unwrap();
@@ -288,7 +278,7 @@ const OrderFlowTable = () => {
   const assignPartner = async (partner) => {
     if (!currentOrder || processingOrdersRef.current.has(currentOrder)) return;
     processingOrdersRef.current.add(currentOrder);
-    setLoadingAction({ id: currentOrder, type: 'ASSIGN' });
+    setLoadingAction({ id: currentOrder, type: "ASSIGN" });
     try {
       await assignDelivery({
         orderId: currentOrder,
@@ -325,14 +315,14 @@ const OrderFlowTable = () => {
   const handleGenerateInvoiceProtected = async (orderId) => {
     if (processingOrdersRef.current.has(orderId)) return;
     processingOrdersRef.current.add(orderId);
-    setLoadingAction({ id: orderId, type: 'INVOICE' });
+    setLoadingAction({ id: orderId, type: "INVOICE" });
     try {
       await handleGenerateInvoice(orderId);
     } finally {
       processingOrdersRef.current.delete(orderId);
       setLoadingAction({ id: null, type: null });
     }
-  }
+  };
 
   return (
     <div className="p-6 min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white">
@@ -344,246 +334,156 @@ const OrderFlowTable = () => {
         </h1>
 
         {/* Search Box */}
-        <div className="flex items-center w-full md:w-72 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-full px-4 py-2 focus-within:border-dark-400 transition">
-          <FiSearch size={18} className="text-gray-400 mr-3" />
+        <div className="flex items-center w-full md:w-80 bg-white/80 backdrop-blur-md border border-red-200 rounded-full px-4 py-2 shadow-md hover:shadow-lg transition-all duration-300 focus-within:ring-2 focus-within:ring-red-400 focus-within:border-red-400">
+          <FiSearch
+            size={20}
+            className="text-red-400 mr-3 transition-colors duration-300 group-focus-within:text-red-500"
+          />
 
           <input
             type="text"
             placeholder="Search order / customer / status"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-transparent outline-none text-gray-700 dark:text-gray-200 placeholder-gray-400"
+            className="w-full bg-transparent outline-none text-gray-800 placeholder-red-300 dark:text-gray-200 dark:placeholder-red-400 text-sm font-medium"
           />
         </div>
       </div>
 
       {/* TABLE */}
-      <div className="overflow-x-auto bg-white dark:bg-gray-800 rounded-xl shadow justify-center relative">
-        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-          <thead className="bg-gray-100 dark:bg-gray-700 text-[10px]">
-            <tr className="">
-              <th className="sticky left-0 bg-gray-100 dark:bg-gray-700 z-20 text-center px-8 py-2 text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
-                S.No
-              </th>
-
-              <th className="px-8 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
-                Order ID
-              </th>
-              <th className="px-8 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
-                Customer
-              </th>
-              <th className="px-8 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
-                Phone
-              </th>
-              <th className="px-8 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
-                Placed On
-              </th>
-              <th className="px-8 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
-                Timeline
-              </th>
-              <th className="px-8 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
-                Current Status
-              </th>
-              <th className="px-8 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
-                Amount
-              </th>
-              <th className="px-8 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
-                Payment
-              </th>
-              <th className="px-8 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
-                Delivery Partner
-              </th>
-              <th className="px-8 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
-                Assigned On
-              </th>
-              <th className="px-8 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
-                Track Order
-              </th>
-              <th className="px-8 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200 dark:divide-gray-700 text-[10px]">
-            {currentOrders.map((order, idx) => (
-              <tr key={order._id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                <td className="sticky left-0 bg-white dark:bg-gray-800 z-10 text-center px-2 py-2 shadow-md dark:shadow-sm dark:shadow-gray-700/50">
-                  {(currentPage - 1) * ITEMS_PER_PAGE + idx + 1}
-                </td>
-                <td className="px-8 py-2 text-gray-700 dark:text-gray-300">{order.orderId}</td>
-                <td className="px-8 py-2 text-gray-700 dark:text-gray-300">{order.customer.name}</td>
-                <td className="px-8 py-2 text-gray-700 dark:text-gray-300">{order.customer.phone}</td>
-                <td className="px-8 py-2 text-gray-700 dark:text-gray-300">
-                  {new Date(order.createdAt).toLocaleString()}
-                </td>
-
-                {/* Timeline */}
-                <td className="px-8 py-2 flex gap-1 items-center">
-                  {STATUS_FLOW.map((s) => {
-                    const completed =
-                      STATUS_FLOW.indexOf(order.status) >=
-                      STATUS_FLOW.indexOf(s);
-                    return (
-                      <div
-                        key={s}
-                        className={`px-2 py-1 text-[10px] rounded font-semibold ${completed
-                          ? STATUS_COLORS[s]
-                          : "bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500"
-                          }`}
-                        title={
-                          order.timestamps?.[s]
-                            ? `At: ${new Date(
-                              order.timestamps[s]
-                            ).toLocaleString()}`
-                            : ""
-                        }
-                      >
-                        {s}
-                      </div>
-                    );
-                  })}
-                </td>
-
-                <td className="px-8 py-2">
-                  <span
-                    className={`px-2 py-1 rounded text-[10px] font-semibold ${STATUS_COLORS[order.status]
-                      }`}
-                  >
-                    {order.status}
-                  </span>
-                </td>
-
-                <td className="px-8 py-2 text-gray-700 dark:text-gray-300 font-bold">
-                  ₹{order.price?.grandTotal}
-                </td>
-
-                <td className="px-8 py-2 text-gray-700 dark:text-gray-300">
-                  <div className="font-semibold text-[10px]">{order.payment?.type}</div>
-                  <div className={`text-[9px] font-bold ${order.payment?.status === 'PAID' ? 'text-green-600' : 'text-orange-500'}`}>
-                    {order.payment?.status}
-                  </div>
-                </td>
-
-                <td className="px-8 py-2 text-gray-700 dark:text-gray-300">
-                  {order.delivery?.partner ? (
-                    <>
-                      {order.delivery.partner.name} <br />
-                      <span className="text-[10px] text-gray-500">
-                        {order.delivery.partner.phone}
-                      </span>
-                    </>
-                  ) : (
-                    "—"
-                  )}
-                </td>
-
-                <td className="px-8 py-2 text-gray-700 dark:text-gray-300">
-                  {order.delivery?.assignedAt
-                    ? new Date(order.delivery.assignedAt).toLocaleString()
-                    : "—"}
-                </td>
-                <td className="px-8 py-2 text-gray-700 dark:text-gray-300">
-                  {order.status === "DELIVERED" ? (
-                    "Already Delivered"
-                  ) : (
-                    <TrackOrderButton
-                      order={order}
-                      onClick={(o) => {
-                        setOrderId(o.orderId);
-                        setTrackOrder(true);
-                      }}
-                    />
-                  )}
-                </td>
-
-
-                {/* Actions */}
-                <td className="px-8 py-2 flex flex-col gap-1">
-                  {order.status === "PLACED" && (
-                    <div className="flex gap-1">
-                      <Button
-                        size="sm"
-                        variant="success"
-                        disabled={loadingAction.id === order._id}
-                        onClick={() => handleAccept(order._id)}
-                      >
-                        Accept
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="danger"
-                        disabled={loadingAction.id === order._id}
-                        onClick={() => handleReject(order._id)}
-                      >
-                        Reject
-                      </Button>
-                    </div>
-                  )}
-                  {order.status === "ACCEPTED" && (
-                    <Button
-                      size="sm"
-                      variant="primary"
-                      disabled={loadingAction.id === order.orderId}
-                      onClick={() => handlePrepare(order.orderId)}
-                    >
-                      Prepare
-                    </Button>
-                  )}
-                  {order.status === "PREPARING" && (
-                    <Button
-                      size="sm"
-                      variant="success"
-                      disabled={loadingAction.id === order.orderId}
-                      onClick={() => handleReady(order.orderId)}
-                    >
-                      Ready
-                    </Button>
-                  )}
-                  {order.status === "READY" && (
-                    <Button
-                      size="sm"
-                      variant="primary"
-                      disabled={loadingAction.id === order.orderId && loadingAction.type === 'ASSIGN'}
-                      onClick={() => {
-                        partnersRefetch();
-                        handleAssign(order.orderId)
-                      }}
-                    >
-                      Assign
-                    </Button>
-                  )}
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    disabled={false}
-                    onClick={() => setViewingOrder(order)}
-                  >
-                    View
-                  </Button>
-                  {order.status === "ASSIGNED" && (
-                    <Button
-                      size="sm"
-                      variant="warning"
-                      disabled={loadingAction.id === order._id}
-                      onClick={() => handleGenerateInvoiceProtected(order._id)}
-                      className="bg-orange-500"
-                    >
-                      Generate Invoice
-                    </Button>
-                  )}
-                </td>
-              </tr>
-            ))}
-            {currentOrders.length === 0 && (
-              <tr>
-                <td colSpan={10} className="text-center py-6 text-gray-400">
-                  No orders found
-                </td>
-              </tr>
+     {/* TABLE */}
+<div className="overflow-x-auto bg-white dark:bg-gray-900 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700">
+  <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+    <thead className="bg-gray-100 dark:bg-gray-700 text-[10px]">
+      <tr>
+        <th className="sticky left-0 bg-gray-100 dark:bg-gray-700 z-20 text-center px-4 py-2 text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase shadow-md">
+          S.No
+        </th>
+        <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
+          Order ID
+        </th>
+        <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
+          Customer
+        </th>
+        <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
+          Phone
+        </th>
+        <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
+          Placed On
+        </th>
+        <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
+          Timeline
+        </th>
+        <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
+          Current Status
+        </th>
+        <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
+          Amount
+        </th>
+        <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
+          Payment
+        </th>
+        <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
+          Delivery Partner
+        </th>
+        <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
+          Assigned On
+        </th>
+        <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
+          Actions
+        </th>
+      </tr>
+    </thead>
+    <tbody className="divide-y divide-gray-200 dark:divide-gray-700 text-[10px]">
+      {currentOrders.map((order, idx) => (
+        <tr
+          key={order._id}
+          className={`transition-all duration-300 transform hover:scale-[1.01] hover:shadow-xl rounded-lg ${
+            idx % 2 === 0
+              ? "bg-gradient-to-r from-gray-50 via-white to-gray-50 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800"
+              : "bg-gradient-to-r from-white via-gray-50 to-white dark:from-gray-700 dark:via-gray-800 dark:to-gray-700"
+          } border-l-4 border-l-red-500 dark:border-l-pink-500`}
+        >
+          <td className="sticky left-0 bg-white dark:bg-gray-800 z-10 text-center px-2 py-2 shadow-inner">
+            {(currentPage - 1) * ITEMS_PER_PAGE + idx + 1}
+          </td>
+          <td className="px-4 py-2 text-gray-700 dark:text-gray-300">{order.orderId}</td>
+          <td className="px-4 py-2 text-gray-700 dark:text-gray-300">{order.customer.name}</td>
+          <td className="px-4 py-2 text-gray-700 dark:text-gray-300">{order.customer.phone}</td>
+          <td className="px-4 py-2 text-gray-700 dark:text-gray-300">{new Date(order.createdAt).toLocaleString()}</td>
+          <td className="px-4 py-2 flex gap-1 items-center">
+            {STATUS_FLOW.map((s) => {
+              const completed = STATUS_FLOW.indexOf(order.status) >= STATUS_FLOW.indexOf(s);
+              return (
+                <div
+                  key={s}
+                  className={`px-2 py-1 text-[10px] rounded font-semibold ${
+                    completed
+                      ? STATUS_COLORS[s]
+                      : "bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500"
+                  }`}
+                  title={order.timestamps?.[s] ? `At: ${new Date(order.timestamps[s]).toLocaleString()}` : ""}
+                >
+                  {s}
+                </div>
+              );
+            })}
+          </td>
+          <td className="px-4 py-2">
+            <span className={`px-2 py-1 rounded text-[10px] font-semibold ${STATUS_COLORS[order.status]}`}>
+              {order.status}
+            </span>
+          </td>
+          <td className="px-4 py-2 text-gray-700 dark:text-gray-300 font-bold">₹{order.price?.grandTotal}</td>
+          <td className="px-4 py-2 text-gray-700 dark:text-gray-300">
+            <div className="font-semibold text-[10px]">{order.payment?.method}</div>
+            <div className={`text-[9px] font-bold ${order.payment?.status === "PAID" ? "text-green-600" : "text-orange-500"}`}>
+              {order.payment?.status}
+            </div>
+          </td>
+          <td className="px-4 py-2 text-gray-700 dark:text-gray-300">
+            {order.delivery?.partner ? (
+              <>
+                {order.delivery.partner.name} <br />
+                <span className="text-[10px] text-gray-500">{order.delivery.partner.phone}</span>
+              </>
+            ) : "—"}
+          </td>
+          <td className="px-4 py-2 text-gray-700 dark:text-gray-300">
+            {order.delivery?.assignedAt ? new Date(order.delivery.assignedAt).toLocaleString() : "—"}
+          </td>
+          <td className="px-4 py-2 flex flex-col gap-1">
+            {order.status === "PLACED" && (
+              <div className="flex gap-1">
+                <Button size="sm" variant="success" disabled={loadingAction.id === order._id} onClick={() => handleAccept(order._id)}>Accept</Button>
+                <Button size="sm" variant="danger" disabled={loadingAction.id === order._id} onClick={() => handleReject(order._id)}>Reject</Button>
+              </div>
             )}
-          </tbody>
-        </table>
-      </div>
+            {order.status === "ACCEPTED" && (
+              <Button size="sm" variant="primary" disabled={loadingAction.id === order.orderId} onClick={() => handlePrepare(order.orderId)}>Prepare</Button>
+            )}
+            {order.status === "PREPARING" && (
+              <Button size="sm" variant="success" disabled={loadingAction.id === order.orderId} onClick={() => handleReady(order.orderId)}>Ready</Button>
+            )}
+            {order.status === "READY" && (
+              <Button size="sm" variant="primary" disabled={loadingAction.id === order.orderId && loadingAction.type === "ASSIGN"} onClick={() => handleAssign(order.orderId)}>Assign</Button>
+            )}
+            <Button size="sm" variant="secondary" disabled={false} onClick={() => setViewingOrder(order)}>View</Button>
+            {order.status === "ASSIGNED" && (
+              <Button size="sm" variant="warning" disabled={loadingAction.id === order._id} onClick={() => handleGenerateInvoiceProtected(order._id)}>Generate Invoice</Button>
+            )}
+          </td>
+        </tr>
+      ))}
+      {currentOrders.length === 0 && (
+        <tr>
+          <td colSpan={12} className="text-center py-6 text-gray-400">No orders found</td>
+        </tr>
+      )}
+    </tbody>
+  </table>
+</div>
+
 
       {/* Pagination */}
       {totalPages > 1 && (
@@ -639,16 +539,20 @@ const OrderFlowTable = () => {
               {filteredPartners.map((p) => (
                 <div
                   key={p._id}
-                  className={`p-3 rounded-lg mb-2 shadow flex justify-between items-center cursor-pointer ${p.isAvailable === false
-                    ? "bg-red-100 dark:bg-red-900/20 opacity-50 cursor-not-allowed"
-                    : "bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
-                    }`}
+                  className={`p-3 rounded-lg mb-2 shadow flex justify-between items-center cursor-pointer ${
+                    p.isAvailable === false
+                      ? "bg-red-100 dark:bg-red-900/20 opacity-50 cursor-not-allowed"
+                      : "bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
+                  }`}
                   onClick={() => p.isAvailable !== false && assignPartner(p)}
-
                 >
                   <div>
-                    <div className="font-semibold text-gray-900 dark:text-gray-100">{p.name}</div>
-                    <div className="text-[10px] text-gray-500 dark:text-gray-400">{p.phone}</div>
+                    <div className="font-semibold text-gray-900 dark:text-gray-100">
+                      {p.name}
+                    </div>
+                    <div className="text-[10px] text-gray-500 dark:text-gray-400">
+                      {p.phone}
+                    </div>
                     <div className="text-[10px] text-gray-400 dark:text-gray-500">
                       {p.vehicleType} {p.isAvailable === false ? "(Busy)" : ""}
                     </div>
@@ -673,7 +577,6 @@ const OrderFlowTable = () => {
       {viewingInvoice && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 dark:bg-black/60 backdrop-blur-sm">
           <div className="bg-white dark:bg-gray-800 w-[400px] md:w-[500px] p-6 rounded-2xl shadow-2xl overflow-y-auto max-h-[80vh] animate-slideIn text-gray-900 dark:text-gray-100 h-scrollbar">
-
             {/* Header */}
             <div className="mb-4 pb-2 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
               <h2 className="text-2xl font-bold bg-gradient-to-r from-red-500 to-pink-500 text-transparent bg-clip-text">
@@ -689,12 +592,30 @@ const OrderFlowTable = () => {
 
             {/* Customer Details */}
             <div className="mb-4 text-sm space-y-1">
-              <p><span className="font-semibold text-gray-700 dark:text-gray-300">Customer:</span> {viewingInvoice.customerDetails.name}</p>
-              <p><span className="font-semibold text-gray-700 dark:text-gray-300">Phone:</span> {viewingInvoice.customerDetails.phone}</p>
-              <p><span className="font-semibold text-gray-700 dark:text-gray-300">Address:</span> {viewingInvoice.customerDetails.address}</p>
               <p>
-                <span className="font-semibold text-gray-700 dark:text-gray-300">Payment:</span>{" "}
-                {viewingInvoice.payment.method} ({viewingInvoice.payment.status})
+                <span className="font-semibold text-gray-700 dark:text-gray-300">
+                  Customer:
+                </span>{" "}
+                {viewingInvoice.customerDetails.name}
+              </p>
+              <p>
+                <span className="font-semibold text-gray-700 dark:text-gray-300">
+                  Phone:
+                </span>{" "}
+                {viewingInvoice.customerDetails.phone}
+              </p>
+              <p>
+                <span className="font-semibold text-gray-700 dark:text-gray-300">
+                  Address:
+                </span>{" "}
+                {viewingInvoice.customerDetails.address}
+              </p>
+              <p>
+                <span className="font-semibold text-gray-700 dark:text-gray-300">
+                  Payment:
+                </span>{" "}
+                {viewingInvoice.payment.method} ({viewingInvoice.payment.status}
+                )
               </p>
             </div>
 
@@ -703,14 +624,27 @@ const OrderFlowTable = () => {
               <table className="w-full border border-gray-200 dark:border-gray-700 rounded-lg text-sm">
                 <thead className="bg-gray-100 dark:bg-gray-700">
                   <tr>
-                    <th className="py-2 px-3 text-left text-gray-600 dark:text-gray-300">Item</th>
-                    <th className="py-2 px-3 text-center text-gray-600 dark:text-gray-300">Qty</th>
-                    <th className="py-2 px-3 text-right text-gray-600 dark:text-gray-300">Total</th>
+                    <th className="py-2 px-3 text-left text-gray-600 dark:text-gray-300">
+                      Item
+                    </th>
+                    <th className="py-2 px-3 text-center text-gray-600 dark:text-gray-300">
+                      Qty
+                    </th>
+                    <th className="py-2 px-3 text-right text-gray-600 dark:text-gray-300">
+                      Total
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {viewingInvoice.items.map((item, idx) => (
-                    <tr key={item._id} className={idx % 2 === 0 ? "bg-gray-50 dark:bg-gray-900" : "bg-white dark:bg-gray-800"}>
+                    <tr
+                      key={item._id}
+                      className={
+                        idx % 2 === 0
+                          ? "bg-gray-50 dark:bg-gray-900"
+                          : "bg-white dark:bg-gray-800"
+                      }
+                    >
                       <td className="py-2 px-3">{item.name}</td>
                       <td className="py-2 px-3 text-center">{item.quantity}</td>
                       <td className="py-2 px-3 text-right">₹{item.total}</td>
@@ -723,7 +657,9 @@ const OrderFlowTable = () => {
             {/* Amount Breakdown */}
             <div className="mt-4 text-sm space-y-1 border-t border-gray-200 dark:border-gray-700 pt-3">
               <div className="flex justify-between">
-                <span className="text-gray-600 dark:text-gray-400">Subtotal</span>
+                <span className="text-gray-600 dark:text-gray-400">
+                  Subtotal
+                </span>
                 <span>₹{viewingInvoice.amount.subTotal}</span>
               </div>
 
@@ -765,13 +701,9 @@ const OrderFlowTable = () => {
                 Download PDF
               </button>
             </div>
-
-
-
           </div>
         </div>
       )}
-
     </div>
   );
 };

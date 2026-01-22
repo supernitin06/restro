@@ -38,7 +38,7 @@ const TopCategories = () => {
       return (
         <div className="bg-primary p-3 rounded-xl shadow-sm border border-gray-200">
           <p className="text-sm font-semibold text-primary">{payload[0].name}</p>
-          <p className="text-sm text-primary opacity-70">{payload[0].value}%</p>
+          <p className="text-sm text-primary opacity-70">Sales: {payload[0].value}</p>
         </div>
       );
     }
@@ -55,7 +55,7 @@ const TopCategories = () => {
               style={{ backgroundColor: entry.color }}
             ></div>
             <span className="text-sm font-medium text-primary opacity-80 group-hover:text-primary flex gap-1">
-              {entry.name} <span className="text-primary opacity-60"></span>
+              {entry.payload?.name || entry.value} <span className="text-primary opacity-60"></span>
             </span>
           </div>
         ))}
