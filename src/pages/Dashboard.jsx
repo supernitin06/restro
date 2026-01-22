@@ -1,7 +1,7 @@
 import React from "react";
 import { ShoppingBag, Users, Star, DollarSign, Clock, CheckCircle } from "lucide-react";
 import Select from "../components/ui/Select";
-
+import { HiOutlineChartBar } from "react-icons/hi";
 import StatCard from "../components/ui/StatCard";
 import RevenueChart from "../components/PageDashboard/RevenueChart";
 import TopCategories from "../components/PageDashboard/TopCategories";
@@ -74,14 +74,29 @@ const Dashboard = () => {
 
         {/* ================= HEADER ================= */}
         <div className="flex bg-primary flex-col md:flex-row justify-between items-start md:items-center bg-white dark:bg-gray-800 p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
-          <div>
-            <h1 className="highlight text-4xl font-extrabold tracking-tight">
-              Dashboard
-            </h1>
-            <p className="text-primary opacity-70 mt-2 text-lg font-medium">
-              Welcome back! Here's what's happening today.
-            </p>
-          </div>
+   <div className="flex items-center gap-4">
+  {/* Icon */}
+  <div className="p-3 rounded-lg bg-red-50 dark:bg-red-900/30">
+    <HiOutlineChartBar
+      className="text-red-600 dark:text-red-400"
+      size={22}
+    />
+  </div>
+
+  {/* Text */}
+  <div className="flex flex-col gap-1">
+    <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-red-500 dark:text-white">
+      Dashboard
+    </h1>
+
+    <p className="text-sm md:text-base text-gray-500 dark:text-gray-400">
+      Welcome back. Here’s an overview of today’s activity.
+    </p>
+
+    <div className="mt-1 h-[2px] w-16 rounded-full bg-red-500/70"></div>
+  </div>
+</div>
+
           {/* <div className="mt-4 md:mt-0">
             <Select
               value={filterType}
