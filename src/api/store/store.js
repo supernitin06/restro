@@ -8,6 +8,8 @@ import { restaurantApi } from "../services/resturentsapi";
 import { deliveryPartnerApi } from "../services/deliveryPartnerApi";
 import { bannerApi } from "../services/bannerApi";
 import { invoiceApi } from "../services/invoice"
+import { taxApi } from "../services/taxApi";
+
 
 export const store = configureStore({
   reducer: {
@@ -20,13 +22,15 @@ export const store = configureStore({
     [deliveryPartnerApi.reducerPath]: deliveryPartnerApi.reducer,
     [bannerApi.reducerPath]: bannerApi.reducer,
     [invoiceApi.reducerPath]: invoiceApi.reducer,
+    [taxApi.reducerPath]: taxApi.reducer,
+
 
   },
 
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: false,
-    }).concat(baseApi.middleware, orderApi.middleware, userApi.middleware, restaurantApi.middleware, deliveryPartnerApi.middleware,  bannerApi.middleware, invoiceApi.middleware),
+    }).concat(baseApi.middleware, orderApi.middleware, userApi.middleware, restaurantApi.middleware, deliveryPartnerApi.middleware,  bannerApi.middleware, invoiceApi.middleware, taxApi.middleware),
 
 
 
