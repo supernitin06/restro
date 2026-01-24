@@ -60,17 +60,17 @@ const DeliverySettings = () => {
 
                 <div className="transition-all duration-500 ease-in-out">
                     {activeTab === 'rules' ? (
-                        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                        <div className="grid grid-cols-1 xl:grid-cols-1 gap-8">
                             {/* Left Column */}
                             <div className="space-y-8">
-                                <OrderValueRules />
+                                {/* <OrderValueRules /> */}
                                 <DistanceRules />
                             </div>
 
                             {/* Right Column */}
                             <div className="space-y-8">
-                                <CityBasedCharges />
-                                <RestaurantOverride />
+                                {/* <CityBasedCharges /> */}
+                                {/* <RestaurantOverride /> */}
                             </div>
                         </div>
                     ) : (

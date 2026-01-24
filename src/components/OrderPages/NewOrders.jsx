@@ -29,7 +29,7 @@ const STATUS_COLORS = {
   ASSIGNED: "bg-gradient-to-r from-purple-200 to-purple-300 text-purple-800",
 };
 
-const OrderFlowTable = () => {
+const NewOrders = () => {
   const { data, refetch } = useGetOrdersQuery({
     page: 1,
     limit: 5000,
@@ -351,135 +351,229 @@ const OrderFlowTable = () => {
       </div>
 
       {/* TABLE */}
-     {/* TABLE */}
-<div className="overflow-x-auto bg-white dark:bg-gray-900 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700">
-  <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-    <thead className="bg-gray-100 dark:bg-gray-700 text-[10px]">
-      <tr>
-        <th className="sticky left-0 bg-gray-100 dark:bg-gray-700 z-20 text-center px-4 py-2 text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase shadow-md">
-          S.No
-        </th>
-        <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
-          Order ID
-        </th>
-        <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
-          Customer
-        </th>
-        <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
-          Phone
-        </th>
-        <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
-          Placed On
-        </th>
-        <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
-          Timeline
-        </th>
-        <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
-          Current Status
-        </th>
-        <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
-          Amount
-        </th>
-        <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
-          Payment
-        </th>
-        <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
-          Delivery Partner
-        </th>
-        <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
-          Assigned On
-        </th>
-        <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
-          Actions
-        </th>
-      </tr>
-    </thead>
-    <tbody className="divide-y divide-gray-200 dark:divide-gray-700 text-[10px]">
-      {currentOrders.map((order, idx) => (
-        <tr
-          key={order._id}
-          className={`transition-all duration-300 transform hover:scale-[1.01] hover:shadow-xl rounded-lg ${
-            idx % 2 === 0
-              ? "bg-gradient-to-r from-gray-50 via-white to-gray-50 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800"
-              : "bg-gradient-to-r from-white via-gray-50 to-white dark:from-gray-700 dark:via-gray-800 dark:to-gray-700"
-          } border-l-4 border-l-red-500 dark:border-l-pink-500`}
-        >
-          <td className="sticky left-0 bg-white dark:bg-gray-800 z-10 text-center px-2 py-2 shadow-inner">
-            {(currentPage - 1) * ITEMS_PER_PAGE + idx + 1}
-          </td>
-          <td className="px-4 py-2 text-gray-700 dark:text-gray-300">{order.orderId}</td>
-          <td className="px-4 py-2 text-gray-700 dark:text-gray-300">{order.customer.name}</td>
-          <td className="px-4 py-2 text-gray-700 dark:text-gray-300">{order.customer.phone}</td>
-          <td className="px-4 py-2 text-gray-700 dark:text-gray-300">{new Date(order.createdAt).toLocaleString()}</td>
-          <td className="px-4 py-2 flex gap-1 items-center">
-            {STATUS_FLOW.map((s) => {
-              const completed = STATUS_FLOW.indexOf(order.status) >= STATUS_FLOW.indexOf(s);
-              return (
-                <div
-                  key={s}
-                  className={`px-2 py-1 text-[10px] rounded font-semibold ${
-                    completed
-                      ? STATUS_COLORS[s]
-                      : "bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500"
-                  }`}
-                  title={order.timestamps?.[s] ? `At: ${new Date(order.timestamps[s]).toLocaleString()}` : ""}
-                >
-                  {s}
-                </div>
-              );
-            })}
-          </td>
-          <td className="px-4 py-2">
-            <span className={`px-2 py-1 rounded text-[10px] font-semibold ${STATUS_COLORS[order.status]}`}>
-              {order.status}
-            </span>
-          </td>
-          <td className="px-4 py-2 text-gray-700 dark:text-gray-300 font-bold">₹{order.price?.grandTotal}</td>
-          <td className="px-4 py-2 text-gray-700 dark:text-gray-300">
-            <div className="font-semibold text-[10px]">{order.payment?.method}</div>
-            <div className={`text-[9px] font-bold ${order.payment?.status === "PAID" ? "text-green-600" : "text-orange-500"}`}>
-              {order.payment?.status}
-            </div>
-          </td>
-          <td className="px-4 py-2 text-gray-700 dark:text-gray-300">
-            {order.delivery?.partner ? (
-              <>
-                {order.delivery.partner.name} <br />
-                <span className="text-[10px] text-gray-500">{order.delivery.partner.phone}</span>
-              </>
-            ) : "—"}
-          </td>
-          <td className="px-4 py-2 text-gray-700 dark:text-gray-300">
-            {order.delivery?.assignedAt ? new Date(order.delivery.assignedAt).toLocaleString() : "—"}
-          </td>
-          <td className="px-4 py-2 flex flex-col gap-1">
-            {order.status === "PLACED" && (
-              <div className="flex gap-1">
-                <Button size="sm" variant="success" disabled={loadingAction.id === order._id} onClick={() => handleAccept(order._id)}>Accept</Button>
-                <Button size="sm" variant="danger" disabled={loadingAction.id === order._id} onClick={() => handleReject(order._id)}>Reject</Button>
-              </div>
+      <div className="overflow-x-auto bg-white dark:bg-gray-800 rounded-xl shadow justify-center relative">
+        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead className="bg-gray-100 dark:bg-gray-700 text-[10px]">
+            <tr className="">
+              <th className="sticky left-0 bg-gray-100 dark:bg-gray-700 z-20 text-center px-8 py-2 text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
+                S.No
+              </th>
+
+              <th className="px-8 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
+                Order ID
+              </th>
+              <th className="px-8 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
+                Customer
+              </th>
+              <th className="px-8 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
+                Phone
+              </th>
+              <th className="px-8 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
+                Placed On
+              </th>
+              <th className="px-8 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
+                Timeline
+              </th>
+              <th className="px-8 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
+                Current Status
+              </th>
+              <th className="px-8 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
+                Amount
+              </th>
+              <th className="px-8 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
+                Payment
+              </th>
+              <th className="px-8 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
+                Delivery Partner
+              </th>
+              <th className="px-8 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
+                Assigned On
+              </th>
+              <th className="px-8 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
+                Track Order
+              </th>
+              <th className="px-8 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200 dark:divide-gray-700 text-[10px]">
+            {currentOrders.map((order, idx) => (
+              <tr key={order._id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                <td className="sticky left-0 bg-white dark:bg-gray-800 z-10 text-center px-2 py-2 shadow-md dark:shadow-sm dark:shadow-gray-700/50">
+                  {(currentPage - 1) * ITEMS_PER_PAGE + idx + 1}
+                </td>
+                <td className="px-8 py-2 text-gray-700 dark:text-gray-300">{order.orderId}</td>
+                <td className="px-8 py-2 text-gray-700 dark:text-gray-300">{order.customer.name}</td>
+                <td className="px-8 py-2 text-gray-700 dark:text-gray-300">{order.customer.phone}</td>
+                <td className="px-8 py-2 text-gray-700 dark:text-gray-300">
+                  {new Date(order.createdAt).toLocaleString()}
+                </td>
+
+                {/* Timeline */}
+                <td className="px-8 py-2 flex gap-1 items-center">
+                  {STATUS_FLOW.map((s) => {
+                    const completed =
+                      STATUS_FLOW.indexOf(order.status) >=
+                      STATUS_FLOW.indexOf(s);
+                    return (
+                      <div
+                        key={s}
+                        className={`px-2 py-1 text-[10px] rounded font-semibold ${completed
+                          ? STATUS_COLORS[s]
+                          : "bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500"
+                          }`}
+                        title={
+                          order.timestamps?.[s]
+                            ? `At: ${new Date(
+                              order.timestamps[s]
+                            ).toLocaleString()}`
+                            : ""
+                        }
+                      >
+                        {s}
+                      </div>
+                    );
+                  })}
+                </td>
+
+                <td className="px-8 py-2">
+                  <span
+                    className={`px-2 py-1 rounded text-[10px] font-semibold ${STATUS_COLORS[order.status]
+                      }`}
+                  >
+                    {order.status}
+                  </span>
+                </td>
+
+                <td className="px-8 py-2 text-gray-700 dark:text-gray-300 font-bold">
+                  ₹{order.price?.grandTotal}
+                </td>
+
+                <td className="px-8 py-2 text-gray-700 dark:text-gray-300">
+                  <div className="font-semibold text-[10px]">{order.payment?.type}</div>
+                  <div className={`text-[9px] font-bold ${order.payment?.status === 'PAID' ? 'text-green-600' : 'text-orange-500'}`}>
+                    {order.payment?.status}
+                  </div>
+                </td>
+
+                <td className="px-8 py-2 text-gray-700 dark:text-gray-300">
+                  {order.delivery?.partner ? (
+                    <>
+                      {order.delivery.partner.name} <br />
+                      <span className="text-[10px] text-gray-500">
+                        {order.delivery.partner.phone}
+                      </span>
+                    </>
+                  ) : (
+                    "—"
+                  )}
+                </td>
+
+                <td className="px-8 py-2 text-gray-700 dark:text-gray-300">
+                  {order.delivery?.assignedAt
+                    ? new Date(order.delivery.assignedAt).toLocaleString()
+                    : "—"}
+                </td>
+                <td className="px-8 py-2 text-gray-700 dark:text-gray-300">
+                  {order.status === "DELIVERED" ? (
+                    "Already Delivered"
+                  ) : (
+                    <TrackOrderButton
+                      order={order}
+                      onClick={(o) => {
+                        setOrderId(o.orderId);
+                        setTrackOrder(true);
+                      }}
+                    />
+                  )}
+                </td>
+
+
+                {/* Actions */}
+                <td className="px-8 py-2 flex flex-col gap-1">
+                  {order.status === "PLACED" && (
+                    <div className="flex gap-1">
+                      <Button
+                        size="sm"
+                        variant="success"
+                        disabled={loadingAction.id === order._id}
+                        onClick={() => handleAccept(order._id)}
+                      >
+                        Accept
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="danger"
+                        disabled={loadingAction.id === order._id}
+                        onClick={() => handleReject(order._id)}
+                      >
+                        Reject
+                      </Button>
+                    </div>
+                  )}
+                  {order.status === "ACCEPTED" && (
+                    <Button
+                      size="sm"
+                      variant="primary"
+                      disabled={loadingAction.id === order.orderId}
+                      onClick={() => handlePrepare(order.orderId)}
+                    >
+                      Prepare
+                    </Button>
+                  )}
+                  {order.status === "PREPARING" && (
+                    <Button
+                      size="sm"
+                      variant="success"
+                      disabled={loadingAction.id === order.orderId}
+                      onClick={() => handleReady(order.orderId)}
+                    >
+                      Ready
+                    </Button>
+                  )}
+                  {order.status === "READY" && (
+                    <Button
+                      size="sm"
+                      variant="primary"
+                      disabled={loadingAction.id === order.orderId && loadingAction.type === 'ASSIGN'}
+                      onClick={() => {
+                        partnersRefetch();
+                        handleAssign(order.orderId)
+                      }}
+                    >
+                      Assign
+                    </Button>
+                  )}
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    disabled={false}
+                    onClick={() => setViewingOrder(order)}
+                  >
+                    View
+                  </Button>
+                  {order.status === "ASSIGNED" && (
+                    <Button
+                      size="sm"
+                      variant="warning"
+                      disabled={loadingAction.id === order._id}
+                      onClick={() => handleGenerateInvoiceProtected(order._id)}
+                      className="bg-orange-500"
+                    >
+                      Generate Invoice
+                    </Button>
+                  )}
+                </td>
+              </tr>
+            ))}
+            {currentOrders.length === 0 && (
+              <tr>
+                <td colSpan={13} className="text-center py-6 text-gray-400">
+                  No orders found
+                </td>
+              </tr>
             )}
-            {order.status === "ACCEPTED" && (
-              <Button size="sm" variant="primary" disabled={loadingAction.id === order.orderId} onClick={() => handlePrepare(order.orderId)}>Prepare</Button>
-            )}
-            {order.status === "PREPARING" && (
-              <Button size="sm" variant="success" disabled={loadingAction.id === order.orderId} onClick={() => handleReady(order.orderId)}>Ready</Button>
-            )}
-            {order.status === "READY" && (
-              <Button size="sm" variant="primary" disabled={loadingAction.id === order.orderId && loadingAction.type === "ASSIGN"} onClick={() => handleAssign(order.orderId)}>Assign</Button>
-            )}
-            <Button size="sm" variant="secondary" disabled={false} onClick={() => setViewingOrder(order)}>View</Button>
-            {order.status === "ASSIGNED" && (
-              <Button size="sm" variant="warning" disabled={loadingAction.id === order._id} onClick={() => handleGenerateInvoiceProtected(order._id)}>Generate Invoice</Button>
-            )}
-          </td>
-        </tr>
-      ))}
-      {currentOrders.length === 0 && (
-        <tr>
-          <td colSpan={12} className="text-center py-6 text-gray-400">No orders found</td>
-        </tr>
-      )}
     </tbody>
   </table>
 </div>
@@ -701,6 +795,7 @@ const OrderFlowTable = () => {
                 Download PDF
               </button>
             </div>
+
           </div>
         </div>
       )}
@@ -708,4 +803,4 @@ const OrderFlowTable = () => {
   );
 };
 
-export default OrderFlowTable;
+export default NewOrders;

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect } from "react";
+import React, { createContext, useContext, useEffect, useRef } from "react";
 import { mainSocket } from "../socket/mainSocket";
 import { ordersSocket } from "../socket/ordersSocket";
 import { restaurantSocket } from "../socket/restaurantSocket";
@@ -26,6 +26,12 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
   ============================== */
   useEffect(() => {
     localStorage.setItem("NEW_ORDERS", JSON.stringify(newOrders));
+  }, [newOrders]);
+
+  // Keep a ref of newOrders to access current state inside socket listeners
+  const newOrdersRef = useRef(newOrders);
+  useEffect(() => {
+    newOrdersRef.current = newOrders;
   }, [newOrders]);
 
   useEffect(() => {
@@ -104,9 +110,9 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
     restaurantSocket.on("connect", onRestConnect);
     restaurantSocket.on("disconnect", onRestDisconnect);
     restaurantSocket.on("connect_error", onRestError);
-    ordersSocket.on("DELIVERY_LOCATION_UPDATED", (data)=>{
+    ordersSocket.on("DELIVERY_LOCATION_UPDATED", (data) => {
       console.log("DELIVERY_LOCATION_UPDATED", data);
-    } );
+    });
 
     /* =============================
        Business Logic Handlers
@@ -141,6 +147,12 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
 
       console.log("Processed newOrder:", newOrder);
 
+      // Check for duplicates using the ref (avoids toast on reload if order exists)
+      if (newOrdersRef.current.some((o) => o.orderId === newOrder.orderId)) {
+        console.log(" Duplicate order ignored (toast skipped):", newOrder.orderId);
+        return;
+      }
+
       setNewOrders((prev) => {
         if (prev.some((o) => o.orderId === newOrder.orderId)) {
           console.log(" Duplicate order ignored:", newOrder.orderId);
@@ -164,7 +176,7 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
           ...prev,
         ];
       });
-      
+
 
       toast.success(`New Order #${newOrder.orderId} received!`);
     };
@@ -354,7 +366,7 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
     ordersSocket.on("ORDER_STATUS_UPDATED", onOrderStatusUpdated);
     ordersSocket.on("ORDER_PICKED_UP", onOrderPickedUp);
     ordersSocket.on("ORDER_DELIVERED_BY_PARTNER", onOrderDelivered);
-    
+
     if (restaurantId) {
       console.log(" Emitting JOIN_RESTAURANT_ROOM", restaurantId);
       ordersSocket.emit("JOIN_RESTAURANT_ROOM", { restaurantId });
