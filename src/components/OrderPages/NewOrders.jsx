@@ -76,8 +76,13 @@ const NewOrders = () => {
     doc.text(`Customer: ${invoice.customerDetails.name}`, 14, 30);
     doc.text(`Phone: ${invoice.customerDetails.phone}`, 14, 36);
     doc.text(`Address: ${invoice.customerDetails.address}`, 14, 42);
+    
+    const pType = invoice.payment?.type || invoice.type;
+    const pMethod = invoice.payment?.method || invoice.method;
+    const paymentDisplay = (pType && pMethod && pType !== pMethod) ? `${pType} - ${pMethod}` : (pType || pMethod || "N/A");
+
     doc.text(
-      `Payment: ${invoice.payment.method} (${invoice.payment.status})`,
+      `Payment: ${paymentDisplay} (${invoice.payment?.status || invoice.status || "PENDING"})`,
       14,
       48,
     );
@@ -91,7 +96,7 @@ const NewOrders = () => {
 
     let finalY = doc.lastAutoTable.finalY + 10;
 
-    doc.text(`Subtotal: ₹${invoice.amount.subTotal}`, 14, finalY);
+    doc.text(`Subtotal: ₹${invoice.amount?.subTotal || invoice.amount?.total || 0}`, 14, finalY);
 
     if (invoice.amount.tax) {
       finalY += 6;
@@ -106,9 +111,8 @@ const NewOrders = () => {
     finalY += 8;
     doc.setFontSize(14);
     doc.text(`Grand Total: ₹${invoice.amount.grandTotal}`, 14, finalY);
-
     doc.text(
-      `Grand Total: ₹${invoice.amount.grandTotal}`,
+      `Grand Total: ₹${invoice.amount?.grandTotal || invoice.amount?.payable || 0}`,
       14,
       doc.lastAutoTable.finalY + 10,
     );
@@ -403,9 +407,9 @@ const NewOrders = () => {
                 <td className="sticky left-0 bg-white dark:bg-gray-800 z-10 text-center px-2 py-2 shadow-md dark:shadow-sm dark:shadow-gray-700/50">
                   {(currentPage - 1) * ITEMS_PER_PAGE + idx + 1}
                 </td>
-                <td className="px-8 py-2 text-gray-700 dark:text-gray-300">{order.orderId}</td>
-                <td className="px-8 py-2 text-gray-700 dark:text-gray-300">{order.customer.name}</td>
-                <td className="px-8 py-2 text-gray-700 dark:text-gray-300">{order.customer.phone}</td>
+                <td className="px-8 py-2 text-gray-700 dark:text-gray-300">{order.orderId?.orderId || order.orderId}</td>
+                <td className="px-8 py-2 text-gray-700 dark:text-gray-300">{order.customer?.name || order.userId?.name || "Unknown"}</td>
+                <td className="px-8 py-2 text-gray-700 dark:text-gray-300">{order.customer?.phone || order.userId?.phone || "N/A"}</td>
                 <td className="px-8 py-2 text-gray-700 dark:text-gray-300">
                   {new Date(order.createdAt).toLocaleString()}
                 </td>
@@ -447,13 +451,25 @@ const NewOrders = () => {
                 </td>
 
                 <td className="px-8 py-2 text-gray-700 dark:text-gray-300 font-bold">
-                  ₹{order.price?.grandTotal}
+                  ₹{order.amount?.payable || order.amount?.total || order.price?.grandTotal || 0}
                 </td>
 
                 <td className="px-8 py-2 text-gray-700 dark:text-gray-300">
-                  <div className="font-semibold text-[10px]">{order.payment?.type}</div>
-                  <div className={`text-[9px] font-bold ${order.payment?.status === 'PAID' ? 'text-green-600' : 'text-orange-500'}`}>
-                    {order.payment?.status}
+                  <div className="font-semibold text-[10px] uppercase">
+                    {(() => {
+                      const type = order.payment?.type || order.type;
+                      const method = order.payment?.method || order.method;
+                      return (type && method && type !== method) ? `${type} - ${method}` : (type || method || "N/A");
+                    })()}
+                  </div>
+                  <div
+                    className={`text-[9px] font-bold ${
+                      (order.payment?.status === "PAID" || order.status === "PAID")
+                        ? "text-green-600"
+                        : "text-orange-500"
+                    }`}
+                  >
+                    {order.payment?.status || (['PAID', 'PENDING', 'FAILED'].includes(order.status) ? order.status : "PENDING")}
                   </div>
                 </td>
 
@@ -482,7 +498,7 @@ const NewOrders = () => {
                     <TrackOrderButton
                       order={order}
                       onClick={(o) => {
-                        setOrderId(o.orderId);
+                        setOrderId(o.orderId?.orderId || o.orderId);
                         setTrackOrder(true);
                       }}
                     />
@@ -516,8 +532,8 @@ const NewOrders = () => {
                     <Button
                       size="sm"
                       variant="primary"
-                      disabled={loadingAction.id === order.orderId}
-                      onClick={() => handlePrepare(order.orderId)}
+                      disabled={loadingAction.id === (order.orderId?.orderId || order.orderId)}
+                      onClick={() => handlePrepare(order.orderId?.orderId || order.orderId)}
                     >
                       Prepare
                     </Button>
@@ -526,8 +542,8 @@ const NewOrders = () => {
                     <Button
                       size="sm"
                       variant="success"
-                      disabled={loadingAction.id === order.orderId}
-                      onClick={() => handleReady(order.orderId)}
+                      disabled={loadingAction.id === (order.orderId?.orderId || order.orderId)}
+                      onClick={() => handleReady(order.orderId?.orderId || order.orderId)}
                     >
                       Ready
                     </Button>
@@ -536,10 +552,10 @@ const NewOrders = () => {
                     <Button
                       size="sm"
                       variant="primary"
-                      disabled={loadingAction.id === order.orderId && loadingAction.type === 'ASSIGN'}
+                      disabled={loadingAction.id === (order.orderId?.orderId || order.orderId) && loadingAction.type === 'ASSIGN'}
                       onClick={() => {
                         partnersRefetch();
-                        handleAssign(order.orderId)
+                        handleAssign(order.orderId?.orderId || order.orderId)
                       }}
                     >
                       Assign
@@ -755,6 +771,7 @@ const NewOrders = () => {
                   Subtotal
                 </span>
                 <span>₹{viewingInvoice.amount.subTotal}</span>
+
               </div>
 
               {viewingInvoice.amount.tax && (
@@ -764,10 +781,10 @@ const NewOrders = () => {
                 </div>
               )}
 
-              {viewingInvoice.amount.deliveryCharge && (
+              {(viewingInvoice.amount.deliveryCharge || viewingInvoice.amount.deliveryFee) && (
                 <div className="flex justify-between text-gray-600 dark:text-gray-400">
                   <span>Delivery</span>
-                  <span>₹{viewingInvoice.amount.deliveryCharge}</span>
+                  <span>₹{viewingInvoice.amount.deliveryCharge || viewingInvoice.amount.deliveryFee}</span>
                 </div>
               )}
             </div>
@@ -776,7 +793,7 @@ const NewOrders = () => {
             <div className="mt-3 flex justify-between text-lg font-bold">
               <span>Grand Total</span>
               <span className="text-red-500">
-                ₹{viewingInvoice.amount.grandTotal}
+                ₹{viewingInvoice.amount?.grandTotal || viewingInvoice.amount?.payable || 0}
               </span>
             </div>
 

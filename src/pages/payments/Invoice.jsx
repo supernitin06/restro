@@ -40,7 +40,12 @@ const Invoice = () => {
   const [deleteInvoice] = useDeleteInvoiceMutation();
 
   // Determine the source list of invoices
-  const rawInvoices = useMemo(() => invoiceData?.data || [], [invoiceData]);
+  const rawInvoices = useMemo(() => {
+  if (Array.isArray(invoiceData)) return invoiceData;
+  if (Array.isArray(invoiceData?.data)) return invoiceData.data;
+  return [];
+}, [invoiceData]);
+
 
   // Derive filtered invoices using useMemo
   const filteredInvoices = useMemo(() => {
@@ -301,7 +306,6 @@ const Invoice = () => {
               },
             ]}
             actions={invoiceActions}
-            title="Invoices"
           />
         </div>
       </div>

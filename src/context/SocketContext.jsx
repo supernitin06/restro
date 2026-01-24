@@ -163,11 +163,16 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
 
       setNotifications((prev) => {
         console.log(" Adding NEW_ORDER notification");
+        
+        const pType = newOrder.payment?.type || newOrder.type;
+        const pMethod = newOrder.payment?.method || newOrder.method;
+        const paymentDisplay = (pType && pMethod && pType !== pMethod) ? `${pType} - ${pMethod}` : (pType || pMethod || "COD");
+
         return [
           {
             id: Date.now(),
             title: "New Order",
-            message: `Order #${newOrder.orderId} received`,
+            message: `Order #${newOrder.orderId} received (${paymentDisplay})`,
             type: "order",
             read: false,
             time: new Date().toISOString(),

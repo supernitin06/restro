@@ -48,13 +48,13 @@ const Transactions = () => {
           customerName: transaction.userId?.name || transaction.orderId?.customer?.name || 'N/A',
           customerEmail: transaction.userId?.email || 'N/A',
           customerPhone: transaction.userId?.mobile || transaction.orderId?.customer?.phone || 'N/A',
-          amount: transaction.amount?.payable || 0,
+          amount: transaction.amount?.payable || transaction.amount?.total || 0,
           date: transaction.createdAt,
-          invoice: transaction.orderId?.orderId,
-          paymentMethod: transaction.method,
+          invoice: transaction.orderId?.orderId || transaction.orderId,
+          paymentMethod: (transaction.type && transaction.method && transaction.type !== transaction.method) ? `${transaction.type} - ${transaction.method}` : (transaction.type || transaction.method || transaction.payment?.type || transaction.payment?.method || 'N/A'),
           currency: transaction.currency,
           status: transaction.status,
-          description: `Order #${transaction.orderId?.orderId || 'N/A'}`
+          description: `Order #${transaction.orderId?.orderId || transaction.orderId || 'N/A'}`
         });
         setIsModalOpen(true);
       },
@@ -62,27 +62,30 @@ const Transactions = () => {
       show: true
     },
 
-    // {
-    //   key: 'download',
-    //   label: 'Download Invoice',
-    //   icon: Download,
-    //   onClick: (transaction) => {
-    //     alert(`Download for ${transaction.paymentId} coming soon`);
-    //   },
-    //   color: 'emerald',
-    //   show: true
-    // },
-    // {
-    //   key: 'refund',
-    //   label: 'Process Refund',
-    //   icon: RefreshCw,
-    //   onClick: (transaction) => {
-    //     alert(`Refunding for ${transaction.paymentId} coming soon`);
-    //   },
-    //   color: 'amber',
-    //   disabled: (transaction) => transaction.status !== 'COMPLETED',
-    //   show: true
-    // },
+    {
+      key: 'download',
+      label: 'Download Invoice',
+      icon: Download,
+      onClick: (transaction) => {
+        const orderId = transaction.orderId?.orderId || transaction.orderId || 'N/A';
+        alert(`Download Invoice for Order #${orderId} coming soon`);
+      },
+      color: 'emerald',
+      show: true
+    },
+    {
+      key: 'refund',
+      label: 'Process Refund',
+      icon: RefreshCw,
+      onClick: (transaction) => {
+        const paymentId = transaction.paymentId || transaction._id || 'N/A';
+        const amount = transaction.amount?.payable || transaction.amount?.total || 0;
+        alert(`Refunding ₹${amount} for Payment ID: ${paymentId} coming soon`);
+      },
+      color: 'amber',
+      disabled: (transaction) => transaction.status !== 'COMPLETED',
+      show: true
+    },
     // {
     //   key: 'send-receipt',
     //   label: 'Send Receipt',
@@ -116,9 +119,10 @@ const Transactions = () => {
 
     // Filter by payment method
     if (filterValues.method && filterValues.method !== 'all') {
-      filtered = filtered.filter(t =>
-        t.method?.toLowerCase() === filterValues.method.toLowerCase()
-      );
+      filtered = filtered.filter(t => {
+        const method = t.type || t.method || t.payment?.type || t.payment?.method || '';
+        return method.toLowerCase() === filterValues.method.toLowerCase();
+      });
     }
 
     // Search by customer name or email
@@ -127,13 +131,14 @@ const Transactions = () => {
       filtered = filtered.filter(t =>
         (t.userId?.name || '').toLowerCase().includes(searchTerm) ||
         (t.paymentId || '').toLowerCase().includes(searchTerm) ||
-        (t.orderId?.orderId || '').toLowerCase().includes(searchTerm)
+        (t.orderId?.orderId || t.orderId || '').toLowerCase().includes(searchTerm) ||
+        (t.method || '').toLowerCase().includes(searchTerm) ||
+        (t.type || '').toLowerCase().includes(searchTerm)
       );
     }
     return filtered;
   }, [rawTransactions, filterValues]);
 
-  // Pagination logic
   const paginatedTransactions = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     return filteredTransactions.slice(startIndex, startIndex + itemsPerPage);
@@ -201,7 +206,7 @@ const Transactions = () => {
                   key: "amount",
                   render: (transaction) => (
                     <span className="font-semibold text-gray-900 dark:text-white">
-                      ₹{Number(transaction.amount?.payable || 0).toFixed(2)}
+                      ₹{Number(transaction.amount?.payable || transaction.amount?.total || 0).toFixed(2)}
                     </span>
                   ),
                 },
@@ -217,7 +222,12 @@ const Transactions = () => {
                 {
                   header: "Method",
                   key: "method",
-                  render: (transaction) => <Badge>{transaction.method}</Badge>,
+                  render: (transaction) => {
+                    const type = transaction.type || transaction.payment?.type;
+                    const method = transaction.method || transaction.payment?.method;
+                    const display = (type && method && type !== method) ? `${type} - ${method}` : (type || method || 'N/A');
+                    return <Badge>{display}</Badge>;
+                  },
                 },
                 // {
                 //   header: "Contact",
