@@ -121,7 +121,7 @@ const Invoice = () => {
     } catch (err) {
       showErrorAlert('Failed to delete invoice');
       console.error(err);
-    }
+    }     
   };
 
   const handleSendInvoice = (invoice) => {
