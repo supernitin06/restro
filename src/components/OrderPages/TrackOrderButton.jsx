@@ -4,27 +4,13 @@ const TrackOrderButton = ({ order, onClick }) => {
     const [show, setShow] = useState(false);
 
     useEffect(() => {
-        let timer;
-
-        if (order.status === 'OUT_FOR_DELIVERY') {
-            // Check if 4 seconds have already passed since the status update
-            const lastUpdate = new Date(order.updatedAt).getTime();
-            const now = Date.now();
-            const diff = now - lastUpdate;
-
-            if (diff >= 4000) {
-                setShow(true);
-            } else {
-                // Wait for the remaining time
-                timer = setTimeout(() => {
-                    setShow(true);
-                }, 4000 - diff);
-            }
+        const activeStatuses = ['ASSIGNED', 'READY_FOR_PICKUP', 'OUT_FOR_DELIVERY'];
+        if (activeStatuses.includes(order.status)) {
+            setShow(true);
         } else {
             setShow(false);
         }
-        return () => clearTimeout(timer);
-    }, [order.status, order.updatedAt]);
+    }, [order.status]);
 
     if (!show) return <span className="text-gray-400">—</span>;
 

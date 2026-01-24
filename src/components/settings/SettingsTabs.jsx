@@ -7,16 +7,16 @@ const SettingsTabs = ({ activeTab, setActiveTab }) => {
   const tabs = [
     { key: "general", label: "General" },
     { key: "profile", label: "Profile" },
-    { key: "menu", label: "Menu" },
-    { key: "orders", label: "Orders" },
+    // { key: "menu", label: "Menu" },
+    // { key: "orders", label: "Orders" },
     { key: "payments", label: "Payments" },
 
     // ✅ NEW BANNER TAB
     { key: "banners", label: "Banners" },
 
-    { key: "delivery", label: "Delivery" },
+    // { key: "delivery", label: "Delivery" },
     { key: "tax", label: "Tax" },
-    { key: "users", label: "Users" },
+    // { key: "users", label: "Users" },
     { key: "notifications", label: "Notifications" },
   ];
 

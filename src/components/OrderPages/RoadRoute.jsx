@@ -28,17 +28,28 @@ const RoadRoute = ({ start, end, lastStart, onRouteFound }) => {
             createMarker: () => null,
             lineOptions: {
                 styles: [{ color: "#2563eb", weight: 5, opacity: 0.75 }],
+                extendToWaypoints: false,
+                missingRouteTolerance: 0
             },
             router: L.Routing.osrmv1({
                 serviceUrl: "https://router.project-osrm.org/route/v1",
+                profile: 'driving'
             }),
         });
 
-        routing.on("routesfound", (e) => {
-            onRouteFoundRef.current?.(e.routes[0].summary);
-        });
+        const handleRoutesFound = (e) => {
+            if (onRouteFoundRef.current) {
+                onRouteFoundRef.current(e.routes[0].summary);
+            }
+        };
 
-        routing.addTo(map);
+        routing.on("routesfound", handleRoutesFound);
+
+        try {
+            routing.addTo(map);
+        } catch (e) {
+            console.error("Error adding routing control to map:", e);
+        }
 
         // Hide default container
         const container = routing.getContainer();
@@ -48,11 +59,27 @@ const RoadRoute = ({ start, end, lastStart, onRouteFound }) => {
 
         // Cleanup on unmount
         return () => {
+            // Remove listeners first to prevent updates during cleanup
+            routing.off("routesfound", handleRoutesFound);
+
             if (map && routing) {
                 try {
+                    // Attempt to clear lines safely by setting empty waypoints before removal
+                    // This can sometimes help prevent the "removeLayer of null" error
+                    routing.setWaypoints([]);
+
+                    // Allow a microtask for the update to process before removing control if needed, 
+                    // though synchronous removal is usually safer for React effects.
+                    // We wrap in try-catch to suppress the specific Leaflet Routing Machine error
+                    // which occurs because it tries to clear lines after map reference is gone.
                     map.removeControl(routing);
                 } catch (e) {
-                    console.warn(e);
+                    // Suppress the specific error known to happen with OSRM routing machine cleanup
+                    if (e?.message?.includes("removeLayer")) {
+                        // Known issue, safe to ignore during unmount
+                    } else {
+                        console.warn("Cleanup error in RoadRoute:", e);
+                    }
                 }
             }
             routingRef.current = null;

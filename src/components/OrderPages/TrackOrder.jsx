@@ -18,6 +18,20 @@ let DefaultIcon = L.icon({
 
 L.Marker.prototype.options.icon = DefaultIcon;
 
+const deliveryIcon = L.icon({
+  iconUrl: "https://cdn-icons-png.flaticon.com/512/3324/3324750.png",
+  iconSize: [45, 45],
+  iconAnchor: [22, 22],
+  popupAnchor: [0, -20],
+});
+
+const customerIcon = L.icon({
+  iconUrl: "https://cdn-icons-png.flaticon.com/512/619/619153.png",
+  iconSize: [40, 40],
+  iconAnchor: [20, 20],
+  popupAnchor: [0, -20],
+});
+
 // Helper to update map center to fit bounds
 function FitBounds({ start, end }) {
   const map = useMap();
@@ -168,7 +182,7 @@ const TrackOrder = ({ orderId, onClose }) => {
               />
 
               {/* Delivery Partner Marker */}
-              <Marker position={deliveryLocation}>
+              <Marker position={deliveryLocation} icon={deliveryIcon}>
                 <Popup className="font-semibold">
                   🚚 Delivery Partner
                 </Popup>
@@ -177,7 +191,7 @@ const TrackOrder = ({ orderId, onClose }) => {
               {/* Customer Marker */}
               {customerLocation && (
                 <>
-                  <Marker position={customerLocation}>
+                  <Marker position={customerLocation} icon={customerIcon}>
                     <Popup className="font-semibold">
                       🏠 Customer
                     </Popup>

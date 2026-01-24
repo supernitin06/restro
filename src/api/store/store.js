@@ -10,7 +10,7 @@ import { bannerApi } from "../services/bannerApi";
 import { invoiceApi } from "../services/invoice"
 import { adminApi } from "../services/adminApi";
 import { notificationApi } from "../services/notificationApi";
-
+import { taxApi } from "../services/taxApi";
 
 
 export const store = configureStore({
@@ -26,7 +26,7 @@ export const store = configureStore({
     [invoiceApi.reducerPath]: invoiceApi.reducer,
     [adminApi.reducerPath]: adminApi.reducer,
     [notificationApi.reducerPath]: notificationApi.reducer,
-
+    [taxApi.reducerPath]: taxApi.reducer,
 
 
   },
@@ -34,12 +34,6 @@ export const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: false,
-    }).concat(baseApi.middleware, orderApi.middleware, userApi.middleware, restaurantApi.middleware, deliveryPartnerApi.middleware,  bannerApi.middleware, invoiceApi.middleware, adminApi.middleware, notificationApi.middleware,
-),
-
-
-
- 
-
+    }).concat(baseApi.middleware, orderApi.middleware, userApi.middleware, restaurantApi.middleware, deliveryPartnerApi.middleware,  bannerApi.middleware, invoiceApi.middleware, taxApi.middleware,adminApi.middleware, notificationApi.middleware),
     devTools: import.meta.env.MODE !== "production",
 });
