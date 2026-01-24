@@ -8,9 +8,7 @@ import {
   useUpdateKitchenStatusMutation,
   useAssignDeliveryMutation,
 } from "../../api/services/orderApi";
-// OrderFlowTable.jsx ke top me
 import { useGenerateInvoiceMutation } from "../../api/services/invoice";
-
 import { useGetDeliveryPartnersQuery } from "../../api/services/deliveryPartnerApi";
 import { useSockets } from "../../context/SocketContext";
 import Pagination from "../../components/ui/Pagination";
@@ -31,7 +29,7 @@ const STATUS_COLORS = {
   ASSIGNED: "bg-gradient-to-r from-purple-200 to-purple-300 text-purple-800",
 };
 
-const OrderFlowTable = () => {
+const NewOrders = () => {
   const { data, refetch } = useGetOrdersQuery({
     page: 1,
     limit: 5000,
@@ -45,10 +43,14 @@ const OrderFlowTable = () => {
   const { ordersSocket } = useSockets();
   const ITEMS_PER_PAGE = 20;
 
-  const [updateStatus, { isLoading: updateStatusLoading }] = useUpdateOrderStatusMutation();
-  const [updateKitchenStatus, { isLoading: updateKitchenStatusLoading }] = useUpdateKitchenStatusMutation();
-  const [assignDelivery, { isLoading: assignDeliveryLoading }] = useAssignDeliveryMutation();
-  const [generateInvoice, { isLoading: generateInvoiceLoading }] = useGenerateInvoiceMutation();
+  const [updateStatus, { isLoading: updateStatusLoading }] =
+    useUpdateOrderStatusMutation();
+  const [updateKitchenStatus, { isLoading: updateKitchenStatusLoading }] =
+    useUpdateKitchenStatusMutation();
+  const [assignDelivery, { isLoading: assignDeliveryLoading }] =
+    useAssignDeliveryMutation();
+  const [generateInvoice, { isLoading: generateInvoiceLoading }] =
+    useGenerateInvoiceMutation();
 
   const [loadingAction, setLoadingAction] = useState({ id: null, type: null });
 
@@ -82,17 +84,13 @@ const OrderFlowTable = () => {
     doc.text(
       `Payment: ${paymentDisplay} (${invoice.payment?.status || invoice.status || "PENDING"})`,
       14,
-      48
+      48,
     );
 
     autoTable(doc, {
       startY: 55,
       head: [["Item", "Qty", "Total"]],
-      body: invoice.items.map((item) => [
-        item.name,
-        item.quantity,
-        item.total,
-      ]),
+      body: invoice.items.map((item) => [item.name, item.quantity, item.total]),
       theme: "grid",
     });
 
@@ -107,25 +105,16 @@ const OrderFlowTable = () => {
 
     if (invoice.amount.deliveryCharge) {
       finalY += 6;
-      doc.text(
-        `Delivery: ₹${invoice.amount.deliveryCharge || invoice.amount.deliveryFee || 0}`,
-        14,
-        finalY
-      );
+      doc.text(`Delivery: ₹${invoice.amount.deliveryCharge}`, 14, finalY);
     }
 
     finalY += 8;
     doc.setFontSize(14);
+    doc.text(`Grand Total: ₹${invoice.amount.grandTotal}`, 14, finalY);
     doc.text(
       `Grand Total: ₹${invoice.amount?.grandTotal || invoice.amount?.payable || 0}`,
       14,
-      finalY
-    );
-
-    doc.text(
-      `Grand Total: ₹${invoice.amount?.grandTotal || invoice.amount?.payable || 0}`,
-      14,
-      doc.lastAutoTable.finalY + 10
+      doc.lastAutoTable.finalY + 10,
     );
     doc.save(`Invoice-${invoice.invoiceNumber}.pdf`);
   };
@@ -172,25 +161,19 @@ const OrderFlowTable = () => {
   const filteredOrders = useMemo(() => {
     if (!searchTerm) return allOrders;
     const term = searchTerm.toLowerCase();
-    return allOrders.filter((o) => {
-      const orderIdStr = o.orderId?.orderId || o.orderId || "";
-      const custName = o.customer?.name || o.userId?.name || "";
-      const custPhone = o.customer?.phone || "";
-      const statusStr = o.status || "";
-      const paymentStr = `${o.payment?.method || ""} ${o.method || ""} ${o.payment?.type || ""} ${o.type || ""}`;
-      
-      return orderIdStr.toLowerCase().includes(term) ||
-        custName.toLowerCase().includes(term) ||
-        custPhone.includes(term) ||
-        statusStr.toLowerCase().includes(term) ||
-        paymentStr.toLowerCase().includes(term);
-    });
+    return allOrders.filter(
+      (o) =>
+        o.orderId.toLowerCase().includes(term) ||
+        o.customer.name.toLowerCase().includes(term) ||
+        o.customer.phone.includes(term) ||
+        o.status.toLowerCase().includes(term),
+    );
   }, [allOrders, searchTerm]);
 
   // ===== SORTED =====
   const sortedOrders = useMemo(() => {
     return [...filteredOrders].sort(
-      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
     );
   }, [filteredOrders]);
 
@@ -198,7 +181,7 @@ const OrderFlowTable = () => {
   const totalPages = Math.ceil(sortedOrders.length / ITEMS_PER_PAGE);
   const currentOrders = sortedOrders.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
+    currentPage * ITEMS_PER_PAGE,
   );
 
   const handleGenerateInvoice = async (orderId) => {
@@ -219,7 +202,7 @@ const OrderFlowTable = () => {
     return deliveryPartners.filter(
       (p) =>
         p.name.toLowerCase().includes(term) ||
-        p.city?.toLowerCase().includes(term)
+        p.city?.toLowerCase().includes(term),
     );
   }, [deliveryPartners, partnerSearch]);
 
@@ -227,7 +210,7 @@ const OrderFlowTable = () => {
   const handleAccept = async (orderId) => {
     if (processingOrdersRef.current.has(orderId)) return;
     processingOrdersRef.current.add(orderId);
-    setLoadingAction({ id: orderId, type: 'ACCEPT' });
+    setLoadingAction({ id: orderId, type: "ACCEPT" });
 
     try {
       await updateStatus({ id: orderId, status: "ACCEPTED" }).unwrap();
@@ -245,7 +228,7 @@ const OrderFlowTable = () => {
   const handleReject = async (orderId) => {
     if (processingOrdersRef.current.has(orderId)) return;
     processingOrdersRef.current.add(orderId);
-    setLoadingAction({ id: orderId, type: 'REJECT' });
+    setLoadingAction({ id: orderId, type: "REJECT" });
     try {
       await updateStatus({ id: orderId, status: "REJECTED" }).unwrap();
       showSuccessAlert("Order Rejected");
@@ -261,7 +244,7 @@ const OrderFlowTable = () => {
   const handlePrepare = async (orderId) => {
     if (processingOrdersRef.current.has(orderId)) return;
     processingOrdersRef.current.add(orderId);
-    setLoadingAction({ id: orderId, type: 'PREPARE' });
+    setLoadingAction({ id: orderId, type: "PREPARE" });
     try {
       await updateKitchenStatus({ orderId, status: "PREPARING" }).unwrap();
       showSuccessAlert("Order Preparing");
@@ -277,7 +260,7 @@ const OrderFlowTable = () => {
   const handleReady = async (orderId) => {
     if (processingOrdersRef.current.has(orderId)) return;
     processingOrdersRef.current.add(orderId);
-    setLoadingAction({ id: orderId, type: 'READY' });
+    setLoadingAction({ id: orderId, type: "READY" });
     try {
       // Also update the main status to READY so it can be assigned
       await updateKitchenStatus({ orderId, status: "READY" }).unwrap();
@@ -299,7 +282,7 @@ const OrderFlowTable = () => {
   const assignPartner = async (partner) => {
     if (!currentOrder || processingOrdersRef.current.has(currentOrder)) return;
     processingOrdersRef.current.add(currentOrder);
-    setLoadingAction({ id: currentOrder, type: 'ASSIGN' });
+    setLoadingAction({ id: currentOrder, type: "ASSIGN" });
     try {
       await assignDelivery({
         orderId: currentOrder,
@@ -336,14 +319,14 @@ const OrderFlowTable = () => {
   const handleGenerateInvoiceProtected = async (orderId) => {
     if (processingOrdersRef.current.has(orderId)) return;
     processingOrdersRef.current.add(orderId);
-    setLoadingAction({ id: orderId, type: 'INVOICE' });
+    setLoadingAction({ id: orderId, type: "INVOICE" });
     try {
       await handleGenerateInvoice(orderId);
     } finally {
       processingOrdersRef.current.delete(orderId);
       setLoadingAction({ id: null, type: null });
     }
-  }
+  };
 
   return (
     <div className="p-6 min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white">
@@ -355,15 +338,18 @@ const OrderFlowTable = () => {
         </h1>
 
         {/* Search Box */}
-        <div className="flex items-center w-full md:w-72 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-full px-4 py-2 focus-within:border-dark-400 transition">
-          <FiSearch size={18} className="text-gray-400 mr-3" />
+        <div className="flex items-center w-full md:w-80 bg-white/80 backdrop-blur-md border border-red-200 rounded-full px-4 py-2 shadow-md hover:shadow-lg transition-all duration-300 focus-within:ring-2 focus-within:ring-red-400 focus-within:border-red-400">
+          <FiSearch
+            size={20}
+            className="text-red-400 mr-3 transition-colors duration-300 group-focus-within:text-red-500"
+          />
 
           <input
             type="text"
             placeholder="Search order / customer / status"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-transparent outline-none text-gray-700 dark:text-gray-200 placeholder-gray-400"
+            className="w-full bg-transparent outline-none text-gray-800 placeholder-red-300 dark:text-gray-200 dark:placeholder-red-400 text-sm font-medium"
           />
         </div>
       </div>
@@ -599,14 +585,15 @@ const OrderFlowTable = () => {
             ))}
             {currentOrders.length === 0 && (
               <tr>
-                <td colSpan={10} className="text-center py-6 text-gray-400">
+                <td colSpan={13} className="text-center py-6 text-gray-400">
                   No orders found
                 </td>
               </tr>
             )}
-          </tbody>
-        </table>
-      </div>
+    </tbody>
+  </table>
+</div>
+
 
       {/* Pagination */}
       {totalPages > 1 && (
@@ -662,16 +649,20 @@ const OrderFlowTable = () => {
               {filteredPartners.map((p) => (
                 <div
                   key={p._id}
-                  className={`p-3 rounded-lg mb-2 shadow flex justify-between items-center cursor-pointer ${p.isAvailable === false
-                    ? "bg-red-100 dark:bg-red-900/20 opacity-50 cursor-not-allowed"
-                    : "bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
-                    }`}
+                  className={`p-3 rounded-lg mb-2 shadow flex justify-between items-center cursor-pointer ${
+                    p.isAvailable === false
+                      ? "bg-red-100 dark:bg-red-900/20 opacity-50 cursor-not-allowed"
+                      : "bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
+                  }`}
                   onClick={() => p.isAvailable !== false && assignPartner(p)}
-
                 >
                   <div>
-                    <div className="font-semibold text-gray-900 dark:text-gray-100">{p.name}</div>
-                    <div className="text-[10px] text-gray-500 dark:text-gray-400">{p.phone}</div>
+                    <div className="font-semibold text-gray-900 dark:text-gray-100">
+                      {p.name}
+                    </div>
+                    <div className="text-[10px] text-gray-500 dark:text-gray-400">
+                      {p.phone}
+                    </div>
                     <div className="text-[10px] text-gray-400 dark:text-gray-500">
                       {p.vehicleType} {p.isAvailable === false ? "(Busy)" : ""}
                     </div>
@@ -696,7 +687,6 @@ const OrderFlowTable = () => {
       {viewingInvoice && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 dark:bg-black/60 backdrop-blur-sm">
           <div className="bg-white dark:bg-gray-800 w-[400px] md:w-[500px] p-6 rounded-2xl shadow-2xl overflow-y-auto max-h-[80vh] animate-slideIn text-gray-900 dark:text-gray-100 h-scrollbar">
-
             {/* Header */}
             <div className="mb-4 pb-2 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
               <h2 className="text-2xl font-bold bg-gradient-to-r from-red-500 to-pink-500 text-transparent bg-clip-text">
@@ -712,16 +702,30 @@ const OrderFlowTable = () => {
 
             {/* Customer Details */}
             <div className="mb-4 text-sm space-y-1">
-              <p><span className="font-semibold text-gray-700 dark:text-gray-300">Customer:</span> {viewingInvoice.customerDetails.name}</p>
-              <p><span className="font-semibold text-gray-700 dark:text-gray-300">Phone:</span> {viewingInvoice.customerDetails.phone}</p>
-              <p><span className="font-semibold text-gray-700 dark:text-gray-300">Address:</span> {viewingInvoice.customerDetails.address}</p>
               <p>
-                <span className="font-semibold text-gray-700 dark:text-gray-300">Payment:</span>{" "}
-                {(() => {
-                  const type = viewingInvoice.payment?.type || viewingInvoice.type;
-                  const method = viewingInvoice.payment?.method || viewingInvoice.method;
-                  return (type && method && type !== method) ? `${type} - ${method}` : (type || method || "N/A");
-                })()} ({viewingInvoice.payment?.status || viewingInvoice.status || "PENDING"})
+                <span className="font-semibold text-gray-700 dark:text-gray-300">
+                  Customer:
+                </span>{" "}
+                {viewingInvoice.customerDetails.name}
+              </p>
+              <p>
+                <span className="font-semibold text-gray-700 dark:text-gray-300">
+                  Phone:
+                </span>{" "}
+                {viewingInvoice.customerDetails.phone}
+              </p>
+              <p>
+                <span className="font-semibold text-gray-700 dark:text-gray-300">
+                  Address:
+                </span>{" "}
+                {viewingInvoice.customerDetails.address}
+              </p>
+              <p>
+                <span className="font-semibold text-gray-700 dark:text-gray-300">
+                  Payment:
+                </span>{" "}
+                {viewingInvoice.payment.method} ({viewingInvoice.payment.status}
+                )
               </p>
             </div>
 
@@ -730,14 +734,27 @@ const OrderFlowTable = () => {
               <table className="w-full border border-gray-200 dark:border-gray-700 rounded-lg text-sm">
                 <thead className="bg-gray-100 dark:bg-gray-700">
                   <tr>
-                    <th className="py-2 px-3 text-left text-gray-600 dark:text-gray-300">Item</th>
-                    <th className="py-2 px-3 text-center text-gray-600 dark:text-gray-300">Qty</th>
-                    <th className="py-2 px-3 text-right text-gray-600 dark:text-gray-300">Total</th>
+                    <th className="py-2 px-3 text-left text-gray-600 dark:text-gray-300">
+                      Item
+                    </th>
+                    <th className="py-2 px-3 text-center text-gray-600 dark:text-gray-300">
+                      Qty
+                    </th>
+                    <th className="py-2 px-3 text-right text-gray-600 dark:text-gray-300">
+                      Total
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {viewingInvoice.items.map((item, idx) => (
-                    <tr key={item._id} className={idx % 2 === 0 ? "bg-gray-50 dark:bg-gray-900" : "bg-white dark:bg-gray-800"}>
+                    <tr
+                      key={item._id}
+                      className={
+                        idx % 2 === 0
+                          ? "bg-gray-50 dark:bg-gray-900"
+                          : "bg-white dark:bg-gray-800"
+                      }
+                    >
                       <td className="py-2 px-3">{item.name}</td>
                       <td className="py-2 px-3 text-center">{item.quantity}</td>
                       <td className="py-2 px-3 text-right">₹{item.total}</td>
@@ -750,8 +767,11 @@ const OrderFlowTable = () => {
             {/* Amount Breakdown */}
             <div className="mt-4 text-sm space-y-1 border-t border-gray-200 dark:border-gray-700 pt-3">
               <div className="flex justify-between">
-                <span className="text-gray-600 dark:text-gray-400">Subtotal</span>
-                <span>₹{viewingInvoice.amount?.subTotal || viewingInvoice.amount?.total || 0}</span>
+                <span className="text-gray-600 dark:text-gray-400">
+                  Subtotal
+                </span>
+                <span>₹{viewingInvoice.amount.subTotal}</span>
+
               </div>
 
               {viewingInvoice.amount.tax && (
@@ -793,14 +813,11 @@ const OrderFlowTable = () => {
               </button>
             </div>
 
-
-
           </div>
         </div>
       )}
-
     </div>
   );
 };
 
-export default OrderFlowTable;
+export default NewOrders;

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect } from "react";
+import React, { createContext, useContext, useEffect, useRef } from "react";
 import { mainSocket } from "../socket/mainSocket";
 import { ordersSocket } from "../socket/ordersSocket";
 import { restaurantSocket } from "../socket/restaurantSocket";
@@ -26,6 +26,12 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
   ============================== */
   useEffect(() => {
     localStorage.setItem("NEW_ORDERS", JSON.stringify(newOrders));
+  }, [newOrders]);
+
+  // Keep a ref of newOrders to access current state inside socket listeners
+  const newOrdersRef = useRef(newOrders);
+  useEffect(() => {
+    newOrdersRef.current = newOrders;
   }, [newOrders]);
 
   useEffect(() => {
@@ -104,32 +110,15 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
     restaurantSocket.on("connect", onRestConnect);
     restaurantSocket.on("disconnect", onRestDisconnect);
     restaurantSocket.on("connect_error", onRestError);
+    ordersSocket.on("DELIVERY_LOCATION_UPDATED", (data) => {
+      console.log("DELIVERY_LOCATION_UPDATED", data);
+    });
 
     /* =============================
        Business Logic Handlers
     ============================== */
     const onJoinedRoom = (data) => {
       console.log(" JOINED_RESTAURANT_ROOM", data);
-    };
-
-    // ✅ Helper to remove notification globally
-    const removeNotification = (data) => {
-      const payload = data?.data || data?.order || data;
-      if (!payload) return;
-
-      // Collect all possible IDs (MongoID and ReadableID)
-      const possibleIds = [payload._id, payload.id, payload.orderId].filter(Boolean);
-      
-      if (possibleIds.length === 0) return;
-
-      setNotifications((prev) => {
-        // Filter out if EITHER orderId OR mongoId matches
-        return prev.filter((n) => {
-          const matchReadable = possibleIds.includes(n.orderId);
-          const matchMongo = n.mongoId && possibleIds.includes(n.mongoId);
-          return !(matchReadable || matchMongo);
-        });
-      });
     };
 
     const onNewOrder = (payload) => {
@@ -158,6 +147,12 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
 
       console.log("Processed newOrder:", newOrder);
 
+      // Check for duplicates using the ref (avoids toast on reload if order exists)
+      if (newOrdersRef.current.some((o) => o.orderId === newOrder.orderId)) {
+        console.log(" Duplicate order ignored (toast skipped):", newOrder.orderId);
+        return;
+      }
+
       setNewOrders((prev) => {
         if (prev.some((o) => o.orderId === newOrder.orderId)) {
           console.log(" Duplicate order ignored:", newOrder.orderId);
@@ -182,12 +177,11 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
             read: false,
             time: new Date().toISOString(),
             orderId: newOrder.orderId,
-            mongoId: newOrder._id, // ✅ Store MongoID for better matching
           },
           ...prev,
         ];
       });
-      
+
 
       toast.success(`New Order #${newOrder.orderId} received!`);
     };
@@ -244,7 +238,6 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
 
     const onOrderStatusUpdated = (data) => {
       console.log("ORDER_STATUS_UPDATED:", data);
-      removeNotification(data); // ✅ Remove notification on update
     };
 
     // const onOrderPickedUp = (data) => {
@@ -376,11 +369,9 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
     ordersSocket.on("USER_REGISTER_SUCCESSFULLY", onUserRegistered);
     mainSocket.on("USER_REGISTER_SUCCESSFULLY", onUserRegistered);
     ordersSocket.on("ORDER_STATUS_UPDATED", onOrderStatusUpdated);
-    ordersSocket.on("ORDER_ACCEPTED", removeNotification); // ✅ Listen for explicit accept
-    ordersSocket.on("ORDER_REJECTED", removeNotification); // ✅ Listen for explicit reject
     ordersSocket.on("ORDER_PICKED_UP", onOrderPickedUp);
     ordersSocket.on("ORDER_DELIVERED_BY_PARTNER", onOrderDelivered);
-    
+
     if (restaurantId) {
       console.log(" Emitting JOIN_RESTAURANT_ROOM", restaurantId);
       ordersSocket.emit("JOIN_RESTAURANT_ROOM", { restaurantId });
@@ -409,8 +400,6 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
       ordersSocket.off("USER_REGISTER_SUCCESSFULLY", onUserRegistered);
       mainSocket.off("USER_REGISTER_SUCCESSFULLY", onUserRegistered);
       ordersSocket.off("ORDER_STATUS_UPDATED", onOrderStatusUpdated);
-      ordersSocket.off("ORDER_ACCEPTED", removeNotification);
-      ordersSocket.off("ORDER_REJECTED", removeNotification);
       ordersSocket.off("ORDER_PICKED_UP", onOrderPickedUp);
       ordersSocket.off("ORDER_DELIVERED_BY_PARTNER", onOrderDelivered);
 
