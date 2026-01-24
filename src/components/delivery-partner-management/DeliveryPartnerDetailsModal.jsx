@@ -22,16 +22,35 @@ const DeliveryPartnerDetailsModal = ({
 
   if (!partner) return null;
 
+  /* ✅ CORRECT DESTRUCTURING (NORMALIZED DATA ONLY) */
   const {
     partnerId,
-    registrationData,
-    listView,
+    registrationData = {},
+    listView = {},
     orderHistory = [],
     documents = [],
   } = partner;
 
+  const {
+    name,
+    mobileNumber,
+    email,
+    cityArea,
+    image,
+    createdAt,
+    vehicleType: regVehicleType,
+  } = registrationData;
+
+  const {
+    status,
+    kycStatus,
+    vehicleType,
+    vehicleNumber,
+    fullAddress,
+  } = listView;
+
   const toggleStatus = () => {
-    const newStatus = listView.status === "Active" ? "Inactive" : "Active";
+    const newStatus = status === "Active" ? "Inactive" : "Active";
     updatePartner({
       ...partner,
       listView: { ...listView, status: newStatus },
@@ -49,7 +68,7 @@ const DeliveryPartnerDetailsModal = ({
             <div className="flex items-center gap-4">
               <img
                 src={
-                  registrationData?.image ||
+                  image ||
                   `https://api.dicebear.com/7.x/avataaars/svg?seed=${partnerId}`
                 }
                 className="w-12 h-12 rounded-xl border"
@@ -57,7 +76,7 @@ const DeliveryPartnerDetailsModal = ({
               />
               <div>
                 <h2 className="font-bold text-lg">
-                  {registrationData?.name}
+                  {name || "N/A"}
                 </h2>
                 <p className="text-xs text-gray-500">
                   Partner ID: {partnerId}
@@ -66,7 +85,7 @@ const DeliveryPartnerDetailsModal = ({
             </div>
 
             <div className="flex items-center gap-3">
-              <DeliveryPartnerStatusBadge status={listView.status} />
+              <DeliveryPartnerStatusBadge status={status} />
               <button onClick={onClose}>
                 <X />
               </button>
@@ -78,28 +97,47 @@ const DeliveryPartnerDetailsModal = ({
 
             {/* BASIC DETAILS */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Detail icon={Phone} label="Phone" value={registrationData.mobileNumber} />
-              <Detail icon={Mail} label="Email" value={registrationData.email} />
-              <Detail icon={MapPin} label="City" value={registrationData.cityArea} />
               <Detail
-                icon={listView.vehicleType === "Bike" ? Bike : Truck}
-                label="Vehicle"
-                value={registrationData.vehicleType}
+                icon={Phone}
+                label="Phone"
+                value={mobileNumber}
               />
+
+              <Detail
+                icon={Mail}
+                label="Email"
+                value={email}
+              />
+
+              <Detail
+                icon={MapPin}
+                label="Address"
+                value={fullAddress || cityArea}
+              />
+
+              <Detail
+                icon={vehicleType === "BIKE" ? Bike : Truck}
+                label="Vehicle"
+                value={`${vehicleType || regVehicleType || "N/A"} ${
+                  vehicleNumber ? `(${vehicleNumber})` : ""
+                }`}
+              />
+
               <Detail
                 icon={Shield}
                 label="KYC Status"
-                value={listView.kycStatus}
+                value={kycStatus}
               />
-              <Detail
+
+              {/* <Detail
                 icon={Calendar}
                 label="Joined On"
                 value={
-                  registrationData.createdAt
-                    ? new Date(registrationData.createdAt).toLocaleDateString()
+                  createdAt
+                    ? new Date(createdAt).toLocaleDateString()
                     : "N/A"
                 }
-              />
+              /> */}
             </div>
 
             {/* DOCUMENTS */}
@@ -117,7 +155,7 @@ const DeliveryPartnerDetailsModal = ({
                         className="h-32 flex items-center justify-center bg-white dark:bg-gray-800 rounded cursor-pointer"
                         onClick={() => setSelectedDoc(doc.url)}
                       >
-                        {doc.url.endsWith(".pdf") ? (
+                        {doc.url?.endsWith(".pdf") ? (
                           <FileText size={36} />
                         ) : (
                           <img
@@ -130,7 +168,7 @@ const DeliveryPartnerDetailsModal = ({
 
                       <div className="mt-2">
                         <p className="font-semibold capitalize">
-                          {doc.type.replace("_", " ")}
+                          {doc.type?.replace("_", " ")}
                         </p>
 
                         <span
@@ -203,12 +241,10 @@ const DeliveryPartnerDetailsModal = ({
               Close
             </Button>
             <Button
-              variant={listView.status === "Active" ? "danger" : "success"}
+              variant={status === "Active" ? "danger" : "success"}
               onClick={toggleStatus}
             >
-              {listView.status === "Active"
-                ? "Deactivate"
-                : "Activate"}
+              {status === "Active" ? "Deactivate" : "Activate"}
             </Button>
           </div>
         </div>
@@ -237,9 +273,11 @@ const Detail = ({ icon: Icon, label, value }) => (
     <div className="w-10 h-10 bg-gray-100 dark:bg-gray-700 rounded-xl flex items-center justify-center">
       <Icon size={18} />
     </div>
-    <div>
+    <div className="min-w-0">
       <p className="text-xs text-gray-500">{label}</p>
-      <p className="font-semibold">{value || "N/A"}</p>
+      <p className="font-semibold break-words">
+        {value || "N/A"}
+      </p>
     </div>
   </div>
 );
