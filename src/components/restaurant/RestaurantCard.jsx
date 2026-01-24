@@ -35,10 +35,9 @@ const RestaurantCard = ({
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent z-10" />
 
           <img
-            src={getImageUrl(restaurant.logo)}
+            src={restaurant.logo}
             alt={restaurant.name}
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-            onError={(e) => { e.target.src = "https://placehold.co/600x400?text=No+Image"; }}
           />
 
           {/* STATUS BADGE */}

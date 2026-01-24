@@ -22,7 +22,7 @@ const deliveryIcon = L.icon({
   iconUrl: "https://cdn-icons-png.flaticon.com/512/3324/3324750.png",
   iconSize: [45, 45],
   iconAnchor: [22, 22],
-  popupAnchor: [0, -20],
+  // popupAnchor: [0, -20],
 });
 
 const customerIcon = L.icon({
