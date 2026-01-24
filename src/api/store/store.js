@@ -12,8 +12,6 @@ import { taxApi } from "../services/taxApi";
 import { adminApi } from "../services/adminApi";
 import { notificationApi } from "../services/notificationApi";
 
-
-
 export const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -28,9 +26,6 @@ export const store = configureStore({
     [taxApi.reducerPath]: taxApi.reducer,
     [adminApi.reducerPath]: adminApi.reducer,
     [notificationApi.reducerPath]: notificationApi.reducer,
-
-
-
   },
 
   middleware: (getDefaultMiddleware) =>
@@ -38,10 +33,5 @@ export const store = configureStore({
       serializableCheck: false,
     }).concat(baseApi.middleware, orderApi.middleware, userApi.middleware, restaurantApi.middleware, deliveryPartnerApi.middleware,  bannerApi.middleware, invoiceApi.middleware, adminApi.middleware, notificationApi.middleware,
 ),
-
-
-
- 
-
     devTools: import.meta.env.MODE !== "production",
 });

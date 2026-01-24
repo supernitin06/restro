@@ -27,35 +27,55 @@ const DeliveryPartnerManagement = () => {
   const itemsPerPage = 10;
 
   // Sync API data to local state
-  useEffect(() => {
-    if (apiResponse?.success && apiResponse?.data) {
-      const normalizedData = apiResponse.data.map((p) => ({
-       
+useEffect(() => {
+  if (apiResponse?.success && apiResponse?.data) {
+    const normalizedData = apiResponse.data.map((p) => {
+
+      // 🔹 Full address in one line
+      const fullAddress = p.address
+        ? [
+            p.address.street,
+            p.address.area,
+            p.address.city,
+            p.address.state,
+            p.address.zipCode
+          ]
+          .filter(Boolean)        // undefined/null ko remove kare
+          .join(", ")             // sabko comma se join kare
+        : "N/A";
+
+      return {
         partnerId: p._id,
         listView: {
-          name: p.name,
-          phone: p.phone,
-          city: "N/A",
+          name: p.name || "N/A",
+          phone: p.phone || "N/A",
+          fullAddress,            // ✅ ab pura address ek line me
           status: p.isActive ? "Active" : "Inactive",
           approvalStatus: p.isApproved ? "Approved" : "Pending",
           assignedOrdersCount: p.totalOrders || 0,
-          vehicleType: p.vehicleType,
+          vehicleType: p.vehicle?.type || "N/A",
+          vehicleNumber: p.vehicle?.number || "N/A",
           kycStatus: p.kyc?.status || "PENDING",
-          isOnline: p.isOnline,
+          isOnline: p.isOnline ?? false,
         },
+
         registrationData: {
           name: p.name,
           mobileNumber: p.phone,
           email: p.email || "",
-          cityArea: "N/A",
+          cityArea: fullAddress,   // yahan bhi full address use ho sakta
           vehicleType: p.vehicleType,
           image: p.profileImage,
         },
         orderHistory: [],
-      }));
-      setPartners(normalizedData);
-    }
-  }, [apiResponse]);
+      };
+    });
+
+    setPartners(normalizedData);
+  }
+}, [apiResponse]);
+
+
 
   // Persist view mode
   useEffect(() => {

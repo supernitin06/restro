@@ -377,9 +377,8 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
       ordersSocket.emit("JOIN_RESTAURANT_ROOM", { restaurantId });
     }
 
-    /* =============================
-       CLEANUP
-    ============================== */
+    
+      
     return () => {
       console.log("Cleaning up socket listeners & disconnecting");
 
