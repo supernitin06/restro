@@ -27,10 +27,29 @@ const paymentsApi = baseApi.injectEndpoints({
 
     getRefundPayments: builder.query({
       query: () => ({
-        url: `admin/dashboard/refunds`,
+        url: `admin/refunds`,
         method: "get",
       }),
       providesTags: ["Payments"],
+    }),
+
+
+    getRefundRequest: builder.query({
+      query: () => ({
+        url: `admin/refunds/requests`,
+        method: "get",
+      }),
+      providesTags: ["Payments"],
+    }),
+
+    refundAprroved: builder.mutation({
+      query: ({ paymentId, status, orderId }) => ({
+        url: `admin/refund/${paymentId}/action`,
+        method: "patch",
+        data: { action: status,
+          orderId: orderId        },
+      }),
+      invalidatesTags: ["Payments"],
     }),
 
     // Added to support full transaction list with filters
@@ -44,9 +63,10 @@ const paymentsApi = baseApi.injectEndpoints({
     }),
 
     getTransactionById: builder.query({
-      query: (id) => ({
+      query: ({ id, status }) => ({
         url: `admin/dashboard/payments/${id}`,
         method: "get",
+        params: { status }
       }),
       providesTags: ["Payments"],
     }),
@@ -69,4 +89,6 @@ export const {
   useSearchPaymentsQuery,
   useGetTransactionsQuery,
   useGetTransactionByIdQuery,
+  useGetRefundRequestQuery,
+  useRefundAprrovedMutation,
 } = paymentsApi;

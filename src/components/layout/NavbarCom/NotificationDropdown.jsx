@@ -137,8 +137,8 @@ const NotificationDrawer = ({ isOpen, onClose }) => {
               )}
             </div>
             <div>
-              <h2 className="font-bold text-lg">Notifications</h2>
-              <p className="text-xs text-gray-500">
+              <h2 className="font-bold text-primary text-lg">Notifications</h2>
+              <p className="text-xs  text-primary">
                 You have {unreadCount} unread messages
               </p>
             </div>
@@ -184,7 +184,7 @@ const NotificationDrawer = ({ isOpen, onClose }) => {
                 <div
                   onClick={() => markasread(item.id)}
                   key={item.id}
-                  className={`rounded-xl p-4 border ${card} ${
+                  className={`rounded-xl  text-primary p-4 border ${card} ${
                     item.isRead ? "opacity-70" : ""
                   }`}
                 >
@@ -198,12 +198,12 @@ const NotificationDrawer = ({ isOpen, onClose }) => {
                     <div className="flex-1">
                       <div className="flex justify-between">
                         <h4 className="font-semibold text-sm">{item.title}</h4>
-                        <span className="text-xs text-gray-400 flex items-center gap-1">
+                        <span className="text-xs  text-primary flex items-center gap-1">
                           <Clock className="w-3 h-3" /> {item.time}
                         </span>
                       </div>
 
-                      <p className="text-sm text-gray-600 mt-1">
+                      <p className="text-sm text-primary mt-1">
                         {item.message}
                       </p>
 

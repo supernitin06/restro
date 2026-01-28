@@ -78,24 +78,38 @@ const TrackOrder = ({ orderId, onClose }) => {
     const handleLocationUpdate = (data) => {
       console.log("Socket Data Received:", data);
 
-      // Data is expected to be an array based on user input
       let update = null;
+
+      // Handle array vs single object
       if (Array.isArray(data)) {
-        update = data.find(
-          (item) =>
-            item.assignedOrder?.order?.orderId === orderId ||
-            item.assignedOrder?.order?.id === orderId
-        );
-      } else if (data?.assignedOrder?.order?.orderId === orderId || data?.assignedOrder?.order?.id === orderId) {
-        update = data;
+        update = data.find((item) => {
+          // Check for new structure: item.orderId
+          if (item.orderId === orderId) return true;
+          // Check for old structure (fallback)
+          return item.assignedOrder?.order?.orderId === orderId || item.assignedOrder?.order?.id === orderId;
+        });
+      } else {
+        // Single object check
+        if (data?.orderId === orderId) {
+          update = data;
+        } else if (data?.assignedOrder?.order?.orderId === orderId || data?.assignedOrder?.order?.id === orderId) {
+          update = data;
+        }
       }
 
       if (update) {
         setStatus("Tracking Live");
 
-        // Extract Delivery Partner Location
-        if (update.location && update.location.lat && update.location.lng) {
-          const newLoc = [update.location.lat, update.location.lng];
+        // --- 1. Delivery Partner Location (Root Level) ---
+        // Data structure: { lat: 28.6139, lon: 77.209, ... }
+        const { lat, lon, location } = update;
+
+        // Use root lat/lon first (new format), fallback to location object (old format)
+        const partnerLat = lat || location?.lat;
+        const partnerLng = lon || location?.lng;
+
+        if (partnerLat && partnerLng) {
+          const newLoc = [partnerLat, partnerLng];
 
           // Use Ref to get current value
           const currentLoc = deliveryLocationRef.current;
@@ -105,10 +119,22 @@ const TrackOrder = ({ orderId, onClose }) => {
           setDeliveryLocation(newLoc);
         }
 
-        // Extract Customer Location
-        const deliveryAddress = update.assignedOrder?.deliveryAddress;
-        if (deliveryAddress && deliveryAddress.lat && deliveryAddress.lng) {
-          setCustomerLocation([deliveryAddress.lat, deliveryAddress.lng]);
+        // --- 2. Customer Location (Nested in order) ---
+        // Data structure: { order: { deliveryAddress: { lat: ..., lng: ... } } }
+        const orderData = update.order || update.assignedOrder;
+        const deliveryAddress = orderData?.deliveryAddress;
+
+        if (deliveryAddress) {
+          const { lat: cLat, lng: cLng, latitude, longitude, coordinates } = deliveryAddress;
+
+          // Prioritize direct lat/lng, fallback to other formats
+          // NOTE: coordinates format is usually [lng, lat] (GeoJSON), so index 1 is lat, 0 is lng
+          const finalCustLat = cLat || latitude || (coordinates?.[1]);
+          const finalCustLng = cLng || longitude || (coordinates?.[0]);
+
+          if (finalCustLat && finalCustLng) {
+            setCustomerLocation([finalCustLat, finalCustLng]);
+          }
         }
       }
     };

@@ -16,15 +16,6 @@ import {
 } from "../api/services/resturentsapi";
 
 function RestaurantManagement() {
-  // ===== RTK Query Hooks =====
-  const { data, isLoading, isError, refetch } = useGetRestaurantsQuery();
-  const { data: restaurantDetails } = useGetRestaurantByIdQuery(
-    null,
-    { skip: true } // skip initially
-  );
-  const [toggleStatus] = useToggleRestaurantStatusMutation();
-  const [updateRestaurant] = useUpdateRestaurantMutation();
-  const [deleteRestaurant] = useDeleteRestaurantMutation();
   // ===== State =====
   const [viewMode, setViewMode] = useState("grid");
   const [currentPage, setCurrentPage] = useState(1);
@@ -33,6 +24,16 @@ function RestaurantManagement() {
   const [editRestaurant, setEditRestaurant] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
+
+  // ===== RTK Query Hooks =====
+  const { data, isLoading, isError, refetch } = useGetRestaurantsQuery();
+  const { data: restaurantDetails } = useGetRestaurantByIdQuery(
+    selectedRestaurantId,
+    { skip: !selectedRestaurantId }
+  );
+  const [toggleStatus] = useToggleRestaurantStatusMutation();
+  const [updateRestaurant] = useUpdateRestaurantMutation();
+  const [deleteRestaurant] = useDeleteRestaurantMutation();
   // ===== Prepare restaurants =====
   const restaurants = Array.isArray(data?.data) ? data.data : [];
   // ===== Filtered Restaurants =====

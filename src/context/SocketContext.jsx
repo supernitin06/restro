@@ -163,7 +163,7 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
 
       setNotifications((prev) => {
         console.log(" Adding NEW_ORDER notification");
-        
+
         const pType = newOrder.payment?.type || newOrder.type;
         const pMethod = newOrder.payment?.method || newOrder.method;
         const paymentDisplay = (pType && pMethod && pType !== pMethod) ? `${pType} - ${pMethod}` : (pType || pMethod || "COD");
@@ -372,13 +372,44 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
     ordersSocket.on("ORDER_PICKED_UP", onOrderPickedUp);
     ordersSocket.on("ORDER_DELIVERED_BY_PARTNER", onOrderDelivered);
 
+    const onRefundRequested = (data) => {
+      console.log(" REFUND_REQUESTED:", data);
+      const orderId = data?.orderId || "Unknown Order";
+      const amount = data?.amount ? `₹${data.amount}` : "";
+
+      toast('Refund Request Received', {
+        icon: '💸',
+        duration: 5000,
+        description: `New refund request for Order #${orderId} ${amount}`
+      });
+
+      setNotifications((prev) => [
+        {
+          id: Date.now(),
+          title: "Refund Requested",
+          message: `Refund requested for Order #${orderId}`,
+          type: "refund",
+          read: false,
+          time: new Date().toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+          orderId: data?.orderId,
+          link: '/admin/refunds' // Optional: for redirection logic if implemented in notification component
+        },
+        ...prev,
+      ]);
+    };
+
+    ordersSocket.on("REFUND_REQUESTED", onRefundRequested);
+
     if (restaurantId) {
       console.log(" Emitting JOIN_RESTAURANT_ROOM", restaurantId);
       ordersSocket.emit("JOIN_RESTAURANT_ROOM", { restaurantId });
     }
 
-    
-      
+
+
     return () => {
       console.log("Cleaning up socket listeners & disconnecting");
 
@@ -401,6 +432,7 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
       ordersSocket.off("ORDER_STATUS_UPDATED", onOrderStatusUpdated);
       ordersSocket.off("ORDER_PICKED_UP", onOrderPickedUp);
       ordersSocket.off("ORDER_DELIVERED_BY_PARTNER", onOrderDelivered);
+      ordersSocket.off("REFUND_REQUESTED", onRefundRequested);
 
       mainSocket.offAny();
       ordersSocket.offAny();
