@@ -4,10 +4,12 @@ import { useSelector } from "react-redux";
 import MenuList from "../../components/menu/MenuList";
 import MenuFilters from "../../components/menu/MenuFilter";
 import Button from "../../components/ui/Button";
-import { Plus } from "lucide-react";
+import { Plus, Send } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import MenuStats from "../../components/menu/MenuStats";
 import { useGetMenusQuery } from "../../api/services/menuApi";
+import DailyMenuModal from "../../components/menu/DailyMenuModal";
+
 
 const mapItem = (item) => ({
   itemId: item._id,
@@ -71,6 +73,7 @@ const MenuManagement = () => {
   const [viewType, setViewType] = useState('list');
   const user = useSelector((state) => state.auth.user);
   const [restaurantId, setRestaurantId] = useState(null);
+  const [isDailyMenuModalOpen, setIsDailyMenuModalOpen] = useState(false);
 
 
   const handleFilterChange = (key, value) => {
@@ -100,9 +103,9 @@ const MenuManagement = () => {
 
   return (
     <div className="app page">
-      <div className="mx-auto">
+      <div className="mx-auto ">
         {/* Header */}
-        <div className="mb-2">
+        <div className="mb-6">
           <div className="flex bg-primary flex-col md:flex-row justify-between items-start md:items-center bg-white dark:bg-gray-800 p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
             <div>
               <h1 className="highlight text-4xl font-extrabold tracking-tight">
@@ -112,19 +115,32 @@ const MenuManagement = () => {
                 Track and manage all restaurant orders
               </p>
             </div>
-            <Button onClick={() => navigate("/menu-management/add")} variant="primary">
-              <Plus size={20} /> Add Menu
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-3 mt-4 md:mt-0">
+              <Button
+                onClick={() => setIsDailyMenuModalOpen(true)}
+                variant="outline"
+                className="flex items-center gap-2"
+              >
+                <Send size={20} /> Send Daily Menu
+              </Button>
+              <Button
+                onClick={() => navigate("/menu-management/add")}
+                variant="primary"
+                className="flex items-center gap-2"
+              >
+                <Plus size={20} /> Add Menu
+              </Button>
+            </div>
           </div>
         </div>
-
-        <MenuStats menus={menus} />
+        <div className="mb-4">
+          <MenuStats menus={menus} />
+        </div>
 
         {/* Menu Filters */}
         <MenuFilters
           searchTerm={searchTerm}
           onSearch={(e) => setSearchTerm(e.target.value)}
-          filters={filters}
           onFilterChange={handleFilterChange}
           onClearFilters={handleClearFilters}
           viewType={viewType}
@@ -142,9 +158,14 @@ const MenuManagement = () => {
           statusFilter={filters.status}
           viewType={viewType}
         />
+        {/* Daily Menu Modal */}
+        <DailyMenuModal
+          isOpen={isDailyMenuModalOpen}
+          onClose={() => setIsDailyMenuModalOpen(false)}
+          menus={menus}
+        />
       </div>
     </div>
-
   );
 };
 

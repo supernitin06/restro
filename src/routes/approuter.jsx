@@ -27,7 +27,7 @@ import NewOrders from "../components/OrderPages/NewOrders";
 import ProcessingOrders from "../components/OrderPages/ProcessingOrders";
 
 import AcceptedOrders from "../components/OrderPages/AcceptedOrders";
-import PendingDeliveryPartners from "../pages/PendingDeliveryPartners"; 
+import PendingDeliveryPartners from "../pages/PendingDeliveryPartners";
 // Make sure this path matches where you actually created the page
 
 
@@ -87,11 +87,11 @@ const AppRouter = createBrowserRouter([
             loader: generalLoader,
           },
 
-            {
-    path: "pending-delivery-partners",   // new route
-    element: <PendingDeliveryPartners />,
-    loader: generalLoader,               // optional, if you want the same loader
-  },
+          {
+            path: "pending-delivery-partners",   // new route
+            element: <PendingDeliveryPartners />,
+            loader: generalLoader,               // optional, if you want the same loader
+          },
 
 
           {
@@ -114,7 +114,7 @@ const AppRouter = createBrowserRouter([
                 loader: generalLoader,
               },
 
-               {
+              {
                 path: "accepted",
                 element: <AcceptedOrders />,
                 loader: generalLoader,

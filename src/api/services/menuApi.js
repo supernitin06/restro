@@ -103,6 +103,17 @@ toggleCategoryStatus: builder.mutation({
       invalidatesTags: ["Categories"],
     }),
 
+    dailyMenuSendToUser: builder.mutation({
+      query: ({ payload }) => ({
+        url: "admin/notifications/schedule-daily",
+        method: "POST",
+        data: payload,
+      }),
+      invalidatesTags: ["Menu"],
+    }),
+
+
+
   }),
 });
 
@@ -112,7 +123,7 @@ export const {
   useUpdateMenuMutation,
   useUpdateMenuStockStatusMutation,
   useDeleteMenuMutation,
-
+  useDailyMenuSendToUserMutation,
   useGetCategoriesQuery,
   useAddCategoryMutation,
   useUpdateCategoryMutation,

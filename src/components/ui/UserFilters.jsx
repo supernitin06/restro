@@ -64,16 +64,7 @@ const FiltersBar = ({
           ))}
 
           {/* CLEAR FILTERS */}
-          {onClear && (
-            <Button
-              variant="ghost"
-              onClick={onClear}
-              className="px-4 py-2 hidden sm:flex"
-              title="Clear Filters"
-            >
-              <FaFilterCircleXmark />
-            </Button>
-          )}
+          
 
           {/* CUSTOM ACTIONS */}
           <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-start">
