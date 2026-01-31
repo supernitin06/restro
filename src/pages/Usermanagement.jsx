@@ -4,15 +4,27 @@ import FiltersBar from "../components/ui/UserFilters";
 import UserModal from "../components/users/UserModal";
 import UserOrdersModal from "../components/users/UserOrdersModal";
 import UserCard from "../components/users/UserCard";
-import { useGetUserDetailsQuery, useGetUsersQuery, useUpdateUserBlockMutation, } from "../api/services/userapi";
-import { TrendingUp, TrendingDown, Grid, List, Eye, Edit, Trash2, ShoppingBag } from "lucide-react";
+import {
+  useGetUserDetailsQuery,
+  useGetUsersQuery,
+  useUpdateUserBlockMutation,
+} from "../api/services/userapi";
+import {
+  TrendingUp,
+  TrendingDown,
+  Grid,
+  List,
+  Eye,
+  Edit,
+  Trash2,
+  ShoppingBag,
+} from "lucide-react";
 import GradientButton from "../components/ui/GradientButton";
 import StatCard from "../components/ui/StatCard";
 import Table from "../components/ui/Table";
 import Badge from "../components/ui/Badge";
 import Pagination from "../components/ui/Pagination";
 import { useNavigate } from "react-router-dom";
-
 
 import ConfirmationModal from "../components/ui/ConfirmationModal";
 import toast from "react-hot-toast";
@@ -31,7 +43,11 @@ const UserManagement = () => {
   const [showOrdersModal, setShowOrdersModal] = useState(false);
   const [activeOrdersUserId, setActiveOrdersUserId] = useState(null);
 
-  const { data: userDetail, isLoading: userDetailLoading, isError: userDetailError } = useGetUserDetailsQuery(selectedUser, { skip: !selectedUser });
+  const {
+    data: userDetail,
+    isLoading: userDetailLoading,
+    isError: userDetailError,
+  } = useGetUserDetailsQuery(selectedUser, { skip: !selectedUser });
 
   // Confirmation Modal State
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -47,26 +63,25 @@ const UserManagement = () => {
   //  Action
   const tableActions = [
     {
-      key: 'view',
-      label: 'View Details',
+      key: "view",
+      label: "View Details",
       icon: Eye,
-      color: 'blue',
+      color: "blue",
       onClick: (item) => {
         setSelectedUser(item._id);
         setShowModal(true);
       },
     },
-    {
-      key: 'orders',
-      label: 'View Orders',
-      icon: ShoppingBag,
-      color: 'amber',
-      onClick: (item) => {
-        setActiveOrdersUserId(item._id);
-        setShowOrdersModal(true);
-      },
-    },
-  
+    // {
+    //   key: 'orders',
+    //   label: 'View Orders',
+    //   icon: ShoppingBag,
+    //   color: 'amber',
+    //   onClick: (item) => {
+    //     setActiveOrdersUserId(item._id);
+    //     setShowOrdersModal(true);
+    //   },
+    // },
   ];
 
   // -------------------- Data processing --------------------
@@ -74,23 +89,24 @@ const UserManagement = () => {
   const totalUsers = data?.meta?.total || 0;
   const totalPages = Math.ceil(totalUsers / itemsPerPage);
 
-
   const filteredUsers = useMemo(() => {
     let filtered = users;
 
-    if (filters.status === "active") filtered = filtered.filter(u => !u.isBlocked);
-    if (filters.status === "inactive") filtered = filtered.filter(u => u.isBlocked);
+    if (filters.status === "active")
+      filtered = filtered.filter((u) => !u.isBlocked);
+    if (filters.status === "inactive")
+      filtered = filtered.filter((u) => u.isBlocked);
 
     if (searchTerm)
-      filtered = filtered.filter(u =>
-        u.name?.toLowerCase().includes(searchTerm.toLowerCase())
+      filtered = filtered.filter((u) =>
+        u.name?.toLowerCase().includes(searchTerm.toLowerCase()),
       );
 
     return filtered;
   }, [users, searchTerm, filters]);
 
-  const activeUsers = users.filter(u => !u.isBlocked).length;
-  const inactiveUsers = users.filter(u => u.isBlocked).length;
+  const activeUsers = users.filter((u) => !u.isBlocked).length;
+  const inactiveUsers = users.filter((u) => u.isBlocked).length;
 
   // -------------------- Handlers --------------------
   // -------------------- Handlers --------------------
@@ -100,10 +116,12 @@ const UserManagement = () => {
         id: user._id,
         body: { isBlocked: !user.isBlocked },
       }).unwrap();
-      toast.success(`User ${!user.isBlocked ? 'blocked' : 'unblocked'} successfully!`);
+      toast.success(
+        `User ${!user.isBlocked ? "blocked" : "unblocked"} successfully!`,
+      );
     } catch (error) {
       console.error("Failed to update user status:", error);
-      toast.error('Failed to update user status');
+      toast.error("Failed to update user status");
     }
   };
 
@@ -144,7 +162,11 @@ const UserManagement = () => {
         return (
           <div className="w-10 h-10 rounded-full overflow-hidden border border-gray-200">
             {user.profile && user.profile !== "not available" ? (
-              <img src={user.profile} alt={userName} className="w-full h-full object-cover" />
+              <img
+                src={user.profile}
+                alt={userName}
+                className="w-full h-full object-cover"
+              />
             ) : (
               <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-500 text-xs font-bold">
                 {userName.charAt(0).toUpperCase()}
@@ -168,7 +190,9 @@ const UserManagement = () => {
       key: "email",
       render: (user) => (
         <div className="flex flex-col">
-          <span className="text-sm text-gray-700 dark:text-gray-200">{user.email}</span>
+          <span className="text-sm text-gray-700 dark:text-gray-200">
+            {user.email}
+          </span>
           <span className="text-xs text-gray-500">{user.mobile}</span>
         </div>
       ),
@@ -205,10 +229,8 @@ const UserManagement = () => {
     },
   ];
 
-
-
   const handleFilterChange = (key, value) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
+    setFilters((prev) => ({ ...prev, [key]: value }));
     setCurrentPage(1);
   };
 
@@ -221,7 +243,6 @@ const UserManagement = () => {
     if (page < 1 || page > totalPages) return;
     setCurrentPage(page);
   };
-
 
   // -------------------- Render --------------------
   return (
@@ -267,21 +288,45 @@ const UserManagement = () => {
         isDangerous={true}
       />
 
-      <div className="relative z-10">
+      <div className="relative z-50">
         {isLoading && <div>Loading users...</div>}
         {isError && <div>Error fetching users</div>}
 
         {!isLoading && !isError && (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-6">
-              <StatCard title="Total Users" value={totalUsers} icon={TrendingUp} color="blue" />
-              <StatCard title="Active Users" value={activeUsers} icon={TrendingUp} color="green" />
-              <StatCard title="Inactive Users" value={inactiveUsers} icon={TrendingDown} color="red" />
-              <StatCard title="Current Page Users" value={users.length} icon={TrendingUp} color="purple" />
+              <StatCard
+                title="Total Users"
+                value={totalUsers}
+                icon={TrendingUp}
+                color="blue"
+              />
+              <StatCard
+                title="Active Users"
+                value={activeUsers}
+                icon={TrendingUp}
+                color="green"
+              />
+              <StatCard
+                title="Inactive Users"
+                value={inactiveUsers}
+                icon={TrendingDown}
+                color="red"
+              />
+              <StatCard
+                title="Current Page Users"
+                value={users.length}
+                icon={TrendingUp}
+                color="purple"
+              />
             </div>
 
             <FiltersBar
-              search={{ value: searchTerm, placeholder: "Search by name...", onChange: setSearchTerm }}
+              search={{
+                value: searchTerm,
+                placeholder: "Search by name...",
+                onChange: setSearchTerm,
+              }}
               filters={[
                 {
                   key: "status",
@@ -309,42 +354,53 @@ const UserManagement = () => {
 
             {viewMode === "grid" && (
               <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 ">
                   {filteredUsers.map((user) => (
-                    <UserCard key={user._id} user={user} />
+                    <UserCard
+                      key={user._id}
+                      user={user}
+                      onViewDetails={() => {
+                        console.log("Opening modal for:", user.name);
+                        setSelectedUser(user);
+                        setShowModal(true);
+                      }}
+                      onDelete={handleDelete} 
+                    />
+
+                    
                   ))}
                 </div>
 
-                <Pagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={handlePageChange}
-                />
+                {showModal && selectedUser && (
+                  <UserModal
+                    user={selectedUser}
+                    onClose={() => {
+                      console.log("Closing modal");
+                      setShowModal(false);
+                      setSelectedUser(null);
+                    }}
+                  />
+                )}
               </>
             )}
 
             {viewMode === "table" && (
-              <>
-                <Table
-                  data={filteredUsers}
-                  columns={columns}
-                  title="Users"
-                  actions={tableActions}
-                />
-
-                <Pagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={handlePageChange}
-                />
-              </>
+              <Table
+                data={filteredUsers}
+                columns={columns}
+                title="Users"
+                actions={tableActions}
+              />
             )}
 
-
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
           </>
         )}
       </div>
-
     </div>
   );
 };
