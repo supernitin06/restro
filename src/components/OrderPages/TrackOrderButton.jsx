@@ -4,7 +4,7 @@ const TrackOrderButton = ({ order, onClick }) => {
     const [show, setShow] = useState(false);
 
     useEffect(() => {
-        const activeStatuses = ['ASSIGNED', 'READY_FOR_PICKUP', 'OUT_FOR_DELIVERY'];
+        const activeStatuses = ['OUT_FOR_DELIVERY'];
         if (activeStatuses.includes(order.status)) {
             setShow(true);
         } else {

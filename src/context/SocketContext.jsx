@@ -403,6 +403,35 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
 
     ordersSocket.on("REFUND_REQUESTED", onRefundRequested);
 
+    const onReviewSubmitted = (data) => {
+      console.log(" REVIEW_SUBMITTED:", data);
+      const orderId = data?.orderId || "Unknown Order";
+      const comment = data?.comment || data?.ratingdocs?.comment || "No comment";
+
+      toast.success(`New Review for Order #${orderId}: "${comment}"`, {
+        duration: 5000,
+        icon: '⭐'
+      });
+
+      setNotifications((prev) => [
+        {
+          id: Date.now(),
+          title: "New Review Received",
+          message: `User gave feedback for Order #${orderId}: "${comment}"`,
+          type: "review",
+          read: false,
+          time: new Date().toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+          orderId: data?.orderId,
+        },
+        ...prev,
+      ]);
+    };
+
+    ordersSocket.on("REVIEW_SUBMITTED", onReviewSubmitted);
+
     if (restaurantId) {
       console.log(" Emitting JOIN_RESTAURANT_ROOM", restaurantId);
       ordersSocket.emit("JOIN_RESTAURANT_ROOM", { restaurantId });
@@ -433,6 +462,7 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
       ordersSocket.off("ORDER_PICKED_UP", onOrderPickedUp);
       ordersSocket.off("ORDER_DELIVERED_BY_PARTNER", onOrderDelivered);
       ordersSocket.off("REFUND_REQUESTED", onRefundRequested);
+      ordersSocket.off("REVIEW_SUBMITTED", onReviewSubmitted);
 
       mainSocket.offAny();
       ordersSocket.offAny();
