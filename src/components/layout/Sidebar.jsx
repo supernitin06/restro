@@ -200,13 +200,13 @@ const Sidebar = ({ theme = "dark" }) => {
       icon: MessageSquare,
       path: "/reviews",
     },
-    {
-      id: "support",
-      label: "Support & Tickets",
-      icon: Shield,
-      path: "/support-tickets",
+    // {
+    //   id: "support",
+    //   label: "Support & Tickets",
+    //   icon: Shield,
+    //   path: "/support-tickets",
 
-    },
+    // },
     {
       id: "settings",
       label: "Settings",
