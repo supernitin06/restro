@@ -22,7 +22,7 @@ const DeliveryPartnerDetailsModal = ({
 
   if (!partner) return null;
 
-  /* ✅ CORRECT DESTRUCTURING (NORMALIZED DATA ONLY) */
+  /* CORRECT DESTRUCTURING (NORMALIZED DATA ONLY) */
   const {
     partnerId,
     registrationData = {},
