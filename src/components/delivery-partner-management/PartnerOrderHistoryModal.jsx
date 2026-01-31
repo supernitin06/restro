@@ -76,12 +76,17 @@ const PartnerOrderHistoryModal = ({ partnerId, onClose }) => {
                         </div>
                     ) : (
                         <div className="space-y-4">
-                            {orders.map((order) => (
+                            {orders.map((order, index) => (
                                 <div
                                     key={order._id}
                                     className="group p-4 rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900/50 hover:border-primary/20 hover:shadow-lg dark:hover:shadow-primary/5 transition-all duration-300"
                                 >
                                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+
+                                        {/* Serial Number */}
+                                        <div className="text-sm font-bold text-gray-500 dark:text-gray-400 w-8 text-center">
+                                            {index + 1}.
+                                        </div>
 
                                         {/* Order ID & Status */}
                                         <div className="space-y-2 min-w-[150px]">
