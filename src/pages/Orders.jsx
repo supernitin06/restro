@@ -1,7 +1,7 @@
 // Orders.jsx
 import React, { useState, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { Plus, Loader2, Eye, Edit, Trash2, CheckCircle, XCircle, Clock, Bike, CreditCard } from 'lucide-react';
+import { Plus, Loader2, Eye, Trash2, CheckCircle, XCircle, Clock, Bike, CreditCard } from 'lucide-react';
 import AllOrderCards from '../components/OrderPages/OderCards';
 import OrderFormModal from '../components/OrderPages/OrderForm';
 import OrderFilters from '../components/OrderPages/OrderFilters';
@@ -18,7 +18,7 @@ const Orders = () => {
   });
   const [viewMode, setViewMode] = useState(() => localStorage.getItem('ordersViewMode') || 'grid');
   const [showAddForm, setShowAddForm] = useState(false);
-  const [editingOrder, setEditingOrder] = useState(null);
+  // const [editingOrder, setEditingOrder] = useState(null);
   const [viewingOrder, setViewingOrder] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -330,9 +330,9 @@ const Orders = () => {
           <button onClick={() => setViewingOrder(order)} className="p-1.5 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg text-blue-600 dark:text-blue-400 transition-colors" title="View">
             <Eye size={16} />
           </button>
-          <button onClick={() => setEditingOrder(order)} className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-gray-600 dark:text-gray-300 transition-colors" title="Edit">
+          {/* <button onClick={() => setEditingOrder(order)} className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-gray-600 dark:text-gray-300 transition-colors" title="Edit">
             <Edit size={16} />
-          </button>
+          </button> */}
           {['PLACED', 'ACCEPTED', 'PREPARING', 'READY', 'OUT_FOR_DELIVERY', 'ON-PROCESS'].includes(order.status) && (
             <>
               <button onClick={() => handleUpdateStatus(order.id, 'COMPLETED')} className="p-1.5 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg text-green-600 dark:text-green-400 transition-colors" title="Complete">
@@ -366,13 +366,13 @@ const Orders = () => {
               </p>
             </div>
 
-            <Button
+            {/* <Button
               onClick={() => setShowAddForm(true)}
               variant="primary"
             >
               <Plus size={20} />
               Add New Order
-            </Button>
+            </Button> */}
           </div>
         </div>
 
@@ -416,7 +416,7 @@ const Orders = () => {
                   key={order.id}
                   order={order}
                   onDelete={handleDeleteOrder}
-                  onEdit={() => setEditingOrder(order)}
+                  // onEdit={() => setEditingOrder(order)}
                   onUpdateStatus={handleUpdateStatus}
                   viewMode={viewMode}
                 />
@@ -442,7 +442,7 @@ const Orders = () => {
         )}
 
         {/* Add/Edit Order Modal */}
-        {(showAddForm || editingOrder) && (
+        {/* {(showAddForm || editingOrder) && (
           <OrderFormModal
             order={editingOrder}
             onClose={() => {
@@ -451,7 +451,7 @@ const Orders = () => {
             }}
             onSubmit={editingOrder ? handleUpdateOrder : handleAddOrder}
           />
-        )}
+        )} */}
 
         {/* View Details Modal */}
         {viewingOrder && (
