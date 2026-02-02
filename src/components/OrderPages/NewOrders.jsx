@@ -188,6 +188,7 @@ const NewOrders = () => {
 
   // ===== PAGINATION =====
   const totalPages = Math.ceil(sortedOrders.length / ITEMS_PER_PAGE);
+  
   const currentOrders = sortedOrders.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE,
