@@ -121,14 +121,14 @@ const PartnerOrderHistoryModal = ({ partnerId, onClose }) => {
 
                                         {/* Cost */}
                                         <div className="flex items-center gap-1 font-bold text-gray-900 dark:text-white min-w-[100px]">
-                                            <DollarSign size={14} className="text-primary" />
+                                            <span className="text-lg">₹</span>
                                             <span>{order.price?.grandTotal?.toFixed(2) || '0.00'}</span>
                                         </div>
 
                                         {/* Details Button */}
-                                        <Button variant="ghost" size="sm" className="text-xs">
+                                        {/* <Button variant="ghost" size="sm" className="text-xs">
                                             View Details
-                                        </Button>
+                                        </Button> */}
                                     </div>
 
                                     {/* Pickup/Dropoff - Only show if data exists */}

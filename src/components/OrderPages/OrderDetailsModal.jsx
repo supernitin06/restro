@@ -237,6 +237,7 @@ const OrderDetailsModal = ({ order, onClose }) => {
                   </div>
                 </div>
 
+
                 {/* Delivery Partner */}
                 <div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
                   <h3 className="text-sm font-semibold text-gray-600 dark:text-gray-300 mb-3 flex items-center gap-2">

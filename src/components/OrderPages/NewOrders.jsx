@@ -75,65 +75,100 @@ const NewOrders = () => {
 
   const allOrders = data?.data || [];
   const deliveryPartners = partnersData?.data || [];
-  const downloadInvoicePDF = (invoice) => {
-    const doc = new jsPDF();
-    doc.setFontSize(16);
-    doc.text(`Invoice #${invoice.invoiceNumber}`, 14, 20);
-    doc.setFontSize(12);
-    doc.text(`Customer: ${invoice.customerDetails.name}`, 14, 30);
+const downloadInvoicePDF = (invoice) => {
+  const doc = new jsPDF();
 
-    doc.text(`Phone: ${invoice.customerDetails.phone}`, 14, 36);
+  // Header
+  doc.setFontSize(16);
+  doc.text(`Invoice #${invoice.invoiceNumber}`, 14, 20);
 
-    doc.text(`Address: ${invoice.customerDetails.address}`, 14, 42);
+  doc.setFontSize(11);
+  doc.text(`Customer: ${invoice.customerDetails.name}`, 14, 30);
+  doc.text(`Phone: ${invoice.customerDetails.phone}`, 14, 36);
+  doc.text(`Address: ${invoice.customerDetails.address}`, 14, 42);
 
-    const pType = invoice.payment?.type || invoice.type;
-    const pMethod = invoice.payment?.method || invoice.method;
-    const paymentDisplay =
-      pType && pMethod && pType !== pMethod
-        ? `${pType} - ${pMethod}`
-        : pType || pMethod || "N/A";
+  const pType = invoice.payment?.type || invoice.type;
+  const pMethod = invoice.payment?.method || invoice.method;
+  const paymentDisplay =
+    pType && pMethod && pType !== pMethod ? `${pType} - ${pMethod}` : pType || pMethod || "N/A";
 
-    doc.text(
-      `Payment: ${paymentDisplay} (${invoice.payment?.status || invoice.status || "PENDING"})`,
-      14,
-      48,
-    );
+  doc.text(
+    `Payment: ${paymentDisplay} (${invoice.payment?.status || invoice.status || "PENDING"})`,
+    14,
+    48
+  );
 
-    autoTable(doc, {
-      startY: 55,
-      head: [["Item", "Qty", "Total"]],
-      body: invoice.items.map((item) => [item.name, item.quantity, item.total]),
-      theme: "grid",
-    });
+  // Items Table
+  autoTable(doc, {
+    startY: 55,
+    head: [["Item", "Qty", "Total"]],
+    body: invoice.items.map((item) => {
+      const itemTotal = item.total ?? ((item.price ?? item.finalItemPrice ?? 0) * (item.quantity ?? 1));
+      return [item.name, item.quantity, `₹${itemTotal}`];
+    }),
+    theme: "grid",
+    styles: { fontSize: 10, cellPadding: 3 },
+    headStyles: { fillColor: [240, 240, 240], textColor: 20 },
+    columnStyles: { 0: { cellWidth: 90 }, 1: { cellWidth: 30, halign: "center" }, 2: { cellWidth: 40, halign: "right" } },
+  });
 
-    let finalY = doc.lastAutoTable.finalY + 10;
+  let finalY = doc.lastAutoTable.finalY + 8;
+  doc.setFontSize(11);
 
-    doc.text(
-      `Subtotal: ₹${invoice.amount?.subTotal || invoice.amount?.total || 0}`,
-      14,
-      finalY,
-    );
+  // SUBTOTAL
+  const subTotal = invoice.amount?.subTotal ?? invoice.items?.reduce(
+    (acc, item) => acc + (item.total ?? ((item.price ?? item.finalItemPrice ?? 0) * (item.quantity ?? 1))),
+    0
+  );
+  if (subTotal > 0) {
+    doc.text(`Subtotal: ₹${subTotal}`, 14, finalY);
+    finalY += 6;
+  }
 
-    if (invoice.amount.tax) {
-      finalY += 6;
-      doc.text(`Tax: ₹${invoice.amount.tax}`, 14, finalY);
-    }
+  // TAX
+  if (invoice.amount?.tax > 0) {
+    doc.text(`Tax: +₹${invoice.amount.tax}`, 14, finalY);
+    finalY += 6;
+  }
 
-    if (invoice.amount.deliveryCharge) {
-      finalY += 6;
-      doc.text(`Delivery: ₹${invoice.amount.deliveryCharge}`, 14, finalY);
-    }
+  // DELIVERY
+  let deliveryAmount = Number(invoice.amount?.deliveryCharge || invoice.amount?.deliveryFee || 0);
+  // Fallback: Calculate delivery if missing but total implies it
+  if (deliveryAmount <= 0) {
+    const grandTotal = Number(invoice.amount?.grandTotal ?? invoice.amount?.payable ?? 0);
+    const tax = Number(invoice.amount?.tax || 0);
+    const discount = Number(invoice.amount?.discount || 0);
+    const calculatedDelivery = grandTotal - subTotal - tax + discount;
+    if (calculatedDelivery > 0.5) deliveryAmount = calculatedDelivery; // > 0.5 to avoid float rounding errors
+  }
 
-    finalY += 8;
-    doc.setFontSize(14);
-    doc.text(`Grand Total: ₹${invoice.amount.grandTotal}`, 14, finalY);
-    doc.text(
-      `Grand Total: ₹${invoice.amount?.grandTotal || invoice.amount?.payable || 0}`,
-      14,
-      doc.lastAutoTable.finalY + 10,
-    );
-    doc.save(`Invoice-${invoice.invoiceNumber}.pdf`);
-  };
+  if (deliveryAmount > 0) {
+    doc.text(`Delivery: +₹${deliveryAmount}`, 14, finalY);
+    finalY += 6;
+  }
+
+  // DISCOUNT
+  if (invoice.amount?.discount > 0) {
+    doc.text(`Discount: -₹${invoice.amount.discount}`, 14, finalY);
+    finalY += 6;
+  }
+
+  finalY += 2; // Spacer
+
+  // GRAND TOTAL
+  doc.setFontSize(14);
+  doc.text(
+    `Grand Total: ₹${invoice.amount?.grandTotal ?? invoice.amount?.payable ?? 0}`,
+    14,
+    finalY
+  );
+
+  // Save PDF
+  doc.save(`Invoice-${invoice.invoiceNumber}.pdf`);
+};
+
+
+
 
   // ===== SOCKET AUTO REFRESH =====
   useEffect(() => {
@@ -188,7 +223,7 @@ const NewOrders = () => {
 
   // ===== PAGINATION =====
   const totalPages = Math.ceil(sortedOrders.length / ITEMS_PER_PAGE);
-  
+
   const currentOrders = sortedOrders.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE,
@@ -729,144 +764,122 @@ const NewOrders = () => {
         </>
       )}
 
-      {viewingInvoice && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 dark:bg-black/60 backdrop-blur-sm">
-          <div className="bg-white dark:bg-gray-800 w-[400px] md:w-[500px] p-6 rounded-2xl shadow-2xl overflow-y-auto max-h-[80vh] animate-slideIn text-gray-900 dark:text-gray-100 h-scrollbar">
-            {/* Header */}
-            <div className="mb-4 pb-2 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-              <h2 className="text-2xl font-bold bg-gradient-to-r from-red-500 to-pink-500 text-transparent bg-clip-text">
-                Invoice #{viewingInvoice.invoiceNumber}
-              </h2>
-              <button
-                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-xl"
-                onClick={() => setViewingInvoice(null)}
-              >
-                ✕
-              </button>
-            </div>
-
-            {/* Customer Details */}
-            <div className="mb-4 text-sm space-y-1">
-              <p>
-                <span className="font-semibold text-gray-700 dark:text-gray-300">
-                  Customer:
-                </span>{" "}
-                {viewingInvoice.customerDetails.name}
-              </p>
-              <p>
-                <span className="font-semibold text-gray-700 dark:text-gray-300">
-                  Phone:
-                </span>{" "}
-                {viewingInvoice.customerDetails.phone}
-              </p>
-              <p>
-                <span className="font-semibold text-gray-700 dark:text-gray-300">
-                  Address:
-                </span>{" "}
-                {viewingInvoice.customerDetails.address}
-              </p>
-              <p>
-                <span className="font-semibold text-gray-700 dark:text-gray-300">
-                  Payment:
-                </span>{" "}
-                {viewingInvoice.payment.method} ({viewingInvoice.payment.status}
-                )
-              </p>
-            </div>
-
-            {/* Items Table */}
-            <div className="overflow-x-auto">
-              <table className="w-full border border-gray-200 dark:border-gray-700 rounded-lg text-sm">
-                <thead className="bg-gray-100 dark:bg-gray-700">
-                  <tr>
-                    <th className="py-2 px-3 text-left text-gray-600 dark:text-gray-300">
-                      Item
-                    </th>
-                    <th className="py-2 px-3 text-center text-gray-600 dark:text-gray-300">
-                      Qty
-                    </th>
-                    <th className="py-2 px-3 text-right text-gray-600 dark:text-gray-300">
-                      Total
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {viewingInvoice.items.map((item, idx) => (
-                    <tr
-                      key={item._id}
-                      className={
-                        idx % 2 === 0
-                          ? "bg-gray-50 dark:bg-gray-900"
-                          : "bg-white dark:bg-gray-800"
-                      }
-                    >
-                      <td className="py-2 px-3">{item.name}</td>
-                      <td className="py-2 px-3 text-center">{item.quantity}</td>
-                      <td className="py-2 px-3 text-right">₹{item.total}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Amount Breakdown */}
-            <div className="mt-4 text-sm space-y-1 border-t border-gray-200 dark:border-gray-700 pt-3">
-              <div className="flex justify-between">
-                <span className="text-gray-600 dark:text-gray-400">
-                  Subtotal
-                </span>
-                <span>₹{viewingInvoice.amount.subTotal}</span>
-              </div>
-
-              {viewingInvoice.amount.tax && (
-                <div className="flex justify-between text-gray-600 dark:text-gray-400">
-                  <span>Tax</span>
-                  <span>₹{viewingInvoice.amount.tax}</span>
-                </div>
-              )}
-
-              {(viewingInvoice.amount.deliveryCharge ||
-                viewingInvoice.amount.deliveryFee) && (
-                <div className="flex justify-between text-gray-600 dark:text-gray-400">
-                  <span>Delivery</span>
-                  <span>
-                    ₹
-                    {viewingInvoice.amount.deliveryCharge ||
-                      viewingInvoice.amount.deliveryFee}
-                  </span>
-                </div>
-              )}
-            </div>
-
-            {/* Grand Total */}
-            <div className="mt-3 flex justify-between text-lg font-bold">
-              <span>Grand Total</span>
-              <span className="text-red-500">
-                ₹
-                {viewingInvoice.amount?.grandTotal ||
-                  viewingInvoice.amount?.payable ||
-                  0}
-              </span>
-            </div>
-
-            {/* Buttons */}
-            <div className="mt-6 flex justify-end gap-3">
-              <button
-                className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
-                onClick={() => setViewingInvoice(null)}
-              >
-                Close
-              </button>
-              <button
-                className="px-4 py-2 rounded-lg text-white bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600"
-                onClick={() => downloadInvoicePDF(viewingInvoice)}
-              >
-                Download PDF
-              </button>
-            </div>
-          </div>
+{viewingInvoice && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+    <div className="bg-white dark:bg-gray-900 w-[400px] md:w-[500px] p-6 rounded-2xl shadow-2xl text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-700">
+      
+      {/* PDF CONTENT START */}
+      <div id="invoice-pdf" className="w-full">
+        {/* Header */}
+        <div className="mb-4 pb-2 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+            Invoice #{viewingInvoice.invoiceNumber}
+          </h2>
         </div>
-      )}
+
+        {/* Customer Details */}
+        <div className="mb-4 text-sm space-y-1">
+          <p className="text-gray-700 dark:text-gray-300"><b className="text-gray-800 dark:text-gray-100">Customer:</b> {viewingInvoice.customerDetails.name}</p>
+          <p className="text-gray-700 dark:text-gray-300"><b className="text-gray-800 dark:text-gray-100">Phone:</b> {viewingInvoice.customerDetails.phone}</p>
+          <p className="text-gray-700 dark:text-gray-300"><b className="text-gray-800 dark:text-gray-100">Address:</b> {viewingInvoice.customerDetails.address}</p>
+          <p className="text-gray-700 dark:text-gray-300">
+            <b>Payment:</b> {viewingInvoice.payment?.method || viewingInvoice.method} (
+            {viewingInvoice.payment?.status || viewingInvoice.status || "PENDING"})
+          </p>
+        </div>
+
+        {/* Items + Amount Table */}
+        <table className="w-full border border-gray-200 dark:border-gray-700 text-sm table-fixed">
+          <thead className="bg-gray-100 dark:bg-gray-700">
+            <tr>
+              <th className="py-2 px-2 text-left font-semibold text-gray-600 dark:text-gray-300">Item</th>
+              <th className="py-2 px-2 text-center w-12 font-semibold text-gray-600 dark:text-gray-300">Qty</th>
+              <th className="py-2 px-2 text-right w-20 font-semibold text-gray-600 dark:text-gray-300">Total</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {viewingInvoice.items.map((item) => {
+              const itemTotal = item.total ?? ((item.price ?? item.finalItemPrice ?? 0) * (item.quantity ?? 1));
+              return (
+                <tr key={item._id} className="border-t border-gray-200 dark:border-gray-700">
+                  <td className="py-2 px-2 break-words whitespace-normal text-gray-800 dark:text-gray-200">{item.name}</td>
+                  <td className="py-2 px-2 text-center text-gray-700 dark:text-gray-300">{item.quantity}</td>
+                  <td className="py-2 px-2 text-right font-medium text-gray-800 dark:text-gray-200">₹{itemTotal}</td>
+                </tr>
+              );
+            })}
+
+            {/* TAX */}
+            {viewingInvoice.amount?.tax != null && viewingInvoice.amount.tax > 0 && (
+              <tr className="border-t border-gray-200 dark:border-gray-700">
+                <td colSpan="2" className="py-2 px-2 text-right text-gray-600 dark:text-gray-400">Tax</td>
+                <td className="py-2 px-2 text-right text-gray-700 dark:text-gray-300">₹{viewingInvoice.amount.tax}</td>
+              </tr>
+            )}
+
+            {/* DELIVERY */}
+            {(() => {
+              let deliveryVal = Number(viewingInvoice.amount?.deliveryCharge || viewingInvoice.amount?.deliveryFee || 0);
+              if (deliveryVal <= 0) {
+                 const subTotal = Number(viewingInvoice.amount?.subTotal || viewingInvoice.items?.reduce((acc, item) => acc + (item.total ?? ((item.price ?? item.finalItemPrice ?? 0) * (item.quantity ?? 1))), 0) || 0);
+                 const grandTotal = Number(viewingInvoice.amount?.grandTotal ?? viewingInvoice.amount?.payable ?? 0);
+                 const tax = Number(viewingInvoice.amount?.tax || 0);
+                 const discount = Number(viewingInvoice.amount?.discount || 0);
+                 const diff = grandTotal - subTotal - tax + discount;
+                 if (diff > 0.5) deliveryVal = diff;
+              }
+              
+              if (deliveryVal > 0) return (
+              <tr className="border-t border-gray-200 dark:border-gray-700">
+                <td colSpan="2" className="py-2 px-2 text-right text-gray-600 dark:text-gray-400">Delivery</td>
+                <td className="py-2 px-2 text-right text-gray-700 dark:text-gray-300">
+                  + ₹{deliveryVal.toFixed(2)}
+                </td>
+              </tr>
+              );
+            })()}
+
+            {/* SUBTOTAL */}
+            {viewingInvoice.amount?.subTotal != null && viewingInvoice.amount.subTotal > 0 && (
+              <tr className="border-t border-gray-200 dark:border-gray-700">
+                <td colSpan="2" className="py-2 px-2 text-right text-gray-600 dark:text-gray-400">Subtotal</td>
+                <td className="py-2 px-2 text-right text-gray-700 dark:text-gray-300">₹{viewingInvoice.amount.subTotal}</td>
+              </tr>
+            )}
+
+            {/* GRAND TOTAL */}
+            <tr className="border-t-2 border-gray-300 dark:border-gray-600 font-bold">
+              <td colSpan="2" className="py-3 px-2 text-right text-gray-800 dark:text-gray-100">Grand Total</td>
+              <td className="py-3 px-2 text-right text-gray-900 dark:text-white">
+                ₹{viewingInvoice.amount?.grandTotal ?? viewingInvoice.amount?.payable ?? 0}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      {/* PDF CONTENT END */}
+
+      {/* Buttons */}
+      <div className="mt-5 flex justify-end gap-3">
+        <button
+          className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          onClick={() => setViewingInvoice(null)}
+        >
+          Close
+        </button>
+        <button
+          className="px-4 py-2 rounded-lg text-white bg-red-500 hover:bg-red-600 transition-colors"
+          onClick={() => downloadInvoicePDF(viewingInvoice)}
+        >
+          Download PDF
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+
     </div>
   );
 };
