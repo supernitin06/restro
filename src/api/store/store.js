@@ -27,7 +27,6 @@ export const store = configureStore({
     [adminApi.reducerPath]: adminApi.reducer,
     [notificationApi.reducerPath]: notificationApi.reducer,
   },
- 
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: false,

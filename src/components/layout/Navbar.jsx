@@ -142,11 +142,11 @@ const Navbar = ({ toggleSidebar }) => {
               count={gifts.length}
               onClick={() => setIsGiftsOpen(!isGiftsOpen)}
             />
-            <GiftsDropdown
+            {/* <GiftsDropdown
               isOpen={isGiftsOpen}
               gifts={gifts}
               onCreateNew={() => setIsOfferModalOpen(true)}
-            />
+            /> */}
           </div>
 
           <div className="h-8 w-px bg-gray-300 mx-2" />
