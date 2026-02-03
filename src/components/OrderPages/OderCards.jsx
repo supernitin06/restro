@@ -213,7 +213,7 @@ const OrderCard = ({ order, onDelete, onEdit, onUpdateStatus, viewMode }) => {
               </Button>
             </div>
             <div className="flex gap-1">
-              <Button
+              {/* <Button
                 variant="ghost"
                 size="sm"
                 onClick={(e) => { e.stopPropagation(); onEdit(order); }}
@@ -221,7 +221,7 @@ const OrderCard = ({ order, onDelete, onEdit, onUpdateStatus, viewMode }) => {
                 title="Edit"
               >
                 <Edit size={14} />
-              </Button>
+              </Button> */}
               <Button
                 variant="ghost"
                 size="sm"

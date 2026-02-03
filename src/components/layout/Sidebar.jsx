@@ -135,12 +135,7 @@ const Sidebar = ({ theme = "dark" }) => {
       ]
 
     },
-    {
-      id: "offers",
-      label: "Offers",
-      icon: FaCog,
-      path: "/offers",
-    },
+   
     {
       id: "payments",
       label: "Payments",
@@ -193,6 +188,12 @@ const Sidebar = ({ theme = "dark" }) => {
           icon: Shield,
         },
       ],
+    },
+     {
+      id: "offers",
+      label: "Offers",
+      icon: FaCog,
+      path: "/offers",
     },
     {
       id: "reviews",

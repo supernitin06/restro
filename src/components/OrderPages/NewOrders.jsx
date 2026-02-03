@@ -30,15 +30,22 @@ const STATUS_COLORS = {
 };
 
 const NewOrders = () => {
-  const { data, refetch } = useGetOrdersQuery({
-    page: 1,
-    limit: 5000,
-    refetchOnMountOrArgChange: true,
-  }, {
-    refetchOnFocus: true,
-  });
+  const { data, refetch } = useGetOrdersQuery(
+    {
+      page: 1,
+      limit: 5000,
+      refetchOnMountOrArgChange: true,
+    },
+    {
+      refetchOnFocus: true,
+    },
+  );
 
-  const { data: partnersData, isLoading: partnersLoading, refetch: partnersRefetch } = useGetDeliveryPartnersQuery();
+  const {
+    data: partnersData,
+    isLoading: partnersLoading,
+    refetch: partnersRefetch,
+  } = useGetDeliveryPartnersQuery();
 
   const { ordersSocket } = useSockets();
   const ITEMS_PER_PAGE = 20;
@@ -74,12 +81,17 @@ const NewOrders = () => {
     doc.text(`Invoice #${invoice.invoiceNumber}`, 14, 20);
     doc.setFontSize(12);
     doc.text(`Customer: ${invoice.customerDetails.name}`, 14, 30);
+
     doc.text(`Phone: ${invoice.customerDetails.phone}`, 14, 36);
+
     doc.text(`Address: ${invoice.customerDetails.address}`, 14, 42);
-    
+
     const pType = invoice.payment?.type || invoice.type;
     const pMethod = invoice.payment?.method || invoice.method;
-    const paymentDisplay = (pType && pMethod && pType !== pMethod) ? `${pType} - ${pMethod}` : (pType || pMethod || "N/A");
+    const paymentDisplay =
+      pType && pMethod && pType !== pMethod
+        ? `${pType} - ${pMethod}`
+        : pType || pMethod || "N/A";
 
     doc.text(
       `Payment: ${paymentDisplay} (${invoice.payment?.status || invoice.status || "PENDING"})`,
@@ -96,7 +108,11 @@ const NewOrders = () => {
 
     let finalY = doc.lastAutoTable.finalY + 10;
 
-    doc.text(`Subtotal: ₹${invoice.amount?.subTotal || invoice.amount?.total || 0}`, 14, finalY);
+    doc.text(
+      `Subtotal: ₹${invoice.amount?.subTotal || invoice.amount?.total || 0}`,
+      14,
+      finalY,
+    );
 
     if (invoice.amount.tax) {
       finalY += 6;
@@ -119,13 +135,6 @@ const NewOrders = () => {
     doc.save(`Invoice-${invoice.invoiceNumber}.pdf`);
   };
 
-  // 
-
-
-
-
-
-
   // ===== SOCKET AUTO REFRESH =====
   useEffect(() => {
     if (!ordersSocket) return;
@@ -136,7 +145,7 @@ const NewOrders = () => {
     ordersSocket.on("ORDER_STATUS_UPDATED", refresh);
     ordersSocket.on("KITCHEN_STATUS_UPDATED", refresh);
     ordersSocket.on("DELIVERY_ASSIGNED", refresh);
-    ordersSocket.on("NEW_ORDER", refresh); // 👈 Added NEW_ORDER listener
+    ordersSocket.on("NEW_ORDER", refresh); // Added NEW_ORDER listener
     ordersSocket.on("ORDER_PICKED_UP", refresh); // Added for track order
     ordersSocket.on("ORDER_DELIVERED_BY_PARTNER", refresh); // Added for completion
 
@@ -179,6 +188,7 @@ const NewOrders = () => {
 
   // ===== PAGINATION =====
   const totalPages = Math.ceil(sortedOrders.length / ITEMS_PER_PAGE);
+  
   const currentOrders = sortedOrders.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE,
@@ -297,9 +307,11 @@ const NewOrders = () => {
       // Attempt to verify if it actually succeeded despite the error (e.g. timeout)
       try {
         const { data: freshData } = await refetch();
-        const updatedOrder = freshData?.data?.find(o => o.orderId === currentOrder);
+        const updatedOrder = freshData?.data?.find(
+          (o) => o.orderId === currentOrder,
+        );
 
-        if (updatedOrder && updatedOrder.status === 'ASSIGNED') {
+        if (updatedOrder && updatedOrder.status === "ASSIGNED") {
           showSuccessAlert(`Assigned ${partner.name}`);
           setDrawerOpen(false);
           setCurrentOrder(null);
@@ -403,13 +415,22 @@ const NewOrders = () => {
           </thead>
           <tbody className="divide-y divide-gray-200 dark:divide-gray-700 text-[10px]">
             {currentOrders.map((order, idx) => (
-              <tr key={order._id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+              <tr
+                key={order._id}
+                className="hover:bg-gray-50 dark:hover:bg-gray-700"
+              >
                 <td className="sticky left-0 bg-white dark:bg-gray-800 z-10 text-center px-2 py-2 shadow-md dark:shadow-sm dark:shadow-gray-700/50">
                   {(currentPage - 1) * ITEMS_PER_PAGE + idx + 1}
                 </td>
-                <td className="px-8 py-2 text-gray-700 dark:text-gray-300">{order.orderId?.orderId || order.orderId}</td>
-                <td className="px-8 py-2 text-gray-700 dark:text-gray-300">{order.customer?.name || order.userId?.name || "Unknown"}</td>
-                <td className="px-8 py-2 text-gray-700 dark:text-gray-300">{order.customer?.phone || order.userId?.phone || "N/A"}</td>
+                <td className="px-8 py-2 text-gray-700 dark:text-gray-300">
+                  {order.orderId?.orderId || order.orderId}
+                </td>
+                <td className="px-8 py-2 text-gray-700 dark:text-gray-300">
+                  {order.customer?.name || order.userId?.name || "Unknown"}
+                </td>
+                <td className="px-8 py-2 text-gray-700 dark:text-gray-300">
+                  {order.customer?.phone || order.userId?.phone || "N/A"}
+                </td>
                 <td className="px-8 py-2 text-gray-700 dark:text-gray-300">
                   {new Date(order.createdAt).toLocaleString()}
                 </td>
@@ -423,15 +444,16 @@ const NewOrders = () => {
                     return (
                       <div
                         key={s}
-                        className={`px-2 py-1 text-[10px] rounded font-semibold ${completed
-                          ? STATUS_COLORS[s]
-                          : "bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500"
-                          }`}
+                        className={`px-2 py-1 text-[10px] rounded font-semibold ${
+                          completed
+                            ? STATUS_COLORS[s]
+                            : "bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500"
+                        }`}
                         title={
                           order.timestamps?.[s]
                             ? `At: ${new Date(
-                              order.timestamps[s]
-                            ).toLocaleString()}`
+                                order.timestamps[s],
+                              ).toLocaleString()}`
                             : ""
                         }
                       >
@@ -443,15 +465,20 @@ const NewOrders = () => {
 
                 <td className="px-8 py-2">
                   <span
-                    className={`px-2 py-1 rounded text-[10px] font-semibold ${STATUS_COLORS[order.status]
-                      }`}
+                    className={`px-2 py-1 rounded text-[10px] font-semibold ${
+                      STATUS_COLORS[order.status]
+                    }`}
                   >
                     {order.status}
                   </span>
                 </td>
 
                 <td className="px-8 py-2 text-gray-700 dark:text-gray-300 font-bold">
-                  ₹{order.amount?.payable || order.amount?.total || order.price?.grandTotal || 0}
+                  ₹
+                  {order.amount?.payable ||
+                    order.amount?.total ||
+                    order.price?.grandTotal ||
+                    0}
                 </td>
 
                 <td className="px-8 py-2 text-gray-700 dark:text-gray-300">
@@ -459,17 +486,23 @@ const NewOrders = () => {
                     {(() => {
                       const type = order.payment?.type || order.type;
                       const method = order.payment?.method || order.method;
-                      return (type && method && type !== method) ? `${type} - ${method}` : (type || method || "N/A");
+                      return type && method && type !== method
+                        ? `${type} - ${method}`
+                        : type || method || "N/A";
                     })()}
                   </div>
                   <div
                     className={`text-[9px] font-bold ${
-                      (order.payment?.status === "PAID" || order.status === "PAID")
+                      order.payment?.status === "PAID" ||
+                      order.status === "PAID"
                         ? "text-green-600"
                         : "text-orange-500"
                     }`}
                   >
-                    {order.payment?.status || (['PAID', 'PENDING', 'FAILED'].includes(order.status) ? order.status : "PENDING")}
+                    {order.payment?.status ||
+                      (["PAID", "PENDING", "FAILED"].includes(order.status)
+                        ? order.status
+                        : "PENDING")}
                   </div>
                 </td>
 
@@ -505,7 +538,6 @@ const NewOrders = () => {
                   )}
                 </td>
 
-
                 {/* Actions */}
                 <td className="px-8 py-2 flex flex-col gap-1">
                   {order.status === "PLACED" && (
@@ -532,8 +564,13 @@ const NewOrders = () => {
                     <Button
                       size="sm"
                       variant="primary"
-                      disabled={loadingAction.id === (order.orderId?.orderId || order.orderId)}
-                      onClick={() => handlePrepare(order.orderId?.orderId || order.orderId)}
+                      disabled={
+                        loadingAction.id ===
+                        (order.orderId?.orderId || order.orderId)
+                      }
+                      onClick={() =>
+                        handlePrepare(order.orderId?.orderId || order.orderId)
+                      }
                     >
                       Prepare
                     </Button>
@@ -542,8 +579,13 @@ const NewOrders = () => {
                     <Button
                       size="sm"
                       variant="success"
-                      disabled={loadingAction.id === (order.orderId?.orderId || order.orderId)}
-                      onClick={() => handleReady(order.orderId?.orderId || order.orderId)}
+                      disabled={
+                        loadingAction.id ===
+                        (order.orderId?.orderId || order.orderId)
+                      }
+                      onClick={() =>
+                        handleReady(order.orderId?.orderId || order.orderId)
+                      }
                     >
                       Ready
                     </Button>
@@ -552,10 +594,14 @@ const NewOrders = () => {
                     <Button
                       size="sm"
                       variant="primary"
-                      disabled={loadingAction.id === (order.orderId?.orderId || order.orderId) && loadingAction.type === 'ASSIGN'}
+                      disabled={
+                        loadingAction.id ===
+                          (order.orderId?.orderId || order.orderId) &&
+                        loadingAction.type === "ASSIGN"
+                      }
                       onClick={() => {
                         partnersRefetch();
-                        handleAssign(order.orderId?.orderId || order.orderId)
+                        handleAssign(order.orderId?.orderId || order.orderId);
                       }}
                     >
                       Assign
@@ -590,10 +636,9 @@ const NewOrders = () => {
                 </td>
               </tr>
             )}
-    </tbody>
-  </table>
-</div>
-
+          </tbody>
+        </table>
+      </div>
 
       {/* Pagination */}
       {totalPages > 1 && (
@@ -771,7 +816,6 @@ const NewOrders = () => {
                   Subtotal
                 </span>
                 <span>₹{viewingInvoice.amount.subTotal}</span>
-
               </div>
 
               {viewingInvoice.amount.tax && (
@@ -781,10 +825,15 @@ const NewOrders = () => {
                 </div>
               )}
 
-              {(viewingInvoice.amount.deliveryCharge || viewingInvoice.amount.deliveryFee) && (
+              {(viewingInvoice.amount.deliveryCharge ||
+                viewingInvoice.amount.deliveryFee) && (
                 <div className="flex justify-between text-gray-600 dark:text-gray-400">
                   <span>Delivery</span>
-                  <span>₹{viewingInvoice.amount.deliveryCharge || viewingInvoice.amount.deliveryFee}</span>
+                  <span>
+                    ₹
+                    {viewingInvoice.amount.deliveryCharge ||
+                      viewingInvoice.amount.deliveryFee}
+                  </span>
                 </div>
               )}
             </div>
@@ -793,7 +842,10 @@ const NewOrders = () => {
             <div className="mt-3 flex justify-between text-lg font-bold">
               <span>Grand Total</span>
               <span className="text-red-500">
-                ₹{viewingInvoice.amount?.grandTotal || viewingInvoice.amount?.payable || 0}
+                ₹
+                {viewingInvoice.amount?.grandTotal ||
+                  viewingInvoice.amount?.payable ||
+                  0}
               </span>
             </div>
 
@@ -812,7 +864,6 @@ const NewOrders = () => {
                 Download PDF
               </button>
             </div>
-
           </div>
         </div>
       )}
