@@ -85,7 +85,7 @@ const Dashboard = () => {
 
   {/* Text */}
   <div className="flex flex-col gap-1">
-    <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-red-500 dark:text-white">
+    <h1 className="text-heading font-bold tracking-tight text-red-500 dark:text-white">
       Dashboard
     </h1>
 

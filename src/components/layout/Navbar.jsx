@@ -18,6 +18,7 @@ import {
   Mail,
 } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
+import ThemeCustomizer from "./ThemeCustomizer";
 import InputField from "../ui/InputField";
 import NotificationDropdown from "./NavbarCom/NotificationDropdown";
 import MessagesDropdown from "./NavbarCom/MessagesDropdown";
@@ -110,6 +111,7 @@ const Navbar = ({ toggleSidebar }) => {
 
         {/* RIGHT */}
         <div className="flex items-center gap-3">
+          <ThemeCustomizer />
           <ThemeToggle />
 
           <div ref={notificationRef} className="relative">
@@ -287,8 +289,8 @@ const ActionItem = ({ icon, label, description, danger, onClick }) => (
     <div className="flex-1">
       <p
         className={`text-sm font-medium ${danger
-            ? "text-red-600 dark:text-red-400"
-            : "text-gray-700 dark:text-gray-200 group-hover:text-gray-900 dark:group-hover:text-white"
+          ? "text-red-600 dark:text-red-400"
+          : "text-gray-700 dark:text-gray-200 group-hover:text-gray-900 dark:group-hover:text-white"
           }`}
       >
         {label}

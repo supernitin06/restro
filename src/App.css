@@ -11,7 +11,8 @@
     --text-main: #000000;
     --text-muted: #6b7280;
     --text-sidebar: #ffffff;
-
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: 600;
     --primary: #f91616;
 
 
@@ -38,7 +39,8 @@
     --text-muted: #9ca3af;
     --text-sidebar: #f9fafb;
 
-
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
     --primary: #f91616;
 
     --primary-hover: #ea0c0c;
@@ -294,7 +296,7 @@ a {
     letter-spacing: -0.02em;
     /* tracking-tight */
     /* Gradient text */
-    background: linear-gradient(to right, #d01313, #ed3a3a);
+    background: linear-gradient(to right, var(--primary), var(--primary-hover));
     /* indigo-600 → violet-600 */
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
