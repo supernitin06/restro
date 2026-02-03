@@ -13,6 +13,7 @@ const SettingsTabs = ({ activeTab, setActiveTab }) => {
 
     // ✅ NEW BANNER TAB
     { key: "banners", label: "Banners" },
+    { key: "appearance", label: "Appearance" }, // ✅ NEW APPEARANCE TAB
 
     // { key: "delivery", label: "Delivery" },
     { key: "tax", label: "Tax" },
@@ -42,9 +43,8 @@ const SettingsTabs = ({ activeTab, setActiveTab }) => {
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`btn ${
-              activeTab === tab.key ? "btn-primary" : "btn-ghost"
-            }`}
+            className={`btn ${activeTab === tab.key ? "btn-primary" : "btn-ghost"
+              }`}
           >
             {tab.label}
           </button>

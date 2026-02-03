@@ -9,11 +9,6 @@ import {
   Bike,
   ShoppingBag,
   CreditCard,
-  ChevronLeft,
-  ChevronRight,
-  Receipt,
-  RefreshCw,
-  FileText,
   ChevronDown,
   UserPlus,
   Shield,
@@ -21,14 +16,129 @@ import {
   Circle,
   Menu,
   X,
-
   Clock,
-  CheckCircle,
   MessageSquare,
+  GripVertical,
+  Receipt,
+  RefreshCw,
+  FileText
 } from "lucide-react";
 import { FiClock } from "react-icons/fi";
-import Button from "../ui/Button";
+import { useTheme } from "../../context/ThemeContext";
+
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+
 import "./sidebar.css";
+
+// Draggable Item Wrapper
+const DraggableMenuItem = ({ item, isCollapsed, isActive, isExpanded, handleMenuClick, navigate, location, setIsMobileOpen }) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging
+  } = useSortable({ id: item.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 50 : "auto",
+    position: "relative",
+    opacity: isDragging ? 0.8 : 1
+  };
+
+  const Icon = item.icon;
+
+  return (
+    <div ref={setNodeRef} style={style} className="mb-1 group relative">
+      <div className="flex items-center">
+        {/* Main Item Content (Clickable for navigation) */}
+        <div
+          onClick={() => handleMenuClick(item)}
+          className={`flex-1 flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer transition border-l-4
+            ${isActive ? "sidebar-item-active border-white" : "text-sidebar hover:bg-white/10 border-transparent hover:border-white"}
+            ${isCollapsed ? "justify-center" : ""}
+          `}
+        >
+          <div className="flex items-center gap-3">
+            <Icon className="w-5 h-5" />
+            {!isCollapsed && <span>{item.label}</span>}
+          </div>
+
+          {!isCollapsed && item.hasDropdown && (
+            <ChevronDown
+              className={`w-4 h-4 transition ${isExpanded ? "rotate-180" : ""}`}
+            />
+          )}
+        </div>
+
+        {/* Drag Handle (Only visible when not collapsed and on hover) */}
+        {!isCollapsed && (
+          <div
+            {...attributes}
+            {...listeners}
+            className="opacity-0 group-hover:opacity-100 cursor-grab active:cursor-grabbing p-2 text-sidebar/50 hover:text-white transition-opacity"
+          >
+            <GripVertical size={16} />
+          </div>
+        )}
+      </div>
+
+      {/* Dropdown (Not sortable within itself for now) */}
+      {item.hasDropdown && !isCollapsed && (
+        <div
+          className={`
+            overflow-hidden transition-all duration-400 ml-4
+            ${isExpanded ? "max-h-96 mt-2" : "max-h-0"}
+          `}
+        >
+          {item.subItems.map((sub) => {
+            const SubIcon = sub.icon || Circle;
+            const isSubActive = location.pathname === sub.path;
+
+            return (
+              <div
+                key={sub.id}
+                onClick={() => {
+                  navigate(sub.path);
+                  setIsMobileOpen(false);
+                }}
+                className={`
+                  flex items-center gap-3 px-3 py-2 rounded-lg text-sm cursor-pointer
+                  transition-all duration-200
+                  ${isSubActive
+                    ? "bg-primary/20 text-white scale-105 font-semibold translate-x-4"
+                    : "text-sidebar/70 hover:bg-white/10 hover:translate-x-2"
+                  }
+                `}
+              >
+                <SubIcon className="w-4 h-4" />
+                <span>{sub.label}</span>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const Sidebar = ({ theme = "dark" }) => {
   const navigate = useNavigate();
@@ -39,53 +149,25 @@ const Sidebar = ({ theme = "dark" }) => {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
+  // Theme Context for sorting
+  const { sidebarOrder, setSidebarOrder } = useTheme();
+
   /* ---------------- Menu config ---------------- */
-  const menuItems = [
-    {
-      id: "dashboard",
-      label: "Dashboard",
-      icon: LayoutDashboard,
-      path: "/",
-    },
-    {
-      id: "users",
-      label: "Users",
-      icon: Users,
-      path: "/users",
-    },
-    {
-      id: "restaurants",
-      label: "Restaurants",
-      icon: UtensilsCrossed,
-      path: "/restaurants",
-    },
-    {
-      id: "delivery-settings",
-      label: "Delivery Settings",
-      icon: Truck,
-      path: "/delivery-settings",
-    },
+  const baseMenuItems = [
+    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/" },
+    { id: "users", label: "Users", icon: Users, path: "/users" },
+    { id: "restaurants", label: "Restaurants", icon: UtensilsCrossed, path: "/restaurants" },
+    { id: "delivery-settings", label: "Delivery Settings", icon: Truck, path: "/delivery-settings" },
     {
       id: "delivery-partners",
       label: "Delivery Partners",
       icon: Bike,
       hasDropdown: true,
       subItems: [
-        {
-          id: "all-partners",
-          label: "Manage Partners",
-          path: "/delivery-partners", // your existing approved partners page
-          icon: Bike,
-        },
-        {
-          id: "pending-partners",
-          label: "Pending Approvals",
-          path: "/pending-delivery-partners", // new pending partners page
-          icon: Clock, // or any other icon
-        },
+        { id: "all-partners", label: "Manage Partners", path: "/delivery-partners", icon: Bike },
+        { id: "pending-partners", label: "Pending Approvals", path: "/pending-delivery-partners", icon: Clock },
       ],
     },
-
     {
       id: "orders",
       label: "Orders",
@@ -93,79 +175,29 @@ const Sidebar = ({ theme = "dark" }) => {
       icon: ShoppingBag,
       hasDropdown: true,
       subItems: [
-        {
-          id: "new-orders",
-          label: "Order Management",
-          icon: FiClock,
-          path: "/orders/new",
-        },
-        // {
-        //   id: "processing-orders",
-        //   label: "Processing Orders",
-        //   icon: Bike,
-        //   path: "/orders/processing",
-        // },
-        // {
-        //   id: "accepted-orders",
-        //   label: "Accepted Orders",
-        //   icon: CheckCircle,
-        //   path: "/orders/accepted",
-        // }
+        { id: "new-orders", label: "Order Management", icon: FiClock, path: "/orders/new" },
       ],
     },
-
     {
       id: "menu_items",
       label: "Menu",
       icon: UtensilsCrossed,
       hasDropdown: true,
       subItems: [
-        {
-          id: "menu-management",
-          label: "Menu Management",
-          icon: UtensilsCrossed,
-          path: "/menu-management"
-        },
-        {
-          id: "add-menu",
-          label: "Add Menu",
-          icon: UtensilsCrossed,
-          path: "/menu-management/add"
-        }
+        { id: "menu-management", label: "Menu Management", icon: UtensilsCrossed, path: "/menu-management" },
+        { id: "add-menu", label: "Add Menu", icon: UtensilsCrossed, path: "/menu-management/add" }
       ]
-
     },
-   
     {
       id: "payments",
       label: "Payments",
       icon: CreditCard,
       hasDropdown: true,
       subItems: [
-        {
-          id: "pay-dashboard",
-          label: "Dashboard",
-          path: "/payments/dashboard",
-          icon: LayoutDashboard,
-        },
-        {
-          id: "transactions",
-          label: "Transactions",
-          path: "/payments/transactions",
-          icon: Receipt,
-        },
-        {
-          id: "refunds",
-          label: "Refunds",
-          path: "/payments/refunds",
-          icon: RefreshCw,
-        },
-        {
-          id: "invoice",
-          label: "Invoice",
-          path: "/payments/invoice",
-          icon: FileText,
-        },
+        { id: "pay-dashboard", label: "Dashboard", path: "/payments/dashboard", icon: LayoutDashboard },
+        { id: "transactions", label: "Transactions", path: "/payments/transactions", icon: Receipt },
+        { id: "refunds", label: "Refunds", path: "/payments/refunds", icon: RefreshCw },
+        { id: "invoice", label: "Invoice", path: "/payments/invoice", icon: FileText },
       ],
     },
     {
@@ -175,63 +207,40 @@ const Sidebar = ({ theme = "dark" }) => {
       path: "/sub-admin",
       hasDropdown: true,
       subItems: [
-        {
-          id: "create-sub-admin",
-          label: "Create SubAdmin",
-          path: "/sub-admin/create",
-          icon: UserPlus,
-        },
-        {
-          id: "assign-sub-admin",
-          label: "Assign SubAdmin",
-          path: "/sub-admin/assign",
-          icon: Shield,
-        },
+        { id: "create-sub-admin", label: "Create SubAdmin", path: "/sub-admin/create", icon: UserPlus },
+        { id: "assign-sub-admin", label: "Assign SubAdmin", path: "/sub-admin/assign", icon: Shield },
       ],
     },
-     {
-      id: "offers",
-      label: "Offers",
-      icon: FaCog,
-      path: "/offers",
-    },
-    {
-      id: "reviews",
-      label: "Reviews",
-      icon: MessageSquare,
-      path: "/reviews",
-    },
-    // {
-    //   id: "support",
-    //   label: "Support & Tickets",
-    //   icon: Shield,
-    //   path: "/support-tickets",
-
-    // },
-    {
-      id: "settings",
-      label: "Settings",
-      icon: FaCog,
-      path: "/settings",
-    },
-
+    { id: "offers", label: "Offers", icon: FaCog, path: "/offers" },
+    { id: "reviews", label: "Reviews", icon: MessageSquare, path: "/reviews" },
+    { id: "settings", label: "Settings", icon: FaCog, path: "/settings" },
   ];
 
-  /* ---------------- Sync active route ---------------- */
+  /* ---------------- Sync & Sort ---------------- */
+  const menuItems = React.useMemo(() => {
+    if (!sidebarOrder || sidebarOrder.length === 0) return baseMenuItems;
+    const sorted = [];
+    const itemMap = new Map(baseMenuItems.map((item) => [item.id, item]));
+    sidebarOrder.forEach((id) => {
+      if (itemMap.has(id)) {
+        sorted.push(itemMap.get(id));
+        itemMap.delete(id);
+      }
+    });
+    itemMap.forEach((item) => sorted.push(item));
+    return sorted;
+  }, [sidebarOrder]);
+
   useEffect(() => {
     const current = location.pathname;
-
     for (const item of menuItems) {
       if (item.path === current) {
         setActiveMenu(item.id);
         setExpandedMenu(item.hasDropdown ? item.id : null);
         return;
       }
-
       if (item.hasDropdown) {
-        const sub = item.subItems.find((s) =>
-          current.startsWith(s.path)
-        );
+        const sub = item.subItems.find((s) => current.startsWith(s.path));
         if (sub) {
           setActiveMenu(item.id);
           setExpandedMenu(item.id);
@@ -255,6 +264,22 @@ const Sidebar = ({ theme = "dark" }) => {
     }
   };
 
+  // DnD Sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }), // Requires slight move to drag
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    if (active.id !== over.id) {
+      const oldIndex = sidebarOrder.indexOf(active.id);
+      const newIndex = sidebarOrder.indexOf(over.id);
+      const newOrder = arrayMove(sidebarOrder, oldIndex, newIndex);
+      setSidebarOrder(newOrder);
+    }
+  };
+
   return (
     <>
       {/* Mobile Toggle Button */}
@@ -274,7 +299,7 @@ const Sidebar = ({ theme = "dark" }) => {
         />
       )}
 
-      <div className={` h-screen sidebar-wrapper`}>
+      <div className={`h-screen sidebar-wrapper`}>
         <div
           className={`
             fixed lg:static top-0 left-0 z-[100] h-full bg-sidebar border-r border-sidebar
@@ -302,21 +327,10 @@ const Sidebar = ({ theme = "dark" }) => {
             <button
               onClick={() => setIsCollapsed(!isCollapsed)}
               className={`hidden ${isCollapsed ? "hidden" : "lg:flex"} absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 items-center justify-center z-[101] border border-sidebar rounded-full shadow-md text-sidebar transition-transform duration-200 hover:scale-110`}>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d={isCollapsed ? "m9 18 6-6-6-6" : "m15 18-6-6 6-6"} />
               </svg>
             </button>
-
 
             {/* Mobile Close Button */}
             {isMobileOpen && !isCollapsed && (
@@ -330,76 +344,32 @@ const Sidebar = ({ theme = "dark" }) => {
             )}
           </div>
 
-          {/* ---------- Menu ---------- */}
-          <nav className="py-4 px-3 overflow-y-auto sidebar-scroll h-[calc(100vh-90px)] overflow-hidden">
-            {menuItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = activeMenu === item.id;
-              const isExpanded = expandedMenu === item.id;
-
-              return (
-                <div key={item.id} className="mb-1">
-
-                  {/* Main Item */}
-                  <div
-                    onClick={() => handleMenuClick(item)}
-                    className={`flex items-center  justify-between px-4 py-3 rounded-xl cursor-pointer transition border-l-4
-                    ${isActive ? "sidebar-item-active border-white" : "text-sidebar hover:bg-white/10 border-transparent hover:border-white"}
-                    ${isCollapsed ? "justify-center" : ""}
-                  `}
-                  >
-                    <div className="flex items-center gap-3">
-                      <Icon className="w-5 h-5" />
-                      {!isCollapsed && <span>{item.label}</span>}
-                    </div>
-
-                    {!isCollapsed && item.hasDropdown && (
-                      <ChevronDown
-                        className={`w-4 h-4 transition ${isExpanded ? "rotate-180" : ""
-                          }`}
-                      />
-                    )}
-                  </div>
-
-                  {/* Dropdown */}
-                  {item.hasDropdown && !isCollapsed && (
-                    <div
-                      className={`
-                      overflow-hidden transition-all duration-400 ml-4
-                      ${isExpanded ? "max-h-96 mt-2" : "max-h-0"}
-                    `}
-                    >
-                      {item.subItems.map((sub) => {
-                        const SubIcon = sub.icon || Circle;
-                        const isSubActive =
-                          location.pathname === sub.path;
-
-                        return (
-                          <div
-                            key={sub.id}
-                            onClick={() => {
-                              navigate(sub.path);
-                              setIsMobileOpen(false);
-                            }}
-                            className={`
-                            flex items-center gap-3 px-3 py-2 rounded-lg text-sm cursor-pointer
-                            transition-all duration-200
-                            ${isSubActive
-                                ? "bg-primary/20 text-white scale-105 font-semibold translate-x-4"
-                                : "text-sidebar/70 hover:bg-white/10 hover:translate-x-2"
-                              }
-                          `}
-                          >
-                            <SubIcon className="w-4 h-4" />
-                            <span>{sub.label}</span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+          {/* ---------- Menu (Sortable) ---------- */}
+          <nav className="py-4 px-3 overflow-y-auto sidebar-scroll h-[calc(100vh-120px)] overflow-hidden">
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={menuItems.map(i => i.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                {menuItems.map((item) => (
+                  <DraggableMenuItem
+                    key={item.id}
+                    item={item}
+                    isCollapsed={isCollapsed}
+                    isActive={activeMenu === item.id}
+                    isExpanded={expandedMenu === item.id}
+                    handleMenuClick={handleMenuClick}
+                    navigate={navigate}
+                    location={location}
+                    setIsMobileOpen={setIsMobileOpen}
+                  />
+                ))}
+              </SortableContext>
+            </DndContext>
           </nav>
         </div>
       </div>

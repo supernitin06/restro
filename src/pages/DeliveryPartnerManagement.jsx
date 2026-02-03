@@ -27,55 +27,11 @@ const DeliveryPartnerManagement = () => {
   const itemsPerPage = 10;
 
   // Sync API data to local state
-useEffect(() => {
-  if (apiResponse?.success && apiResponse?.data) {
-    const normalizedData = apiResponse.data.map((p) => {
-
-      // 🔹 Full address in one line
-      const fullAddress = p.address
-        ? [
-            p.address.street,
-            p.address.area,
-            p.address.city,
-            p.address.state,
-            p.address.zipCode
-          ]
-          .filter(Boolean)        // undefined/null ko remove kare
-          .join(", ")             // sabko comma se join kare
-        : "N/A";
-
-      return {
-        partnerId: p._id,
-        listView: {
-          name: p.name || "N/A",
-          phone: p.phone || "N/A",
-          fullAddress,            // ✅ ab pura address ek line me
-          status: p.isActive ? "Active" : "Inactive",
-          approvalStatus: p.isApproved ? "Approved" : "Pending",
-          assignedOrdersCount: p.totalOrders || 0,
-          vehicleType: p.vehicle?.type || "N/A",
-          vehicleNumber: p.vehicle?.number || "N/A",
-          kycStatus: p.kyc?.status || "PENDING",
-          isOnline: p.isOnline ?? false,
-        },
-
-        registrationData: {
-          name: p.name,
-          mobileNumber: p.phone,
-          email: p.email || "",
-          cityArea: fullAddress,   // yahan bhi full address use ho sakta
-          vehicleType: p.vehicleType,
-          image: p.profileImage,
-        },
-        orderHistory: [],
-      };
-    });
-
-    setPartners(normalizedData);
-  }
-}, [apiResponse]);
-
-
+  useEffect(() => {
+    if (apiResponse?.success && apiResponse?.data) {
+      setPartners(apiResponse.data);
+    }
+  }, [apiResponse]);
 
   // Persist view mode
   useEffect(() => {
@@ -85,15 +41,28 @@ useEffect(() => {
   // Filter partners based on search, status, and approval
   useEffect(() => {
     let filtered = partners.filter((p) =>
-      p.listView.name.toLowerCase().includes(searchTerm.toLowerCase())
+      (p.name || "").toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     if (statusFilter !== "All") {
-      filtered = filtered.filter((p) => p.listView.status === statusFilter);
+      filtered = filtered.filter((p) => {
+        const isActive = p.isActive; // boolean
+        const calculatedStatus = isActive ? "Active" : "Inactive";
+        // If filter is "Active", we want isActive=true.
+        return calculatedStatus === statusFilter;
+      });
     }
 
     if (approvalFilter !== "All") {
-      filtered = filtered.filter((p) => p.listView.approvalStatus === approvalFilter);
+      // Assuming isApproved is the flag. If not in raw data, check kyc.status?
+      // Raw data provided has 'kyc.status'. JSON doesn't show explicit 'isApproved'.
+      // Based on previous code: `approvalStatus: p.isApproved ? "Approved" : "Pending"`
+      // If raw data lacks isApproved, this filter might break or need adjustment.
+      // Let's assume isApproved exists or map from kyc.status.
+      // JSON example: "kyc": { "status": "VERIFIED" }.
+      // Let's use KYC status for approval filter if isApproved is missing.
+      const approvalStatus = p.isApproved ? "Approved" : (p.kyc?.status === "VERIFIED" ? "Approved" : "Pending");
+      return approvalStatus === approvalFilter;
     }
 
     setFilteredPartners(filtered);
@@ -103,9 +72,9 @@ useEffect(() => {
   // Partner counts
   const partnerCounts = useMemo(() => ({
     all: partners.length,
-    active: partners.filter((p) => p.listView.status === "Active").length,
-    inactive: partners.filter((p) => p.listView.status === "Inactive").length,
-    pending: partners.filter((p) => p.listView.approvalStatus === "Pending").length,
+    active: partners.filter((p) => p.isActive).length,
+    inactive: partners.filter((p) => !p.isActive).length,
+    pending: partners.filter((p) => !p.isApproved && p.kyc?.status !== "VERIFIED").length,
   }), [partners]);
 
   // Pagination
@@ -142,11 +111,11 @@ useEffect(() => {
   // Update Partner in state
   const updatePartner = (updatedPartner) => {
     const updatedList = partners.map((p) =>
-      p.partnerId === updatedPartner.partnerId ? updatedPartner : p
+      (p._id || p.partnerId) === (updatedPartner._id || updatedPartner.partnerId) ? updatedPartner : p
     );
     setPartners(updatedList);
     setFilteredPartners(updatedList);
-    if (selectedPartner?.partnerId === updatedPartner.partnerId) {
+    if ((selectedPartner?._id || selectedPartner?.partnerId) === (updatedPartner._id || updatedPartner.partnerId)) {
       setSelectedPartner(updatedPartner);
     }
   };
@@ -154,11 +123,14 @@ useEffect(() => {
   // Approve / Reject Partner
   const handleApprove = async (partner) => {
     try {
-      const response = await approvePartnerApi(partner.partnerId);
+      const id = partner._id || partner.partnerId;
+      const response = await approvePartnerApi(id);
       if (response.success) {
         updatePartner({
           ...partner,
-          listView: { ...partner.listView, approvalStatus: "Approved", status: "Active" },
+          isActive: true,
+          isApproved: true,
+          kyc: { ...partner.kyc, status: "VERIFIED" }
         });
         toast.success("Partner approved successfully");
         closeModal();
@@ -170,11 +142,14 @@ useEffect(() => {
 
   const handleReject = async (partner) => {
     try {
-      const response = await rejectPartnerApi(partner.partnerId);
+      const id = partner._id || partner.partnerId;
+      const response = await rejectPartnerApi(id);
       if (response.success) {
         updatePartner({
           ...partner,
-          listView: { ...partner.listView, approvalStatus: "Rejected", status: "Inactive" },
+          isActive: false,
+          isApproved: false,
+          kyc: { ...partner.kyc, status: "REJECTED" }
         });
         toast.error("Partner rejected");
         closeModal();

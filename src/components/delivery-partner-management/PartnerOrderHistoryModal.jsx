@@ -131,34 +131,57 @@ const PartnerOrderHistoryModal = ({ partnerId, onClose }) => {
                                         </Button>
                                     </div>
 
-                                    {/* Pickup/Dropoff - Only show if data exists */}
-                                    {((order.restaurant && typeof order.restaurant === 'object') || order.deliveryAddress) && (
-                                        <div className="mt-4 pt-4 border-t border-gray-50 dark:border-gray-800 flex flex-col md:flex-row gap-6 text-sm">
-                                            {order.restaurant && typeof order.restaurant === 'object' && (
-                                                <div className="flex gap-2">
-                                                    <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5" />
-                                                    <div>
-                                                        <p className="text-xs text-gray-500 uppercase font-semibold">Pickup</p>
-                                                        <p className="text-gray-700 dark:text-gray-300 font-medium truncate max-w-[200px]">{order.restaurant.name || "Restaurant"}</p>
-                                                        <p className="text-gray-500 text-xs truncate max-w-[200px]">{order.restaurant.address?.street || ""}</p>
-                                                    </div>
-                                                </div>
-                                            )}
-                                            {order.deliveryAddress && (
-                                                <div className="flex gap-2">
-                                                    <div className="w-1.5 h-1.5 rounded-full bg-green-500 mt-1.5" />
-                                                    <div>
-                                                        <p className="text-xs text-gray-500 uppercase font-semibold">Dropoff</p>
-                                                        <p className="text-gray-700 dark:text-gray-300 font-medium truncate max-w-[200px]">{order.deliveryAddress.name || "Customer"}</p>
-                                                        <p className="text-gray-500 text-xs truncate max-w-[200px]">
-                                                            {order.deliveryAddress.addressLine ? order.deliveryAddress.addressLine : order.deliveryAddress.addressLine1}
-                                                            {order.deliveryAddress.city ? `, ${order.deliveryAddress.city}` : ''}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            )}
+                                    {/* Order Items Summary */}
+                                    <div className="mt-3 py-2 border-t border-b border-gray-50 dark:border-gray-800">
+                                        <p className="text-xs text-gray-500 mb-1">Items</p>
+                                        <div className="flex flex-wrap gap-2">
+                                            {order.items?.map((item, i) => (
+                                                <span key={i} className="text-xs font-medium px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-gray-700 dark:text-gray-300">
+                                                    {item.quantity} x {item.name}
+                                                </span>
+                                            ))}
+                                            {(!order.items || order.items.length === 0) && <span className="text-xs text-gray-400">No items listed</span>}
                                         </div>
-                                    )}
+                                    </div>
+
+                                    {/* Pickup/Dropoff & Payment */}
+                                    <div className="mt-3 flex flex-col md:flex-row gap-6 text-sm">
+
+                                        {/* Dropoff (Customer) */}
+                                        {order.deliveryAddress && (
+                                            <div className="flex gap-2 min-w-[200px]">
+                                                <div className="min-w-[6px] w-1.5 h-1.5 rounded-full bg-green-500 mt-1.5" />
+                                                <div>
+                                                    <p className="text-xs text-gray-500 uppercase font-semibold">Deliver To</p>
+                                                    <p className="text-gray-700 dark:text-gray-300 font-medium truncate max-w-[200px]">{order.deliveryAddress.name || order.customer?.name || "Customer"}</p>
+                                                    <p className="text-gray-500 text-xs truncate max-w-[200px]">
+                                                        {order.deliveryAddress.addressLine || order.deliveryAddress.addressLine1 || ""}
+                                                        {order.deliveryAddress.city ? `, ${order.deliveryAddress.city}` : ''}
+                                                    </p>
+                                                    <p className="text-gray-400 text-[10px] mt-0.5">
+                                                        {order.deliveryAddress.phone || order.customer?.phone}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Payment Info */}
+                                        <div className="flex gap-2">
+                                            <div className="min-w-[6px] w-1.5 h-1.5 rounded-full bg-purple-500 mt-1.5" />
+                                            <div>
+                                                <p className="text-xs text-gray-500 uppercase font-semibold">Payment</p>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-gray-700 dark:text-gray-300 font-medium text-xs">
+                                                        {order.payment?.type || "COD"}
+                                                    </span>
+                                                    <span className={`text-[10px] px-1.5 py-0.5 rounded ${order.payment?.status === 'PAID' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                                                        }`}>
+                                                        {order.payment?.status || "PENDING"}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             ))}
                         </div>

@@ -53,12 +53,80 @@ export const ThemeProvider = ({ children }) => {
     localStorage.setItem('primaryColor', primaryColor);
   }, [primaryColor]);
 
+  const [fontFamily, setFontFamily] = useState(() => {
+    return localStorage.getItem('fontFamily') || "'Poppins', sans-serif";
+  });
+
+  const [fontSize, setFontSize] = useState(() => {
+    return parseInt(localStorage.getItem('fontSize')) || 16;
+  });
+
+  const [fontWeight, setFontWeight] = useState(() => {
+    return parseInt(localStorage.getItem('fontWeight')) || 400;
+  });
+
+  const [notificationSound, setNotificationSound] = useState(() => {
+    return localStorage.getItem('notificationSound') || 'sound1';
+  });
+
+  const [sidebarOrder, setSidebarOrder] = useState(() => {
+    const saved = localStorage.getItem('sidebarOrder');
+    return saved ? JSON.parse(saved) : [
+      "dashboard", "users", "restaurants", "delivery-settings",
+      "delivery-partners", "orders", "menu_items", "payments",
+      "sub-admin", "offers", "reviews", "settings"
+    ];
+  });
+
+  const [sidebarBackgroundColor, setSidebarBackgroundColor] = useState(() => {
+    return localStorage.getItem('sidebarBackgroundColor') || '#0f5474';
+  });
+
+  useEffect(() => {
+    const root = window.document.documentElement;
+    root.style.setProperty('--font-family', fontFamily);
+    root.style.setProperty('--font-size', `${fontSize}px`);
+    root.style.setProperty('--font-weight', fontWeight);
+
+    // Also update body directly to ensure immediate effect
+    document.body.style.fontFamily = fontFamily;
+    document.body.style.fontSize = `${fontSize}px`;
+    document.body.style.fontWeight = fontWeight;
+
+    localStorage.setItem('fontFamily', fontFamily);
+    localStorage.setItem('fontSize', fontSize);
+    localStorage.setItem('fontWeight', fontWeight);
+  }, [fontFamily, fontSize, fontWeight]);
+
+  useEffect(() => {
+    const root = window.document.documentElement;
+    root.style.setProperty('--bg-sidebar', sidebarBackgroundColor);
+    localStorage.setItem('sidebarBackgroundColor', sidebarBackgroundColor);
+  }, [sidebarBackgroundColor]);
+
+  useEffect(() => {
+    localStorage.setItem('notificationSound', notificationSound);
+  }, [notificationSound]);
+
+  useEffect(() => {
+    localStorage.setItem('sidebarOrder', JSON.stringify(sidebarOrder));
+  }, [sidebarOrder]);
+
   const toggleTheme = () => {
     setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
   };
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, primaryColor, setPrimaryColor }}>
+    <ThemeContext.Provider value={{
+      theme, toggleTheme,
+      primaryColor, setPrimaryColor,
+      fontFamily, setFontFamily,
+      fontSize, setFontSize,
+      fontWeight, setFontWeight,
+      notificationSound, setNotificationSound,
+      sidebarOrder, setSidebarOrder,
+      sidebarBackgroundColor, setSidebarBackgroundColor
+    }}>
       {children}
     </ThemeContext.Provider>
   );

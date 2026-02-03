@@ -11,8 +11,9 @@
     --text-main: #000000;
     --text-muted: #6b7280;
     --text-sidebar: #ffffff;
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    font-weight: 600;
+    font-family: var(--font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif);
+    font-size: var(--font-size, 16px);
+    font-weight: var(--font-weight, 600);
     --primary: #f91616;
 
 
@@ -39,8 +40,9 @@
     --text-muted: #9ca3af;
     --text-sidebar: #f9fafb;
 
-    font-family: 'Poppins', sans-serif;
-    font-weight: 600;
+    font-family: var(--font-family, 'Poppins', sans-serif);
+    font-size: var(--font-size, 16px);
+    font-weight: var(--font-weight, 600);
     --primary: #f91616;
 
     --primary-hover: #ea0c0c;

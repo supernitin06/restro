@@ -50,10 +50,14 @@ const DeliveryPartnerDetailsModal = ({
   } = listView;
 
   const toggleStatus = () => {
-    const newStatus = status === "Active" ? "Inactive" : "Active";
+    const isActive = partner.isActive ?? listView.isAccountActive;
+    const newIsActive = !isActive;
+    const newStatus = newIsActive ? "Active" : "Inactive";
+
     updatePartner({
       ...partner,
-      listView: { ...listView, status: newStatus },
+      isActive: newIsActive,
+      listView: { ...listView, status: newStatus, isAccountActive: newIsActive },
     });
   };
 
@@ -118,9 +122,8 @@ const DeliveryPartnerDetailsModal = ({
               <Detail
                 icon={vehicleType === "BIKE" ? Bike : Truck}
                 label="Vehicle"
-                value={`${vehicleType || regVehicleType || "N/A"} ${
-                  vehicleNumber ? `(${vehicleNumber})` : ""
-                }`}
+                value={`${vehicleType || regVehicleType || "N/A"} ${vehicleNumber ? `(${vehicleNumber})` : ""
+                  }`}
               />
 
               <Detail
@@ -172,11 +175,10 @@ const DeliveryPartnerDetailsModal = ({
                         </p>
 
                         <span
-                          className={`text-xs px-2 py-0.5 rounded-full ${
-                            doc.status === "VERIFIED"
+                          className={`text-xs px-2 py-0.5 rounded-full ${doc.status === "VERIFIED"
                               ? "bg-green-100 text-green-700"
                               : "bg-yellow-100 text-yellow-700"
-                          }`}
+                            }`}
                         >
                           {doc.status}
                         </span>

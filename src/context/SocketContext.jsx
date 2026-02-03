@@ -3,11 +3,40 @@ import { mainSocket } from "../socket/mainSocket";
 import { ordersSocket } from "../socket/ordersSocket";
 import { restaurantSocket } from "../socket/restaurantSocket";
 import toast from "react-hot-toast";
+import { useTheme } from "./ThemeContext";
+import { SOUNDS } from "../constants/sounds";
 
 const SocketContext = createContext(null);
 
 export const SocketProvider = ({ children, authToken, restaurantId }) => {
   console.log(" SocketProvider render", { authToken, restaurantId });
+
+  // Access notification sound preference
+  const { notificationSound } = useTheme();
+
+  // Ref to hold the current notification sound ID (to avoid stale closures in socket listeners)
+  const notificationSoundRef = useRef(notificationSound);
+
+  useEffect(() => {
+    notificationSoundRef.current = notificationSound;
+  }, [notificationSound]);
+
+  // Helper to play the selected sound
+  const playNotificationSound = () => {
+    try {
+      const currentSoundId = notificationSoundRef.current;
+      if (!currentSoundId) return;
+
+      const soundObj = SOUNDS.find(s => s.id === currentSoundId);
+      if (soundObj && soundObj.url) {
+        const audio = new Audio(soundObj.url);
+        audio.volume = 0.5;
+        audio.play().catch(e => console.error("Error playing notification sound:", e));
+      }
+    } catch (error) {
+      console.error("Audio playback failed", error);
+    }
+  };
 
   const [newOrders, setNewOrders] = React.useState(() => {
     try {
@@ -182,7 +211,7 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
         ];
       });
 
-
+      playNotificationSound(); // Play sound
       toast.success(`New Order #${newOrder.orderId} received!`);
     };
 
@@ -218,6 +247,7 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
 
       console.log(" Extracted User Name:", userName);
 
+      playNotificationSound(); // Play sound
       toast.success(`${userName} has registered!`);
 
       setNotifications((prev) => [
@@ -280,6 +310,7 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
 
       console.log(" Extracted Delivery Partner:", partnerName);
 
+      playNotificationSound(); // Play sound
       toast.success(`Order #${orderId} picked up by ${partnerName}`);
 
       setNotifications((prev) => [
@@ -339,6 +370,7 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
 
       console.log(" Extracted Delivered By:", deliveredBy);
 
+      playNotificationSound(); // Play sound
       toast.success(`Order #${orderId} delivered by ${deliveredBy}`);
 
       setNotifications((prev) => [
@@ -377,6 +409,7 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
       const orderId = data?.orderId || "Unknown Order";
       const amount = data?.amount ? `₹${data.amount}` : "";
 
+      playNotificationSound(); // Play sound
       toast('Refund Request Received', {
         icon: '💸',
         duration: 5000,
@@ -408,6 +441,7 @@ export const SocketProvider = ({ children, authToken, restaurantId }) => {
       const orderId = data?.orderId || "Unknown Order";
       const comment = data?.comment || data?.ratingdocs?.comment || "No comment";
 
+      playNotificationSound(); // Play sound
       toast.success(`New Review for Order #${orderId}: "${comment}"`, {
         duration: 5000,
         icon: '⭐'

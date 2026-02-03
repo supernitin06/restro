@@ -231,7 +231,7 @@ const DistanceRules = () => {
                         <button
                             onClick={handleSave}
                             disabled={isLoading}
-                            className="w-full py-3 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl shadow-lg shadow-teal-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full py-3 btn-primary  font-bold rounded-xl shadow-lg shadow-teal-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {isLoading ? "Saving..." : "Save Changes"}
                         </button>

@@ -15,6 +15,8 @@ import Notifications from "./Notifications";
 // ✅ BANNER IMPORT
 import Banners from "./Banners";
 
+import Appearance from "./Appearance"; // ✅ NEW IMPORT
+
 const Settings = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const tab = searchParams.get("tab") || "general";
@@ -43,6 +45,9 @@ const Settings = () => {
 
         {/* ✅ BANNER TAB */}
         {tab === "banners" && <Banners />}
+
+        {/* ✅ APPEARANCE TAB */}
+        {tab === "appearance" && <Appearance />}
 
         {tab === "delivery" && <Delivery />}
         {tab === "tax" && <Tax />}
