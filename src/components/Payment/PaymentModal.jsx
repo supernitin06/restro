@@ -1,10 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
-import InputField from '../ui/InputField';
 import {
   FaUser,
   FaEnvelope,
-  FaDollarSign,
   FaCreditCard,
   FaCalendarAlt,
   FaIdBadge,
@@ -14,34 +11,23 @@ import {
   FaClock,
   FaTimesCircle,
   FaUndo,
-  FaBan
+  FaBan,
+  FaRupeeSign,
+  FaReceipt
 } from 'react-icons/fa';
 import { BsBank } from 'react-icons/bs';
 import { SiBitcoin, SiPaypal, SiRazorpay } from 'react-icons/si';
 
-const PaymentModal = ({ isOpen, onClose, onSubmit, paymentData, mode = 'view' }) => {
-  const [formData, setFormData] = useState({
-    id: paymentData?.id || '',
-    customerName: paymentData?.customerName || '',
-    customerEmail: paymentData?.customerEmail || '',
-    amount: paymentData?.amount || '',
-    currency: paymentData?.currency || 'INR',
-    paymentMethod: 'credit_card',
-    status: 'pending',
-    date: paymentData?.date || new Date().toISOString().split('T')[0],
-    description: paymentData?.description || '',
-    transactionId: paymentData?.transactionId || `TXN${Date.now()}`
-  });
+const PaymentDetailsModal = ({ isOpen, onClose, paymentData }) => {
+  const [payment, setPayment] = useState(null);
 
-  const [errors, setErrors] = useState({});
-
-  // Update form data when paymentData changes
+  // Update payment data when paymentData changes
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && paymentData) {
       const rawMethod = (paymentData?.paymentMethod || 'upi').toLowerCase();
       const finalMethod = rawMethod === 'cod' ? 'cash' : rawMethod;
 
-      setFormData({
+      setPayment({
         id: paymentData?.id || '',
         customerName: paymentData?.customerName || '',
         customerEmail: paymentData?.customerEmail || '',
@@ -59,7 +45,10 @@ const PaymentModal = ({ isOpen, onClose, onSubmit, paymentData, mode = 'view' })
           }
         })(),
         description: paymentData?.description || '',
-        transactionId: paymentData?.transactionId || paymentData?.paymentId || `TXN${Date.now()}`
+        transactionId: paymentData?.transactionId || paymentData?.paymentId || '',
+        referenceNumber: paymentData?.referenceNumber || '',
+        paymentGateway: paymentData?.paymentGateway || '',
+        notes: paymentData?.notes || ''
       });
     }
   }, [paymentData, isOpen]);
@@ -72,7 +61,6 @@ const PaymentModal = ({ isOpen, onClose, onSubmit, paymentData, mode = 'view' })
     } else {
       document.body.style.overflow = 'unset';
       document.body.style.paddingRight = '0';
-      setErrors({});
     }
 
     return () => {
@@ -92,51 +80,6 @@ const PaymentModal = ({ isOpen, onClose, onSubmit, paymentData, mode = 'view' })
     document.addEventListener('keydown', handleEscKey);
     return () => document.removeEventListener('keydown', handleEscKey);
   }, [isOpen, onClose]);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
-    }
-  };
-
-  const validateForm = () => {
-    const newErrors = {};
-
-    if (!formData.customerName.trim()) {
-      newErrors.customerName = 'Customer name is required';
-    }
-
-    if (!formData.customerEmail.trim()) {
-      newErrors.customerEmail = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.customerEmail)) {
-      newErrors.customerEmail = 'Please enter a valid email';
-    }
-
-    if (!formData.amount || Number(formData.amount) <= 0) {
-      newErrors.amount = 'Amount must be greater than 0';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
-
-    onSubmit(formData);
-    onClose();
-  };
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -162,13 +105,13 @@ const PaymentModal = ({ isOpen, onClose, onSubmit, paymentData, mode = 'view' })
 
   const getPaymentMethodIcon = (method) => {
     switch (method) {
-      case 'credit_card': return <FaCreditCard className="text-lg" />;
-      case 'paypal': return <SiPaypal className="text-lg text-blue-600" />;
-      case 'bank_transfer': return <BsBank className="text-lg" />;
-      case 'crypto': return <SiBitcoin className="text-lg text-orange-500" />;
-      case 'upi': return <SiRazorpay className="text-lg text-blue-500" />;
-      case 'cash': return <FaDollarSign className="text-lg" />;
-      default: return <FaCreditCard className="text-lg" />;
+      case 'credit_card': return <FaCreditCard className="text-xl" />;
+      case 'paypal': return <SiPaypal className="text-xl text-blue-600" />;
+      case 'bank_transfer': return <BsBank className="text-xl" />;
+      case 'crypto': return <SiBitcoin className="text-xl text-orange-500" />;
+      case 'upi': return <SiRazorpay className="text-xl text-blue-500" />;
+      case 'cash': return <FaRupeeSign className="text-xl" />;
+      default: return <FaCreditCard className="text-xl" />;
     }
   };
 
@@ -183,7 +126,22 @@ const PaymentModal = ({ isOpen, onClose, onSubmit, paymentData, mode = 'view' })
     }
   };
 
-  if (!isOpen) return null;
+  const formatDate = (dateString) => {
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-IN', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch {
+      return dateString;
+    }
+  };
+
+  if (!isOpen || !payment) return null;
 
   return (
     <>
@@ -198,19 +156,39 @@ const PaymentModal = ({ isOpen, onClose, onSubmit, paymentData, mode = 'view' })
         <div className="fixed inset-0 overflow-y-auto">
           <div className="flex min-h-full items-center justify-center p-4">
             {/* Modal Content */}
-            <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-sm w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden border border-gray-200 dark:border-gray-800 cursor-pointer">
+            <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden border border-gray-200 dark:border-gray-800">
 
               {/* Header */}
-              <div className="relative p-6 border-b border-gray-200 dark:border-gray-800 bg-primary">
+              <div className="relative p-6 border-b border-gray-200 dark:border-gray-800">
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-start">
                   <div>
-                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
-                      {mode === 'edit' ? 'Edit Payment' : mode === 'create' ? 'Create New Payment' : 'Payment Details'}
-                    </h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                      {mode === 'view' ? 'View payment information' : mode === 'edit' ? 'Update payment details' : 'Add a new payment record'}
-                    </p>
+                    <div className="flex items-center gap-3">
+                      <div className="p-3 bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30 rounded-xl">
+                        <FaReceipt className="text-2xl text-indigo-600 dark:text-indigo-400" />
+                      </div>
+                      <div>
+                        <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+                          Payment Details
+                        </h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                          View payment information and transaction details
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-4 mt-4">
+                      <div className={`px-4 py-2 rounded-full text-sm font-medium border ${getStatusColor(payment.status)}`}>
+                        {getStatusIcon(payment.status)}
+                        {payment.status.charAt(0).toUpperCase() + payment.status.slice(1)}
+                      </div>
+                      <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                        {getPaymentMethodIcon(payment.paymentMethod)}
+                        <span className="text-sm font-medium">
+                          {payment.paymentMethod.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                   <button
                     onClick={onClose}
@@ -222,218 +200,163 @@ const PaymentModal = ({ isOpen, onClose, onSubmit, paymentData, mode = 'view' })
                     </svg>
                   </button>
                 </div>
+              </div>
 
-                {mode === 'view' && (
-                  <div className="flex items-center gap-4 mt-4">
-                    <div className={`px-4 py-1.5 rounded-full text-sm font-medium border ${getStatusColor(formData.status)}`}>
-                      {getStatusIcon(formData.status)}
-                      {formData.status.charAt(0).toUpperCase() + formData.status.slice(1)}
+              {/* Scrollable Content Area */}
+              <div className="flex-1 overflow-y-auto p-6">
+                {/* Transaction Overview */}
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl p-5 mb-6 border border-blue-100 dark:border-blue-800/30">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Transaction Amount</p>
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-3xl font-bold text-gray-900 dark:text-white">
+                          {getCurrencySymbol(payment.currency)}{payment.amount}
+                        </span>
+                        <span className="text-gray-500 dark:text-gray-400">{payment.currency}</span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                      {getPaymentMethodIcon(formData.paymentMethod)}
-                      <span className="text-sm">
-                        {formData.paymentMethod.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                      </span>
+                    <div className="text-right">
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Transaction ID</p>
+                      <p className="font-mono font-bold text-gray-900 dark:text-white text-lg">{payment.transactionId}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Customer Information */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <div className="bg-white dark:bg-gray-800 rounded-xl p-5 border border-gray-200 dark:border-gray-700">
+                    <h4 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                      <FaUser className="text-gray-500" />
+                      Customer Information
+                    </h4>
+                    <div className="space-y-4">
+                      <div>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Customer Name</p>
+                        <p className="font-medium text-gray-900 dark:text-white">{payment.customerName}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Email Address</p>
+                        <p className="font-medium text-gray-900 dark:text-white break-all">{payment.customerEmail}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Payment Information */}
+                  <div className="bg-white dark:bg-gray-800 rounded-xl p-5 border border-gray-200 dark:border-gray-700">
+                    <h4 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                      <FaCreditCard className="text-gray-500" />
+                      Payment Information
+                    </h4>
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Payment Method</p>
+                          <p className="font-medium text-gray-900 dark:text-white flex items-center gap-2">
+                            {getPaymentMethodIcon(payment.paymentMethod)}
+                            {payment.paymentMethod.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Currency</p>
+                          <p className="font-medium text-gray-900 dark:text-white flex items-center gap-2">
+                            <FaGlobe className="text-gray-500" />
+                            {payment.currency}
+                          </p>
+                        </div>
+                      </div>
+                      {payment.referenceNumber && (
+                        <div>
+                          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Reference Number</p>
+                          <p className="font-medium text-gray-900 dark:text-white">{payment.referenceNumber}</p>
+                        </div>
+                      )}
+                      {payment.paymentGateway && (
+                        <div>
+                          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Payment Gateway</p>
+                          <p className="font-medium text-gray-900 dark:text-white">{payment.paymentGateway}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Transaction Details */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <div className="bg-white dark:bg-gray-800 rounded-xl p-5 border border-gray-200 dark:border-gray-700">
+                    <h4 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                      <FaCalendarAlt className="text-gray-500" />
+                      Transaction Details
+                    </h4>
+                    <div className="space-y-4">
+                      <div>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Transaction Date & Time</p>
+                        <p className="font-medium text-gray-900 dark:text-white">{formatDate(payment.date)}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Payment ID</p>
+                        <p className="font-medium text-gray-900 dark:text-white">{payment.id || 'N/A'}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Status Information */}
+                  <div className="bg-white dark:bg-gray-800 rounded-xl p-5 border border-gray-200 dark:border-gray-700">
+                    <h4 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                      <FaInfoCircle className="text-gray-500" />
+                      Status Information
+                    </h4>
+                    <div className="space-y-4">
+                      <div>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Current Status</p>
+                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(payment.status)}`}>
+                          {getStatusIcon(payment.status)}
+                          {payment.status.charAt(0).toUpperCase() + payment.status.slice(1)}
+                        </span>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Last Updated</p>
+                        <p className="font-medium text-gray-900 dark:text-white">{formatDate(payment.date)}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Description / Notes */}
+                {(payment.description || payment.notes) && (
+                  <div className="bg-white dark:bg-gray-800 rounded-xl p-5 border border-gray-200 dark:border-gray-700">
+                    <h4 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                      <FaInfoCircle className="text-gray-500" />
+                      Additional Information
+                    </h4>
+                    <div className="space-y-4">
+                      {payment.description && (
+                        <div>
+                          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Description</p>
+                          <p className="font-medium text-gray-900 dark:text-white">{payment.description}</p>
+                        </div>
+                      )}
+                      {payment.notes && (
+                        <div>
+                          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Notes</p>
+                          <p className="font-medium text-gray-900 dark:text-white">{payment.notes}</p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
               </div>
 
-              {/* Scrollable Content Area */}
-              <div className="flex-1 overflow-y-auto">
-                <form onSubmit={handleSubmit}>
-                  <div className="p-6 space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {/* Customer Name */}
-                      <InputField
-                        label="Customer Name"
-                        name="customerName"
-                        type="text"
-                        placeholder="Enter customer name"
-                        value={formData.customerName}
-                        onChange={handleChange}
-                        error={errors.customerName}
-                        required={mode !== 'view'}
-                        disabled={mode === 'view'}
-                        startIcon={<FaUser className="text-gray-400" />}
-                        className="md:col-span-2"
-                      />
-
-                      {/* Customer Email */}
-                      {/* <InputField
-                        label="Customer Email"
-                        name="customerEmail"
-                        type="email"
-                        placeholder="customer@example.com"
-                        value={formData.customerEmail}
-                        onChange={handleChange}
-                        error={errors.customerEmail}
-                        required={mode !== 'view'}
-                        disabled={mode === 'view'}
-                        startIcon={<FaEnvelope className="text-gray-400" />}
-                      /> */}
-
-                      {/* Amount */}
-                      <InputField
-                        label="Amount"
-                        name="amount"
-                        type="number"
-                        placeholder="0.00"
-                        value={formData.amount}
-                        onChange={handleChange}
-                        error={errors.amount}
-                        required={mode !== 'view'}
-                        disabled={mode === 'view'}
-                        startIcon={<FaDollarSign className="text-gray-400" />}
-                        endIcon={
-                          <span className="text-sm text-gray-500">
-                            {getCurrencySymbol(formData.currency)}
-                          </span>
-                        }
-                        min="0"
-                        step="0.01"
-                      />
-
-                      {/* Currency */}
-                      <div className="space-y-2">
-                        <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 ml-1">
-                          Currency
-                        </label>
-                        <div className="relative">
-                          <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                            <FaGlobe className="text-gray-400" />
-                          </div>
-                          <select
-                            name="currency"
-                            value={formData.currency}
-                            onChange={handleChange}
-                            disabled={mode === 'view'}
-                            className="w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white pl-11 pr-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 dark:focus:ring-indigo-400/10 hover:border-gray-300 dark:hover:border-gray-600 transition-all duration-200 ease-in-out outline-none text-sm font-medium shadow-sm disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-gray-100 dark:disabled:bg-gray-900 appearance-none"
-                          >
-                            <option value="INR">🇮🇳 INR (₹)</option>
-                            <option value="USD">🇺🇸 USD ($)</option>
-                            <option value="EUR">🇪🇺 EUR (€)</option>
-                            <option value="GBP">🇬🇧 GBP (£)</option>
-                            <option value="JPY">🇯🇵 JPY (¥)</option>
-                          </select>
-                        </div>
-                      </div>
-
-                      {/* Payment Method */}
-                      <div className="space-y-2">
-                        <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 ml-1">
-                          Payment Method
-                        </label>
-                        <div className="relative">
-                          <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                            {getPaymentMethodIcon(formData.paymentMethod)}
-                          </div>
-                          <select
-                            name="paymentMethod"
-                            value={formData.paymentMethod}
-                            onChange={handleChange}
-                            disabled={mode === 'view'}
-                            className="w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white pl-11 pr-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 dark:focus:ring-indigo-400/10 hover:border-gray-300 dark:hover:border-gray-600 transition-all duration-200 ease-in-out outline-none text-sm font-medium shadow-sm disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-gray-100 dark:disabled:bg-gray-900 appearance-none"
-                          >
-                            <option value="upi">UPI</option>
-                            <option value="cash">Cash (COD)</option>
-                            <option value="credit_card">Credit Card</option>
-                            <option value="paypal">PayPal</option>
-                            <option value="bank_transfer">Bank Transfer</option>
-                            <option value="crypto">Cryptocurrency</option>
-                          </select>
-                        </div>
-                      </div>
-
-                      {/* Status */}
-                      <div className="space-y-2">
-                        <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 ml-1">
-                          Status
-                        </label>
-                        <select
-                          name="status"
-                          value={formData.status}
-                          onChange={handleChange}
-                          disabled={mode === 'view'}
-                          className={`w-full px-4 py-3 rounded-xl border-2 focus:outline-none focus:ring-4 transition-all duration-200 ease-in-out text-sm font-medium shadow-sm disabled:opacity-60 disabled:cursor-not-allowed bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${getStatusColor(formData.status)} focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-indigo-500/10 dark:focus:ring-indigo-400/10 appearance-none`}
-                        >
-                          <option value="pending">🟡 Pending</option>
-                          <option value="completed">🟢 Completed</option>
-                          <option value="failed">🔴 Failed</option>
-                          <option value="refunded">🔵 Refunded</option>
-                          <option value="cancelled">⚫ Cancelled</option>
-                        </select>
-                      </div>
-
-                      {/* Transaction ID */}
-                      <InputField
-                        label="Transaction ID"
-                        name="transactionId"
-                        type="text"
-                        placeholder="Auto-generated"
-                        value={formData.transactionId}
-                        onChange={handleChange}
-                        disabled={mode === 'view' || mode === 'edit'}
-                        startIcon={<FaIdBadge className="text-gray-400" />}
-                        helperText="Auto-generated for new payments"
-                      />
-
-                      {/* Date */}
-                      <InputField
-                        label="Date"
-                        name="date"
-                        type="date"
-                        value={formData.date}
-                        onChange={handleChange}
-                        disabled={mode === 'view'}
-                        startIcon={<FaCalendarAlt className="text-gray-400" />}
-                      />
-                    </div>
-
-                    {/* Description */}
-                    <div className="space-y-2">
-                      <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 ml-1">
-                        Description
-                      </label>
-                      <div className="relative group">
-                        <div className="absolute top-3 left-3 pointer-events-none">
-                          <FaInfoCircle className="text-gray-400 group-focus-within:text-indigo-500 dark:group-focus-within:text-indigo-400 transition-colors" />
-                        </div>
-                        <textarea
-                          name="description"
-                          value={formData.description}
-                          onChange={handleChange}
-                          disabled={mode === 'view'}
-                          rows="4"
-                          className="w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white pl-10 pr-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 dark:focus:ring-indigo-400/10 hover:border-gray-300 dark:hover:border-gray-600 transition-all duration-200 ease-in-out outline-none text-sm font-medium shadow-sm disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-gray-100 dark:disabled:bg-gray-900 placeholder-gray-400 dark:placeholder-gray-500 resize-none"
-                          placeholder="Add payment description or notes..."
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </form>
-              </div>
-
-              {/* Footer - Fixed at bottom */}
-              <div className="border-t border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 backdrop-blur-sm p-6">
-                <div className="flex justify-end space-x-3">
+              {/* Footer */}
+              <div className="border-t border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 p-6">
+                <div className="flex justify-end">
                   <button
                     type="button"
                     onClick={onClose}
-                    className="btn btn-secondary"
+                    className="px-6 py-2.5 rounded-xl font-medium border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200"
                   >
-                    {mode === 'view' ? 'Close' : 'Cancel'}
+                    Close Details
                   </button>
-                  {mode !== 'view' && (
-                    <button
-                      type="button"
-                      onClick={handleSubmit}
-                      className="btn btn-primary shadow-sm hover:shadow-md active:shadow-sm"
-                    >
-                      {mode === 'edit' ? 'Update Payment' : 'Create Payment'}
-                      <span className="ml-2">→</span>
-                    </button>
-                  )}
                 </div>
               </div>
             </div>
@@ -444,4 +367,4 @@ const PaymentModal = ({ isOpen, onClose, onSubmit, paymentData, mode = 'view' })
   );
 };
 
-export default PaymentModal;
+export default PaymentDetailsModal;
