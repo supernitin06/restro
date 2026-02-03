@@ -1,3 +1,4 @@
+// Created by miss Khushboo saifi// Created by miss Khushboo saifi// Created by miss Khushboo saifi// Created by miss Khushboo saifi
 import React, { useState, useEffect } from "react";
 import { showPromiseToast } from "../../utils/toastAlert";
 import restaurantImage from "../../assets/image.png";
@@ -20,51 +21,74 @@ const LoginForm = ({ role = "admin", onRoleChange }) => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 900);
   const [isAnimating, setIsAnimating] = useState(false);
   const [particles, setParticles] = useState([]);
-
   const navigate = useNavigate();
 
   // Floating particles effect
   useEffect(() => {
+
     const createParticles = () => {
       const newParticles = Array.from({ length: 20 }).map((_, i) => ({
         id: i,
         x: Math.random() * 100,
+
         y: Math.random() * 100,
+
         size: Math.random() * 4 + 2,
+
         speed: Math.random() * 0.5 + 0.2,
+
         opacity: Math.random() * 0.3 + 0.1,
+
       }));
+
       setParticles(newParticles);
+
     };
 
     createParticles();
   }, []);
 
   // Animate particles
+
   useEffect(() => {
+
     const interval = setInterval(() => {
+
       setParticles(prev => prev.map(p => ({
+
         ...p,
+
         y: (p.y + p.speed) % 100,
+
       })));
+
     }, 50);
 
     return () => clearInterval(interval);
+
   }, []);
 
   // Responsive handler
   useEffect(() => {
     const handleResize = () => {
+
       setIsMobile(window.innerWidth < 900);
+
     };
     window.addEventListener('resize', handleResize);
+
     return () => window.removeEventListener('resize', handleResize);
+
   }, []);
 
   const handleChange = (e) => {
+
     const { name, value, type, checked } = e.target;
+
     setFormData((prev) => ({
+
       ...prev,
+
       [name]: type === "checkbox" ? checked : value,
     }));
   };
@@ -1038,3 +1062,6 @@ if (styleSheet) {
 }
 
 export default LoginForm;
+
+
+// created by Miss Khushboo Saifi// created by Miss Khushboo Saifi// created by Miss Khushboo Saifi// created by Miss Khushboo Saifi
